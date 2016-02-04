@@ -33,5 +33,5 @@ def strip_string(string):
     return string.strip()
 
 def get_month_number(month_name):
-    monthes=[u"янв.", u"февр.", u"мрт.", u"апр.", u"май", u"июн", u"июл", u"авг.", u"сет.", u"окт.", u"нбр.", u"дек."]
+    monthes=[u"янв.", u"февр.", u"марта", u"апр.", u"мая", u"июня", u"июля", u"авг.", u"сент.", u"окт.", u"нояб.", u"дек."]
     return monthes.index(month_name) + 1
