@@ -86,8 +86,8 @@ ${locator_tenderClaim.buttonCancel}		css=button[ng-click='act.delAfp()']
 	Wait Until Element Is Enabled	xpath=//*[@id='sidebar']//input	timeout=20
 	Wait Until Element Is Enabled	xpath=(//div[@class='tender-name_info tender-col'])[1]	timeout=20
 
-	${check_result}=  Run Keyword And Return Status	Element Should Contain	css=div.test-mode-aside	Войти в обучающий режим
-	Run Keyword If	${check_result}	Switch To Education Mode
+	${check_result}=				Run Keyword And Return Status	Element Should Contain	css=div.test-mode-aside	Войти в обучающий режим
+	Run Keyword If					${check_result}	Switch To Education Mode
 
 	WaitForAjax
 	wait until element is enabled	xpath=(//div[@class='tenders_sm_info'])[1]	timeout=10
@@ -98,8 +98,9 @@ ${locator_tenderClaim.buttonCancel}		css=button[ng-click='act.delAfp()']
 #	sleep							3s
 #	Select From List By Index		css=select[ng-model='template.prozorroStatus']	1
 
-	wait until element is enabled	xpath=(//div[@class='tenders_sm_info'])[1]	timeout=20
-	Click Element					xpath=(//div[@class='tenders_sm_info'])[1]
+#	wait until element is enabled	xpath=(//div[@class='tenders_sm_info'])[1]	timeout=20
+#	Click Element					xpath=(//div[@class='tenders_sm_info'])[1]
+	Click Element					id=${ARGUMENTS[1]}
 	WaitForAjax
 	Wait Until Element Is Visible	xpath=//div[contains(@class,'title-div')]	timeout=20
 	Wait Until Element Is Visible	css=div.info-item-val a
@@ -144,15 +145,8 @@ ${locator_tenderClaim.buttonCancel}		css=button[ng-click='act.delAfp()']
 	Run Keyword And Return If	'${ARGUMENTS[1]}' == 'questions[0].date'		Отримати дату та час	${ARGUMENTS[1]}	0
 	Run Keyword And Return If	'${ARGUMENTS[1]}' == 'items[0].deliveryDate.endDate'	Отримати дату та час	${ARGUMENTS[1]}	0
 
-	Run Keyword If								'${ARGUMENTS[1]}' == 'questions[0].title'
-	...  Run Keywords
-	...  Switch To Questions tab
-	...  AND  Wait For Element With Reload		${tender_data_${ARGUMENTS[1]}}
-
-	Run Keyword If								'${ARGUMENTS[1]}' == 'questions[0].answer'
-	...  Run Keywords
-	...  Switch To Questions tab
-	...  AND  Wait For Element With Reload		${tender_data_${ARGUMENTS[1]}}
+	Run Keyword If	'${ARGUMENTS[1]}' == 'questions[0].title'	Wait For Element With Reload	${tender_data_${ARGUMENTS[1]}}	2
+	Run Keyword If	'${ARGUMENTS[1]}' == 'questions[0].answer'	Wait For Element With Reload	${tender_data_${ARGUMENTS[1]}}	2
 
 	Wait Until Element Is Visible				${tender_data_${ARGUMENTS[1]}}	timeout=20
 	${result_full}								Get Text	${tender_data_${ARGUMENTS[1]}}
@@ -231,7 +225,7 @@ ${locator_tenderClaim.buttonCancel}		css=button[ng-click='act.delAfp()']
 	privatmarket.Пошук тендера по ідентифікатору		@{ARGUMENTS}[0]	@{ARGUMENTS}[1]
 	Mark Step							_1
 	WaitForAjax
-	Switch To Questions tab
+	Switch To Tab						2
 	Wait Until Element Is Enabled		xpath=//button[@ng-click='act.sendEnquiry()']				timeout=10
 	Click Button						xpath=//button[@ng-click='act.sendEnquiry()']
 	Mark Step							_2
@@ -269,25 +263,23 @@ ${locator_tenderClaim.buttonCancel}		css=button[ng-click='act.delAfp()']
 	WaitForAjax
 
 	Mark Step							_Start_clame_creation
-#	Reload Page
-	debug
-#	Wait Until Element Is Visible		id=tenders	timeout=20
-#	Select Frame						id=tenders
-	Wait For Element With Reload		${locator_tenderClaim.buttonCreate}
-	Wait Until Element Contains			css=span.state-label.ng-binding	Прием предложений	20
+	Wait For Element With Reload		${locator_tenderClaim.buttonCreate}	1
+	Wait Until Element Contains			css=span.state-label.ng-binding		Прием предложений	20
 	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}
 	WaitForAjax
 	Wait For Element Value				css=input[ng-model='model.person.lastName']
 	Mark Step		 					_wait_pric
-	sleep								2se
+	sleep								2s
 	Wait Until Element Is Enabled		${locator_tenderClaim.fieldPrice}	20
-	Mark Step							_set_price	Input Text							${locator_tenderClaim.fieldPrice}	10
+	Mark Step							_set_price
+	Input Text							${locator_tenderClaim.fieldPrice}	10
 	click element						${locator_tenderClaim.fieldEmail}
 	Input Text							${locator_tenderClaim.fieldEmail}	${USERS.users['${ARGUMENTS[0]}'].login}
 	click element						${locator_tenderClaim.fieldPrice}
 	Mark Step							_send_request
 
 	sleep								5s
+	Scroll Page To Element				${locator_tenderClaim.buttonSend}
 	Click Button						${locator_tenderClaim.buttonSend}
 	Close confirmation					Ваша заявка успешно отправлена!
 	Mark Step							Save_information
@@ -295,8 +287,9 @@ ${locator_tenderClaim.buttonCancel}		css=button[ng-click='act.delAfp()']
 	wait until element contains			css=div.afp-info.ng-scope.ng-binding	Номер заявки
 	WaitForAjax
 	${clame_id}=						Get text			css=div.afp-info.ng-scope.ng-binding
-	${clame_id}=						get_reg_exp_matches	Номер заявки: (\\d*),	${clame_id}	1
-	[return]	${clame_id}
+	${result}=							get_reg_exp_matches	Номер заявки: (\\d*),	${clame_id}	1
+	log to console						${result}
+	[return]	${result}
 
 
 Змінити цінову пропозицію
@@ -311,22 +304,25 @@ ${locator_tenderClaim.buttonCancel}		css=button[ng-click='act.delAfp()']
 	WaitForAjax
 	Wait For Element Value				css=input[ng-model='model.person.lastName']
 	Wait Until Element Is Enabled		${locator_tenderClaim.fieldPrice}	${COMMONWAIT}
+	sleep								5s
 	Input Text							${locator_tenderClaim.fieldPrice}	${ARGUMENTS[2]}
+	Scroll Page To Element				${locator_tenderClaim.buttonSend}
 	Click Button						${locator_tenderClaim.buttonSend}
-	Close confirmation					Ваша заявка успешно отправлена!
+	Close confirmation					Ваша заявка успешно обновлена!
 	Mark Step							Save_information
 	Wait Until Element Is Visible		css=div.afp-info.ng-scope.ng-binding
 	WaitForAjax
 	${clame_id}=						Get text			css=div.afp-info.ng-scope.ng-binding
-	${clame_id}=						get_reg_exp_matches	Номер заявки: (\\d*),	${clame_id}	1
-	[return]	${clame_id}
+	${result}=							get_reg_exp_matches	Номер заявки: (\\d*),	${clame_id}	1
+	[return]	${result}
 
 Скасувати цінову пропозицію
 	[Arguments]  @{ARGUMENTS}
 	privatmarket.Пошук тендера по ідентифікатору	${ARGUMENTS[0]}	${ARGUMENTS[1]}
 	WaitForAjax
 	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}
-	Wait Enable And Click Element		${locator_tenderClaim.buttonRecall}
+	Wait Until Element Is Enabled		${locator_tenderClaim.buttonCancel}
+#	Wait Enable And Click Element		${locator_tenderClaim.buttonRecall}
 	Wait Enable And Click Element		${locator_tenderClaim.buttonCancel}
 	Close Confirmation					Ваша заявка была отменена!
 	Wait Until Element Is Enabled		${locator_tenderClaim.buttonCreate}	${COMMONWAIT}
@@ -436,10 +432,11 @@ Switch To Education Mode
 	Click Element					css=div.test-mode-aside a
 	Wait Until Element Contains		css=div.test-mode-aside a	Выйти из обучающего режима	10
 
-Switch To Questions tab
+Switch To Tab
+	[Arguments]  ${tab_number}
 	Reload Page
 	Switch To Frame						 id=tenders
-	Wait Visibulity And Click Element	xpath=(//ul[@class='widget-header-block']//a)[2]
+	Wait Visibulity And Click Element	xpath=(//ul[@class='widget-header-block']//a)[${tab_number}]
 	WaitForAjax
 
 Fail Clame
@@ -447,14 +444,14 @@ Fail Clame
 	{return]	None
 
 Wait For Element With Reload
-	[Arguments]	${locator}
+	[Arguments]  ${locator}  ${tab_number}
 	Mark Step							_i_will_wait
-	Wait Until Keyword Succeeds			3min	10s	Try Search Element	${locator}
+	Wait Until Keyword Succeeds			4min	10s	Try Search Element	${locator}	${tab_number}
 
 Try Search Element
-	[Arguments]	${locator}
+	[Arguments]	${locator}  ${tab_number}
 	Mark Step							_i_start
-	Switch To Questions tab
+	Switch To Tab						${tab_number}
 	Mark Step							_i_reloaded
 	Wait Until Element Is Enabled		${locator}	2
 	[return]	true
