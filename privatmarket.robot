@@ -83,14 +83,14 @@ ${locator_tenderClaim.buttonCancel}		css=button[ng-click='act.delAfp()']
 	Switch browser					${ARGUMENTS[0]}
 	Go to							${USERS.users['${ARGUMENTS[0]}'].homepage}
 	Switch To Frame					id=tenders
-	Wait Until Element Is Enabled	xpath=//*[@id='sidebar']//input	timeout=20
-	Wait Until Element Is Enabled	xpath=(//div[@class='tender-name_info tender-col'])[1]	timeout=20
+	Wait Until Element Is Enabled	xpath=//*[@id='sidebar']//input	timeout=${COMMONWAIT}
+	Wait Until Element Is Enabled	xpath=(//div[@class='tender-name_info tender-col'])[1]	timeout=${COMMONWAIT}
 
 	${check_result}=				Run Keyword And Return Status	Element Should Contain	css=div.test-mode-aside	Войти в обучающий режим
 	Run Keyword If					${check_result}	Switch To Education Mode
 
 	WaitForAjax
-	wait until element is enabled	xpath=(//div[@class='tenders_sm_info'])[1]	timeout=10
+	Wait Until Element Is Enabled	xpath=(//div[@class='tenders_sm_info'])[1]	timeout=${COMMONWAIT}
 	Clear Element Text				xpath=//*[@id='sidebar']//input
 	sleep							1s
 	Input Text						xpath=//*[@id='sidebar']//input	${ARGUMENTS[1]}
@@ -260,7 +260,6 @@ ${locator_tenderClaim.buttonCancel}		css=button[ng-click='act.delAfp()']
 	${tender_status} = 					Get text	css=span.state-label.ng-binding
 	Run Keyword If	'${tender_status}' == 'Период уточнений завершен'	Wait For Element With Reload		${locator_tenderClaim.buttonCreate}	1
 
-#	Wait Until Element Contains			css=span.state-label.ng-binding		Прием предложений	20
 	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}
 	WaitForAjax
 	Wait For Element Value				css=input[ng-model='model.person.lastName']
@@ -317,7 +316,6 @@ ${locator_tenderClaim.buttonCancel}		css=button[ng-click='act.delAfp()']
 	WaitForAjax
 	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}
 	Wait Until Element Is Enabled		${locator_tenderClaim.buttonCancel}
-#	Wait Enable And Click Element		${locator_tenderClaim.buttonRecall}
 	Wait Enable And Click Element		${locator_tenderClaim.buttonCancel}
 	Close Confirmation					Ваша заявка была отменена!
 	Wait Until Element Is Enabled		${locator_tenderClaim.buttonCreate}	${COMMONWAIT}
@@ -392,7 +390,7 @@ Close Confirmation
 	[Arguments]	${confirmation_text}
 	WaitForAjax
 	sleep								3s
-	Wait Until Element Is Visible		css=p.ng-binding	${COMMONWAIT}
+	Wait Until Element Is Visible		css=p.ng-binding	${COMMONWAIT}	${COMMONWAIT}
 	Wait Until Element Contains			css=p.ng-binding	${confirmation_text}	${COMMONWAIT}
 	sleep								2s
 	Wait Visibulity And Click Element	xpath=//button[@ng-click='close()']
@@ -417,13 +415,15 @@ Wait For Tender
 
 Try Search Tender
 	[Arguments]	${tender_id}
-	Click Element					xpath=//div[@class="search-aside"]/span
-	wait until element is enabled	id=${tender_id}	timeout=20
+	Click Element						xpath=//div[@class="search-aside"]/span
+	Wait Until Element Is Not Visible	xpath=//div[@class='ajax_overflow']
+	Wait Until Element Is Enabled		id=${tender_id}	timeout=20
 	[return]	true
 
 Switch To Education Mode
-	Click Element					css=div.test-mode-aside a
-	Wait Until Element Contains		css=div.test-mode-aside a	Выйти из обучающего режима	10
+	Click Element						css=div.test-mode-aside a
+	Wait Until Element Contains			css=div.test-mode-aside a	Выйти из обучающего режима	10
+	Wait Until Element Is Not Visible	xpath=//div[@class='ajax_overflow']
 
 Switch To Tab
 	[Arguments]  ${tab_number}
