@@ -95,11 +95,6 @@ ${locator_tenderClaim.buttonCancel}		css=button[ng-click='act.delAfp()']
 	sleep							1s
 	Input Text						xpath=//*[@id='sidebar']//input	${ARGUMENTS[1]}
 	Wait For Tender					${ARGUMENTS[1]}
-#	sleep							3s
-#	Select From List By Index		css=select[ng-model='template.prozorroStatus']	1
-
-#	wait until element is enabled	xpath=(//div[@class='tenders_sm_info'])[1]	timeout=20
-#	Click Element					xpath=(//div[@class='tenders_sm_info'])[1]
 	Click Element					id=${ARGUMENTS[1]}
 	WaitForAjax
 	Wait Until Element Is Visible	xpath=//div[contains(@class,'title-div')]	timeout=20
@@ -263,8 +258,13 @@ ${locator_tenderClaim.buttonCancel}		css=button[ng-click='act.delAfp()']
 	WaitForAjax
 
 	Mark Step							_Start_clame_creation
-	Wait For Element With Reload		${locator_tenderClaim.buttonCreate}	1
-	Wait Until Element Contains			css=span.state-label.ng-binding		Прием предложений	20
+	Wait Until Element Is Visible		css=span.state-label.ng-binding
+	Mark Step							_Get_status
+
+	${tender_status} = 					Get text	css=span.state-label.ng-binding
+	Run Keyword If	'${tender_status}' == 'Период уточнений завершен'	Wait For Element With Reload		${locator_tenderClaim.buttonCreate}	1
+
+#	Wait Until Element Contains			css=span.state-label.ng-binding		Прием предложений	20
 	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}
 	WaitForAjax
 	Wait For Element Value				css=input[ng-model='model.person.lastName']
@@ -382,8 +382,10 @@ Wait Visibulity And Click Element
 
 Mark Step
 	[Arguments]  ${stepName}
-	log to console	-
-	log to console	${stepName}
+#	log to console	-
+#	log to console	${stepName}
+	Log	-
+	Log	${stepName}
 
 Change Feild Value
 	[Arguments]	${locator}	${value}
