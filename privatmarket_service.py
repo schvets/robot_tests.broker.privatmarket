@@ -47,5 +47,9 @@ def is_element_stale(webelement):
         return True
     except:
         pass
-
     return False
+
+def readFileContent(filePath):
+    with open(filePath, 'r') as content_file:
+        content = content_file.read()
+    return content

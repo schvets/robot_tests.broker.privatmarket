@@ -144,8 +144,8 @@ ${locator_tender.ajax_overflow}			xpath=//div[@class='ajax_overflow']
 	Run Keyword If	'${ARGUMENTS[1]}' == 'questions[0].title'	Wait For Element With Reload	${tender_data_${ARGUMENTS[1]}}	2
 	Run Keyword If	'${ARGUMENTS[1]}' == 'questions[0].answer'	Wait For Element With Reload	${tender_data_${ARGUMENTS[1]}}	2
 
-	Return From Keyword If	'${ARGUMENTS[1]}' == 'items[0].deliveryLocation.longitude'	Fail
-	Return From Keyword If	'${ARGUMENTS[1]}' == 'items[0].deliveryLocation.latitude'	Fail
+	Run Keyword If	'${ARGUMENTS[1]}' == 'items[0].deliveryLocation.longitude'	Fail	None
+	Run Keyword If	'${ARGUMENTS[1]}' == 'items[0].deliveryLocation.latitude'	Fail	None
 	Wait Until Element Is Visible				${tender_data_${ARGUMENTS[1]}}	timeout=20
 	${result_full}								Get Text	${tender_data_${ARGUMENTS[1]}}
 	${result}									strip_string	${result_full}
@@ -271,7 +271,7 @@ ${locator_tender.ajax_overflow}			xpath=//div[@class='ajax_overflow']
 	sleep								2s
 	Wait Until Element Is Enabled		${locator_tenderClaim.fieldPrice}	20
 	Mark Step							_clame_creation_set_price
-	Input Text							${locator_tenderClaim.fieldPrice}	10
+	Input Text							${locator_tenderClaim.fieldPrice}	${Arguments[2].data.value.amount}
 	click element						${locator_tenderClaim.fieldEmail}
 	Input Text							${locator_tenderClaim.fieldEmail}	${USERS.users['${ARGUMENTS[0]}'].login}
 	click element						${locator_tenderClaim.fieldPrice}
@@ -288,8 +288,7 @@ ${locator_tender.ajax_overflow}			xpath=//div[@class='ajax_overflow']
 	Wait For Ajax
 	${clame_id}=						Get text			css=div.afp-info.ng-scope.ng-binding
 	${result}=							get_reg_exp_matches	Номер заявки: (\\d*),	${clame_id}	1
-	log to console						${result}
-	[return]	${result}
+	[return]	${Arguments[2]}
 
 
 Змінити цінову пропозицію
@@ -304,7 +303,7 @@ ${locator_tender.ajax_overflow}			xpath=//div[@class='ajax_overflow']
 	Wait For Element Value				css=input[ng-model='model.person.lastName']
 	Wait Until Element Is Enabled		${locator_tenderClaim.fieldPrice}	${COMMONWAIT}
 	sleep								5s
-	Input Text							${locator_tenderClaim.fieldPrice}	${ARGUMENTS[2]}
+	Input Text							${locator_tenderClaim.fieldPrice}	${ARGUMENTS[2].data.value.amount}
 	Scroll Page To Element				${locator_tenderClaim.buttonSend}
 	Click Button						${locator_tenderClaim.buttonSend}
 	Close confirmation					Ваша заявка успешно обновлена!
@@ -313,7 +312,7 @@ ${locator_tender.ajax_overflow}			xpath=//div[@class='ajax_overflow']
 	Wait For Ajax
 	${clame_id}=						Get text			css=div.afp-info.ng-scope.ng-binding
 	${result}=							get_reg_exp_matches	Номер заявки: (\\d*),	${clame_id}	1
-	[return]	${result}
+	[return]	${Arguments[2]}
 
 Скасувати цінову пропозицію
 	[Arguments]  @{ARGUMENTS}
@@ -330,9 +329,34 @@ ${locator_tender.ajax_overflow}			xpath=//div[@class='ajax_overflow']
 	[Arguments]  @{ARGUMENTS}
 	Fail  None
 
-Завантажити документ в ставці
-	[Arguments]  @{ARGUMENTS}
-	Fail  None
+Завантажити документ в ставку
+	[Arguments]  ${user}  ${tenderId}  ${filePath}
+	Switch browser						${user}
+	privatmarket.Пошук тендера по ідентифікатору	${user}   ${tenderId}
+	Wait For Ajax
+
+	Mark Step							_clame_creation_start
+	Wait Until Element Is Visible		css=span.state-label.ng-binding
+	Mark Step							_clame_creation_get_tender_status
+
+	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}
+	Wait For Ajax
+	Wait For Element Value				css=input[ng-model='model.person.lastName']
+	Mark Step		 					_clame_creation_wait_data_load
+	sleep								2s
+
+	debug
+	Wait Until Element Is Enabled		css=button[ng-click='act.chooseFile()']	${COMMONWAIT}
+	sleep  3s
+	Mark Step							_read_file_data
+	${fileContent} =					readFileContent						${filePath}
+	Mark Step							${fileContent}
+
+	Execute Javascript	var scope = angular.element($("input[ng-model='model.fileName']")).scope();
+	...  var generatedFile = new File(["${fileContent}"], "${fileContent}", {type: "application/force-download", lastModified: new Date()});
+	...  scope.files[0] = generatedFile;
+	...  scope.uploadFile(scope.files[0]);
+	Wait Until Element Is Visible    xpath=(//div[contains(@class, 'file-item')])[1]   timeout=20
 
 Змінити документ в ставці
 	[Arguments]  @{ARGUMENTS}
