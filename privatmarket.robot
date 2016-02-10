@@ -330,7 +330,7 @@ ${locator_tender.ajax_overflow}			xpath=//div[@class='ajax_overflow']
 	Fail  None
 
 Завантажити документ в ставку
-	[Arguments]  ${user}  ${tenderId}  ${filePath}
+	[Arguments]  ${user}  ${filePath}  ${tenderId}
 	Switch browser						${user}
 	privatmarket.Пошук тендера по ідентифікатору	${user}   ${tenderId}
 	Wait For Ajax
@@ -345,18 +345,22 @@ ${locator_tender.ajax_overflow}			xpath=//div[@class='ajax_overflow']
 	Mark Step		 					_clame_creation_wait_data_load
 	sleep								2s
 
-	debug
 	Wait Until Element Is Enabled		css=button[ng-click='act.chooseFile()']	${COMMONWAIT}
+	Scroll Page To Element				css=button[ng-click='act.chooseFile()']
 	sleep  3s
 	Mark Step							_read_file_data
-	${fileContent} =					readFileContent						${filePath}
+	${fileContent} =					readFileContent	${filePath}
+	${correctFilePath} = 				Replace String		${filePath}	\\	\/
 	Mark Step							${fileContent}
 
-	Execute Javascript	var scope = angular.element($("input[ng-model='model.fileName']")).scope();
-	...  var generatedFile = new File(["${fileContent}"], "${fileContent}", {type: "application/force-download", lastModified: new Date()});
-	...  scope.files[0] = generatedFile;
-	...  scope.uploadFile(scope.files[0]);
-	Wait Until Element Is Visible    xpath=(//div[contains(@class, 'file-item')])[1]   timeout=20
+	Execute Javascript	var scope = angular.element($("button[ng-click='act.chooseFile()']")).scope();
+		...  var generatedFile = new File(["${fileContent}"], "${correctFilePath}.txt", {type: "application/force-download", lastModified: new Date()});
+		...  scope.files[0] = generatedFile;
+		...  scope.uploadFile(scope.files[0]);
+
+	Wait Until Element Is Not Visible	css=div[ng-show='progressVisible'] div.progress-bar	timeout=30
+	Sleep								3s
+	Wait Until Element Is Visible		xpath=(//div[contains(@class, 'file-item')])[1]	timeout=30
 
 Змінити документ в ставці
 	[Arguments]  @{ARGUMENTS}
@@ -403,7 +407,8 @@ Wait Visibulity And Click Element
 
 Mark Step
 	[Arguments]  ${stepName}
-	Log	${stepName}
+	log to console	_
+	log to console	${stepName}
 
 Change Feild Value
 	[Arguments]	${locator}	${value}
