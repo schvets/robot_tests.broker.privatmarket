@@ -53,8 +53,9 @@ ${locator_tenderClaim.buttonCreate}		css=button[ng-click='act.createAfp()']
 ${locator_tenderClaim.fieldPrice}		xpath=//input[@ng-model='model.price']
 ${locator_tenderClaim.fieldEmail}		css=input[ng-model='model.person.email']
 ${locator_tenderClaim.buttonSend}		css=button[ng-click='act.sendAfp()']
-${locator_tenderClaim.buttonRecall}		css=button[ng-click='act.retAfp()']
+#${locator_tenderClaim.buttonRecall}		css=button[ng-click='act.retAfp()']
 ${locator_tenderClaim.buttonCancel}		css=button[ng-click='act.delAfp()']
+${locator_tenderClaim.buttonGoBack}		css=a[ng-click='act.ret2Ad()']
 ${locator_tender.ajax_overflow}			xpath=//div[@class='ajax_overflow']
 
 
@@ -255,28 +256,14 @@ ${locator_tender.ajax_overflow}			xpath=//div[@class='ajax_overflow']
 	[Arguments]  @{ARGUMENTS}
 	Switch browser						${ARGUMENTS[0]}
 	privatmarket.Пошук тендера по ідентифікатору	${ARGUMENTS[0]}   ${ARGUMENTS[1]}
-	Wait For Ajax
 
-	Mark Step							_clame_creation_start
-	Wait Until Element Is Visible		css=span.state-label.ng-binding
-	Mark Step							_clame_creation_get_tender_status
-
-	${tender_status} = 					Get text	css=span.state-label.ng-binding
-	Run Keyword If	'${tender_status}' == 'Период уточнений завершен'	Wait For Element With Reload		${locator_tenderClaim.buttonCreate}	1
-
-	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}
-	Wait For Ajax
-	Wait For Element Value				css=input[ng-model='model.person.lastName']
-	Mark Step		 					_clame_creation_wait_data_load
-	sleep								2s
-	Wait Until Element Is Enabled		${locator_tenderClaim.fieldPrice}	20
+	Відкрити заявку
 	Mark Step							_clame_creation_set_price
 	Input Text							${locator_tenderClaim.fieldPrice}	${Arguments[2].data.value.amount}
 	click element						${locator_tenderClaim.fieldEmail}
-	Input Text							${locator_tenderClaim.fieldEmail}	${USERS.users['${ARGUMENTS[0]}'].login}
+	Input Text							${locator_tenderClaim.fieldEmail}	${USERS.users['${ARGUMENTS[0]}'].email}
 	click element						${locator_tenderClaim.fieldPrice}
 	Mark Step							_clame_creation_send_request
-
 	sleep								5s
 	Scroll Page To Element				${locator_tenderClaim.buttonSend}
 	Click Button						${locator_tenderClaim.buttonSend}
@@ -290,6 +277,20 @@ ${locator_tender.ajax_overflow}			xpath=//div[@class='ajax_overflow']
 	${result}=							get_reg_exp_matches	Номер заявки: (\\d*),	${clame_id}	1
 	[return]	${Arguments[2]}
 
+Відкрити заявку
+	Wait For Ajax
+
+	Mark Step							_clame_creation_start
+	Wait Until Element Is Visible		css=span.state-label.ng-binding
+	Mark Step							_clame_creation_get_tender_status
+	${tender_status} = 					Get text	css=span.state-label.ng-binding
+	Run Keyword If	'${tender_status}' == 'Период уточнений завершен'	Wait For Element With Reload		${locator_tenderClaim.buttonCreate}	1
+	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}
+	Wait For Ajax
+	Wait For Element Value				css=input[ng-model='model.person.lastName']
+	Mark Step		 					_clame_creation_wait_data_load
+	sleep								3s
+	Wait Until Element Is Enabled		${locator_tenderClaim.fieldPrice}	20
 
 Змінити цінову пропозицію
 	[Arguments]  @{ARGUMENTS}
@@ -324,7 +325,6 @@ ${locator_tender.ajax_overflow}			xpath=//div[@class='ajax_overflow']
 	Wait Until Element Is Enabled		${locator_tenderClaim.buttonCreate}	${COMMONWAIT}
 	[return]	${ARGUMENTS[1]}
 
-
 Відповісти на питання
 	[Arguments]  @{ARGUMENTS}
 	Fail  None
@@ -333,18 +333,10 @@ ${locator_tender.ajax_overflow}			xpath=//div[@class='ajax_overflow']
 	[Arguments]  ${user}  ${filePath}  ${tenderId}
 	Switch browser						${user}
 	privatmarket.Пошук тендера по ідентифікатору	${user}   ${tenderId}
-	Wait For Ajax
+	Відкрити заявку
+	Input Text							${locator_tenderClaim.fieldEmail}	${USERS.users['${user}'].email}
 
-	Mark Step							_clame_creation_start
-	Wait Until Element Is Visible		css=span.state-label.ng-binding
-	Mark Step							_clame_creation_get_tender_status
-
-	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}
-	Wait For Ajax
-	Wait For Element Value				css=input[ng-model='model.person.lastName']
-	Mark Step		 					_clame_creation_wait_data_load
-	sleep								2s
-
+	Mark Step							_3
 	Wait Until Element Is Enabled		css=button[ng-click='act.chooseFile()']	${COMMONWAIT}
 	Scroll Page To Element				css=button[ng-click='act.chooseFile()']
 	sleep  3s
@@ -361,6 +353,29 @@ ${locator_tender.ajax_overflow}			xpath=//div[@class='ajax_overflow']
 	Wait Until Element Is Not Visible	css=div[ng-show='progressVisible'] div.progress-bar	timeout=30
 	Sleep								3s
 	Wait Until Element Is Visible		xpath=(//div[contains(@class, 'file-item')])[1]	timeout=30
+	Click Button						${locator_tenderClaim.buttonSend}
+	Close confirmation					Ваша заявка успешно обновлена!
+	${dateModified}						Get text	css=span.file-tlm
+	Click Element						${locator_tenderClaim.buttonGoBack}
+	wait until element is visible		css=table.bids tr
+	Wait For Element With Reload		xpath=//table[@class='bids']//tr[1]/td[contains(., 'Отправлена')]	1
+
+	#получим ссылку на файл и его id
+	Click Element						css=a[ng-click='act.showDocWin(b)']
+	Wait For Ajax
+	Wait Until Element Is Enabled		css=div.modal div.file-item	5s
+	${url} = 							Execute Javascript	var scope = angular.element($("div.modal div.file-item")).scope(); return scope.file.url
+	Mark Step  							${url}
+	${uploaded_file_data} =				munchify  {'data': {'url':'${url}', 'title':'${filePath}', 'id':'', 'dateModified':'${dateModified}', 'datePublished':'${dateModified}'}}
+	[return]	${uploaded_file_data}
+
+Отримати документ
+	[Arguments]  ${tenderId}  ${url}
+	debug
+	Go To 	https://dds.privatbank.ua/${url}
+	${fileText} =	Get text	css=pre
+	[return]	${fileText}
+
 
 Змінити документ в ставці
 	[Arguments]  @{ARGUMENTS}
@@ -380,7 +395,8 @@ Login
 	Wait Until Element Is Visible	css=ul.user-menu  timeout=30
 
 Wait For Ajax
-	Wait For Condition	return window.jQuery!=undefined && jQuery.active==0	 ${COMMONWAIT}
+	Wait For Condition	return window.jQuery!=undefined && jQuery.active==0	${COMMONWAIT}
+	Wait For Condition	return angular.element(document.body).injector().get(\'$http\').pendingRequests.length;==0	${COMMONWAIT}
 
 Test Fail
 	Capture and crop page screenshot	fail.jpg
@@ -479,6 +495,7 @@ Try Search Element
 	Mark Step							_i_start
 	Switch To Tab						${tab_number}
 	Mark Step							_i_reloaded
+	Wait For Ajax
 	Wait Until Element Is Enabled		${locator}	2
 	[return]	true
 
