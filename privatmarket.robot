@@ -396,7 +396,7 @@ Login
 
 Wait For Ajax
 	Wait For Condition	return window.jQuery!=undefined && jQuery.active==0	${COMMONWAIT}
-	Wait For Condition	return angular.element(document.body).injector().get(\'$http\').pendingRequests.length;==0	${COMMONWAIT}
+	Wait For Condition	return angular.element(document.body).injector().get(\'$http\').pendingRequests.length==0	${COMMONWAIT}
 
 Test Fail
 	Capture and crop page screenshot	fail.jpg
