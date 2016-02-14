@@ -53,3 +53,14 @@ def readFileContent(filePath):
     with open(filePath, 'r') as content_file:
         content = content_file.read()
     return content
+
+def fill_file_data(url, title, dateModified, datePublished):
+    return munchify({
+        "data": {
+            "url": url,
+            "title": title,
+            "id": "",
+            "dateModified": dateModified,
+            "datePublished": datePublished,
+        }
+    })
