@@ -64,3 +64,13 @@ def fill_file_data(url, title, dateModified, datePublished):
             "datePublished": datePublished,
         }
     })
+
+def fill_bid_data(amount):
+    return munchify({
+        "data": {
+            "value": {
+                "amount": amount,
+                "currency": "UAH"
+            }
+        }
+    })

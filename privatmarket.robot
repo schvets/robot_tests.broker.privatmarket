@@ -51,6 +51,7 @@ ${locator_tenderCreation.description}	css=textarea[ng-model='model.filterData.ad
 
 ${locator_tenderClaim.buttonCreate}		css=button[ng-click='act.createAfp()']
 ${locator_tenderClaim.fieldPrice}		xpath=//input[@ng-model='model.price']
+${locator_tenderClaim.checkedLot.fieldPrice}		xpath=//input[@ng-model='model.checkedLot.userPrice']
 ${locator_tenderClaim.fieldEmail}		css=input[ng-model='model.person.email']
 ${locator_tenderClaim.buttonSend}		css=button[ng-click='act.sendAfp()']
 ${locator_tenderClaim.buttonCancel}		css=button[ng-click='act.delAfp()']
@@ -101,8 +102,12 @@ ${locator_tender.ajax_overflow}			xpath=//div[@class='ajax_overflow']
 	Wait Until Element Is Visible	xpath=//div[contains(@class,'title-div')]	timeout=20
 	Wait Until Element Is Visible	css=div.info-item-val a
 	@{itemsList}=					Get Webelements	css=div.info-item-val a
-	:FOR	${item}	IN	@{itemsList}
-		\  Click Element			${item}
+	${item_list_length} = 			Get Length	${itemsList}
+	: FOR    ${INDEX}    IN RANGE    0    ${item_list_length}
+		\  ${locato_index} =		Evaluate	${INDEX}+1
+		\  Scroll Page To Element	xpath=(//div[@class='info-item-val']/a)[${locato_index}]
+		\  Wait For Ajax
+		\  Click Element			${itemsList[${INDEX}]}
 	Mark Step						_tender_search_end
 
 Створити тендер
@@ -134,7 +139,6 @@ ${locator_tender.ajax_overflow}			xpath=//div[@class='ajax_overflow']
 
 	${element} = 	Replace String	${base_element}	items[${item}]	items
 	Mark Step  _in_getting_info item=${item} result=${element}
-	debug
 
 	Run Keyword And Return If	'${element}' == 'value.amount'				Отримати число			${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'minimalStep.amount'		Отримати число			${element}	0	${item}
@@ -244,10 +248,6 @@ ${locator_tender.ajax_overflow}			xpath=//div[@class='ajax_overflow']
 	[Arguments]  @{ARGUMENTS}
 	Fail  None
 
-Завантажити документ
-	[Arguments]  @{ARGUMENTS}
-	Fail  None
-
 Подати скаргу
 	[Arguments]  @{ARGUMENTS}
 	Fail  None
@@ -258,7 +258,12 @@ ${locator_tender.ajax_overflow}			xpath=//div[@class='ajax_overflow']
 
 Задати питання
 	[Arguments]  @{ARGUMENTS}
-	privatmarket.Пошук тендера по ідентифікатору		@{ARGUMENTS}[0]	@{ARGUMENTS}[1]
+	[Documentation]
+	...	${ARGUMENTS[0]} ==  username
+	...	${ARGUMENTS[1]} ==  tenderId
+	...	${ARGUMENTS[2]} ==  question_id
+
+	privatmarket.Пошук тендера по ідентифікатору		${ARGUMENTS}[0]	${ARGUMENTS}[1]
 	Mark Step							_asking_question_start
 	Wait For Ajax
 	Mark Step							_asking_question_select_right_tab
@@ -287,15 +292,26 @@ ${locator_tender.ajax_overflow}			xpath=//div[@class='ajax_overflow']
 
 Оновити сторінку з тендером
 	[Arguments]  @{ARGUMENTS}
+	[Documentation]
+	...	${ARGUMENTS[0]} ==  username
+	...	${ARGUMENTS[1]} ==  tenderId
+
 	privatmarket.Пошук тендера по ідентифікатору		@{ARGUMENTS}[0]	@{ARGUMENTS}[1]
 
 Подати цінову пропозицію
 	[Arguments]  @{ARGUMENTS}
+	[Documentation]
+	...	${ARGUMENTS[0]} ==  username
+	...	${ARGUMENTS[1]} ==  tenderId
+	...	${ARGUMENTS[2]} ==  bid
+
 	Switch browser						${ARGUMENTS[0]}
 	privatmarket.Пошук тендера по ідентифікатору	${ARGUMENTS[0]}   ${ARGUMENTS[1]}
 
 	Відкрити заявку
 	Mark Step							_clame_creation_set_price
+	Run Keyword If	'multiLotTender' in '${SUITE_NAME}'	Input Text	${locator_tenderClaim.checkedLot.fieldPrice}	${Arguments[2].data.value.amount}
+		...  ELSE	Input Text	${locator_tenderClaim.fieldPrice}	${Arguments[2].data.value.amount}
 	Input Text							${locator_tenderClaim.fieldPrice}	${Arguments[2].data.value.amount}
 	click element						${locator_tenderClaim.fieldEmail}
 	Input Text							${locator_tenderClaim.fieldEmail}	${USERS.users['${ARGUMENTS[0]}'].email}
@@ -330,6 +346,11 @@ ${locator_tender.ajax_overflow}			xpath=//div[@class='ajax_overflow']
 
 Змінити цінову пропозицію
 	[Arguments]  @{ARGUMENTS}
+	[Documentation]
+	...	${ARGUMENTS[0]} ==  username
+	...	${ARGUMENTS[1]} ==  tenderId
+	...	${ARGUMENTS[2]} ==  bid
+
 	Switch browser						${ARGUMENTS[0]}
 	privatmarket.Пошук тендера по ідентифікатору	${ARGUMENTS[0]}   ${ARGUMENTS[1]}
 	Wait For Ajax
@@ -341,6 +362,7 @@ ${locator_tender.ajax_overflow}			xpath=//div[@class='ajax_overflow']
 	Wait Until Element Is Enabled		${locator_tenderClaim.fieldPrice}	${COMMONWAIT}
 	sleep								5s
 	Input Text							${locator_tenderClaim.fieldPrice}	${ARGUMENTS[2].data.value.amount}
+	Input Text							${locator_tenderClaim.fieldEmail}	${USERS.users['${ARGUMENTS[0]}'].email}
 	Scroll Page To Element				${locator_tenderClaim.buttonSend}
 	Click Button						${locator_tenderClaim.buttonSend}
 	Close confirmation					Ваша заявка успешно обновлена!
@@ -353,6 +375,10 @@ ${locator_tender.ajax_overflow}			xpath=//div[@class='ajax_overflow']
 
 Скасувати цінову пропозицію
 	[Arguments]  @{ARGUMENTS}
+	[Documentation]
+	...	${ARGUMENTS[0]} ==  username
+	...	${ARGUMENTS[1]} ==  tenderId
+
 	privatmarket.Пошук тендера по ідентифікатору	${ARGUMENTS[0]}	${ARGUMENTS[1]}
 	Wait For Ajax
 	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}
@@ -379,7 +405,6 @@ ${locator_tender.ajax_overflow}			xpath=//div[@class='ajax_overflow']
 	Mark Step							_read_file_data
 	${fileContent} =					readFileContent	${filePath}
 	${correctFilePath} = 				Replace String		${filePath}	\\	\/
-	Mark Step							${fileContent}
 
 	Execute Javascript	var scope = angular.element($("button[ng-click='act.chooseFile()']")).scope();
 		...  var generatedFile = new File(["${fileContent}"], "${correctFilePath}.txt", {type: "application/force-download", lastModified: new Date()});
@@ -403,11 +428,11 @@ ${locator_tender.ajax_overflow}			xpath=//div[@class='ajax_overflow']
 	Wait Until Element Is Enabled		css=div.modal div.file-item	5s
 	${url} = 							Execute Javascript	var scope = angular.element($("div.modal div.file-item")).scope(); return scope.file.url
 	Mark Step  							${url}
-#	${title} = 	Get Text				css=div.modal span.file-name
 	${uploaded_file_data} =				fill_file_data  ${url}  ${filePath}  ${dateModified}  ${dateModified}
 	${upload_response} = 				Create Dictionary
 	Set To Dictionary					${upload_response}	upload_response	${uploaded_file_data}
 	[return]	${upload_response}
+
 Отримати документ
 	[Arguments]  ${user}  ${tenderId}  ${url}
 	${title} = 	Get Text	css=div.modal span.file-name
@@ -421,7 +446,6 @@ ${locator_tender.ajax_overflow}			xpath=//div[@class='ajax_overflow']
 	Відкрити заявку
 	Scroll Page To Element				css=button[ng-click='act.chooseFile()']
 	sleep  2s
-	debug
 	Execute Javascript	var scope = angular.element($("div[ng-click='act.changeFile(file)']")).scope();
 		...  var generatedFile = new File(["${fileContent}"], "${correctFilePath}.txt", {type: "application/force-download", lastModified: new Date()});
 		...  scope.files[0] = generatedFile;
@@ -433,10 +457,23 @@ ${locator_tender.ajax_overflow}			xpath=//div[@class='ajax_overflow']
 	Click Button						${locator_tenderClaim.buttonSend}
 	Close confirmation					Ваша заявка успешно обновлена!
 	[return]  ${uploaded_file_data}
+
 Обробити скаргу
 	[Arguments]  @{ARGUMENTS}
 	Fail  None
 
+Отримати посилання на аукціон для глядача
+	[Arguments]  @{ARGUMENTS}
+	Fail  None
+
+Отримати посилання на аукціон для учасника
+	[Arguments]  @{ARGUMENTS}
+#	a ng-click="act.takePart()"
+
+Отримати пропозицію
+	[Arguments]  @{ARGUMENTS}
+	${amount} = Get Text	xpath=//table[@class='bids']//tr[1]/td[3]
+	${response} =	fill_bid_data	${amount}
 
 
 #Custom Keywords
@@ -509,8 +546,10 @@ Wait For Element Value
 
 Scroll Page To Element
 	[Arguments]	${locator}
-	${cssLocator} =	Get Substring	${locator}	4
-	Execute JavaScript				return window.$("${cssLocator}")[0].scrollIntoView()
+	${cssLocator} =		Run Keyword If	'css' in '${TEST_NAME}'	Get Substring	${locator}	4
+		...  ELSE	Get Substring	${locator}	6
+	${js_expresion} =	Run Keyword If	'css' in '${TEST_NAME}'	Convert To String	return window.$("${cssLocator}")[0].scrollIntoView()
+		...  ELSE	Convert To String	return window.$x("${cssLocator}")[0].scrollIntoView()
 
 Wait For Tender
 	[Arguments]	${tender_id}
