@@ -11,21 +11,21 @@ Library  privatmarket_service.py
 ${BROWSER}		chrome
 ${COMMONWAIT}	20
 
-${tender_data_title}												xpath=//div[contains(@class,'title-div')]
-${tender_data_description}											css=div.description
-${tender_data_value.amount}											css=div[ng-if='model.budjet'] div.info-item-val
-${tender_data_tenderID}												xpath=//div[.='Тендер ID:']/following-sibling::div
-${tender_data_procuringEntity.name}									css=a[title='О компании']
-${tender_data_enquiryPeriod.startDate}								xpath=(//div[@class='period ng-scope']/div[@class='info-item'])[1]
-${tender_data_enquiryPeriod.endDate}								xpath=(//div[@class='period ng-scope']/div[@class='info-item'])[2]
-${tender_data_tenderPeriod.startDate}								xpath=(//div[@class='period ng-scope']/div[@class='info-item'])[3]
-${tender_data_tenderPeriod.endDate}									xpath=(//div[@class='period ng-scope']/div[@class='info-item'])[4]
-${tender_data_minimalStep.amount}									css=div[ng-if='model.ad.minimalStep.amount'] div.info-item-val
-${tender_data_items.description}									xpath=//section[contains(@class,'marged ')]//a
+${tender_data_title}											xpath=//div[contains(@class,'title-div')]
+${tender_data_description}										css=div.description
+${tender_data_value.amount}										css=div[ng-if='model.budjet'] div.info-item-val
+${tender_data_tenderID}											xpath=//div[.='Тендер ID:']/following-sibling::div
+${tender_data_procuringEntity.name}								css=a[title='О компании']
+${tender_data_enquiryPeriod.startDate}							xpath=(//div[@class='period ng-scope']/div[@class='info-item'])[1]
+${tender_data_enquiryPeriod.endDate}							xpath=(//div[@class='period ng-scope']/div[@class='info-item'])[2]
+${tender_data_tenderPeriod.startDate}							xpath=(//div[@class='period ng-scope']/div[@class='info-item'])[3]
+${tender_data_tenderPeriod.endDate}								xpath=(//div[@class='period ng-scope']/div[@class='info-item'])[4]
+${tender_data_minimalStep.amount}								css=div[ng-if='model.ad.minimalStep.amount'] div.info-item-val
+${tender_data_items.description}								xpath=//section[contains(@class,'marged ')]//a
 ${tender_data_items.deliveryDate.endDate}						xpath=//div[contains(@class,'delivery-info')]//div[.='Конец:']/following-sibling::div
 ${tender_data_items.deliveryLocation.latitude}					xpath=//qw	#в наших такого нет
 ${tender_data_items.deliveryLocation.longitude}					xpath=//qw	#в наших такого нет
-${tender_data_items.deliveryAddress.countryName}					xpath=//div[.='Адрес:']/following-sibling::div
+${tender_data_items.deliveryAddress.countryName}				xpath=//div[.='Адрес:']/following-sibling::div
 ${tender_data_items.deliveryAddress.postalCode}					xpath=//div[.='Адрес:']/following-sibling::div
 ${tender_data_items.deliveryAddress.region}						xpath=//div[.='Адрес:']/following-sibling::div
 ${tender_data_items.deliveryAddress.locality}					xpath=//div[.='Адрес:']/following-sibling::div
@@ -33,30 +33,30 @@ ${tender_data_items.deliveryAddress.streetAddress}				xpath=//div[.='Адрес:
 ${tender_data_items.classification.scheme}						xpath=//div[@ng-if="adb.classification"]
 ${tender_data_items.classification.id}							xpath=//div[@ng-if="adb.classification"]
 ${tender_data_items.classification.description}					xpath=//div[@ng-if="adb.classification"]
-${tender_data_items.additionalClassifications[0].scheme}			xpath=//div[@ng-repeat="cl in adb.additionalClassifications"]
-${tender_data_items.additionalClassifications[0].id}				xpath=//div[@ng-repeat="cl in adb.additionalClassifications"]
+${tender_data_items.additionalClassifications[0].scheme}		xpath=//div[@ng-repeat="cl in adb.additionalClassifications"]
+${tender_data_items.additionalClassifications[0].id}			xpath=//div[@ng-repeat="cl in adb.additionalClassifications"]
 ${tender_data_items.additionalClassifications[0].description}	xpath=//div[@ng-repeat="cl in adb.additionalClassifications"]
 ${tender_data_items.unit.name}									xpath=//div[.='Количество:']/following-sibling::div
 ${tender_data_items.unit.code}									xpath=//div[.='Количество:']/following-sibling::div
 ${tender_data_items.quantity}									xpath=//div[.='Количество:']/following-sibling::div
-${tender_data_questions[0].description}								css=div.description
-${tender_data_questions[0].date}									xpath=//div[@class = 'question-head title']/b[2]
-${tender_data_questions[0].title}									css=div.question-head.title span
-${tender_data_questions[0].answer}									css=div[ng-bind-html='q.answer']
+${tender_data_questions[0].description}							css=div.description
+${tender_data_questions[0].date}								xpath=//div[@class = 'question-head title']/b[2]
+${tender_data_questions[0].title}								css=div.question-head.title span
+${tender_data_questions[0].answer}								css=div[ng-bind-html='q.answer']
 
-${locator_tenderCreation.buttonEdit}	xpath=//button[@ng-click='act.createAfp()']
-${locator_tenderCreation.buttonSave}	css=button.btn.btn-success
-${locator_tenderCreation.buttonBack}	xpath=//a[@ng-click='act.goBack()']
-${locator_tenderCreation.description}	css=textarea[ng-model='model.filterData.adbName']
+${locator_tenderCreation.buttonEdit}			xpath=//button[@ng-click='act.createAfp()']
+${locator_tenderCreation.buttonSave}			css=button.btn.btn-success
+${locator_tenderCreation.buttonBack}			xpath=//a[@ng-click='act.goBack()']
+${locator_tenderCreation.description}			css=textarea[ng-model='model.filterData.adbName']
 
-${locator_tenderClaim.buttonCreate}		css=button[ng-click='act.createAfp()']
-${locator_tenderClaim.fieldPrice}		xpath=//input[@ng-model='model.price']
-${locator_tenderClaim.checkedLot.fieldPrice}		xpath=//input[@ng-model='model.checkedLot.userPrice']
-${locator_tenderClaim.fieldEmail}		css=input[ng-model='model.person.email']
-${locator_tenderClaim.buttonSend}		css=button[ng-click='act.sendAfp()']
-${locator_tenderClaim.buttonCancel}		css=button[ng-click='act.delAfp()']
-${locator_tenderClaim.buttonGoBack}		css=a[ng-click='act.ret2Ad()']
-${locator_tender.ajax_overflow}			xpath=//div[@class='ajax_overflow']
+${locator_tenderClaim.buttonCreate}				css=button[ng-click='act.createAfp()']
+${locator_tenderClaim.fieldPrice}				xpath=//input[@ng-model='model.price']
+${locator_tenderClaim.checkedLot.fieldPrice}	xpath=//input[@ng-model='model.checkedLot.userPrice']
+${locator_tenderClaim.fieldEmail}				css=input[ng-model='model.person.email']
+${locator_tenderClaim.buttonSend}				css=button[ng-click='act.sendAfp()']
+${locator_tenderClaim.buttonCancel}				css=button[ng-click='act.delAfp()']
+${locator_tenderClaim.buttonGoBack}				css=a[ng-click='act.ret2Ad()']
+${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 
 *** Keywords ***
@@ -120,13 +120,13 @@ ${locator_tender.ajax_overflow}			xpath=//div[@class='ajax_overflow']
 	...	${ARGUMENTS[0]} ==  username
 	...	${ARGUMENTS[1]} ==  element
 
-	Mark Step						_set_tender_info_ + ${ARGUMENTS[1]}
+#	Mark Step						_set_tender_info_ + ${ARGUMENTS[1]}
 	Switch browser					${ARGUMENTS[0]}
 	Wait Until Element Contains		xpath=//div[contains(@class,'title-div')]	[ТЕСТУВАННЯ]	timeout=20
 
 	#check tender type
-	Mark Step  _before_type_check
-	${item} =	Run Keyword If	'багатопредметного' in '''${TEST_NAME}'''	Отримати номер позиції	${ARGUMENTS[1]}
+#	Mark Step  _before_type_check
+	${item} =	Run Keyword If	'багатопредметного' in '${TEST_NAME}'	Отримати номер позиції	${ARGUMENTS[1]}
 		...  ELSE	Convert To Integer	0
 	${result1} =	Отримати інформацію зі сторінки	${item}	${ARGUMENTS[1]}
 	[return]	${result1}
@@ -138,7 +138,7 @@ ${locator_tender.ajax_overflow}			xpath=//div[@class='ajax_overflow']
 	...	${element} ==  element
 
 	${element} = 	Replace String	${base_element}	items[${item}]	items
-	Mark Step  _in_getting_info item=${item} result=${element}
+#	Mark Step  _in_getting_info item=${item} result=${element}
 
 	Run Keyword And Return If	'${element}' == 'value.amount'				Отримати число			${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'minimalStep.amount'		Отримати число			${element}	0	${item}
@@ -178,8 +178,9 @@ ${locator_tender.ajax_overflow}			xpath=//div[@class='ajax_overflow']
 	[Arguments]  ${element_name}  ${position_number}  ${item}
 	Wait Until Element Is Visible	${tender_data_${element_name}}
 	@{itemsList}=					Get Webelements	${tender_data_${element_name}}
+	${num} =						Evaluate		${item}-1
 	${length} =						Get Length		${itemsList}
-	${result_full} =				Get Text		${itemsList[${item}]}
+	${result_full} =				Get Text		${itemsList[${num}]}
 	${result} =						strip_string	${result_full}
 	${result} =						Replace String	${result}	,	${EMPTY}
 	${result} =						Replace String	${result}	:	${EMPTY}
@@ -202,8 +203,9 @@ ${locator_tender.ajax_overflow}			xpath=//div[@class='ajax_overflow']
 	[Arguments]  ${element_name}  ${shift}  ${item}
 	Wait Until Element Is Visible	${tender_data_${element_name}}
 	@{itemsList}=					Get Webelements	${tender_data_${element_name}}
+	${num} =						Evaluate		${item}-1
 	${length} =						Get Length	${itemsList}
-	${result_full} =	Get Text			${itemsList[${item}]}
+	${result_full} =	Get Text			${itemsList[${num}]}
 	${work_string} =	Replace String		${result_full}	${SPACE},${SPACE}	${SPACE}
 	${work_string} =	Replace String		${result_full}	,${SPACE}	${SPACE}
 	${values_list} =	Split String		${work_string}
@@ -218,8 +220,9 @@ ${locator_tender.ajax_overflow}			xpath=//div[@class='ajax_overflow']
 	[Arguments]  ${element_name}  ${position_number}  ${item}
 	Wait Until Element Is Visible	${tender_data_${element_name}}
 	@{itemsList}=					Get Webelements	${tender_data_${element_name}}
+	${num} =						Evaluate		${item}-1
 	${length} =						Get Length		${itemsList}
-	${result_full} =				Get Text		${itemsList[${item}]}
+	${result_full} =				Get Text		${itemsList[${num}]}
 	${result} =						strip_string	${result_full}
 	${values_list} =				Split String	${result}		,${SPACE}
 	[return]	${values_list[${position_number}]}
@@ -228,9 +231,9 @@ ${locator_tender.ajax_overflow}			xpath=//div[@class='ajax_overflow']
 	[Arguments]  ${element_name}  ${item}
 	Wait Until Element Is Visible	${tender_data_${element_name}}
 	@{itemsList}=					Get Webelements	${tender_data_${element_name}}
+	${num} =						Evaluate		${item}-1
 	${length} =						Get Length		${itemsList}
-#	${result_full} =				Get Text		${itemsList[${length} - 1 - ${item}]}
-	${result_full} =				Get Text		${itemsList[${item}]}
+	${result_full} =				Get Text		${itemsList[${num}]}
 	${reg_expresion} =				Set Variable	[A-zА-Яа-яёЁЇїІіЄєҐґ\\s]+\: \\w+[\\d\\.\\-]+ ([А-Яа-яёЁЇїІіЄєҐґ\\s,]+)
 	${result} =						get_reg_exp_matches	${reg_expresion}	${result_full}
 	[return]	${result}
