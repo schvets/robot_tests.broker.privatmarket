@@ -33,9 +33,9 @@ ${tender_data_items.deliveryAddress.streetAddress}				xpath=//div[.='Адрес:
 ${tender_data_items.classification.scheme}						xpath=//div[@ng-if="adb.classification"]
 ${tender_data_items.classification.id}							xpath=//div[@ng-if="adb.classification"]
 ${tender_data_items.classification.description}					xpath=//div[@ng-if="adb.classification"]
-${tender_data_items.additionalClassifications[0].scheme}		xpath=//div[@ng-repeat="cl in adb.additionalClassifications"]
-${tender_data_items.additionalClassifications[0].id}			xpath=//div[@ng-repeat="cl in adb.additionalClassifications"]
-${tender_data_items.additionalClassifications[0].description}	xpath=//div[@ng-repeat="cl in adb.additionalClassifications"]
+${tender_data_items.additionalClassifications[0].scheme}		xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
+${tender_data_items.additionalClassifications[0].id}			xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
+${tender_data_items.additionalClassifications[0].description}	xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
 ${tender_data_items.unit.name}									xpath=//div[.='Количество:']/following-sibling::div
 ${tender_data_items.unit.code}									xpath=//div[.='Количество:']/following-sibling::div
 ${tender_data_items.quantity}									xpath=//div[.='Количество:']/following-sibling::div
@@ -162,6 +162,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Run Keyword And Return If	'${element}' == 'items.deliveryAddress.locality'		Отримати частину адреси	${element}	3	${item}
 	Run Keyword And Return If	'${element}' == 'items.deliveryAddress.streetAddress'	Отримати частину адреси	${element}	4	${item}
 	Run Keyword And Return If	'${element}' == 'items.deliveryDate.endDate'			Отримати дату та час	${element}	0	${item}
+	Run Keyword And Return If	'${element}' == 'items.unit.name'						Отримати назву			${element}	0	${item}
+	Run Keyword And Return If	'${element}' == 'items.unit.code'						Отримати код			${element}	0	${item}
 
 	Run Keyword If	'${element}' == 'items.deliveryLocation.longitude'	Fail	None
 	Run Keyword If	'${element}' == 'items.deliveryLocation.latitude'	Fail	None
@@ -235,6 +237,28 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	${result_full} =				Get Text		${itemsList[${num}]}
 	${reg_expresion} =				Set Variable	[A-zА-Яа-яёЁЇїІіЄєҐґ\\s]+\: \\w+[\\d\\.\\-]+ ([А-Яа-яёЁЇїІіЄєҐґ\\s,]+)
 	${result} =						get_reg_exp_matches	${reg_expresion}	${result_full}
+	[return]	${result}
+
+Отримати назву
+	[Arguments]  ${element_name}  ${item}
+	Wait Until Element Is Visible	${tender_data_${element_name}}
+	@{itemsList}=					Get Webelements	${tender_data_${element_name}}
+	${num} =						Evaluate		${item}-1
+	${length} =						Get Length		${itemsList}
+	${result_full} =				Get Text		${itemsList[${num}]}
+	${result} =	Run Keyword If	'${result_full}' == 'килограмм'	Convert To String	'кілограм'
+		...  ELSE	Convert To String	${result_full}
+	[return]	${result}
+
+Отримати код
+	[Arguments]  ${element_name}  ${item}
+	Wait Until Element Is Visible	${tender_data_${element_name}}
+	@{itemsList}=					Get Webelements	${tender_data_${element_name}}
+	${num} =						Evaluate		${item}-1
+	${length} =						Get Length		${itemsList}
+	${result_full} =				Get Text		${itemsList[${num}]}
+	${result} =	Run Keyword If	'${result_full}' == 'килограмм'	Convert To String	'KGM'
+		...  ELSE	Convert To String	${result_full}
 	[return]	${result}
 
 Отримати номер позиції
