@@ -23,8 +23,8 @@ ${tender_data_tenderPeriod.endDate}								xpath=(//div[@class='period ng-scope'
 ${tender_data_minimalStep.amount}								css=div[ng-if='model.ad.minimalStep.amount'] div.info-item-val
 ${tender_data_items.description}								xpath=//section[contains(@class,'marged ')]//a
 ${tender_data_items.deliveryDate.endDate}						xpath=//div[contains(@class,'delivery-info')]//div[.='Конец:']/following-sibling::div
-${tender_data_items.deliveryLocation.latitude}					css=//span.longitude	#в наших такого нет
-${tender_data_items.deliveryLocation.longitude}					css=//span.latitude	#в наших такого нет
+${tender_data_items.deliveryLocation.latitude}					css=span.latitude
+${tender_data_items.deliveryLocation.longitude}					css=span.longitude
 ${tender_data_items.deliveryAddress.countryName}				xpath=//div[.='Адрес:']/following-sibling::div
 ${tender_data_items.deliveryAddress.postalCode}					xpath=//div[.='Адрес:']/following-sibling::div
 ${tender_data_items.deliveryAddress.region}						xpath=//div[.='Адрес:']/following-sibling::div
@@ -80,36 +80,39 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	[Documentation]
 	...	${ARGUMENTS[0]} ==  username
 	...	${ARGUMENTS[1]} ==  tenderId
-	Mark Step						_tender_search_start
-	Mark Step						${ARGUMENTS[1]}
+	Mark Step								_tender_search_start
+	Mark Step								${ARGUMENTS[1]}
 
-	Switch browser					${ARGUMENTS[0]}
-	Go to							${USERS.users['${ARGUMENTS[0]}'].homepage}
-	Switch To Frame					id=tenders
-	Wait Until Element Is Enabled	xpath=//*[@id='sidebar']//input	timeout=${COMMONWAIT}
-	Wait Until Element Is Enabled	xpath=(//div[@class='tender-name_info tender-col'])[1]	timeout=${COMMONWAIT}
+	Switch browser							${ARGUMENTS[0]}
+	Go to									${USERS.users['${ARGUMENTS[0]}'].homepage}
+	Switch To Frame							id=tenders
+	Wait Until Element Is Enabled			xpath=//*[@id='sidebar']//input	timeout=${COMMONWAIT}
+	Wait Until Element Is Enabled			xpath=(//div[@class='tender-name_info tender-col'])[1]	timeout=${COMMONWAIT}
 
-	${check_result}=				Run Keyword And Return Status	Element Should Contain	css=div.test-mode-aside	Войти в обучающий режим
-	Run Keyword If					${check_result}	Switch To Education Mode
+	${check_result}=						Run Keyword And Return Status	Element Should Contain	css=div.test-mode-aside	Войти в обучающий режим
+	Run Keyword If							${check_result}	Switch To Education Mode
 
 	Wait For Ajax
-	Wait Until Element Is Enabled	xpath=(//div[@class='tenders_sm_info'])[1]	timeout=${COMMONWAIT}
-	Clear Element Text				xpath=//*[@id='sidebar']//input
-	sleep							1s
-	Input Text						xpath=//*[@id='sidebar']//input	${ARGUMENTS[1]}
-	Wait For Tender					${ARGUMENTS[1]}
-	Click Element					id=${ARGUMENTS[1]}
+	Wait Until Element Is Enabled			xpath=(//div[@class='tenders_sm_info'])[1]	timeout=${COMMONWAIT}
+	Clear Element Text						xpath=//*[@id='sidebar']//input
+	sleep									1s
+	Input Text								xpath=//*[@id='sidebar']//input	${ARGUMENTS[1]}
+	Wait For Tender							${ARGUMENTS[1]}
+	Click Element							id=${ARGUMENTS[1]}
 	Wait For Ajax
-	Wait Until Element Is Visible	xpath=//div[contains(@class,'title-div')]	timeout=20
-	Wait Until Element Is Visible	css=div.info-item-val a
-	@{itemsList}=					Get Webelements	css=div.info-item-val a
-	${item_list_length} = 			Get Length	${itemsList}
+	Wait Until Element Is Visible			xpath=//div[contains(@class,'title-div')]	timeout=20
+	Wait Until Element Is Visible			css=div.info-item-val a
+	@{itemsList}=							Get Webelements	//div[@class='info-item-val']/a
+	${item_list_length} = 					Get Length	${itemsList}
+	log to console  ${item_list_length}
 	: FOR    ${INDEX}    IN RANGE    0    ${item_list_length}
-		\  ${locato_index} =		Evaluate	${INDEX}+1
-		\  Scroll Page To Element	xpath=(//div[@class='info-item-val']/a)[${locato_index}]
+		\  ${locator_index} =				Evaluate	${INDEX}+1
+		\  Wait Until Element Is Visible	xpath=(//div[@class='info-item-val']/a)[${locator_index}]
+		\  Scroll Page To Element			xpath=(//div[@class='info-item-val']/a)[${locator_index}]
 		\  Wait For Ajax
-		\  Click Element			${itemsList[${INDEX}]}
-	Mark Step						_tender_search_end
+		\  Click Element					${itemsList[${INDEX}]}
+		\  Wait Until Element Is Visible	${tender_data_items.classification.id}
+	Mark Step								_tender_search_end
 
 Створити тендер
 	[Arguments]  @{ARGUMENTS}
@@ -149,7 +152,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 	Run Keyword And Return If	'${element}' == 'items.classification.scheme'		Отримати строку		${element}	1	${item}
 	Run Keyword And Return If	'${element}' == 'items.classification.id'			Отримати строку		${element}	2	${item}
-	Run Keyword And Return If	'${element}' == 'items.unit.name'					Отримати строку		${element}	1	${item}
 	Run Keyword And Return If	'${element}' == 'items.quantity'					Отримати ціле число	${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'items.classification.description'					Отримати класифікацію		${element}	${item}
 	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].scheme'			Отримати строку	${element}	1	${item}
@@ -162,11 +164,11 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Run Keyword And Return If	'${element}' == 'items.deliveryAddress.locality'		Отримати частину адреси	${element}	3	${item}
 	Run Keyword And Return If	'${element}' == 'items.deliveryAddress.streetAddress'	Отримати частину адреси	${element}	4	${item}
 	Run Keyword And Return If	'${element}' == 'items.deliveryDate.endDate'			Отримати дату та час	${element}	0	${item}
-	Run Keyword And Return If	'${element}' == 'items.unit.name'						Отримати назву			${element}	0	${item}
-	Run Keyword And Return If	'${element}' == 'items.unit.code'						Отримати код			${element}	0	${item}
+	Run Keyword And Return If	'${element}' == 'items.unit.name'						Отримати назву			${element}	${item}
+	Run Keyword And Return If	'${element}' == 'items.unit.code'						Отримати код			${element}	${item}
+	Run Keyword And Return If	'${element}' == 'items.deliveryLocation.latitude'		Отримати число			${element}	0	${item}
+	Run Keyword And Return If	'${element}' == 'items.deliveryLocation.longitude'		Отримати число			${element}	0	${item}
 
-	Run Keyword If	'${element}' == 'items.deliveryLocation.longitude'	Fail	None
-	Run Keyword If	'${element}' == 'items.deliveryLocation.latitude'	Fail	None
 	Run Keyword If	'${element}' == 'questions[0].title'	Wait For Element With Reload	${tender_data_${element}}	2
 	Run Keyword If	'${element}' == 'questions[0].answer'	Wait For Element With Reload	${tender_data_${element}}	2
 
@@ -246,8 +248,10 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	${num} =						Evaluate		${item}-1
 	${length} =						Get Length		${itemsList}
 	${result_full} =				Get Text		${itemsList[${num}]}
-	${result} =	Run Keyword If	'${result_full}' == 'килограмм'	Convert To String	'кілограм'
-		...  ELSE	Convert To String	${result_full}
+	log to console  килограмм b {result_full}
+	${result} =	Run Keyword If	'килограмм' in '${result_full}'	Set Variable	кілограм
+		...  ELSE	Set Variable	${result_full}
+	Mark Step						${result}
 	[return]	${result}
 
 Отримати код
@@ -257,8 +261,9 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	${num} =						Evaluate		${item}-1
 	${length} =						Get Length		${itemsList}
 	${result_full} =				Get Text		${itemsList[${num}]}
-	${result} =	Run Keyword If	'${result_full}' == 'килограмм'	Convert To String	'KGM'
-		...  ELSE	Convert To String	${result_full}
+	${result} =	Run Keyword If	'килограмм' in '${result_full}'	Set Variable	KGM
+		...  ELSE	Set Variable	${result_full}
+	Mark Step						${result}
 	[return]	${result}
 
 Отримати номер позиції
