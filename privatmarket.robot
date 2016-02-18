@@ -21,7 +21,7 @@ ${tender_data_enquiryPeriod.endDate}							xpath=(//div[@class='period ng-scope'
 ${tender_data_tenderPeriod.startDate}							xpath=(//div[@class='period ng-scope']/div[@class='info-item'])[3]
 ${tender_data_tenderPeriod.endDate}								xpath=(//div[@class='period ng-scope']/div[@class='info-item'])[4]
 ${tender_data_minimalStep.amount}								css=div[ng-if='model.ad.minimalStep.amount'] div.info-item-val
-${tender_data_items.description}								xpath=//section[contains(@class,'marged ')]//a
+${tender_data_items.description}								css=section[ng-repeat='adb in model.items'] div[title]
 ${tender_data_items.deliveryDate.endDate}						xpath=//div[contains(@class,'delivery-info')]//div[.='Конец:']/following-sibling::div
 ${tender_data_items.deliveryLocation.latitude}					css=span.latitude
 ${tender_data_items.deliveryLocation.longitude}					css=span.longitude
@@ -43,7 +43,7 @@ ${tender_data_questions[0].description}							css=div.description
 ${tender_data_questions[0].date}								xpath=//div[@class = 'question-head title']/b[2]
 ${tender_data_questions[0].title}								css=div.question-head.title span
 ${tender_data_questions[0].answer}								css=div[ng-bind-html='q.answer']
-${tender_data_bids}										xpath=//table[@class='bids']//tr
+${tender_data_bids}												xpath=(//table[@class='bids']//tr)[2]
 
 ${locator_tenderCreation.buttonEdit}			xpath=//button[@ng-click='act.createAfp()']
 ${locator_tenderCreation.buttonSave}			css=button.btn.btn-success
@@ -149,10 +149,12 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Run Keyword And Return If	'${element}' == 'tenderPeriod.startDate'	Отримати дату та час	${element}	1	${item}
 	Run Keyword And Return If	'${element}' == 'tenderPeriod.endDate'		Отримати дату та час	${element}	1	${item}
 	Run Keyword And Return If	'${element}' == 'questions[0].date'			Отримати дату та час	${element}	0	${item}
+	Run Keyword And Return If	'${element}' == 'bids'						Перевірити присутність bids
 
-	Run Keyword And Return If	'${element}' == 'items.classification.scheme'		Отримати строку		${element}	1	${item}
-	Run Keyword And Return If	'${element}' == 'items.classification.id'			Отримати строку		${element}	2	${item}
-	Run Keyword And Return If	'${element}' == 'items.quantity'					Отримати ціле число	${element}	0	${item}
+	Run Keyword And Return If	'${element}' == 'items.classification.scheme'	Отримати строку		${element}	1	${item}
+	Run Keyword And Return If	'${element}' == 'items.classification.id'		Отримати строку		${element}	2	${item}
+	Run Keyword And Return If	'${element}' == 'items.description'				Отримати текст елемента	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'items.quantity'				Отримати ціле число	${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'items.classification.description'					Отримати класифікацію		${element}	${item}
 	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].scheme'			Отримати строку	${element}	1	${item}
 	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].id'				Отримати строку	${element}	2	${item}
@@ -177,13 +179,18 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	${result} =						strip_string	${result_full}
 	[return]	${result}
 
-Отримати строку
-	[Arguments]  ${element_name}  ${position_number}  ${item}
+Отримати текст елемента
+	[Arguments]  ${element_name}  ${item}
 	Wait Until Element Is Visible	${tender_data_${element_name}}
 	@{itemsList}=					Get Webelements	${tender_data_${element_name}}
-	${num} =						Evaluate		${item}-1
-	${length} =						Get Length		${itemsList}
+	${num} =						set variable	${item}
+#	${num} =						Evaluate		${item}-1
 	${result_full} =				Get Text		${itemsList[${num}]}
+	[return]	${result_full}
+
+Отримати строку
+	[Arguments]  ${element_name}  ${position_number}  ${item}
+	${result_full} =				Отримати текст елемента	${element_name}	${item}
 	${result} =						strip_string	${result_full}
 	${result} =						Replace String	${result}	,	${EMPTY}
 	${result} =						Replace String	${result}	:	${EMPTY}
@@ -204,11 +211,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Отримати дату та час
 	[Arguments]  ${element_name}  ${shift}  ${item}
-	Wait Until Element Is Visible	${tender_data_${element_name}}
-	@{itemsList}=					Get Webelements	${tender_data_${element_name}}
-	${num} =						Evaluate		${item}-1
-	${length} =						Get Length	${itemsList}
-	${result_full} =	Get Text			${itemsList[${num}]}
+	${result_full} =	Отримати текст елемента	${element_name}	${item}
 	${work_string} =	Replace String		${result_full}	${SPACE},${SPACE}	${SPACE}
 	${work_string} =	Replace String		${result_full}	,${SPACE}	${SPACE}
 	${values_list} =	Split String		${work_string}
@@ -221,49 +224,33 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Отримати частину адреси
 	[Arguments]  ${element_name}  ${position_number}  ${item}
-	Wait Until Element Is Visible	${tender_data_${element_name}}
-	@{itemsList}=					Get Webelements	${tender_data_${element_name}}
-	${num} =						Evaluate		${item}-1
-	${length} =						Get Length		${itemsList}
-	${result_full} =				Get Text		${itemsList[${num}]}
-	${result} =						strip_string	${result_full}
-	${values_list} =				Split String	${result}		,${SPACE}
-	[return]	${values_list[${position_number}]}
+	${result_full} =	Отримати текст елемента	${element_name}	${item}
+	${result} =			strip_string	${result_full}
+	${values_list} =	Split String	${result}		,${SPACE}
+	${length} =	Get Length	${values_list}
+	${result} =	Run Keyword If	'${position_number}' == '4' and ${length} > 5	Set variable	${values_list[4]}, ${values_list[5]}
+		...  ELSE	Set variable	${values_list[${position_number}]}
+	[return]	${result}
 
 Отримати класифікацію
 	[Arguments]  ${element_name}  ${item}
-	Wait Until Element Is Visible	${tender_data_${element_name}}
-	@{itemsList}=					Get Webelements	${tender_data_${element_name}}
-	${num} =						Evaluate		${item}-1
-	${length} =						Get Length		${itemsList}
-	${result_full} =				Get Text		${itemsList[${num}]}
-	${reg_expresion} =				Set Variable	[A-zА-Яа-яёЁЇїІіЄєҐґ\\s]+\: \\w+[\\d\\.\\-]+ ([А-Яа-яёЁЇїІіЄєҐґ\\s,]+)
-	${result} =						get_reg_exp_matches	${reg_expresion}	${result_full}
+	${result_full} =	Отримати текст елемента	${element_name}	${item}
+	${reg_expresion} =	Set Variable	[A-zА-Яа-яёЁЇїІіЄєҐґ\\s]+\: \\w+[\\d\\.\\-]+ ([А-Яа-яёЁЇїІіЄєҐґ\\s;,\\"_\\(\\)]+)
+	${result} =			get_reg_exp_matches	${reg_expresion}	${result_full}
 	[return]	${result}
 
 Отримати назву
 	[Arguments]  ${element_name}  ${item}
-	Wait Until Element Is Visible	${tender_data_${element_name}}
-	@{itemsList}=					Get Webelements	${tender_data_${element_name}}
-	${num} =						Evaluate		${item}-1
-	${length} =						Get Length		${itemsList}
-	${result_full} =				Get Text		${itemsList[${num}]}
-	log to console  килограмм b {result_full}
+	${result_full} =	Отримати текст елемента	${element_name}	${item}
 	${result} =	Run Keyword If	'килограмм' in '${result_full}'	Set Variable	кілограм
 		...  ELSE	Set Variable	${result_full}
-	Mark Step						${result}
 	[return]	${result}
 
 Отримати код
 	[Arguments]  ${element_name}  ${item}
-	Wait Until Element Is Visible	${tender_data_${element_name}}
-	@{itemsList}=					Get Webelements	${tender_data_${element_name}}
-	${num} =						Evaluate		${item}-1
-	${length} =						Get Length		${itemsList}
-	${result_full} =				Get Text		${itemsList[${num}]}
+	${result_full} =	Отримати текст елемента	${element_name}	${item}
 	${result} =	Run Keyword If	'килограмм' in '${result_full}'	Set Variable	KGM
 		...  ELSE	Set Variable	${result_full}
-	Mark Step						${result}
 	[return]	${result}
 
 Отримати номер позиції
@@ -272,8 +259,13 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	${item} =	get_reg_exp_matches	items\\[(\\d)\\]	${element_name}
 	${result} =	Run Keyword If	'${item}' == 'none'	Set Variable	0
 		...  ELSE	Convert To Integer	${item}
-	Mark Step  _after_type_check name = ${element_name} item=${item} result=${result}
+	Mark Step	_after_type_check name = ${element_name} item=${item} result=${result}
 	[return]  ${result}
+
+Перевірити присутність bids
+	Element Should Not Be Visible	${tender_data_${element}}
+	[return]	${True} #element is not visible
+
 
 Внести зміни в тендер
 	[Arguments]  @{ARGUMENTS}
@@ -393,6 +385,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait Until Element Is Enabled		${locator_tenderClaim.fieldPrice}	${COMMONWAIT}
 	sleep								5s
 	Input Text							${locator_tenderClaim.fieldPrice}	${ARGUMENTS[2].data.value.amount}
+	click element						${locator_tenderClaim.fieldEmail}
 	Input Text							${locator_tenderClaim.fieldEmail}	${USERS.users['${ARGUMENTS[0]}'].email}
 	Scroll Page To Element				${locator_tenderClaim.buttonSend}
 	Click Button						${locator_tenderClaim.buttonSend}
@@ -443,12 +436,13 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 		...  scope.files[0] = generatedFile;
 		...  scope.uploadFile(scope.files[0]);
 
-	${upload_response} =	Сберегти доданий файл
+	${upload_response} =	Сберегти доданий файл	${filePath}
 	#before step for Change File
 	privatmarket.Пошук тендера по ідентифікатору	${user}	${tenderId}
 	[return]	${upload_response}
 
 Сберегти доданий файл
+	[Arguments]  ${filePath}
 	Wait Until Element Is Not Visible	css=div[ng-show='progressVisible'] div.progress-bar	timeout=30
 	Sleep								3s
 	Wait Until Element Is Visible		xpath=(//div[contains(@class, 'file-item')])[1]	timeout=30
@@ -457,7 +451,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	${dateModified}						Get text	css=span.file-tlm
 	Click Element						${locator_tenderClaim.buttonGoBack}
 	wait until element is visible		css=table.bids tr
-	Wait For Element With Reload		xpath=//table[@class='bids']//tr[1]/td[contains(., 'Отправлена')]	1
+	Wait For Element With Reload		xpath=//table[@class='bids']//tr[1]/td//img[contains(@src,'clip_icon.png')]
 
 	#получим ссылку на файл и его id
 	Scroll Page To Element				css=a[ng-click='act.showDocWin(b)']
@@ -501,7 +495,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Click Button						${locator_tenderClaim.buttonSend}
 	Close confirmation					Ваша заявка успешно обновлена!
 
-	${uploaded_file_data} =				Сберегти доданий файл
+	${uploaded_file_data} =				Сберегти доданий файл	${filePath}
 	[return]  ${uploaded_file_data}
 
 Обробити скаргу
@@ -510,12 +504,18 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Отримати посилання на аукціон для глядача
 	[Arguments]  ${user}  ${tenderId}
-	privatmarket.Пошук тендера по ідентифікатору	${user}   ${tenderId}
-	Execute Javascript	return angular.element($("a[ng-click='act.takePart()']")).scope().model.ad.auctionUrl;
+	${resutl} =	Отримати посилання на аукціон	${user}  ${tenderId}
 
 Отримати посилання на аукціон для учасника
 	[Arguments]  ${user}  ${tenderId}
-	Fail  None
+	${resutl} =	Отримати посилання на аукціон	${user}  ${tenderId}
+
+Отримати посилання на аукціон
+	[Arguments]  ${user}  ${tenderId}
+	privatmarket.Пошук тендера по ідентифікатору	${user}   ${tenderId}
+	Wait For Element With Reload					css=a[ng-click='act.takePart()']
+	Execute Javascript								return angular.element($("a[ng-click='act.takePart()']")).scope().model.ad.auctionUrl;
+
 
 
 
@@ -529,7 +529,7 @@ Login
 	Wait Until Element Is Visible	css=ul.user-menu  timeout=30
 
 Wait For Ajax
-	Wait For Condition	return angular.element(document.body).injector().get(\'$http\').pendingRequests.length==0	${COMMONWAIT}
+	Wait For Condition	return angular.element(document.body).injector().get(\'$http\').pendingRequests.length==0	40s
 	Wait For Condition	return window.jQuery!=undefined && jQuery.active==0	${COMMONWAIT}
 
 Test Fail
@@ -595,13 +595,13 @@ Scroll Page To Element
 
 Wait For Tender
 	[Arguments]	${tender_id}
-	Wait Until Keyword Succeeds		10min	30s	Try Search Tender	${tender_id}
+	Wait Until Keyword Succeeds		10min	15s	Try Search Tender	${tender_id}
 
 Try Search Tender
 	[Arguments]	${tender_id}
 	Click Element						xpath=//div[@class="search-aside"]/span
 	Wait For Ajax Overflow Vanish
-	Wait Until Element Is Enabled		id=${tender_id}	timeout=20
+	Wait Until Element Is Enabled		id=${tender_id}	timeout=10
 	[return]	true
 
 Switch To Education Mode
