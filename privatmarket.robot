@@ -89,8 +89,11 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait Until Element Is Enabled			xpath=//*[@id='sidebar']//input	timeout=${COMMONWAIT}
 	Wait Until Element Is Enabled			xpath=(//div[@class='tender-name_info tender-col'])[1]	timeout=${COMMONWAIT}
 
+	${education_type} =	Run Keyword If	'limited' in '${SUITE_NAME}'	Set Variable	True
+		...  ELSE	Set Variable	False
+
 	${check_result}=						Run Keyword And Return Status	Element Should Contain	css=div.test-mode-aside	Войти в обучающий режим
-	Run Keyword If							${check_result}	Switch To Education Mode
+	Run Keyword If							${check_result} and ${education_type}	Switch To Education Mode
 
 	Wait For Ajax
 	Wait Until Element Is Enabled			xpath=(//div[@class='tenders_sm_info'])[1]	timeout=${COMMONWAIT}
@@ -125,7 +128,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	...	${ARGUMENTS[1]} ==  element
 
 	Switch browser					${ARGUMENTS[0]}
-	Wait Until Element Contains		xpath=//div[contains(@class,'title-div')]	[ТЕСТУВАННЯ]	timeout=20
+	wait until element is visible		xpath=//div[contains(@class,'title-div')]	timeout=20
 
 	#check tender type
 	${item} =	Run Keyword If	'багатопредметного' in '${TEST_NAME}'	Отримати номер позиції	${ARGUMENTS[1]}
@@ -264,8 +267,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Перевірити присутність bids
 	Element Should Not Be Visible	${tender_data_${element}}
-	[return]	${True} #element is not visible
-
+	#element is not visible
+	[return]	None
 
 Внести зміни в тендер
 	[Arguments]  @{ARGUMENTS}
@@ -360,7 +363,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait Until Element Is Visible		css=span.state-label.ng-binding
 	Mark Step							_clame_creation_get_tender_status
 	${tender_status} = 					Get text	css=span.state-label.ng-binding
-	Run Keyword If	'${tender_status}' == 'Период уточнений завершен'	Wait For Element With Reload		${locator_tenderClaim.buttonCreate}	1
+	Run Keyword If	'${tender_status}' == 'Период уточнений завершен'	Wait For Element With Reload	${locator_tenderClaim.buttonCreate}	1
 	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}
 	Wait For Ajax
 	Wait For Element Value				css=input[ng-model='model.person.lastName']
@@ -451,7 +454,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	${dateModified}						Get text	css=span.file-tlm
 	Click Element						${locator_tenderClaim.buttonGoBack}
 	wait until element is visible		css=table.bids tr
-	Wait For Element With Reload		xpath=//table[@class='bids']//tr[1]/td//img[contains(@src,'clip_icon.png')]
+	Wait For Element With Reload		xpath=//table[@class='bids']//tr[1]/td//img[contains(@src,'clip_icon.png')]	1
 
 	#получим ссылку на файл и его id
 	Scroll Page To Element				css=a[ng-click='act.showDocWin(b)']
@@ -513,7 +516,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 Отримати посилання на аукціон
 	[Arguments]  ${user}  ${tenderId}
 	privatmarket.Пошук тендера по ідентифікатору	${user}   ${tenderId}
-	Wait For Element With Reload					css=a[ng-click='act.takePart()']
+	Wait For Element With Reload					css=a[ng-click='act.takePart()']	1
 	Execute Javascript								return angular.element($("a[ng-click='act.takePart()']")).scope().model.ad.auctionUrl;
 
 
