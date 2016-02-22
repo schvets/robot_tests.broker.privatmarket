@@ -89,10 +89,11 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait Until Element Is Enabled			xpath=//*[@id='sidebar']//input	timeout=${COMMONWAIT}
 	Wait Until Element Is Enabled			xpath=(//div[@class='tender-name_info tender-col'])[1]	timeout=${COMMONWAIT}
 
-	${education_type} =	Run Keyword If	'limited' in '${SUITE_NAME}'	Set Variable	True
-		...  ELSE	Set Variable	False
-
-	${check_result}=						Run Keyword And Return Status	Element Should Contain	css=div.test-mode-aside	Войти в обучающий режим
+	${education_type} =	Run Keyword If	'limited' in '${SUITE_NAME}'	Set Variable	False
+		...  ELSE	Set Variable	True
+	${current_type} =						Get text	css=div.test-mode-aside
+	${check_result}=						Run Keyword If	'Войти в обучающий режим' in '${current_type}'	Set Variable  True
+	debug
 	Run Keyword If							${check_result} and ${education_type}	Switch To Education Mode
 
 	Wait For Ajax
