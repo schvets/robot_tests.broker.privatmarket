@@ -119,7 +119,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Створити тендер
 	[Arguments]  @{ARGUMENTS}
-	Fail  None
+	Fail  Функція не підтримується майданчиком
 
 Отримати інформацію із тендера
 	[Arguments]  @{ARGUMENTS}
@@ -128,7 +128,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	...	${ARGUMENTS[1]} ==  element
 
 	Switch browser					${ARGUMENTS[0]}
-	wait until element is visible		xpath=//div[contains(@class,'title-div')]	timeout=20
+	Wait Until Element Is Visible		xpath=//div[contains(@class,'title-div')]	timeout=20
 
 	#check tender type
 	${item} =	Run Keyword If	'багатопредметного' in '${TEST_NAME}'	Отримати номер позиції	${ARGUMENTS[1]}
@@ -187,7 +187,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait Until Element Is Visible	${tender_data_${element_name}}
 	@{itemsList}=					Get Webelements	${tender_data_${element_name}}
 	${num} =						set variable	${item}
-#	${num} =						Evaluate		${item}-1
 	${result_full} =				Get Text		${itemsList[${num}]}
 	[return]	${result_full}
 
@@ -272,15 +271,15 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Внести зміни в тендер
 	[Arguments]  @{ARGUMENTS}
-	Fail  None
+	Fail  Функція не підтримується майданчиком
 
 Подати скаргу
 	[Arguments]  @{ARGUMENTS}
-	Fail  None
+	Fail  Ключове слово не реалізовано
 
 Порівняти скаргу
 	[Arguments]  @{ARGUMENTS}
-	Fail  None
+	Fail  Ключове слово не реалізовано
 
 Задати питання
 	[Arguments]  @{ARGUMENTS}
@@ -336,38 +335,38 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	privatmarket.Пошук тендера по ідентифікатору	${ARGUMENTS[0]}   ${ARGUMENTS[1]}
 
 	Відкрити заявку
-	Mark Step							_clame_creation_set_price
+	Mark Step							_claim_creation_set_price
 	Run Keyword If	'multiLotTender' in '${SUITE_NAME}'	Input Text	${locator_tenderClaim.checkedLot.fieldPrice}	${Arguments[2].data.value.amount}
 		...  ELSE	Input Text	${locator_tenderClaim.fieldPrice}	${Arguments[2].data.value.amount}
 	click element						${locator_tenderClaim.fieldPrice}
 	Input Text							${locator_tenderClaim.fieldPrice}	${Arguments[2].data.value.amount}
 	click element						${locator_tenderClaim.fieldEmail}
 	Input Text							${locator_tenderClaim.fieldEmail}	${USERS.users['${ARGUMENTS[0]}'].email}
-	Mark Step							_clame_creation_send_request
+	Mark Step							_claim_creation_send_request
 	sleep								5s
 	Scroll Page To Element				${locator_tenderClaim.buttonSend}
 	Click Button						${locator_tenderClaim.buttonSend}
 	Wait For Ajax Overflow Vanish
 	Close confirmation					Ваша заявка успешно отправлена!
-	Mark Step							_clame_creation_save_information
+	Mark Step							_claim_creation_save_information
 	Wait Until Element Is Visible		css=div.afp-info.ng-scope.ng-binding
 	wait until element contains			css=div.afp-info.ng-scope.ng-binding	Номер заявки
 	Wait For Ajax
-	${clame_id}=						Get text			css=div.afp-info.ng-scope.ng-binding
-	${result}=							get_reg_exp_matches	Номер заявки: (\\d*),	${clame_id}	1
+	${claim_id}=						Get text			css=div.afp-info.ng-scope.ng-binding
+	${result}=							get_reg_exp_matches	Номер заявки: (\\d*),	${claim_id}	1
 	[return]	${Arguments[2]}
 
 Відкрити заявку
 	Wait For Ajax
-	Mark Step							_clame_creation_start
+	Mark Step							_claim_creation_start
 	Wait Until Element Is Visible		css=span.state-label.ng-binding
-	Mark Step							_clame_creation_get_tender_status
+	Mark Step							_claim_creation_get_tender_status
 	${tender_status} = 					Get text	css=span.state-label.ng-binding
 	Run Keyword If	'${tender_status}' == 'Период уточнений завершен'	Wait For Element With Reload	${locator_tenderClaim.buttonCreate}	1
 	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}
 	Wait For Ajax
 	Wait For Element Value				css=input[ng-model='model.person.lastName']
-	Mark Step		 					_clame_creation_wait_data_load
+	Mark Step		 					_claim_creation_wait_data_load
 	sleep								5s
 	Wait Until Element Is Enabled		${locator_tenderClaim.fieldPrice}	20
 
@@ -381,7 +380,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	privatmarket.Пошук тендера по ідентифікатору	${ARGUMENTS[0]}   ${ARGUMENTS[1]}
 	Wait For Ajax
 
-	Mark Step							_clame_edit_start
+	Mark Step							_claim_edit_start
 	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}
 	Wait For Ajax
 	Wait For Element Value				css=input[ng-model='model.person.lastName']
@@ -393,11 +392,11 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Scroll Page To Element				${locator_tenderClaim.buttonSend}
 	Click Button						${locator_tenderClaim.buttonSend}
 	Close confirmation					Ваша заявка успешно обновлена!
-	Mark Step							_clame_edit_save_information
+	Mark Step							_claim_edit_save_information
 	Wait Until Element Is Visible		css=div.afp-info.ng-scope.ng-binding
 	Wait For Ajax
-	${clame_id}=						Get text			css=div.afp-info.ng-scope.ng-binding
-	${result}=							get_reg_exp_matches	Номер заявки: (\\d*),	${clame_id}	1
+	${claim_id}=						Get text			css=div.afp-info.ng-scope.ng-binding
+	${result}=							get_reg_exp_matches	Номер заявки: (\\d*),	${claim_id}	1
 	[return]	${Arguments[2]}
 
 Скасувати цінову пропозицію
@@ -416,7 +415,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Відповісти на питання
 	[Arguments]  @{ARGUMENTS}
-	Fail  None
+	Fail  Функція не підтримується майданчиком
 
 Завантажити документ в ставку
 	[Arguments]  ${user}  ${filePath}  ${tenderId}
@@ -503,7 +502,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Обробити скаргу
 	[Arguments]  @{ARGUMENTS}
-	Fail  None
+	Fail  Функція не підтримується майданчиком
 
 Отримати посилання на аукціон для глядача
 	[Arguments]  ${user}  ${tenderId}
@@ -619,10 +618,6 @@ Switch To Tab
 	Wait Visibulity And Click Element	xpath=(//ul[@class='widget-header-block']//a)[${tab_number}]
 	Wait For Ajax
 
-Fail Clame
-	Set Global Variable	${tender_clame_try}	1
-	{return]	None
-
 Wait For Element With Reload
 	[Arguments]  ${locator}  ${tab_number}
 	Mark Step							_i_will_wait
@@ -639,9 +634,4 @@ Try Search Element
 
 Wait For Ajax Overflow Vanish
 	Wait Until Element Is Not Visible	${locator_tender.ajax_overflow}	${COMMONWAIT}
-
-#in case staleElementException
-Click element by JS
-	[Arguments]	${css_locator}
-	Execute Javascript					return window.$("${css_locator}").click()
 

@@ -33,10 +33,9 @@ def is_element_stale(webelement):
         pass
     return False
 
-def readFileContent(filePath):
+def read_file_content(filePath):
     with open(filePath, 'r') as content_file:
-        content = content_file.read()
-    return content
+	return content_file.read()
 
 def fill_file_data(url, title, dateModified, datePublished):
     return munchify({
