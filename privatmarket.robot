@@ -8,7 +8,6 @@ Library  DebugLibrary
 Library  privatmarket_service.py
 
 *** Variables ***
-${BROWSER}		chrome
 ${COMMONWAIT}	20
 
 ${tender_data_title}											xpath=//div[contains(@class,'title-div')]
@@ -69,7 +68,13 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	[Arguments]  ${username}
 	log  ${username}
 	[Documentation]  Відкрити брaвзер, створити обєкт api wrapper, тощо
-	Open Browser			${USERS.users['${username}'].homepage}   ${USERS.users['${username}'].browser}   alias=${username}
+	${service args}=    Create List	--ignore-ssl-errors=true	--ssl-protocol=tlsv1
+	${browset} = 	Convert To Lowercase	${USERS.users['${username}'].browser}
+
+	Run Keyword If	'phantomjs' in '${browset}'	Run Keywords	Create Webdriver		PhantomJS	${username}	service_args=${service args}
+	...   AND   Go To					${USERS.users['${username}'].homepage}
+	...  ELSE	Open Browser	${USERS.users['${username}'].homepage}   ${USERS.users['${username}'].browser}   alias=${username}
+
 	Set Window Position		@{USERS.users['${username}'].position}
 	Maximize Browser Window
 	Run Keyword If	'Provider' in '${username}'	Login
@@ -93,7 +98,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 		...  ELSE	Set Variable	True
 	${current_type} =						Get text	css=div.test-mode-aside
 	${check_result}=						Run Keyword If	'Войти в обучающий режим' in '${current_type}'	Set Variable  True
-	debug
 	Run Keyword If							${check_result} and ${education_type}	Switch To Education Mode
 
 	Wait For Ajax
@@ -102,8 +106,9 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	sleep									1s
 	Input Text								xpath=//*[@id='sidebar']//input	${ARGUMENTS[1]}
 	Wait For Tender							${ARGUMENTS[1]}
-	Click Element							id=${ARGUMENTS[1]}
+	Click Element By JS						span[id='${ARGUMENTS[1]}'] div.tenders_sm_info
 	Wait For Ajax
+
 	Wait Until Element Is Visible			xpath=//div[contains(@class,'title-div')]	timeout=20
 	Wait Until Element Is Visible			css=div.info-item-val a
 	@{itemsList}=							Get Webelements	//div[@class='info-item-val']/a
@@ -635,4 +640,8 @@ Try Search Element
 
 Wait For Ajax Overflow Vanish
 	Wait Until Element Is Not Visible	${locator_tender.ajax_overflow}	${COMMONWAIT}
+
+Click element by JS
+	[Arguments]	${locator}
+	Execute Javascript					window.$("${locator}").mouseup()
 
