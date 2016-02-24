@@ -14,7 +14,7 @@ ${tender_data_title}											xpath=//div[contains(@class,'title-div')]
 ${tender_data_description}										css=div.description
 ${tender_data_value.amount}										css=div[ng-if='model.budjet'] div.info-item-val
 ${tender_data_tenderID}											xpath=//div[.='Тендер ID:']/following-sibling::div
-${tender_data_procuringEntity.name}								css=a[title='О компании']
+${tender_data_procuringEntity.name}								css=a[ng-click='act.openCard()']
 ${tender_data_enquiryPeriod.startDate}							xpath=(//div[@class='period ng-scope']/div[@class='info-item'])[1]
 ${tender_data_enquiryPeriod.endDate}							xpath=(//div[@class='period ng-scope']/div[@class='info-item'])[2]
 ${tender_data_tenderPeriod.startDate}							xpath=(//div[@class='period ng-scope']/div[@class='info-item'])[3]
@@ -73,7 +73,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 	Run Keyword If	'phantomjs' in '${browset}'	Run Keywords	Create Webdriver		PhantomJS	${username}	service_args=${service args}
 	...   AND   Go To					${USERS.users['${username}'].homepage}
-	...  ELSE	Open Browser	${USERS.users['${username}'].homepage}   ${USERS.users['${username}'].browser}   alias=${username}
+	...   ELSE	Open Browser	${USERS.users['${username}'].homepage}   ${USERS.users['${username}'].browser}   alias=${username}
 
 	Set Window Position		@{USERS.users['${username}'].position}
 	Maximize Browser Window
@@ -94,10 +94,11 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait Until Element Is Enabled			xpath=//*[@id='sidebar']//input	timeout=${COMMONWAIT}
 	Wait Until Element Is Enabled			xpath=(//div[@class='tender-name_info tender-col'])[1]	timeout=${COMMONWAIT}
 
-	${education_type} =	Run Keyword If	'limited' in '${SUITE_NAME}'	Set Variable	False
+	${suite_name} = 	Convert To Lowercase	${SUITE_NAME}
+	${education_type} =	Run Keyword If	'limited' in '${suite_name}'	Set Variable	False
 		...  ELSE	Set Variable	True
 	${current_type} =						Get text	css=div.test-mode-aside
-	${check_result}=						Run Keyword If	'Войти в обучающий режим' in '${current_type}'	Set Variable  True
+	${check_result} =						Run Keyword If	'Войти в обучающий режим' in '${current_type}'	Set Variable  True
 	Run Keyword If							${check_result} and ${education_type}	Switch To Education Mode
 
 	Wait For Ajax
