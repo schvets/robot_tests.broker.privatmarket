@@ -2,6 +2,9 @@
 import re
 
 from munch import munchify
+from selenium.common.exceptions import StaleElementReferenceException
+
+
 def get_reg_exp_matches(reg_exp, string, group_num = 1):
     result = "none"
     # m = re.search(reg_exp.decode("utf-8"), string.decode("utf-8"), re.U)
@@ -32,4 +35,25 @@ def is_element_stale(webelement):
 
 def read_file_content(filePath):
     with open(filePath, 'r') as content_file:
-        return content_file.read()
+	return content_file.read()
+
+def fill_file_data(url, title, dateModified, datePublished):
+    return munchify({
+        "data": {
+            "url": url,
+            "title": title,
+            "id": "",
+            "dateModified": dateModified,
+            "datePublished": datePublished,
+        }
+    })
+
+def fill_bid_data(amount):
+    return munchify({
+        "data": {
+            "value": {
+                "amount": amount,
+                "currency": "UAH"
+            }
+        }
+    })
