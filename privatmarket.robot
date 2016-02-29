@@ -88,6 +88,10 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Mark Step								_tender_search_start
 	Mark Step								${ARGUMENTS[1]}
 
+	${USERS.users['PrivatMarket_Provider'].tender_data.data} = 		Set variable	${USERS.users['Tender_Owner'].tender_data.data}
+	${USERS.users['PrivatMarket_Provider1'].tender_data.data} = 	Set variable	${USERS.users['Tender_Owner'].tender_data.data}
+	${USERS.users['PrivatMarket_Viewer'].tender_data.data} = 		Set variable	${USERS.users['Tender_Owner'].tender_data.data}
+
 	Switch browser							${ARGUMENTS[0]}
 	Go to									${USERS.users['${ARGUMENTS[0]}'].homepage}
 	Switch To Frame							id=tenders
@@ -274,7 +278,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 Перевірити присутність bids
 	Element Should Not Be Visible	${tender_data_${element}}
 	#element is not visible
-	[return]	None
+	[return]	${FALSE}
 
 Внести зміни в тендер
 	[Arguments]  @{ARGUMENTS}
@@ -566,7 +570,7 @@ Wait Visibulity And Click Element
 
 Mark Step
 	[Arguments]  ${stepName}
-	log ${stepName}
+	log	${stepName}
 
 Change Feild Value
 	[Arguments]	${locator}	${value}
