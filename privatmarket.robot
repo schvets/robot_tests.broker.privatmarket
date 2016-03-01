@@ -153,6 +153,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	...	${item} ==  item
 	...	${element} ==  element
 
+	Switch To Tab	1
 	${element} = 	Replace String	${base_element}	items[${item}]	items
 #	Mark Step  _in_getting_info item=${item} result=${element}
 
@@ -309,6 +310,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Click Button						xpath=//button[@ng-click='act.sendEnquiry()']
 	Mark Step							_asking_question_send
 	Wait For Ajax
+	sleep								4s
 	Wait For Element Value				css=input[ng-model='model.person.phone']
 	Wait Until Element Is Visible		xpath=//input[@ng-model="model.question.title"]				timeout=10
 	Wait Until Element Is Enabled		xpath=//input[@ng-model="model.question.title"]				timeout=10
@@ -347,8 +349,10 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 	Відкрити заявку
 	Mark Step							_claim_creation_set_price
+	debug
 	Run Keyword If	'multiLotTender' in '${SUITE_NAME}'	Input Text	${locator_tenderClaim.checkedLot.fieldPrice}	${Arguments[2].data.value.amount}
 		...  ELSE	Input Text	${locator_tenderClaim.fieldPrice}	${Arguments[2].data.value.amount}
+
 	click element						${locator_tenderClaim.fieldPrice}
 	Input Text							${locator_tenderClaim.fieldPrice}	${Arguments[2].data.value.amount}
 	click element						${locator_tenderClaim.fieldEmail}
@@ -367,6 +371,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	${result}=							get_reg_exp_matches	Номер заявки: (\\d*),	${claim_id}	1
 	[return]	${Arguments[2]}
 
+
 Відкрити заявку
 	Wait For Ajax
 	Mark Step							_claim_creation_start
@@ -374,12 +379,13 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Mark Step							_claim_creation_get_tender_status
 	${tender_status} = 					Get text	css=span.state-label.ng-binding
 	Run Keyword If	'${tender_status}' == 'Период уточнений завершен'	Wait For Element With Reload	${locator_tenderClaim.buttonCreate}	1
+	Scroll Page To Element				${locator_tenderClaim.buttonCreate}
 	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}
 	Wait For Ajax
 	Wait For Element Value				css=input[ng-model='model.person.lastName']
 	Mark Step		 					_claim_creation_wait_data_load
 	sleep								5s
-	Wait Until Element Is Enabled		${locator_tenderClaim.fieldPrice}	20
+	Wait Until Element Is Enabled		${locator_tenderClaim.fieldEmail}	20
 
 Змінити цінову пропозицію
 	[Arguments]  @{ARGUMENTS}
@@ -570,7 +576,8 @@ Wait Visibulity And Click Element
 
 Mark Step
 	[Arguments]  ${stepName}
-	log	${stepName}
+	log to console	_
+	log to console	_${stepName}
 
 Change Feild Value
 	[Arguments]	${locator}	${value}
