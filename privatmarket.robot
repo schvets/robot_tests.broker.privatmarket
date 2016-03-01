@@ -111,9 +111,10 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	sleep									1s
 	Input Text								xpath=//*[@id='sidebar']//input	${ARGUMENTS[1]}
 	Wait For Tender							${ARGUMENTS[1]}
+	sleep									2s
 	Click Element By JS						span[id='${ARGUMENTS[1]}'] div.tenders_sm_info
 	Wait For Ajax
-
+	sleep									7s
 	Wait Until Element Is Visible			xpath=//div[contains(@class,'title-div')]	timeout=20
 	Wait Until Element Is Visible			css=div.info-item-val a
 	@{itemsList}=							Get Webelements	//div[@class='info-item-val']/a
@@ -349,6 +350,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Mark Step							_claim_creation_set_price
 	Run Keyword If	'multiLotTender' in '${SUITE_NAME}'	Input Text	${locator_tenderClaim.checkedLot.fieldPrice}	${Arguments[2].data.value.amount}
 		...  ELSE	Input Text	${locator_tenderClaim.fieldPrice}	${Arguments[2].data.value.amount}
+	sleep								5s
 	click element						${locator_tenderClaim.fieldPrice}
 	Input Text							${locator_tenderClaim.fieldPrice}	${Arguments[2].data.value.amount}
 	click element						${locator_tenderClaim.fieldEmail}
@@ -397,7 +399,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait For Element Value				css=input[ng-model='model.person.lastName']
 	Wait Until Element Is Enabled		${locator_tenderClaim.fieldPrice}	${COMMONWAIT}
 	sleep								5s
-	Input Text							${locator_tenderClaim.fieldPrice}	${ARGUMENTS[2].data.value.amount}
+	Input Text							${locator_tenderClaim.fieldPrice}	${ARGUMENTS[2].data.value['amount']}
 	click element						${locator_tenderClaim.fieldEmail}
 	Input Text							${locator_tenderClaim.fieldEmail}	${USERS.users['${ARGUMENTS[0]}'].email}
 	Scroll Page To Element				${locator_tenderClaim.buttonSend}
@@ -542,7 +544,7 @@ Login
 	Wait Until Element Is Visible	css=ul.user-menu  timeout=30
 
 Wait For Ajax
-	Wait For Condition	return angular.element(document.body).injector().get(\'$http\').pendingRequests.length==0	40s
+	Wait For Condition	return angular.element(document.body).injector().get(\'$http\').pendingRequests.length==0	60s
 	Wait For Condition	return window.jQuery!=undefined && jQuery.active==0	${COMMONWAIT}
 
 Test Fail
