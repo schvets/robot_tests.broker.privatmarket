@@ -580,8 +580,7 @@ Wait Visibulity And Click Element
 
 Mark Step
 	[Arguments]  ${stepName}
-	log to console	_
-	log to console	_${stepName}
+	log	${stepName}
 
 Change Feild Value
 	[Arguments]	${locator}	${value}
