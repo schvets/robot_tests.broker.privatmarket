@@ -285,13 +285,48 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	[Arguments]  @{ARGUMENTS}
 	Fail  Функція не підтримується майданчиком
 
-Подати скаргу
-	[Arguments]  @{ARGUMENTS}
-	Fail  Ключове слово не реалізовано
+Подати скаргу
+	[Arguments]  ${user}  ${tender_id}  ${complaints}
+	privatmarket.Пошук тендера по ідентифікатору	${user}	${tenderId}
+
+	debug
+	Mark Step							_start_complaint
+	Switch To Tab						3
+	Wait Enable And Click Element		xpath=//button[contains(@ng-click, 'act.setComplaintOnlyTender()')]
+	Mark Step							_fill_data
+	Wait For Ajax
+	Wait For Element Value				css=input[ng-model='model.person.phone']
+	Wait Until Element Is Enabled		xpath=//input[@ng-model='model.complaint.user.title']	timeout=10
+	debug
+	Input Text							xpath=//input[@ng-model='model.complaint.user.title']	${complaints}
+	Input Text							xpath=//input[@ng-model='model.complaint.user.description']	${complaints}
+	Click Button						xpath=//button[@ng-click='act.sendComplaint()']
+	Mark Step							_start_complaint_finished
+	Wait For Ajax
+	Mark Step							_complaint_wait_for_allert
+	Wait Until Element Is Enabled		xpath=//div[@class='alert-info ng-scope ng-binding']	timeout=20
+	Wait Until Element Contains			xpath=//div[@class='alert-info ng-scope ng-binding']	Ваше требование успешно отправлено. Спасибо за обращение!	timeout=10
+	Wait For Ajax
+	Mark Step							_asking_question_wait_for_allert_disapeare
+	sleep								3s
+	Wait Until Element Is Not Visible	xpath=//input[@ng-model="model.question.title"]	timeout=20
+	Mark Step							_asking_question_end
 
 Порівняти скаргу
-	[Arguments]  @{ARGUMENTS}
-	Fail  Ключове слово не реалізовано
+	[Arguments]  ${user}  ${tender_id}  ${complaints}
+	privatmarket.Пошук тендера по ідентифікатору	${user}	${tenderId}
+
+	Wait For Element With Reload	css=div.question-head.title	3
+	Wait Until Element Is Visible	css=div.question-head.title
+	${title} = 						Get Text	css=div.question-head.title span
+	${description} = 				Get Text	css=div[ng-bind-html='q.description']
+	${author_name} = 				Get Text	css=div.author
+	debug
+	${author_name} = 				Get Substring	${author_name}	4
+
+	Should Be Equal					${description}	${complaints.data.description}
+	Should Be Equal					${title}		${complaints.data.title}
+	Should Be Equal					${author_name}	${complaints.data.author.name}
 
 Задати питання
 	[Arguments]  @{ARGUMENTS}
@@ -544,12 +579,13 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 #Custom Keywords
 Login
-	Click Element					xpath=//span[.='Мой кабинет']
-	Wait Until Element Is Visible	id=p24__login__field	${COMMONWAIT}
-	Execute Javascript				$('#p24__login__field').val(${USERS.users['${username}'].login})
-	Input Text						xpath=//div[@id="login_modal" and @style='display: block;']//input[@type='password']	${USERS.users['${username}'].password}
-	Click Element					xpath=//div[@id="login_modal" and @style='display: block;']//button[@type='submit']
-	Wait Until Element Is Visible	css=ul.user-menu  timeout=30
+	Click Element						xpath=//span[.='Мой кабинет']
+	Wait Until Element Is Visible		id=p24__login__field	${COMMONWAIT}
+	Execute Javascript					$('#p24__login__field').val(${USERS.users['${username}'].login})
+	Input Text							xpath=//div[@id="login_modal" and @style='display: block;']//input[@type='password']	${USERS.users['${username}'].password}
+	Click Element						xpath=//div[@id="login_modal" and @style='display: block;']//button[@type='submit']
+	Wait Until Element Is Visible		css=ul.user-menu  timeout=30
+	Wait Until Element Is Not Visible	xpath=//div[@id="login_modal" and @style='display: block;']//input[@type='password']	timeout=40
 
 Wait For Ajax
 	Wait For Condition	return angular.element(document.body).injector().get(\'$http\').pendingRequests.length==0	40s
