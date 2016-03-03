@@ -446,10 +446,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Mark Step							${fileContent}
 	Mark Step							${correctFilePath}
 
-	Execute Javascript	var scope = angular.element($("button[ng-click='act.chooseFile()']")).scope();
-		...  var generatedFile = new File(["${fileContent}"], "${correctFilePath}", {type: "application/force-download", lastModified: new Date()});
-		...  scope.files[0] = generatedFile;
-		...  scope.uploadFile(scope.files[0]);
+	Execute Javascript					$("#fileToUpload").removeClass();
+	Choose File							css=input#fileToUpload	${correctFilePath}
 
 	${upload_response} =	Сберегти доданий файл	${filePath}
 	#before step for Change File
@@ -459,7 +457,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 Сберегти доданий файл
 	[Arguments]  ${filePath}
 	Wait Until Element Is Not Visible	css=div[ng-show='progressVisible'] div.progress-bar	timeout=30
-	Sleep								3s
+	Sleep								5s
 	Wait Until Element Is Visible		xpath=(//div[contains(@class, 'file-item')])[1]	timeout=30
 	Click Button						${locator_tenderClaim.buttonSend}
 	Close confirmation					Ваша заявка успешно обновлена!
@@ -499,10 +497,9 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Mark Step							${fileContent}
 	Mark Step							${correctFilePath}
 
-	Execute Javascript	angular.element($("input[ng-model='model.fileName']")).scope().$parent.act.changeFile(angular.element("div.file-item").scope().file);
-	...  var scope = angular.element($("input[ng-model='model.fileName']")).scope();
-	...  var generatedFile = new File(["${fileContent}"], "${correctFilePath}", {type: "application/force-download", lastModified: new Date()});
-	...  scope.files[0] = generatedFile; scope.uploadFile(scope.files[0]);
+	Execute Javascript					$("#fileToUpload").removeClass();
+	Execute Javascript					angular.element($("input[ng-model='model.fileName']")).scope().$parent.act.changeFile(angular.element("div.file-item").scope().file);
+	Choose File   						css=input#fileToUpload    ${correctFilePath}
 
 	Wait Until Element Is Not Visible	css=div[ng-show='progressVisible'] div.progress-bar	timeout=30
 	Sleep								5s
@@ -536,12 +533,13 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 #Custom Keywords
 Login
-	Click Element					xpath=//span[.='Мой кабинет']
-	Wait Until Element Is Visible	id=p24__login__field	${COMMONWAIT}
-	Execute Javascript				$('#p24__login__field').val(${USERS.users['${username}'].login})
-	Input Text						xpath=//div[@id="login_modal" and @style='display: block;']//input[@type='password']	${USERS.users['${username}'].password}
-	Click Element					xpath=//div[@id="login_modal" and @style='display: block;']//button[@type='submit']
-	Wait Until Element Is Visible	css=ul.user-menu  timeout=30
+	Click Element						xpath=//span[.='Мой кабинет']
+	Wait Until Element Is Visible		id=p24__login__field	${COMMONWAIT}
+	Execute Javascript					$('#p24__login__field').val(${USERS.users['${username}'].login})
+	Input Text							xpath=//div[@id="login_modal" and @style='display: block;']//input[@type='password']	${USERS.users['${username}'].password}
+	Click Element						xpath=//div[@id="login_modal" and @style='display: block;']//button[@type='submit']
+	Wait Until Element Is Visible		css=ul.user-menu  timeout=30
+	Wait Until Element Is Not Visible	xpath=//div[@id="login_modal" and @style='display: block;']//input[@type='password']
 
 Wait For Ajax
 	Wait For Condition	return angular.element(document.body).injector().get(\'$http\').pendingRequests.length==0	60s
