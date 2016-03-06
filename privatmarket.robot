@@ -94,7 +94,9 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 	Switch browser							${ARGUMENTS[0]}
 	Go to									${USERS.users['${ARGUMENTS[0]}'].homepage}
+	Wait Until Element Is Enabled			id=tenders	timeout=${COMMONWAIT}
 	Switch To Frame							id=tenders
+	Wait For Ajax
 	Wait Until Element Is Enabled			xpath=//*[@id='sidebar']//input	timeout=${COMMONWAIT}
 	Wait Until Element Is Enabled			xpath=(//div[@class='tender-name_info tender-col'])[1]	timeout=${COMMONWAIT}
 
@@ -118,14 +120,15 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait Until Element Is Visible			css=div.info-item-val a
 	@{itemsList}=							Get Webelements	//div[@class='info-item-val']/a
 	${item_list_length} = 					Get Length	${itemsList}
-	log to console  ${item_list_length}
-	: FOR    ${INDEX}    IN RANGE    0    ${item_list_length}
-		\  ${locator_index} =				Evaluate	${INDEX}+1
-		\  Wait Until Element Is Visible	xpath=(//div[@class='info-item-val']/a)[${locator_index}]
-		\  Scroll Page To Element			xpath=(//div[@class='info-item-val']/a)[${locator_index}]
-		\  Wait For Ajax
-		\  Click Element					${itemsList[${INDEX}]}
-		\  Wait Until Element Is Visible	${tender_data_items.classification.id}
+#	log to console  ${item_list_length}
+#	: FOR    ${INDEX}    IN RANGE    1    ${item_list_length}
+#		\  ${locator_index} =				Evaluate	${INDEX}+1
+#		\  Wait Until Element Is Visible	xpath=(//div[@class='info-item-val']/a)[${locator_index}]
+#		\  Scroll Page To Element			xpath=(//div[@class='info-item-val']/a)[${locator_index}]
+#		\  Wait For Ajax
+#		\  Wait Until Element Is Enabled	${itemsList[${INDEX}]}	timeout=${COMMONWAIT}
+#		\  Click Element					${itemsList[${INDEX}]}
+#		\  Wait Until Element Is Visible	xpath=(//div[@ng-if="adb.classification"])[${locator_index}]
 	Mark Step								_tender_search_end
 
 Створити тендер
@@ -349,7 +352,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 	Відкрити заявку
 	Mark Step							_claim_creation_set_price
-	debug
 	Run Keyword If	'multiLotTender' in '${SUITE_NAME}'	Input Text	${locator_tenderClaim.checkedLot.fieldPrice}	${Arguments[2].data.value.amount}
 		...  ELSE	Input Text	${locator_tenderClaim.fieldPrice}	${Arguments[2].data.value.amount}
 
@@ -403,6 +405,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait For Element Value				css=input[ng-model='model.person.lastName']
 	Wait Until Element Is Enabled		${locator_tenderClaim.fieldPrice}	${COMMONWAIT}
 	sleep								5s
+	debug
 	Input Text							${locator_tenderClaim.fieldPrice}	${ARGUMENTS[2].data.value.amount}
 	click element						${locator_tenderClaim.fieldEmail}
 	Input Text							${locator_tenderClaim.fieldEmail}	${USERS.users['${ARGUMENTS[0]}'].email}
@@ -624,8 +627,9 @@ Try Search Tender
 	[return]	true
 
 Switch To Education Mode
+	Wait Until Element Is Enabled		css=div.test-mode-aside a		timeout=${COMMONWAIT}
 	Click Element						css=div.test-mode-aside a
-	Wait Until Element Contains			css=div.test-mode-aside a	Выйти из обучающего режима	10
+	Wait Until Element Contains			css=div.test-mode-aside a	Выйти из обучающего режима	${COMMONWAIT}
 	Wait For Ajax Overflow Vanish
 
 Switch To Tab
