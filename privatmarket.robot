@@ -121,15 +121,17 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait Until Element Is Visible			css=div.info-item-val a
 	@{itemsList}=							Get Webelements	//div[@class='info-item-val']/a
 	${item_list_length} = 					Get Length	${itemsList}
-#	log to console  ${item_list_length}
-#	: FOR    ${INDEX}    IN RANGE    1    ${item_list_length}
-#		\  ${locator_index} =				Evaluate	${INDEX}+1
-#		\  Wait Until Element Is Visible	xpath=(//div[@class='info-item-val']/a)[${locator_index}]
-#		\  Scroll Page To Element			xpath=(//div[@class='info-item-val']/a)[${locator_index}]
-#		\  Wait For Ajax
-#		\  Wait Until Element Is Enabled	${itemsList[${INDEX}]}	timeout=${COMMONWAIT}
-#		\  Click Element					${itemsList[${INDEX}]}
-#		\  Wait Until Element Is Visible	xpath=(//div[@ng-if="adb.classification"])[${locator_index}]
+
+#	TODO раскомментировать после исправления бага
+	log to console  ${item_list_length}
+	: FOR    ${INDEX}    IN RANGE    1    ${item_list_length}
+		\  ${locator_index} =				Evaluate	${INDEX}+1
+		\  Wait Until Element Is Visible	xpath=(//div[@class='info-item-val']/a)[${locator_index}]
+		\  Scroll Page To Element			xpath=(//div[@class='info-item-val']/a)[${locator_index}]
+		\  Wait For Ajax
+		\  Wait Until Element Is Enabled	${itemsList[${INDEX}]}	timeout=${COMMONWAIT}
+		\  Click Element					${itemsList[${INDEX}]}
+		\  Wait Until Element Is Visible	xpath=(//div[@ng-if="adb.classification"])[${locator_index}]
 	Mark Step								_tender_search_end
 
 Створити тендер
@@ -381,7 +383,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	...	${ARGUMENTS[1]} ==  tenderId
 	...	${ARGUMENTS[2]} ==  bid
 
-	Run Keyword If	'без прив’язки до лоту' in '${TEST_NAME}' OR 'без прив’язки до лоту' in '${TEST_NAME}'	Fail  Така ситуація не може виникнути
+	Run Keyword If	'без прив’язки до лоту' in '${TEST_NAME}'	Fail  Така ситуація не може виникнути
+	Run Keyword If	'без нецінового показника' in '${TEST_NAME}'	Fail  Така ситуація не може виникнути
 
 	Switch browser						${ARGUMENTS[0]}
 	privatmarket.Пошук тендера по ідентифікатору	${ARGUMENTS[0]}   ${ARGUMENTS[1]}
@@ -411,7 +414,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 Відкрити заявку
 	Wait For Ajax
 	Mark Step							_claim_creation_start
-	Wait Until Element Is Visible		css=span.state-label.ng-binding
+	Wait Until Element Is Visible		xpath=//span[@class='state-label ng-binding']
 	Mark Step							_claim_creation_get_tender_status
 	${tender_status} =	Run Keyword If	'multiLotTender' in '${SUITE_NAME}'	Get text	xpath=(//span[@class='state-label ng-binding'])[2]
 		...  ELSE	Get text	xpath=//span[@class='state-label ng-binding']
@@ -426,13 +429,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait Until Element Is Enabled		${locator_tenderClaim.fieldEmail}	20
 
 Змінити цінову пропозицію
-	[Arguments]  @{ARGUMENTS}
-	[Documentation]
-	...	${ARGUMENTS[0]} ==  username
-	...	${ARGUMENTS[1]} ==  tenderId
-	...	${ARGUMENTS[2]} ==  bid
-
-	privatmarket.Пошук тендера по ідентифікатору	${ARGUMENTS[0]}   ${ARGUMENTS[1]}
+	[Arguments]  ${username}  ${tender_uaid}  ${fieldname}  ${fieldvalue}
+	privatmarket.Пошук тендера по ідентифікатору	${username}   ${tender_uaid}
 	Wait For Ajax
 
 	Mark Step							_claim_edit_start
@@ -441,12 +439,10 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait For Element Value				css=input[ng-model='model.person.lastName']
 	Wait Until Element Is Enabled		${locator_tenderClaim.fieldEmail}	${COMMONWAIT}
 	sleep								5s
-	debug
-	Run Keyword If	'multiLotTender' in '${SUITE_NAME}'	Input Text	${locator_tenderClaim.checkedLot.fieldPrice}	${Arguments[2].data.lotValues[0]['value']['amount']}
-		...  ELSE	Input Text	${locator_tenderClaim.fieldPrice}	${Arguments[2].data.value['amount']}
 
-	click element						${locator_tenderClaim.fieldEmail}
-	Input Text							${locator_tenderClaim.fieldEmail}	${USERS.users['${ARGUMENTS[0]}'].email}
+	Run Keyword 						Змінити ${fieldname}	${fieldvalue}
+	Click Element						${locator_tenderClaim.fieldEmail}
+	Input Text							${locator_tenderClaim.fieldEmail}	${USERS.users['${username}'].email}
 	Scroll Page To Element				${locator_tenderClaim.buttonSend}
 	Click Button						${locator_tenderClaim.buttonSend}
 	Close confirmation					Ваша заявка успешно обновлена!
@@ -455,7 +451,18 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait For Ajax
 	${claim_id}=						Get text			css=div.afp-info.ng-scope.ng-binding
 	${result}=							get_reg_exp_matches	Номер заявки: (\\d*),	${claim_id}	1
-	[return]	${Arguments[2]}
+	[return]	${fieldname}
+
+Змінити parameters.0.value
+	[Arguments]  ${fieldvalue}
+	Select From List	xpath=(//select[@ng-model='feature.userValue'])[2]	${fieldvalue}
+	debug
+
+Змінити value.amount
+	[Arguments]  ${fieldvalue}
+	Run Keyword If	'multiLotTender' in '${SUITE_NAME}'	Input Text	${locator_tenderClaim.checkedLot.fieldPrice}	${fieldname.data.lotValues[0]['value']['amount']}
+		...  ELSE	IF	'meatTender' in '${SUITE_NAME}	Input Text	${locator_tenderClaim.fieldPrice}	${fieldname.data.value.amount}
+		...  ELSE	Input Text	${locator_tenderClaim.fieldPrice}	${fieldname.data.value['amount']}
 
 Скасувати цінову пропозицію
 	[Arguments]  @{ARGUMENTS}
