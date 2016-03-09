@@ -1,5 +1,6 @@
 # coding=utf-8
 import re
+from dateutil.parser import parse
 
 from munch import munchify
 from selenium.common.exceptions import StaleElementReferenceException
@@ -45,15 +46,5 @@ def fill_file_data(url, title, dateModified, datePublished):
             "id": "",
             "dateModified": dateModified,
             "datePublished": datePublished,
-        }
-    })
-
-def fill_bid_data(amount):
-    return munchify({
-        "data": {
-            "value": {
-                "amount": amount,
-                "currency": "UAH"
-            }
         }
     })

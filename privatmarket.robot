@@ -190,11 +190,10 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Run Keyword And Return If	'${element}' == 'items.unit.code'						Отримати код			${element}	${item}
 	Run Keyword And Return If	'${element}' == 'items.deliveryLocation.latitude'		Отримати число			${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'items.deliveryLocation.longitude'		Отримати число			${element}	0	${item}
+	Run Keyword And Return If	'${element}' == 'auctionPeriod.startDate'				Отримати інформацію з ${element}	${element}	${item}
 
 	Run Keyword If	'${element}' == 'questions[0].title'	Wait For Element With Reload	${tender_data_${element}}	2
 	Run Keyword If	'${element}' == 'questions[0].answer'	Wait For Element With Reload	${tender_data_${element}}	2
-	Run Keyword If	'${element}' == 'auctionPeriod.startDate'	Wait For Element With Reload	${tender_data_${element}}	1
-	Run Keyword And Return If	'${element}' == 'auctionPeriod.startDate'	Отримати дату та час	${element}	1	${item}
 
 	Wait Until Element Is Visible	${tender_data_${element}}	timeout=${COMMONWAIT}
 	${result_full} =				Get Text	${tender_data_${element}}
@@ -288,6 +287,12 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	#element is not visible
 #	[return]	${FALSE}
 	[return]	${None}
+
+Отримати інформацію з auctionPeriod.startDate
+	[Arguments]  ${element}  ${item}
+	Wait For Element With Reload	${tender_data_${element}}	1
+	${start_date} =					Отримати дату та час	${element}	1	${item}
+	[return]  ${start_date}
 
 Внести зміни в тендер
 	[Arguments]  @{ARGUMENTS}
@@ -533,14 +538,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	${upload_response} = 				Create Dictionary
 	Set To Dictionary					${upload_response}	upload_response	${uploaded_file_data}
 	[return]	${upload_response}
-
-#Відповідний тест тимчасово видалено
-#Отримати документ
-#	[Arguments]  ${user}  ${tenderId}  ${url}
-#	${title} = 	Get Text	css=div.modal span.file-name
-#	Go To 	https://dds.privatbank.ua${url}
-#	${fileText} =	Get text	css=pre
-#	[return]	${fileText}  ${title}
 
 Змінити документ в ставці
 	[Arguments]  ${user}  ${filePath}  ${bidid}  ${docid}
