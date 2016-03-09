@@ -124,14 +124,14 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 #	TODO раскомментировать после исправления бага
 	log to console  ${item_list_length}
-	: FOR    ${INDEX}    IN RANGE    1    ${item_list_length}
+	: FOR    ${INDEX}    IN RANGE    0    ${item_list_length}
 		\  ${locator_index} =				Evaluate	${INDEX}+1
 		\  Wait Until Element Is Visible	xpath=(//div[@class='info-item-val']/a)[${locator_index}]
 		\  Scroll Page To Element			xpath=(//div[@class='info-item-val']/a)[${locator_index}]
 		\  Wait For Ajax
 		\  Wait Until Element Is Enabled	${itemsList[${INDEX}]}	timeout=${COMMONWAIT}
 		\  Click Element					${itemsList[${INDEX}]}
-		\  Wait Until Element Is Visible	xpath=(//div[@ng-if="adb.classification"])[${locator_index}]
+		\  Wait Until Element Is Visible	xpath=(//div[@ng-if='adb.classification'])[${locator_index}]
 	Mark Step								_tender_search_end
 
 Створити тендер
@@ -168,7 +168,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Run Keyword And Return If	'${element}' == 'enquiryPeriod.endDate'		Отримати дату та час	${element}	1	${item}
 	Run Keyword And Return If	'${element}' == 'tenderPeriod.startDate'	Отримати дату та час	${element}	1	${item}
 	Run Keyword And Return If	'${element}' == 'tenderPeriod.endDate'		Отримати дату та час	${element}	1	${item}
-	Run Keyword And Return If	'${element}' == 'auctionPeriod.startDate'	Отримати дату та час	${element}	1	${item}
 	Run Keyword And Return If	'${element}' == 'questions[0].date'			Отримати дату та час	${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'bids'						Перевірити присутність bids
 
@@ -194,6 +193,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 	Run Keyword If	'${element}' == 'questions[0].title'	Wait For Element With Reload	${tender_data_${element}}	2
 	Run Keyword If	'${element}' == 'questions[0].answer'	Wait For Element With Reload	${tender_data_${element}}	2
+	Run Keyword If	'${element}' == 'auctionPeriod.startDate'	Wait For Element With Reload	${tender_data_${element}}	1
+	Run Keyword And Return If	'${element}' == 'auctionPeriod.startDate'	Отримати дату та час	${element}	1	${item}
 
 	Wait Until Element Is Visible	${tender_data_${element}}	timeout=${COMMONWAIT}
 	${result_full} =				Get Text	${tender_data_${element}}
@@ -455,14 +456,16 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Змінити parameters.0.value
 	[Arguments]  ${fieldvalue}
-	Select From List	xpath=(//select[@ng-model='feature.userValue'])[2]	${fieldvalue}
-	debug
+	Select From List	xpath=(//select[@ng-model='feature.userValue'])[1]	${fieldvalue}
+
+Змінити lotValues.0.value.amount
+	[Arguments]  ${fieldvalue}
+	Select From List	xpath=(//select[@ng-model='feature.userValue'])[1]	${fieldvalue}
 
 Змінити value.amount
 	[Arguments]  ${fieldvalue}
-	Run Keyword If	'multiLotTender' in '${SUITE_NAME}'	Input Text	${locator_tenderClaim.checkedLot.fieldPrice}	${fieldname.data.lotValues[0]['value']['amount']}
-		...  ELSE	IF	'meatTender' in '${SUITE_NAME}	Input Text	${locator_tenderClaim.fieldPrice}	${fieldname.data.value.amount}
-		...  ELSE	Input Text	${locator_tenderClaim.fieldPrice}	${fieldname.data.value['amount']}
+	Run Keyword If	'multiLotTender' in '${SUITE_NAME}'	Input Text	${locator_tenderClaim.checkedLot.fieldPrice}	${fieldvalue}
+		...  ELSE	'meatTender' in '${SUITE_NAME}	Input Text	${locator_tenderClaim.fieldPrice}	${fieldvalue}
 
 Скасувати цінову пропозицію
 	[Arguments]  @{ARGUMENTS}
