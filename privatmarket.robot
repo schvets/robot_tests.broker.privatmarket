@@ -44,6 +44,10 @@ ${tender_data_questions[0].date}								xpath=//div[@class = 'question-head titl
 ${tender_data_questions[0].title}								css=div.question-head.title span
 ${tender_data_questions[0].answer}								css=div[ng-bind-html='q.answer']
 ${tender_data_bids}												xpath=(//table[@class='bids']//tr)[2]
+${complaints.title}												css=div.title span
+${complaints.description}										css=div[ng-bind-html='q.description']
+${complaints.documents.title}									css=span.file-name
+${complaints.status}											css=//div[contains(@ng-if,'q.status')]
 
 ${locator_tenderCreation.buttonEdit}			xpath=//button[@ng-click='act.createAfp()']
 ${locator_tenderCreation.buttonSave}			css=button.btn.btn-success
@@ -122,7 +126,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	@{itemsList}=							Get Webelements	//div[@class='info-item-val']/a
 	${item_list_length} = 					Get Length	${itemsList}
 
-#	TODO раскомментировать после исправления бага
 	log to console  ${item_list_length}
 	: FOR    ${INDEX}    IN RANGE    0    ${item_list_length}
 		\  ${locator_index} =				Evaluate	${INDEX}+1
@@ -298,7 +301,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	[Arguments]  @{ARGUMENTS}
 	Fail  Функція не підтримується майданчиком
 
-Подати скаргу
+Створити вимогу
 	[Arguments]  ${user}  ${tender_id}  ${complaints}
 	privatmarket.Пошук тендера по ідентифікатору	${user}	${tenderId}
 	Mark Step							_start_complaint
@@ -313,6 +316,19 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Input Text							css=div.info-item-val textarea							${complaints.data.description}
 	Scroll Page To Element				xpath=//input[@ng-model='model.person.email']
 	Input text							xpath=//input[@ng-model='model.person.email']			${USERS.users['${username}'].email}
+	[return]  ${complaints}
+
+Завантажити документацію до вимоги
+	[Arguments]  ${user}  ${tender_id}  ${complaints}  ${document}
+	${correctFilePath} = 				Replace String	${document}	\\	\/
+	Execute Javascript					$("#fileToUpload").removeClass();
+	Choose File							css=input#fileToUpload	${correctFilePath}
+	sleep								5s
+	Wait Until Element Is Visible		css=div.file-item
+	[return]  ${document}
+
+Подати вимогу
+	[Arguments]  ${user}  ${tender_id}  ${complaints}  ${confrimation_data}
 	Click Button						xpath=//button[@ng-click='act.sendComplaint()']
 	Mark Step							_start_complaint_finished
 	Wait For Ajax
@@ -324,18 +340,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	sleep								3s
 	Wait Until Element Is Not Visible	xpath=//input[@ng-model="model.question.title"]			timeout=${COMMONWAIT}
 	Mark Step							_asking_question_end
-
-Порівняти скаргу
-	[Arguments]  ${user}  ${tender_id}  ${complaints}
-	privatmarket.Пошук тендера по ідентифікатору	${user}	${tenderId}
-
-	Wait For Element With Reload	css=div.question-head.title	3
-#	TODO добавить проверку названия
-#	${title} = 						Get Text	css=div.question-head.title span
-	${description} = 				Get Text	css=div[ng-bind-html='q.description']
-
-#	Should Be Equal					${title}		${complaints.data.title}
-	Should Be Equal					${description}	${complaints.data.description}
 
 Задати питання
 	[Arguments]  @{ARGUMENTS}
