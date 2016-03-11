@@ -200,7 +200,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 Отримати строку
 	[Arguments]  ${element_name}  ${position_number}  ${item}
 	${result_full} =				Отримати текст елемента	${element_name}	${item}
-	${result} =						strip_string	${result_full}
+	${result} =						Strip String	${result_full}
 	${result} =						Replace String	${result}	,	${EMPTY}
 	${result} =						Replace String	${result}	:	${EMPTY}
 	${values_list} =				Split String	${result}
@@ -234,7 +234,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 Отримати частину адреси
 	[Arguments]  ${element_name}  ${position_number}  ${item}
 	${result_full} =	Отримати текст елемента	${element_name}	${item}
-	${result} =			strip_string	${result_full}
+	${result} =			Strip String	${result_full}
 	${values_list} =	Split String	${result}		,${SPACE}
 	${length} =	Get Length	${values_list}
 	${result} =	Run Keyword If	'${position_number}' == '4' and ${length} > 5	Set variable	${values_list[4]}, ${values_list[5]}
@@ -383,7 +383,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	[Documentation]
 	...	${ARGUMENTS[0]} ==  username
 	...	${ARGUMENTS[1]} ==  tenderId
-	...	${ARGUMENTS[2]} ==  bid
+	...	${ARGUMENTS[2]} ==  field
+	...	${ARGUMENTS[3]} ==  value
 
 	privatmarket.Пошук тендера по ідентифікатору	${ARGUMENTS[0]}   ${ARGUMENTS[1]}
 	Wait For Ajax
@@ -394,7 +395,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait For Element Value				css=input[ng-model='model.person.lastName']
 	Wait Until Element Is Enabled		${locator_tenderClaim.fieldPrice}	${COMMONWAIT}
 	sleep								5s
-	Input Text							${locator_tenderClaim.fieldPrice}	${ARGUMENTS[2].data.value['amount']}
+	Input Text							${locator_tenderClaim.fieldPrice}	${ARGUMENTS[3]}
 	click element						${locator_tenderClaim.fieldEmail}
 	Input Text							${locator_tenderClaim.fieldEmail}	${USERS.users['${ARGUMENTS[0]}'].email}
 	Scroll Page To Element				${locator_tenderClaim.buttonSend}
