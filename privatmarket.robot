@@ -44,10 +44,10 @@ ${tender_data_questions[0].date}								xpath=//div[@class = 'question-head titl
 ${tender_data_questions[0].title}								css=div.question-head.title span
 ${tender_data_questions[0].answer}								css=div[ng-bind-html='q.answer']
 ${tender_data_bids}												xpath=(//table[@class='bids']//tr)[2]
-${complaints.title}												css=div.title span
-${complaints.description}										css=div[ng-bind-html='q.description']
-${complaints.documents.title}									css=span.file-name
-${complaints.status}											css=//div[contains(@ng-if,'q.status')]
+${complaints[0].title}											xpath=(//div[@class='title']/span)[1]
+${complaints[0].description}									xpath=(//div[@ng-bind-html='q.description'])[1]
+${complaints[0].documents.title}								xpath=(//span[@class='file-name'])[1]
+${complaints[0].status}											xpath=(//div[contains(@ng-if,'q.status')])[1]
 
 ${locator_tenderCreation.buttonEdit}			xpath=//button[@ng-click='act.createAfp()']
 ${locator_tenderCreation.buttonSave}			css=button.btn.btn-success
@@ -82,7 +82,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 	Set Window Position		@{USERS.users['${username}'].position}
 	Maximize Browser Window
-	Run Keyword If	'Provider' in '${username}'	Login
+	Run Keyword If	'Provider' in '${username}'	Login	${username}
 	Log Variables
 
 Пошук тендера по ідентифікатору
@@ -593,6 +593,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 #Custom Keywords
 Login
+	[Arguments]  ${username}
 	Click Element						xpath=//span[.='Мой кабинет']
 	Wait Until Element Is Visible		id=p24__login__field	${COMMONWAIT}
 	Execute Javascript					$('#p24__login__field').val(${USERS.users['${username}'].login})
