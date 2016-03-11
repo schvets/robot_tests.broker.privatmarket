@@ -69,15 +69,15 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	log  ${username}
 	[Documentation]  Відкрити брaвзер, створити обєкт api wrapper, тощо
 	${service args}=    Create List	--ignore-ssl-errors=true	--ssl-protocol=tlsv1
-	${browset} = 	Convert To Lowercase	${USERS.users['${username}'].browser}
+	${browser} = 	Convert To Lowercase	${USERS.users['${username}'].browser}
 
-	Run Keyword If	'phantomjs' in '${browset}'	Run Keywords	Create Webdriver		PhantomJS	${username}	service_args=${service args}
+	Run Keyword If	'phantomjs' in '${browser}'	Run Keywords	Create Webdriver		PhantomJS	${username}	service_args=${service args}
 	...   AND   Go To					${USERS.users['${username}'].homepage}
 	...   ELSE	Open Browser	${USERS.users['${username}'].homepage}   ${USERS.users['${username}'].browser}   alias=${username}
 
 	Set Window Position		@{USERS.users['${username}'].position}
 	Maximize Browser Window
-	Run Keyword If	'Provider' in '${username}'	Login
+	Run Keyword If	'Provider' in '${username}'	Login	${username}
 	Log Variables
 
 Пошук тендера по ідентифікатору
@@ -87,10 +87,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	...	${ARGUMENTS[1]} ==  tenderId
 	Mark Step								_tender_search_start
 	Mark Step								${ARGUMENTS[1]}
-
-	${USERS.users['PrivatMarket_Provider'].tender_data.data} = 		Set variable	${USERS.users['Tender_Owner'].tender_data.data}
-	${USERS.users['PrivatMarket_Provider1'].tender_data.data} = 	Set variable	${USERS.users['Tender_Owner'].tender_data.data}
-	${USERS.users['PrivatMarket_Viewer'].tender_data.data} = 		Set variable	${USERS.users['Tender_Owner'].tender_data.data}
 
 	Switch browser							${ARGUMENTS[0]}
 	Go to									${USERS.users['${ARGUMENTS[0]}'].homepage}
@@ -155,7 +151,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	...	${element} ==  element
 
 	${element} = 	Replace String	${base_element}	items[${item}]	items
-#	Mark Step  _in_getting_info item=${item} result=${element}
 
 	Run Keyword And Return If	'${element}' == 'value.amount'				Отримати число			${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'minimalStep.amount'		Отримати число			${element}	0	${item}
@@ -191,7 +186,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 	Wait Until Element Is Visible	${tender_data_${element}}	timeout=20
 	${result_full} =				Get Text	${tender_data_${element}}
-	${result} =						strip_string	${result_full}
+	${result} =						Strip String	${result_full}
 	[return]	${result}
 
 Отримати текст елемента
@@ -250,8 +245,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	[Arguments]  ${element_name}  ${item}
 	${result_full} =	Отримати текст елемента	${element_name}	${item}
 	${reg_expresion} =	Set Variable	[A-zА-Яа-яёЁЇїІіЄєҐґ\\s]+\: \\w+[\\d\\.\\-]+ ([А-Яа-яёЁЇїІіЄєҐґ\\s;,\\"_\\(\\)]+)
-	${result} =			get_reg_exp_matches	${reg_expresion}	${result_full}
-	[return]	${result}
+	${result} =			Get Regexp Matches	${result_full}	${reg_expresion}	1
+	[return]	${result[0]}
 
 Отримати назву
 	[Arguments]  ${element_name}  ${item}
@@ -270,10 +265,11 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 Отримати номер позиції
 	[Arguments]  ${element_name}
 	Mark Step  _in_type_check
-	${item} =	get_reg_exp_matches	items\\[(\\d)\\]	${element_name}
-	${result} =	Run Keyword If	'${item}' == 'none'	Set Variable	0
-		...  ELSE	Convert To Integer	${item}
-	Mark Step	_after_type_check name = ${element_name} item=${item} result=${result}
+	${item} =	Get Regexp Matches	${element_name}	items\\[(\\d)\\]	1
+	${length} =	Get Length	${item}
+	${result} =	Run Keyword If	'${length}' == '0'	Set Variable	0
+		...  ELSE	Convert To Integer	${item[0]}
+	Mark Step	_after_type_check name = ${element_name} item=${item[0]} result=${result}
 	[return]  ${result}
 
 Перевірити присутність bids
@@ -315,7 +311,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait Until Element Is Enabled		xpath=//input[@ng-model="model.question.title"]				timeout=10
 	Input text							xpath=//input[@ng-model="model.question.title"]				${ARGUMENTS[2].data.title}
 	Input text							xpath=//textarea[@ng-model='model.question.description']	${ARGUMENTS[2].data.description}
-	Input text							xpath=//input[@ng-model='model.person.email']				${USERS.users['${username}'].email}
+	Input text							xpath=//input[@ng-model='model.person.email']				${USERS.users['${ARGUMENTS[0]}'].email}
 	Click Button						xpath=//button[@ng-click='act.sendQuestion()']
 	Mark Step							_asking_question_finished
 	Wait For Ajax
@@ -323,8 +319,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait Until Element Is Enabled		xpath=//div[@class='alert-info ng-scope ng-binding']	timeout=20
 	Wait Until Element Contains			xpath=//div[@class='alert-info ng-scope ng-binding']	Ваш вопрос успешно отправлен. Спасибо за обращение!	timeout=10
 	Wait For Ajax
-	Mark Step							_asking_question_wait_for_allert_disapeare
-	sleep								3s
+	Click Element						css=span[ng-click='act.hideModal()']
 	Wait Until Element Is Not Visible	xpath=//input[@ng-model="model.question.title"]	timeout=20
 	Mark Step							_asking_question_end
 
@@ -360,13 +355,13 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Scroll Page To Element				${locator_tenderClaim.buttonSend}
 	Click Button						${locator_tenderClaim.buttonSend}
 	Wait For Ajax Overflow Vanish
-	Close confirmation					Ваша заявка успешно отправлена!
+	Close confirmation					Ваша заявка была успешно отправлена!
 	Mark Step							_claim_creation_save_information
 	Wait Until Element Is Visible		css=div.afp-info.ng-scope.ng-binding
 	wait until element contains			css=div.afp-info.ng-scope.ng-binding	Номер заявки
 	Wait For Ajax
 	${claim_id}=						Get text			css=div.afp-info.ng-scope.ng-binding
-	${result}=							get_reg_exp_matches	Номер заявки: (\\d*),	${claim_id}	1
+	${result}=							Get Regexp Matches	${claim_id}	Номер заявки: (\\d*),	1
 	[return]	${Arguments[2]}
 
 Відкрити заявку
@@ -404,12 +399,12 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Input Text							${locator_tenderClaim.fieldEmail}	${USERS.users['${ARGUMENTS[0]}'].email}
 	Scroll Page To Element				${locator_tenderClaim.buttonSend}
 	Click Button						${locator_tenderClaim.buttonSend}
-	Close confirmation					Ваша заявка успешно обновлена!
+	Close confirmation					Ваша заявка была успешно сохранена!
 	Mark Step							_claim_edit_save_information
 	Wait Until Element Is Visible		css=div.afp-info.ng-scope.ng-binding
 	Wait For Ajax
 	${claim_id}=						Get text			css=div.afp-info.ng-scope.ng-binding
-	${result}=							get_reg_exp_matches	Номер заявки: (\\d*),	${claim_id}	1
+	${result}=							Get Regexp Matches	${claim_id}	Номер заявки: (\\d*),	1
 	[return]	${Arguments[2]}
 
 Скасувати цінову пропозицію
@@ -422,7 +417,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait For Ajax
 	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}
 	Wait Enable And Click Element		${locator_tenderClaim.buttonCancel}
-	Close Confirmation					Ваша заявка была отменена!
+	Close Confirmation					Ваша заявка успешно отменена!
 	Wait Until Element Is Enabled		${locator_tenderClaim.buttonCreate}	${COMMONWAIT}
 	[return]	${ARGUMENTS[1]}
 
@@ -449,18 +444,18 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Execute Javascript					$("#fileToUpload").removeClass();
 	Choose File							css=input#fileToUpload	${correctFilePath}
 
-	${upload_response} =	Сберегти доданий файл	${filePath}
+	${upload_response} =	Зберегти доданий файл	${filePath}
 	#before step for Change File
 	privatmarket.Пошук тендера по ідентифікатору	${user}	${tenderId}
 	[return]	${upload_response}
 
-Сберегти доданий файл
+Зберегти доданий файл
 	[Arguments]  ${filePath}
 	Wait Until Element Is Not Visible	css=div[ng-show='progressVisible'] div.progress-bar	timeout=30
 	Sleep								5s
 	Wait Until Element Is Visible		xpath=(//div[contains(@class, 'file-item')])[1]	timeout=30
 	Click Button						${locator_tenderClaim.buttonSend}
-	Close confirmation					Ваша заявка успешно обновлена!
+	Close confirmation					Ваша заявка была успешно сохранена!
 	${dateModified}						Get text	css=span.file-tlm
 	Click Element						${locator_tenderClaim.buttonGoBack}
 	wait until element is visible		css=table.bids tr
@@ -505,9 +500,9 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Sleep								5s
 	Wait Until Element Is Visible		xpath=(//div[contains(@class, 'file-item')])[1]	timeout=30
 	Click Button						${locator_tenderClaim.buttonSend}
-	Close confirmation					Ваша заявка успешно обновлена!
+	Close confirmation					Ваша заявка была успешно сохранена!
 
-	${uploaded_file_data} =				Сберегти доданий файл	${filePath}
+	${uploaded_file_data} =				Зберегти доданий файл	${filePath}
 	[return]  ${uploaded_file_data}
 
 Обробити скаргу
@@ -516,11 +511,11 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Отримати посилання на аукціон для глядача
 	[Arguments]  ${user}  ${tenderId}
-	${resutl} =	Отримати посилання на аукціон	${user}  ${tenderId}
+	${result} =	Отримати посилання на аукціон	${user}  ${tenderId}
 
 Отримати посилання на аукціон для учасника
 	[Arguments]  ${user}  ${tenderId}
-	${resutl} =	Отримати посилання на аукціон	${user}  ${tenderId}
+	${result} =	Отримати посилання на аукціон	${user}  ${tenderId}
 
 Отримати посилання на аукціон
 	[Arguments]  ${user}  ${tenderId}
@@ -533,6 +528,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 #Custom Keywords
 Login
+	[Arguments]  ${username}
 	Click Element						xpath=//span[.='Мой кабинет']
 	Wait Until Element Is Visible		id=p24__login__field	${COMMONWAIT}
 	Execute Javascript					$('#p24__login__field').val(${USERS.users['${username}'].login})
