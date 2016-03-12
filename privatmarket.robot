@@ -160,7 +160,9 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	...	${element} ==  element
 
 	${element} = 	Replace String	${base_element}	items[${item}]	items
-	Switch To Tab	1
+	Run Keyword If	'questions' in '${element}'		Switch To Tab	2
+	Run Keyword If	'complaints' in '${element}'	Switch To Tab	3
+		...  ELSE	Switch To Tab	1
 
 	Run Keyword And Return If	'${element}' == 'value.amount'				Отримати число			${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'minimalStep.amount'		Отримати число			${element}	0	${item}
@@ -192,8 +194,11 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Run Keyword And Return If	'${element}' == 'items.deliveryLocation.longitude'		Отримати число			${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'auctionPeriod.startDate'				Отримати інформацію з ${element}	${element}	${item}
 
-	Run Keyword If	'${element}' == 'questions[0].title'	Wait For Element With Reload	${tender_data_${element}}	2
-	Run Keyword If	'${element}' == 'questions[0].answer'	Wait For Element With Reload	${tender_data_${element}}	2
+
+	Run Keyword If	'${element}' == 'questions[0].title'		Wait For Element With Reload	${tender_data_${element}}	2
+#	Run Keyword If	'${element}' == 'questions[0].description'	Wait For Element With Reload	${tender_data_${element}}	2
+#	Run Keyword If	'${element}' == 'questions[0].date'			Wait For Element With Reload	${tender_data_${element}}	2
+	Run Keyword If	'${element}' == 'questions[0].answer'		Wait For Element With Reload	${tender_data_${element}}	2
 
 	Wait Until Element Is Visible	${tender_data_${element}}	timeout=${COMMONWAIT}
 	${result_full} =				Get Text	${tender_data_${element}}
@@ -629,7 +634,7 @@ Wait Visibulity And Click Element
 
 Mark Step
 	[Arguments]  ${stepName}
-	log to console	_${stepName}
+	log	_${stepName}
 
 Change Feild Value
 	[Arguments]	${locator}	${value}
@@ -663,10 +668,11 @@ Scroll Page To Element
 		...  ELSE	Get Substring	${locator}	6
 	${js_expresion} =	Run Keyword If	'css' in '${TEST_NAME}'	Convert To String	return window.$("${cssLocator}")[0].scrollIntoView()
 		...  ELSE	Convert To String	return window.$x("${cssLocator}")[0].scrollIntoView()
+	Sleep	2s
 
 Wait For Tender
 	[Arguments]	${tender_id}
-	Wait Until Keyword Succeeds		10min	15s	Try Search Tender	${tender_id}
+	Wait Until Keyword Succeeds			10min	15s	Try Search Tender	${tender_id}
 
 Try Search Tender
 	[Arguments]	${tender_id}
@@ -676,7 +682,8 @@ Try Search Tender
 	[return]	true
 
 Switch To Education Mode
-	Wait Until Element Is Enabled		css=div.test-mode-aside a		timeout=${COMMONWAIT}
+	Wait Until Element Is Enabled		css=div.test-mode-aside a	timeout=${COMMONWAIT}
+	Sleep								3s
 	Click Element						css=div.test-mode-aside a
 	Wait Until Element Contains			css=div.test-mode-aside a	Выйти из обучающего режима	${COMMONWAIT}
 	Wait For Ajax Overflow Vanish
