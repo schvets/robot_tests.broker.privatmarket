@@ -1,6 +1,7 @@
 # coding=utf-8
 
 from munch import munchify
+from selenium.common.exceptions import StaleElementReferenceException
 
 
 def get_month_number(month_name):
@@ -24,3 +25,11 @@ def fill_file_data(url, title, date_modified, date_published):
             "datePublished": date_published,
         }
     })
+
+
+def is_element_not_stale(webelement):
+    try:
+        webelement.is_enabled()
+    except StaleElementReferenceException:
+        return True
+    return False

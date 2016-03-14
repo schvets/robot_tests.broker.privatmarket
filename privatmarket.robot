@@ -76,8 +76,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	${service args}=    Create List	--ignore-ssl-errors=true	--ssl-protocol=tlsv1
 	${browser} = 	Convert To Lowercase	${USERS.users['${username}'].browser}
 
-	Run Keyword If	'phantomjs' in '${browser}'	Run Keywords	Create Webdriver		PhantomJS	${username}	service_args=${service args}
-	...   AND   Go To					${USERS.users['${username}'].homepage}
+	Run Keyword If	'phantomjs' in '${browser}'	Run Keywords	Create Webdriver	PhantomJS	${username}	service_args=${service args}
+	...   AND   Go To			${USERS.users['${username}'].homepage}
 	...   ELSE	Open Browser	${USERS.users['${username}'].homepage}   ${USERS.users['${username}'].browser}   alias=${username}
 
 	Set Window Position		@{USERS.users['${username}'].position}
@@ -98,6 +98,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait Until Element Is Enabled			id=tenders	timeout=${COMMONWAIT}
 	Switch To Frame							id=tenders
 	Wait For Ajax
+	Wait For Element Not Stale				xpath=//*[@id='sidebar']//input	40
 	Wait Until Element Is Enabled			xpath=//*[@id='sidebar']//input	timeout=${COMMONWAIT}
 	Wait Until Element Is Enabled			xpath=(//div[@class='tender-name_info tender-col'])[1]	timeout=${COMMONWAIT}
 
@@ -109,26 +110,30 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Run Keyword If							${check_result} and ${education_type}	Switch To Education Mode
 
 	Wait For Ajax
+	Wait For Element Not Stale				xpath=(//div[@class='tenders_sm_info'])[1]	40
 	Wait Until Element Is Enabled			xpath=(//div[@class='tenders_sm_info'])[1]	timeout=${COMMONWAIT}
 	Clear Element Text						xpath=//*[@id='sidebar']//input
-	sleep									1s
+	sleep									2s
 	Input Text								xpath=//*[@id='sidebar']//input	${ARGUMENTS[1]}
 	Wait For Tender							${ARGUMENTS[1]}
 	sleep									2s
+	Wait For Element Not Stale				css=span[id='${ARGUMENTS[1]}'] div.tenders_sm_info	40
+	Mark Step								befor_click
 	Click Element By JS						span[id='${ARGUMENTS[1]}'] div.tenders_sm_info
 	Wait For Ajax
-	sleep									5s
+#	sleep									5s
 	Wait Until Element Is Visible			xpath=//div[contains(@class,'title-div')]	timeout=${COMMONWAIT}
 	Wait Until Element Is Visible			css=div.info-item-val a
+	Wait For Element Not Stale				css=div.info-item-val a	40
 	@{itemsList}=							Get Webelements	//div[@class='info-item-val']/a
 	${item_list_length} = 					Get Length	${itemsList}
 
-	log to console  ${item_list_length}
 	: FOR    ${INDEX}    IN RANGE    0    ${item_list_length}
 		\  ${locator_index} =				Evaluate	${INDEX}+1
 		\  Wait Until Element Is Visible	xpath=(//div[@class='info-item-val']/a)[${locator_index}]
 		\  Scroll Page To Element			xpath=(//div[@class='info-item-val']/a)[${locator_index}]
 		\  Wait For Ajax
+		\  Wait For Element Not Stale		${itemsList[${INDEX}]}	40
 		\  Wait Until Element Is Enabled	${itemsList[${INDEX}]}	timeout=${COMMONWAIT}
 		\  Click Element					${itemsList[${INDEX}]}
 		\  Wait Until Element Is Visible	xpath=(//div[@ng-if='adb.classification'])[${locator_index}]
@@ -196,7 +201,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 
 	Run Keyword If	'${element}' == 'questions[0].title'		Wait For Element With Reload	${tender_data_${element}}	2
-#	Run Keyword If	'${element}' == 'questions[0].description'	Wait For Element With Reload	${tender_data_${element}}	2
+	Run Keyword If	'${element}' == 'questions[0].description'	debug
 #	Run Keyword If	'${element}' == 'questions[0].date'			Wait For Element With Reload	${tender_data_${element}}	2
 	Run Keyword If	'${element}' == 'questions[0].answer'		Wait For Element With Reload	${tender_data_${element}}	2
 
@@ -313,7 +318,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Mark Step							_fill_data
 	Wait For Ajax
 	Wait For Element Value				css=input[ng-model='model.person.phone']
-	wait until element is visible		xpath=//input[@ng-model='model.complaint.user.title']	timeout=10
+	Wait Until Element Is Visible		xpath=//input[@ng-model='model.complaint.user.title']	timeout=10
 	Wait Until Element Is Enabled		xpath=//input[@ng-model='model.complaint.user.title']	timeout=10
 	Input Text							xpath=//input[@ng-model='model.complaint.user.title']	${complaints.data.title}
 	Input Text							css=div.info-item-val textarea							${complaints.data.description}
@@ -357,12 +362,14 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait For Ajax
 	Mark Step							_asking_question_select_right_tab
 	Reload And Switch To Tab			2
+	Wait For Element Not Stale			xpath=//button[@ng-click='act.sendEnquiry()']	40
 	Wait Until Element Is Enabled		xpath=//button[@ng-click='act.sendEnquiry()']				timeout=10
 	Click Button						xpath=//button[@ng-click='act.sendEnquiry()']
 	Mark Step							_asking_question_send
 	Wait For Ajax
 	sleep								4s
 	Wait For Element Value				css=input[ng-model='model.person.phone']
+	Wait For Element Not Stale			xpath=//input[@ng-model="model.question.title"]	40
 	Wait Until Element Is Visible		xpath=//input[@ng-model="model.question.title"]				timeout=10
 	Wait Until Element Is Enabled		xpath=//input[@ng-model="model.question.title"]				timeout=10
 	Input text							xpath=//input[@ng-model="model.question.title"]				${ARGUMENTS[2].data.title}
@@ -372,9 +379,11 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Mark Step							_asking_question_finished
 	Wait For Ajax
 	Mark Step							_asking_question_wait_for_allert
+	Wait For Element Not Stale			xpath=//div[@class='alert-info ng-scope ng-binding']	40
 	Wait Until Element Is Enabled		xpath=//div[@class='alert-info ng-scope ng-binding']	timeout=${COMMONWAIT}
 	Wait Until Element Contains			xpath=//div[@class='alert-info ng-scope ng-binding']	Ваш вопрос успешно отправлен. Спасибо за обращение!	timeout=10
 	Wait For Ajax
+	Wait For Element Not Stale			css=span[ng-click='act.hideModal()']	40
 	Click Element						css=span[ng-click='act.hideModal()']
 	Wait Until Element Is Not Visible	xpath=//input[@ng-model="model.question.title"]	timeout=20
 	Mark Step							_asking_question_end
@@ -606,15 +615,23 @@ Login
 	Wait Until Element Is Not Visible	xpath=//div[@id="login_modal" and @style='display: block;']//input[@type='password']	timeout=40
 
 Wait For Ajax
-	Wait For Condition	return angular.element(document.body).injector().get(\'$http\').pendingRequests.length==0	60s
+#	Wait For Condition	return angular.element(document.body).injector().get(\'$http\').pendingRequests.length==0	60s
 	Wait For Condition	return window.jQuery!=undefined && jQuery.active==0	${COMMONWAIT}
 
-Test Fail
-	Capture and crop page screenshot	fail.jpg
-	Mark Step							__TEST_FAIL___
-	Mark Step							${TEST NAME}
-	Mark Step							${TEST MESSAGE}
-	debug
+Wait For Element Not Stale
+	[Arguments]  ${locator}  ${time}
+#	log to console	_tuta ${locator}
+	sleep 			2s
+	${left_time} =	Evaluate  ${time}-2
+	${element_state} =	Check If Element Stale	${locator}
+	run keyword if  ${element_state} and ${left_time} > 0	Wait For Element Not Stale	${locator}	${left_time}
+
+Check If Element Stale
+	[Arguments]  ${locator}
+#	log to console     _tuta2 ${locator}
+	${element} =	Get Webelement	${locator}
+	${element_state} =	is_element_not_stale	${element}
+	[return]  ${element_state}
 
 Switch To Frame
 	[Arguments]  ${frameId}
@@ -634,7 +651,7 @@ Wait Visibulity And Click Element
 
 Mark Step
 	[Arguments]  ${stepName}
-	log	_${stepName}
+	log to console	_${stepName}
 
 Change Feild Value
 	[Arguments]	${locator}	${value}
