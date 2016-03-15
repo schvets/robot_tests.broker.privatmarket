@@ -101,8 +101,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait Until Element Is Enabled			id=tenders	timeout=${COMMONWAIT}
 	Switch To Frame							id=tenders
 	Wait For Ajax
-	Wait For Element Not Stale				xpath=//*[@id='sidebar']//input	40
-	Wait Until Element Is Enabled			xpath=//*[@id='sidebar']//input	timeout=${COMMONWAIT}
+	Wait Until Element Is Visible			xpath=//*[@id='sidebar']//input	timeout=${COMMONWAIT}
+	Wait Until Element Not Stale			xpath=//*[@id='sidebar']//input	40
 	Wait Until Element Is Enabled			xpath=(//div[@class='tender-name_info tender-col'])[1]	timeout=${COMMONWAIT}
 
 	${suite_name} = 	Convert To Lowercase	${SUITE_NAME}
@@ -113,21 +113,23 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Run Keyword If							${check_result} and ${education_type}	Switch To Education Mode
 
 	Wait For Ajax
-	Wait For Element Not Stale				xpath=(//div[@class='tenders_sm_info'])[1]	40
+	Wait Until Element Not Stale			xpath=(//div[@class='tenders_sm_info'])[1]	40
 	Wait Until Element Is Enabled			xpath=(//div[@class='tenders_sm_info'])[1]	timeout=${COMMONWAIT}
 	Clear Element Text						xpath=//*[@id='sidebar']//input
-	sleep									2s
+	sleep									1s
 	Input Text								xpath=//*[@id='sidebar']//input	${ARGUMENTS[1]}
 	Wait For Tender							${ARGUMENTS[1]}
-	sleep									2s
-	Wait For Element Not Stale				css=span[id='${ARGUMENTS[1]}'] div.tenders_sm_info	40
+	sleep									3s
+	Wait Until Element Not Stale			css=span[id='${ARGUMENTS[1]}'] div.tenders_sm_info	40
 	Mark Step								befor_click
 	Click Element By JS						span[id='${ARGUMENTS[1]}'] div.tenders_sm_info
 	Wait For Ajax
-#	sleep									5s
+#	sleep									3s
+	Wait Until Element Is Not Visible		xpath=//*[@id='sidebar']//input	20s
 	Wait Until Element Is Visible			xpath=//div[contains(@class,'title-div')]	timeout=${COMMONWAIT}
+	Wait Until Element Not Stale			xpath=//div[contains(@class,'title-div')]	40
 	Wait Until Element Is Visible			css=div.info-item-val a
-	Wait For Element Not Stale				css=div.info-item-val a	40
+	Wait Until Element Not Stale			css=div.info-item-val a	40
 	@{itemsList}=							Get Webelements	//div[@class='info-item-val']/a
 	${item_list_length} = 					Get Length	${itemsList}
 
@@ -136,7 +138,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 		\  Wait Until Element Is Visible	xpath=(//div[@class='info-item-val']/a)[${locator_index}]
 		\  Scroll Page To Element			xpath=(//div[@class='info-item-val']/a)[${locator_index}]
 		\  Wait For Ajax
-		\  Wait For Element Not Stale		${itemsList[${INDEX}]}	40
+		\  Wait Until Element Not Stale		${itemsList[${INDEX}]}	40
 		\  Wait Until Element Is Enabled	${itemsList[${INDEX}]}	timeout=${COMMONWAIT}
 		\  Click Element					${itemsList[${INDEX}]}
 		\  Wait Until Element Is Visible	xpath=(//div[@ng-if='adb.classification'])[${locator_index}]
@@ -360,7 +362,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait For Ajax
 	Mark Step							_complaint_wait_for_allert
 	Wait Until Element Is Enabled		xpath=//div[@class='alert-info ng-scope ng-binding']	timeout=${COMMONWAIT}
-	Wait For Element Not Stale			xpath=//div[@class='alert-info ng-scope ng-binding']	40
+	Wait Until Element Not Stale		xpath=//div[@class='alert-info ng-scope ng-binding']	40
 	Wait Until Element Contains			xpath=//div[@class='alert-info ng-scope ng-binding']	Ваше требование успешно отправлено!	timeout=10
 	Wait For Ajax
 	Mark Step							_asking_question_wait_for_allert_disapeare
@@ -382,14 +384,14 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait For Ajax
 	Mark Step							_asking_question_select_right_tab
 	Switch To Tab						2
-	Wait For Element Not Stale			xpath=//button[@ng-click='act.sendEnquiry()']	40
+	Wait Until Element Not Stale		xpath=//button[@ng-click='act.sendEnquiry()']	40
 	Wait Until Element Is Enabled		xpath=//button[@ng-click='act.sendEnquiry()']				timeout=10
 	Click Button						xpath=//button[@ng-click='act.sendEnquiry()']
 	Mark Step							_asking_question_send
 	Wait For Ajax
 	sleep								4s
 	Wait For Element Value				css=input[ng-model='model.person.phone']
-	Wait For Element Not Stale			xpath=//input[@ng-model="model.question.title"]	40
+	Wait Until Element Not Stale		xpath=//input[@ng-model="model.question.title"]	40
 	Wait Until Element Is Visible		xpath=//input[@ng-model="model.question.title"]				timeout=10
 	Wait Until Element Is Enabled		xpath=//input[@ng-model="model.question.title"]				timeout=10
 	Input text							xpath=//input[@ng-model="model.question.title"]				${ARGUMENTS[2].data.title}
@@ -400,10 +402,10 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait For Ajax
 	Mark Step							_asking_question_wait_for_allert
 	Wait Until Element Is Enabled		xpath=//div[@class='alert-info ng-scope ng-binding']	timeout=${COMMONWAIT}
-	Wait For Element Not Stale			xpath=//div[@class='alert-info ng-scope ng-binding']	40
+	Wait Until Element Not Stale		xpath=//div[@class='alert-info ng-scope ng-binding']	40
 	Wait Until Element Contains			xpath=//div[@class='alert-info ng-scope ng-binding']	Ваш вопрос успешно отправлен. Спасибо за обращение!	timeout=10
 	Wait For Ajax
-	Wait For Element Not Stale			css=span[ng-click='act.hideModal()']	40
+	Wait Until Element Not Stale		css=span[ng-click='act.hideModal()']	40
 	Click Element						css=span[ng-click='act.hideModal()']
 	Wait Until Element Is Not Visible	xpath=//input[@ng-model="model.question.title"]	timeout=20
 	Mark Step							_asking_question_end
@@ -432,13 +434,12 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	privatmarket.Пошук тендера по ідентифікатору	${ARGUMENTS[0]}   ${ARGUMENTS[1]}
 
 	Відкрити заявку
+	sleep								5s
 	Mark Step							_claim_creation_set_price
+	Wait Until Element Not Stale		${locator_tenderClaim.fieldEmail}	40
 	Run Keyword If	'multiLotTender' in '${SUITE_NAME}'	Input Text	${locator_tenderClaim.checkedLot.fieldPrice}	${Arguments[2].data.lotValues[1]['value']['amount']}
 		...  ELSE	Input Text	${locator_tenderClaim.fieldPrice}	${Arguments[2].data.value.amount}
 
-	sleep								5s
-	click element						${locator_tenderClaim.fieldPrice}
-	Input Text							${locator_tenderClaim.fieldPrice}	${Arguments[2].data.value.amount}
 	click element						${locator_tenderClaim.fieldEmail}
 	Input Text							${locator_tenderClaim.fieldEmail}	${USERS.users['${ARGUMENTS[0]}'].email}
 	Mark Step							_claim_creation_send_request
@@ -464,12 +465,13 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	${tender_status} =	Run Keyword If	'multiLotTender' in '${SUITE_NAME}'	Get text	xpath=(//span[@class='state-label ng-binding'])[2]
 		...  ELSE	Get text	xpath=//span[@class='state-label ng-binding']
 
-	Run Keyword If	'${tender_status}' == 'Период уточнений завершен'	Wait For Element With Reload	${locator_tenderClaim.buttonCreate}	1
+	Run Keyword Unless	'до початку періоду подачі' in '${TEST_NAME}'	Run Keyword If	'${tender_status}' == 'Период уточнений завершен'	Wait For Element With Reload	${locator_tenderClaim.buttonCreate}	1
 	Scroll Page To Element				${locator_tenderClaim.buttonCreate}
+	sleep								1s
 	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}
-	Wait For Ajax
+	Wait Until Element Is Not Visible	${locator_tenderClaim.buttonCreate}	20s
 	Wait For Element Value				css=input[ng-model='model.person.lastName']
-	Mark Step		 					_claim_creation_wait_data_load
+	Mark Step							_claim_creation_wait_data_load
 	sleep								5s
 	Wait Until Element Is Enabled		${locator_tenderClaim.fieldEmail}	20
 
@@ -640,6 +642,7 @@ Login
 	Click Element						xpath=//span[.='Мой кабинет']
 	Wait Until Element Is Visible		id=p24__login__field	${COMMONWAIT}
 	Execute Javascript					$('#p24__login__field').val(${USERS.users['${username}'].login})
+	Check If Element Stale				xpath=//div[@id="login_modal" and @style='display: block;']//input[@type='password']
 	Input Text							xpath=//div[@id="login_modal" and @style='display: block;']//input[@type='password']	${USERS.users['${username}'].password}
 	Click Element						xpath=//div[@id="login_modal" and @style='display: block;']//button[@type='submit']
 	Wait Until Element Is Visible		css=ul.user-menu  timeout=30
@@ -651,12 +654,12 @@ Wait For Ajax
 	Wait For Condition	return window.jQuery!=undefined && jQuery.active==0	${COMMONWAIT}
 
 
-Wait For Element Not Stale
+Wait Until Element Not Stale
 	[Arguments]  ${locator}  ${time}
 	sleep 			2s
 	${left_time} =	Evaluate  ${time}-2
 	${element_state} =	Check If Element Stale	${locator}
-	run keyword if  ${element_state} and ${left_time} > 0	Wait For Element Not Stale	${locator}	${left_time}
+	run keyword if  ${element_state} and ${left_time} > 0	Wait Until Element Not Stale	${locator}	${left_time}
 
 
 Check If Element Stale
