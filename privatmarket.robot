@@ -8,7 +8,7 @@ Library  DebugLibrary
 Library  privatmarket_service.py
 
 *** Variables ***
-${COMMONWAIT}	20
+${COMMONWAIT}	30
 
 ${tender_data_title}											xpath=//div[contains(@class,'title-div')]
 ${tender_data_description}										css=div.description
@@ -124,10 +124,13 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Mark Step								befor_click
 	Click Element By JS						span[id='${ARGUMENTS[1]}'] div.tenders_sm_info
 	Wait For Ajax
-#	sleep									3s
 	Wait Until Element Is Not Visible		xpath=//*[@id='sidebar']//input	20s
 	Wait Until Element Is Visible			xpath=//div[contains(@class,'title-div')]	timeout=${COMMONWAIT}
 	Wait Until Element Not Stale			xpath=//div[contains(@class,'title-div')]	40
+	Mark Step								_tender_search_end
+
+
+Відкрити детальну інформацию по позиціям
 	Wait Until Element Is Visible			css=div.info-item-val a
 	Wait Until Element Not Stale			css=div.info-item-val a	40
 	@{itemsList}=							Get Webelements	//div[@class='info-item-val']/a
@@ -137,12 +140,9 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 		\  ${locator_index} =				Evaluate	${INDEX}+1
 		\  Wait Until Element Is Visible	xpath=(//div[@class='info-item-val']/a)[${locator_index}]
 		\  Scroll Page To Element			xpath=(//div[@class='info-item-val']/a)[${locator_index}]
-		\  Wait For Ajax
 		\  Wait Until Element Not Stale		${itemsList[${INDEX}]}	40
-		\  Wait Until Element Is Enabled	${itemsList[${INDEX}]}	timeout=${COMMONWAIT}
 		\  Click Element					${itemsList[${INDEX}]}
 		\  Wait Until Element Is Visible	xpath=(//div[@ng-if='adb.classification'])[${locator_index}]
-	Mark Step								_tender_search_end
 
 
 Створити тендер
@@ -163,6 +163,9 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	${item} =	Run Keyword If	'багатопредметного' in '${TEST_NAME}'	Отримати номер позиції	${ARGUMENTS[1]}
 		...  ELSE	Convert To Integer	0
 	${result1} =	Отримати інформацію зі сторінки	${item}	${ARGUMENTS[1]}
+
+	${element_class} =	Get Element Attribute	css=div[ng-show='adb.showCl']@class
+	Run Keyword If	'ng-hide' in '${element_class}'	Відкрити детальну інформацию по позиціям
 	[return]	${result1}
 
 
@@ -467,9 +470,10 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 	Run Keyword Unless	'до початку періоду подачі' in '${TEST_NAME}'	Run Keyword If	'${tender_status}' == 'Период уточнений завершен'	Wait For Element With Reload	${locator_tenderClaim.buttonCreate}	1
 	Scroll Page To Element				${locator_tenderClaim.buttonCreate}
-	sleep								1s
+#	sleep								5s
+	Wait Until Element Not Stale		${locator_tenderClaim.buttonCreate}	30
 	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}
-	Wait Until Element Is Not Visible	${locator_tenderClaim.buttonCreate}	20s
+	Wait Until Element Is Not Visible	${locator_tenderClaim.buttonCreate}	30s
 	Wait For Element Value				css=input[ng-model='model.person.lastName']
 	Mark Step							_claim_creation_wait_data_load
 	sleep								5s
@@ -509,7 +513,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Змінити lotValues.0.value.amount
 	[Arguments]  ${fieldvalue}
-	Select From List	xpath=(//select[@ng-model='feature.userValue'])[1]	${fieldvalue}
+	Input Text	${locator_tenderClaim.checkedLot.fieldPrice}	${fieldvalue}
 
 
 Змінити value.amount
