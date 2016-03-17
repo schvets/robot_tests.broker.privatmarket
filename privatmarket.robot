@@ -12,6 +12,7 @@ ${COMMONWAIT}	30
 
 ${tender_data_title}											xpath=//div[contains(@class,'title-div')]
 ${tender_data_description}										css=div.description
+${tender_data_procurementMethodType}							css=div#tenderType
 ${tender_data_value.amount}										css=div[ng-if='model.budjet'] div.info-item-val
 ${tender_data_tenderID}											xpath=//div[.='Тендер ID:']/following-sibling::div
 ${tender_data_procuringEntity.name}								css=a[ng-click='act.openCard()']
@@ -75,7 +76,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	log  ${username}
 	[Documentation]  Відкрити брaвзер, створити обєкт api wrapper, тощо
 
-
 	${service args}=    Create List	--ignore-ssl-errors=true	--ssl-protocol=tlsv1
 	${browser} = 	Convert To Lowercase	${USERS.users['${username}'].browser}
 
@@ -106,7 +106,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait Until Element Is Enabled			xpath=(//div[@class='tender-name_info tender-col'])[1]	timeout=${COMMONWAIT}
 
 	${suite_name} = 	Convert To Lowercase	${SUITE_NAME}
-	${education_type} =	Run Keyword If	'limited' in '${suite_name}'	Set Variable	False
+	${education_type} =	Run Keyword If	'negotiation' in '${suite_name}'	Set Variable	False
 		...  ELSE	Set Variable	True
 	${current_type} =						Get text	css=div.test-mode-aside
 	${check_result} =						Run Keyword If	'Войти в обучающий режим' in '${current_type}'	Set Variable  True
@@ -125,8 +125,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Click Element By JS						span[id='${ARGUMENTS[1]}'] div.tenders_sm_info
 	Wait For Ajax
 	Wait Until Element Is Not Visible		xpath=//*[@id='sidebar']//input	20s
+	sleep									2s
 	Wait Until Element Is Visible			xpath=//div[contains(@class,'title-div')]	timeout=${COMMONWAIT}
-	Wait Until Element Not Stale			xpath=//div[contains(@class,'title-div')]	40
 	Mark Step								_tender_search_end
 
 
@@ -209,6 +209,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Run Keyword And Return If	'${element}' == 'items.deliveryLocation.latitude'		Отримати число			${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'items.deliveryLocation.longitude'		Отримати число			${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'auctionPeriod.startDate'				Отримати інформацію з ${element}	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'procurementMethodType'					Отримати інформацію з ${element}	${element}
 
 	Run Keyword If	'${element}' == 'questions[0].title'		Wait For Element With Reload	${tender_data_${element}}	2
 	Run Keyword If	'${element}' == 'questions[0].answer'		Wait For Element With Reload	${tender_data_${element}}	2
@@ -223,7 +224,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	[Arguments]  ${element_name}  ${item}
 	Wait Until Element Is Visible	${tender_data_${element_name}}
 	@{itemsList}=					Get Webelements	${tender_data_${element_name}}
-	${num} =						set variable	${item}
+	${num} =						Set Variable	${item}
 	${result_full} =				Get Text		${itemsList[${num}]}
 	[return]	${result_full}
 
@@ -325,6 +326,13 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	[return]  ${start_date}
 
 
+Отримати інформацію з procurementMethodType
+	[Arguments]  ${element_name}
+	${method_name} =	Get text	${tender_data_${element_name}}
+	${method_type} =	get_procurement_method_type	${method_name}
+	[return]  ${method_type}
+
+
 Внести зміни в тендер
 	[Arguments]  @{ARGUMENTS}
 	Fail  Функція не підтримується майданчиком
@@ -344,8 +352,15 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Input Text							xpath=//input[@ng-model='model.complaint.user.title']	${complaints.data.title}
 	Input Text							css=div.info-item-val textarea							${complaints.data.description}
 	Scroll Page To Element				xpath=//input[@ng-model='model.person.email']
-	Input text							xpath=//input[@ng-model='model.person.email']			${USERS.users['${username}'].email}
-	[return]  ${complaints}
+	Input Text							xpath=//input[@ng-model='model.person.email']			${USERS.users['${user}'].email}
+	Click Button						css=button[ng-click='act.saveComplaint()']
+	Wait For Ajax
+	Wait Until Element Is Enabled		css=div.alert-info	timeout=${COMMONWAIT}
+	Wait Until Element Not Stale		css=div.alert-info	40
+	Wait Until Element Contains			css=div.alert-info	Ваше требование успешно сохранено!	timeout=10
+	${claim_data} =	Create Dictionary	id=123
+	${claim_resp} =	Create Dictionary	data=${claim_data}
+	[return]  ${claim_resp}
 
 
 Завантажити документацію до вимоги
@@ -364,13 +379,13 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Mark Step							_start_complaint_finished
 	Wait For Ajax
 	Mark Step							_complaint_wait_for_allert
-	Wait Until Element Is Enabled		xpath=//div[@class='alert-info ng-scope ng-binding']	timeout=${COMMONWAIT}
-	Wait Until Element Not Stale		xpath=//div[@class='alert-info ng-scope ng-binding']	40
-	Wait Until Element Contains			xpath=//div[@class='alert-info ng-scope ng-binding']	Ваше требование успешно отправлено!	timeout=10
+	Wait Until Element Is Enabled		css=div.alert-info	timeout=${COMMONWAIT}
+	Wait Until Element Not Stale		css=div.alert-info	40
+	Wait Until Element Contains			css=div.alert-info	Ваше требование успешно отправлено!	timeout=10
 	Wait For Ajax
 	Mark Step							_asking_question_wait_for_allert_disapeare
 	sleep								3s
-	Wait Until Element Is Not Visible	xpath=//input[@ng-model="model.question.title"]			timeout=${COMMONWAIT}
+	Wait Until Element Is Not Visible	xpath=//input[@ng-model="model.question.title"]	timeout=${COMMONWAIT}
 	Mark Step							_asking_question_end
 
 
@@ -650,8 +665,8 @@ Login
 	Input Text							xpath=//div[@id="login_modal" and @style='display: block;']//input[@type='password']	${USERS.users['${username}'].password}
 	Click Element						xpath=//div[@id="login_modal" and @style='display: block;']//button[@type='submit']
 	Wait Until Element Is Visible		css=ul.user-menu  timeout=30
-	Check If Element Stale				xpath=//div[@id="login_modal" and @style='display: block;']//input[@type='password']
-	Wait Until Element Is Not Visible	xpath=//div[@id="login_modal" and @style='display: block;']//input[@type='password']	timeout=40
+#	Check If Element Stale				xpath=//div[@id="login_modal" and @style='display: block;']//input[@type='password']
+#	Wait Until Element Is Not Visible	xpath=//div[@id="login_modal" and @style='display: block;']//input[@type='password']	timeout=40
 
 
 Wait For Ajax

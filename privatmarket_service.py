@@ -33,3 +33,17 @@ def is_element_not_stale(webelement):
     except StaleElementReferenceException:
         return True
     return False
+
+
+def get_procurement_method_type(method_name):
+    type_dictionary = {
+                       u'Допороговая закупка': 'belowThreshold',
+                       u'Открытые торги': 'aboveThresholdUA',
+                       u'Открытые торги с публикацией на англ.языке': 'aboveThresholdEU',
+                       u'Отчет о заключении договора': 'reporting',
+                       u'Переговорная процедура': 'negotiation',
+                       u'Срочная переговорная процедура': 'negotiation.quick',
+                       u'Открытые торги (особенности обороны)': 'aboveThresholdUA.defense'
+                       }
+    type_name = type_dictionary.get(method_name)
+    return type_name
