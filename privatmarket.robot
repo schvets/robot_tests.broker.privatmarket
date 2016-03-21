@@ -347,8 +347,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Mark Step							_fill_data
 	Wait For Ajax
 	Wait For Element Value				css=input[ng-model='model.person.phone']
-	Wait Until Element Is Visible		xpath=//input[@ng-model='model.complaint.user.title']	timeout=10
-	Wait Until Element Is Enabled		xpath=//input[@ng-model='model.complaint.user.title']	timeout=10
+	Wait Until Element Is Visible		xpath=//input[@ng-model='model.complaint.user.title']	timeout=${COMMONWAIT}
+	Wait Until Element Is Enabled		xpath=//input[@ng-model='model.complaint.user.title']	timeout=${COMMONWAIT}
 	Input Text							xpath=//input[@ng-model='model.complaint.user.title']	${complaints.data.title}
 	Input Text							css=div.info-item-val textarea							${complaints.data.description}
 	Scroll Page To Element				xpath=//input[@ng-model='model.person.email']
@@ -378,15 +378,32 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Click Button						xpath=//button[@ng-click='act.sendComplaint()']
 	Mark Step							_start_complaint_finished
 	Wait For Ajax
-	Mark Step							_complaint_wait_for_allert
 	Wait Until Element Is Enabled		css=div.alert-info	timeout=${COMMONWAIT}
 	Wait Until Element Not Stale		css=div.alert-info	40
 	Wait Until Element Contains			css=div.alert-info	Ваше требование успешно отправлено!	timeout=10
 	Wait For Ajax
-	Mark Step							_asking_question_wait_for_allert_disapeare
 	sleep								3s
 	Wait Until Element Is Not Visible	xpath=//input[@ng-model="model.question.title"]	timeout=${COMMONWAIT}
-	Mark Step							_asking_question_end
+	Wait For Ajax
+	Wait Until Element Not Stale		css=span[ng-click='act.hideModal()']	40
+	Click Element						css=span[ng-click='act.hideModal()']
+	sleep								3s
+	Wait Until Element Is Not Visible	css=div.info-item-val textarea	timeout=30
+
+Скасувати вимогу
+	[Arguments]    ${user}  ${tender_id}  ${claim_data}  ${cancellation_data}
+	Wait Until Element Is Visible		css=a[ng-click='act.showCancelComplaintWnd(q)']	timeout=${COMMONWAIT}
+	Wait Until Element Is Enabled		css=a[ng-click='act.showCancelComplaintWnd(q)']	timeout=${COMMONWAIT}
+	Click element						css=a[ng-click='act.showCancelComplaintWnd(q)']
+
+	Wait Until Element Is Visible		xpath=//textarea[@ng-model='model.cancelComplaint.reason']	timeout=${COMMONWAIT}
+	Wait Until Element Is Enabled		xpath=//textarea[@ng-model='model.cancelComplaint.reason']	timeout=${COMMONWAIT}
+	Wait Until Element Not Stale		xpath=//textarea[@ng-model='model.cancelComplaint.reason']	40
+	Input Text							xpath=//textarea[@ng-model='model.cancelComplaint.reason']	${cancellation_data.data.cancellationReason}
+	Click Button						css=button[ng-click='act.cancelComplaint()']
+	Wait For Ajax
+	Wait Until Element Is Not Visible	css=button[ng-click='act.cancelComplaint()']	timeout=${COMMONWAIT}
+	Wait Until Element Contains			css=div[ng-if*='cancelled'	Отменена автором	timeout=${COMMONWAIT}
 
 
 Задати питання
@@ -472,6 +489,10 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait For Ajax
 	${claim_id}=						Get text			css=div.afp-info.ng-scope.ng-binding
 	${result}=							Get Regexp Matches	${claim_id}	Номер заявки: (\\d*),	1
+
+	debug
+	Run Keyword If	'openUA' in '${SUITE_NAME}'	Run Keywords	Click Element	css=a[ng-click='act.ret2Ad()']
+	...   AND   Wait For Element With Reload	css=table.bids td:contains('Отправлена')	1
 	[return]	${Arguments[2]}
 
 
@@ -480,12 +501,13 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Mark Step							_claim_creation_start
 	Wait Until Element Is Visible		xpath=//span[@class='state-label ng-binding']
 	Mark Step							_claim_creation_get_tender_status
+
 	${tender_status} =	Run Keyword If	'multiLotTender' in '${SUITE_NAME}'	Get text	xpath=(//span[@class='state-label ng-binding'])[2]
 		...  ELSE	Get text	xpath=//span[@class='state-label ng-binding']
 
 	Run Keyword Unless	'до початку періоду подачі' in '${TEST_NAME}'	Run Keyword If	'${tender_status}' == 'Период уточнений завершен'	Wait For Element With Reload	${locator_tenderClaim.buttonCreate}	1
+
 	Scroll Page To Element				${locator_tenderClaim.buttonCreate}
-#	sleep								5s
 	Wait Until Element Not Stale		${locator_tenderClaim.buttonCreate}	30
 	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}
 	Wait Until Element Is Not Visible	${locator_tenderClaim.buttonCreate}	30s
@@ -508,8 +530,9 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	sleep								5s
 
 	Run Keyword 						Змінити ${fieldname}	${fieldvalue}
-	Click Element						${locator_tenderClaim.fieldEmail}
-	Input Text							${locator_tenderClaim.fieldEmail}	${USERS.users['${username}'].email}
+	Run Keyword Unless	'openUA' in '${SUITE_NAME}'	Run Keywords	Click Element	${locator_tenderClaim.fieldEmail}
+	...   AND   Input Text	${locator_tenderClaim.fieldEmail}	${USERS.users['${username}'].email}
+
 	Scroll Page To Element				${locator_tenderClaim.buttonSend}
 	Click Button						${locator_tenderClaim.buttonSend}
 	Close confirmation					Ваша заявка была успешно сохранена!
@@ -537,6 +560,11 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 		...  ELSE	Input Text	${locator_tenderClaim.fieldPrice}	${fieldvalue}
 
 
+Змінити status
+	[Arguments]  ${fieldvalue}
+#	лише клікаємо зберегти, нічого не змінюючи
+
+
 Скасувати цінову пропозицію
 	[Arguments]  @{ARGUMENTS}
 	[Documentation]
@@ -550,6 +578,13 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Close Confirmation					Ваша заявка успешно отменена!
 	Wait Until Element Is Enabled		${locator_tenderClaim.buttonCreate}	${COMMONWAIT}
 	[return]	${ARGUMENTS[1]}
+
+
+Отримати пропозицію
+	[Arguments]  ${username}  ${tender_uaid}
+	${status} =	Get Text	xpath=//table[@class='bids']//tr[1]/td[4]
+	${bid} =	bid_data	${status}
+	[return]	${bid}
 
 
 Відповісти на питання
@@ -665,8 +700,6 @@ Login
 	Input Text							xpath=//div[@id="login_modal" and @style='display: block;']//input[@type='password']	${USERS.users['${username}'].password}
 	Click Element						xpath=//div[@id="login_modal" and @style='display: block;']//button[@type='submit']
 	Wait Until Element Is Visible		css=ul.user-menu  timeout=30
-#	Check If Element Stale				xpath=//div[@id="login_modal" and @style='display: block;']//input[@type='password']
-#	Wait Until Element Is Not Visible	xpath=//div[@id="login_modal" and @style='display: block;']//input[@type='password']	timeout=40
 
 
 Wait For Ajax
@@ -709,7 +742,8 @@ Wait Visibulity And Click Element
 
 Mark Step
 	[Arguments]  ${stepName}
-	log to console	_${stepName}
+	${time} =	Get Time
+	log to console	_${stepName} - ${time}
 
 
 Change Feild Value
@@ -808,4 +842,3 @@ Wait For Ajax Overflow Vanish
 Click element by JS
 	[Arguments]	${locator}
 	Execute Javascript					window.$("${locator}").mouseup()
-

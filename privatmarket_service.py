@@ -27,6 +27,20 @@ def fill_file_data(url, title, date_modified, date_published):
     })
 
 
+def bid_data(status):
+    status_dictionary = {
+                       u'Невалидна': 'invalid',
+                       u'Отправлена': 'sent'
+                       }
+
+    status_name = status_dictionary.get(status)
+    return munchify({
+        "data": {
+            "status": status_name
+        }
+    })
+
+
 def is_element_not_stale(webelement):
     try:
         webelement.is_enabled()
