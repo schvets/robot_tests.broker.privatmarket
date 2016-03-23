@@ -1,6 +1,6 @@
 # coding=utf-8
 
-from munch import munchify
+from munch import munchify as privatmarket_munchify
 from selenium.common.exceptions import StaleElementReferenceException
 
 
@@ -16,7 +16,7 @@ def read_file_content(file_path):
 
 
 def fill_file_data(url, title, date_modified, date_published):
-    return munchify({
+    return privatmarket_munchify({
         "data": {
             "url": url,
             "title": title,
@@ -34,7 +34,7 @@ def bid_data(status):
                        }
 
     status_name = status_dictionary.get(status)
-    return munchify({
+    return privatmarket_munchify({
         "data": {
             "status": status_name
         }

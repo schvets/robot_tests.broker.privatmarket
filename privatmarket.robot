@@ -478,6 +478,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	click element						${locator_tenderClaim.fieldEmail}
 	Input Text							${locator_tenderClaim.fieldEmail}	${USERS.users['${ARGUMENTS[0]}'].email}
 	Mark Step							_claim_creation_send_request
+	Click element						css=input[ng-disabled='model.selfQualifiedDisabled']
+	Click element						css=input[ng-disabled='model.selfEligibleDisabled']
 	sleep								5s
 	Scroll Page To Element				${locator_tenderClaim.buttonSend}
 	Click Button						${locator_tenderClaim.buttonSend}
@@ -490,10 +492,16 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	${claim_id}=						Get text			css=div.afp-info.ng-scope.ng-binding
 	${result}=							Get Regexp Matches	${claim_id}	Номер заявки: (\\d*),	1
 
-	debug
+#	Wait For Element With Reload	xpath=//table[@class='bids']//tr[1]/td[4 and contains(., 'Отправлена')]	1
 	Run Keyword If	'openUA' in '${SUITE_NAME}'	Run Keywords	Click Element	css=a[ng-click='act.ret2Ad()']
-	...   AND   Wait For Element With Reload	css=table.bids td:contains('Отправлена')	1
+	...   AND   Wait For Element With Reload	xpath=//table[@class='bids']//tr[1]/td[4 and contains(., 'Отправлена')]	1
 	[return]	${Arguments[2]}
+
+
+Дочекатися статусу заявки
+	[Arguments]  ${status}
+	Wait Until Element Is Visible		xpath=//table[@class='bids']//tr[1]/td[4]
+	Wait Until Keyword Succeeds			1min	10s	Element Should contain	xpath=//table[@class='bids']//tr[1]/td[4]	${status}
 
 
 Відкрити заявку
@@ -562,6 +570,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Змінити status
 	[Arguments]  ${fieldvalue}
+	Mark Step	_change_status
+	debug
 #	лише клікаємо зберегти, нічого не змінюючи
 
 
@@ -831,7 +841,8 @@ Try Search Element
 	Reload And Switch To Tab			${tab_number}
 	Mark Step							_i_reloaded
 	Wait For Ajax
-	Wait Until Element Is Enabled		${locator}	2
+	Wait Until Element Is Visible		${locator}	5
+	Wait Until Element Is Enabled		${locator}	5
 	[return]	true
 
 
