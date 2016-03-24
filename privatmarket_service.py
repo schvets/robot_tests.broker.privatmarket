@@ -1,6 +1,6 @@
 # coding=utf-8
 
-from munch import munchify
+from munch import munchify as privatmarket_munchify
 from selenium.common.exceptions import StaleElementReferenceException
 
 
@@ -16,7 +16,7 @@ def read_file_content(file_path):
 
 
 def fill_file_data(url, title, date_modified, date_published):
-    return munchify({
+    return privatmarket_munchify({
         "data": {
             "url": url,
             "title": title,
@@ -27,9 +27,20 @@ def fill_file_data(url, title, date_modified, date_published):
     })
 
 
-def is_element_not_stale(webelement):
+def is_element_not_stale(web_element):
     try:
-        webelement.is_enabled()
+        web_element.is_enabled()
     except StaleElementReferenceException:
         return True
     return False
+
+
+def get_currency_type(currency):
+    currency_dictionary = {
+        u'грн': 'UAH'
+    }
+    currency_type = currency_dictionary.get(currency)
+    if currency_type:
+        return currency_type
+    else:
+        return currency

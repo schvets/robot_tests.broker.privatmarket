@@ -13,6 +13,8 @@ ${COMMONWAIT}	30
 ${tender_data_title}											xpath=//div[contains(@class,'title-div')]
 ${tender_data_description}										css=div.description
 ${tender_data_value.amount}										css=div[ng-if='model.budjet'] div.info-item-val
+${tender_data_value.currency}									css=div[ng-if='model.budjet'] div.info-item-val
+${tender_data_value.valueAddedTaxIncluded}						css=div[ng-if='model.budjet'] div.info-item-val
 ${tender_data_tenderID}											xpath=//div[.='Тендер ID:']/following-sibling::div
 ${tender_data_procuringEntity.name}								css=a[ng-click='act.openCard()']
 ${tender_data_enquiryPeriod.startDate}							xpath=(//div[@class='period ng-scope']/div[@class='info-item'])[1]
@@ -162,11 +164,12 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	#check tender type
 	${item} =	Run Keyword If	'багатопредметного' in '${TEST_NAME}'	Отримати номер позиції	${ARGUMENTS[1]}
 		...  ELSE	Convert To Integer	0
-	${result1} =	Отримати інформацію зі сторінки	${item}	${ARGUMENTS[1]}
 
 	${element_class} =	Get Element Attribute	css=div[ng-show='adb.showCl']@class
 	Run Keyword If	'ng-hide' in '${element_class}'	Відкрити детальну інформацию по позиціям
-	[return]	${result1}
+
+	${result} =	Отримати інформацію зі сторінки	${item}	${ARGUMENTS[1]}
+	[return]	${result}
 
 
 Отримати інформацію зі сторінки
@@ -180,22 +183,24 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	...  ELSE	Run Keyword If	'complaints' in '${element}'	Switch To Tab	3
 	...  ELSE	Switch To Tab	1
 
-	Run Keyword And Return If	'${element}' == 'value.amount'				Отримати число			${element}	0	${item}
-	Run Keyword And Return If	'${element}' == 'minimalStep.amount'		Отримати число			${element}	0	${item}
-	Run Keyword And Return If	'${element}' == 'enquiryPeriod.startDate'	Отримати дату та час	${element}	1	${item}
-	Run Keyword And Return If	'${element}' == 'enquiryPeriod.endDate'		Отримати дату та час	${element}	1	${item}
-	Run Keyword And Return If	'${element}' == 'tenderPeriod.startDate'	Отримати дату та час	${element}	1	${item}
-	Run Keyword And Return If	'${element}' == 'tenderPeriod.endDate'		Отримати дату та час	${element}	1	${item}
-	Run Keyword And Return If	'${element}' == 'questions[0].date'			Отримати дату та час	${element}	0	${item}
-	Run Keyword And Return If	'${element}' == 'bids'						Перевірити присутність bids
+	Run Keyword And Return If	'${element}' == 'value.amount'					Отримати число			${element}	0	${item}
+	Run Keyword And Return If	'${element}' == 'minimalStep.amount'			Отримати число			${element}	0	${item}
+	Run Keyword And Return If	'${element}' == 'enquiryPeriod.startDate'		Отримати дату та час	${element}	1	${item}
+	Run Keyword And Return If	'${element}' == 'enquiryPeriod.endDate'			Отримати дату та час	${element}	1	${item}
+	Run Keyword And Return If	'${element}' == 'tenderPeriod.startDate'		Отримати дату та час	${element}	1	${item}
+	Run Keyword And Return If	'${element}' == 'tenderPeriod.endDate'			Отримати дату та час	${element}	1	${item}
+	Run Keyword And Return If	'${element}' == 'questions[0].date'				Отримати дату та час	${element}	0	${item}
+	Run Keyword And Return If	'${element}' == 'bids'							Перевірити присутність bids
+	Run Keyword And Return If	'${element}' == 'value.currency'				Отримати інформацію з ${element}	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'value.valueAddedTaxIncluded'	Отримати інформацію з ${element}	${element}	${item}
 
 	Run Keyword And Return If	'${element}' == 'items.classification.scheme'						Отримати строку		${element}	1	${item}
 	Run Keyword And Return If	'${element}' == 'items.classification.id'							Отримати строку		${element}	2	${item}
 	Run Keyword And Return If	'${element}' == 'items.description'									Отримати текст елемента	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'items.quantity'									Отримати ціле число	${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'items.classification.description'					Отримати класифікацію		${element}	${item}
-	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].scheme'			Отримати строку	${element}	1	${item}
-	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].id'				Отримати строку	${element}	2	${item}
+	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].scheme'			Отримати інформацію з ${element}	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].id'				Отримати строку	${element}	3	${item}
 	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].description'	Отримати класифікацію	${element}	${item}
 
 	Run Keyword And Return If	'${element}' == 'items.deliveryAddress.postalCode'		Отримати частину адреси	${element}	0	${item}
@@ -209,7 +214,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Run Keyword And Return If	'${element}' == 'items.deliveryLocation.latitude'		Отримати число			${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'items.deliveryLocation.longitude'		Отримати число			${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'auctionPeriod.startDate'				Отримати інформацію з ${element}	${element}	${item}
-
 	Run Keyword If	'${element}' == 'questions[0].title'		Wait For Element With Reload	${tender_data_${element}}	2
 	Run Keyword If	'${element}' == 'questions[0].answer'		Wait For Element With Reload	${tender_data_${element}}	2
 
@@ -233,8 +237,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	${result_full} =				Отримати текст елемента	${element_name}	${item}
 	${result} =						Strip String	${result_full}
 	${result} =						Replace String	${result}	,	${EMPTY}
-	${result} =						Replace String	${result}	:	${EMPTY}
 	${values_list} =				Split String	${result}
+	${result} =						Strip String	${result_full}	:
 	[return]	${values_list[${position_number}]}
 
 
@@ -323,6 +327,28 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait For Element With Reload	${tender_data_${element}}	1
 	${start_date} =					Отримати дату та час	${element}	1	${item}
 	[return]  ${start_date}
+
+
+Отримати інформацію з value.currency
+	[Arguments]    ${element_name}  ${item}
+	${currency} =	Отримати строку	${element_name}	1	${item}
+	${currency_type} =	get_currency_type	${currency}
+	[return]  ${currency_type}
+
+
+Отримати інформацію з items.additionalClassifications[0].scheme
+	[Arguments]    ${element_name}  ${item}
+	${currency} =	Отримати строку	${element_name}	1	${item}
+	${currency_type} =	get_currency_type	${currency}
+	[return]  ${currency_type}
+
+
+Отримати інформацію з value.valueAddedTaxIncluded
+	[Arguments]    ${element_name}  ${item}
+	${first_part} =		Отримати строку	${element}	1	${item}
+	${second_part} =	Отримати строку	${element}	2	${item}
+	${result} =			Set Variable	${first_part} ${second_part}
+	[return]  ${result}
 
 
 Внести зміни в тендер
@@ -446,6 +472,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	click element						${locator_tenderClaim.fieldEmail}
 	Input Text							${locator_tenderClaim.fieldEmail}	${USERS.users['${ARGUMENTS[0]}'].email}
 	Mark Step							_claim_creation_send_request
+	Click element						css=input[ng-disabled='model.selfQualifiedDisabled']
+	Click element						css=input[ng-disabled='model.selfEligibleDisabled']
 	sleep								5s
 	Scroll Page To Element				${locator_tenderClaim.buttonSend}
 	Click Button						${locator_tenderClaim.buttonSend}
@@ -626,18 +654,21 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 Отримати посилання на аукціон для глядача
 	[Arguments]  ${user}  ${tenderId}
 	${result} =	Отримати посилання на аукціон	${user}  ${tenderId}
+	[return]  ${result}
 
 
 Отримати посилання на аукціон для учасника
 	[Arguments]  ${user}  ${tenderId}
 	${result} =	Отримати посилання на аукціон	${user}  ${tenderId}
+	[return]  ${result}
 
 
 Отримати посилання на аукціон
 	[Arguments]  ${user}  ${tenderId}
 	privatmarket.Пошук тендера по ідентифікатору	${user}   ${tenderId}
 	Wait For Element With Reload					css=a[ng-click='act.takePart()']	1
-	Execute Javascript								return angular.element($("a[ng-click='act.takePart()']")).scope().model.ad.auctionUrl;
+	${result} =	Execute Javascript					return angular.element($("a[ng-click='act.takePart()']")).scope().model.ad.auctionUrl;
+	[return]  ${result}
 
 
 #Custom Keywords
