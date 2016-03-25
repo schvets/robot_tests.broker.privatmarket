@@ -44,3 +44,14 @@ def get_currency_type(currency):
         return currency_type
     else:
         return currency
+
+
+def get_Classifications_type(classifications):
+    classifications_dictionary = {
+        u'ДК 016:2010': u'ДКПП'
+    }
+    classifications_type = classifications_dictionary.get(classifications)
+    if classifications_type:
+        return classifications_type
+    else:
+        return classifications

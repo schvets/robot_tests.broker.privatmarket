@@ -133,6 +133,10 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 
 Відкрити детальну інформацию по позиціям
+	#check if extra information is already opened
+	${element_class} =	Get Element Attribute	css=div[ng-show='adb.showCl']@class
+	Run Keyword Unless	'ng-hide' in '${element_class}'	Return From Keyword	False
+
 	Wait Until Element Is Visible			css=div.info-item-val a
 	Wait Until Element Not Stale			css=div.info-item-val a	40
 	@{itemsList}=							Get Webelements	//div[@class='info-item-val']/a
@@ -165,9 +169,17 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	${item} =	Run Keyword If	'багатопредметного' in '${TEST_NAME}'	Отримати номер позиції	${ARGUMENTS[1]}
 		...  ELSE	Convert To Integer	0
 
-	${element_class} =	Get Element Attribute	css=div[ng-show='adb.showCl']@class
-	Run Keyword If	'ng-hide' in '${element_class}'	Відкрити детальну інформацию по позиціям
+	#switch to correct tab
+	${tab_num} =	Set Variable If
+		...  'questions' in '${ARGUMENTS[1]}'	2
+		...  'complaints' in '${ARGUMENTS[1]}'	3
+		...  1
+	Switch To Tab	${tab_num}
 
+	#show extra information if it need
+	Run Keyword If	${tab_num} == 1	Відкрити детальну інформацию по позиціям
+
+	#get information
 	${result} =	Отримати інформацію зі сторінки	${item}	${ARGUMENTS[1]}
 	[return]	${result}
 
@@ -179,9 +191,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	...	${element} ==  element
 
 	${element} = 	Replace String	${base_element}	items[${item}]	items
-	Run Keyword If	'questions' in '${element}'		Switch To Tab	2
-	...  ELSE	Run Keyword If	'complaints' in '${element}'	Switch To Tab	3
-	...  ELSE	Switch To Tab	1
 
 	Run Keyword And Return If	'${element}' == 'value.amount'					Отримати число			${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'minimalStep.amount'			Отримати число			${element}	0	${item}
@@ -238,8 +247,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	${result} =						Strip String	${result_full}
 	${result} =						Replace String	${result}	,	${EMPTY}
 	${values_list} =				Split String	${result}
-	${result} =						Strip String	${result_full}	:
-	[return]	${values_list[${position_number}]}
+	${result} =						Strip String	${values_list[${position_number}]}	mode=both	characters=:
+	[return]	${result}
 
 
 Отримати число
@@ -284,7 +293,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 Отримати класифікацію
 	[Arguments]  ${element_name}  ${item}
 	${result_full} =	Отримати текст елемента	${element_name}	${item}
-	${reg_expresion} =	Set Variable	[A-zА-Яа-яёЁЇїІіЄєҐґ\\s]+\: \\w+[\\d\\.\\-]+ ([А-Яа-яёЁЇїІіЄєҐґ\\s;,\\"_\\(\\)]+)
+	${reg_expresion} =	Set Variable	[0-9A-zА-Яа-яёЁЇїІіЄєҐґ\\s\\:]+\: \\w+[\\d\\.\\-]+ ([А-Яа-яёЁЇїІіЄєҐґ\\s;,\\"_\\(\\)]+)
 	${result} =			Get Regexp Matches	${result_full}	${reg_expresion}	1
 	[return]	${result[0]}
 
@@ -336,19 +345,21 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	[return]  ${currency_type}
 
 
-Отримати інформацію з items.additionalClassifications[0].scheme
-	[Arguments]    ${element_name}  ${item}
-	${currency} =	Отримати строку	${element_name}	1	${item}
-	${currency_type} =	get_currency_type	${currency}
-	[return]  ${currency_type}
-
-
 Отримати інформацію з value.valueAddedTaxIncluded
 	[Arguments]    ${element_name}  ${item}
+	${value_added_tax_included} =	Get text	${tender_data_${element_name}}
+	${result} =	Set Variable If	'(c НДС)' in '${value_added_tax_included}'	True
+	${result} =	Convert To Boolean	${result}
+	[return]  ${result}
+
+
+Отримати інформацію з items.additionalClassifications[0].scheme
+	[Arguments]    ${element}  ${item}
 	${first_part} =		Отримати строку	${element}	1	${item}
 	${second_part} =	Отримати строку	${element}	2	${item}
 	${result} =			Set Variable	${first_part} ${second_part}
-	[return]  ${result}
+	${currency_type} =	get_Classifications_type	${result}
+	[return]  ${currency_type}
 
 
 Внести зміни в тендер
@@ -498,7 +509,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 	Run Keyword Unless	'до початку періоду подачі' in '${TEST_NAME}'	Run Keyword If	'${tender_status}' == 'Период уточнений завершен'	Wait For Element With Reload	${locator_tenderClaim.buttonCreate}	1
 	Scroll Page To Element				${locator_tenderClaim.buttonCreate}
-#	sleep								5s
 	Wait Until Element Not Stale		${locator_tenderClaim.buttonCreate}	30
 	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}
 	Wait Until Element Is Not Visible	${locator_tenderClaim.buttonCreate}	30s
@@ -660,6 +670,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 Отримати посилання на аукціон для учасника
 	[Arguments]  ${user}  ${tenderId}
 	${result} =	Отримати посилання на аукціон	${user}  ${tenderId}
+	debug
 	[return]  ${result}
 
 
@@ -667,6 +678,9 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	[Arguments]  ${user}  ${tenderId}
 	privatmarket.Пошук тендера по ідентифікатору	${user}   ${tenderId}
 	Wait For Element With Reload					css=a[ng-click='act.takePart()']	1
+	Scroll Page To Element							css=a[ng-click='act.takePart()']
+	Wait Until Element Is Visible					css=a[ng-click='act.takePart()']  timeout=30
+	Sleep											5s
 	${result} =	Execute Javascript					return angular.element($("a[ng-click='act.takePart()']")).scope().model.ad.auctionUrl;
 	[return]  ${result}
 
@@ -725,7 +739,7 @@ Wait Visibulity And Click Element
 
 Mark Step
 	[Arguments]  ${stepName}
-	log to console	_${stepName}
+	log	_${stepName}
 
 
 Change Feild Value
