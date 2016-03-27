@@ -126,6 +126,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Mark Step								befor_click
 	Click Element By JS						span[id='${ARGUMENTS[1]}'] div.tenders_sm_info
 	Wait For Ajax
+	sleep									5s
 	Wait Until Element Is Not Visible		xpath=//*[@id='sidebar']//input	20s
 	Wait Until Element Is Visible			xpath=//div[contains(@class,'title-div')]	timeout=${COMMONWAIT}
 	Wait Until Element Not Stale			xpath=//div[contains(@class,'title-div')]	40
@@ -475,22 +476,22 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 	Відкрити заявку
 	sleep								5s
-	Mark Step							_claim_creation_set_price
 	Wait Until Element Not Stale		${locator_tenderClaim.fieldEmail}	40
 	Run Keyword If	'multiLotTender' in '${SUITE_NAME}'	Input Text	${locator_tenderClaim.checkedLot.fieldPrice}	${Arguments[2].data.lotValues[1]['value']['amount']}
 		...  ELSE	Input Text	${locator_tenderClaim.fieldPrice}	${Arguments[2].data.value.amount}
 
 	click element						${locator_tenderClaim.fieldEmail}
 	Input Text							${locator_tenderClaim.fieldEmail}	${USERS.users['${ARGUMENTS[0]}'].email}
-	Mark Step							_claim_creation_send_request
-	Click element						css=input[ng-disabled='model.selfQualifiedDisabled']
-	Click element						css=input[ng-disabled='model.selfEligibleDisabled']
+
+	#Just for openUA/EU tests
+	Run Keyword If	'Open' in '${SUITE_NAME}'	Run Keywords	Click element	css=input[ng-disabled='model.selfQualifiedDisabled']
+	...   AND   Go To	Click element	css=input[ng-disabled='model.selfEligibleDisabled']
+
 	sleep								5s
 	Scroll Page To Element				${locator_tenderClaim.buttonSend}
 	Click Button						${locator_tenderClaim.buttonSend}
 	Wait For Ajax Overflow Vanish
 	Close confirmation					Ваша заявка была успешно отправлена!
-	Mark Step							_claim_creation_save_information
 	Wait Until Element Is Visible		css=div.afp-info.ng-scope.ng-binding
 	wait until element contains			css=div.afp-info.ng-scope.ng-binding	Номер заявки
 	Wait For Ajax
@@ -511,7 +512,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Scroll Page To Element				${locator_tenderClaim.buttonCreate}
 	Wait Until Element Not Stale		${locator_tenderClaim.buttonCreate}	30
 	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}
-	Wait Until Element Is Not Visible	${locator_tenderClaim.buttonCreate}	30s
+	sleep								3s
+	Wait Until Element Is Not Visible	${locator_tenderClaim.buttonCreate}	50S
 	Wait For Element Value				css=input[ng-model='model.person.lastName']
 	Mark Step							_claim_creation_wait_data_load
 	sleep								5s
@@ -670,7 +672,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 Отримати посилання на аукціон для учасника
 	[Arguments]  ${user}  ${tenderId}
 	${result} =	Отримати посилання на аукціон	${user}  ${tenderId}
-	debug
 	[return]  ${result}
 
 
