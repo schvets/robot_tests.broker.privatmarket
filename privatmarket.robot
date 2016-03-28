@@ -491,7 +491,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Scroll Page To Element				${locator_tenderClaim.buttonSend}
 	Click Button						${locator_tenderClaim.buttonSend}
 	Wait For Ajax Overflow Vanish
-	Close confirmation					Ваша заявка была успешно отправлена!
+	Close confirmation					Ваша заявка была успешно помещена в очередь на отправку!
 	Wait Until Element Is Visible		css=div.afp-info.ng-scope.ng-binding
 	wait until element contains			css=div.afp-info.ng-scope.ng-binding	Номер заявки
 	Wait For Ajax
