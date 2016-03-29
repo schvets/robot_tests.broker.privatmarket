@@ -484,7 +484,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Scroll Page To Element				${locator_tenderClaim.buttonSend}
 	Click Button						${locator_tenderClaim.buttonSend}
 	Wait For Ajax Overflow Vanish
-	Close confirmation					Ваша заявка была успешно отправлена!
+	Close confirmation					Ваша заявка была успешно помещена в очередь на отправку!
 	Mark Step							_claim_creation_save_information
 	Wait Until Element Is Visible		css=div.afp-info.ng-scope.ng-binding
 	wait until element contains			css=div.afp-info.ng-scope.ng-binding	Номер заявки
@@ -492,7 +492,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	${claim_id}=						Get text			css=div.afp-info.ng-scope.ng-binding
 	${result}=							Get Regexp Matches	${claim_id}	Номер заявки: (\\d*),	1
 
-#	Wait For Element With Reload	xpath=//table[@class='bids']//tr[1]/td[4 and contains(., 'Отправлена')]	1
 	Run Keyword If	'openUA' in '${SUITE_NAME}'	Run Keywords	Click Element	css=a[ng-click='act.ret2Ad()']
 	...   AND   Wait For Element With Reload	xpath=//table[@class='bids']//tr[1]/td[4 and contains(., 'Отправлена')]	1
 	[return]	${Arguments[2]}
@@ -516,9 +515,10 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Run Keyword Unless	'до початку періоду подачі' in '${TEST_NAME}'	Run Keyword If	'${tender_status}' == 'Период уточнений завершен'	Wait For Element With Reload	${locator_tenderClaim.buttonCreate}	1
 
 	Scroll Page To Element				${locator_tenderClaim.buttonCreate}
+	Sleep								2s
 	Wait Until Element Not Stale		${locator_tenderClaim.buttonCreate}	30
 	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}
-	Wait Until Element Is Not Visible	${locator_tenderClaim.buttonCreate}	30s
+	Wait Until Element Is Not Visible	${locator_tenderClaim.buttonCreate}	50s
 	Wait For Element Value				css=input[ng-model='model.person.lastName']
 	Mark Step							_claim_creation_wait_data_load
 	sleep								5s
@@ -543,7 +543,11 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 	Scroll Page To Element				${locator_tenderClaim.buttonSend}
 	Click Button						${locator_tenderClaim.buttonSend}
-	Close confirmation					Ваша заявка была успешно сохранена!
+
+	${test_name} =	Convert To Lowercase	${TEST_NAME}
+	Run Keyword If	'оновити статус цінової пропозиції'	in ${test_name}	Close confirmation	Ваша заявка была успешно сохранена!
+		...  ELSE	Close confirmation	Ваша заявка была успешно помещена в очередь на отправку!
+
 	Mark Step							_claim_edit_save_information
 	Wait Until Element Is Visible		css=div.afp-info.ng-scope.ng-binding
 	Wait For Ajax
@@ -571,7 +575,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 Змінити status
 	[Arguments]  ${fieldvalue}
 	Mark Step	_change_status
-	debug
 #	лише клікаємо зберегти, нічого не змінюючи
 
 
@@ -592,8 +595,9 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Отримати пропозицію
 	[Arguments]  ${username}  ${tender_uaid}
-	${status} =	Get Text	xpath=//table[@class='bids']//tr[1]/td[4]
-	${bid} =	bid_data	${status}
+	${button_of_send_claim_text} =	Get text	${locator_tenderClaim.buttonCreate}
+	${status} =	Set Variable If	'Подать заявку' in '${button_of_send_claim_text}'	invalid	unknown
+	${bid} =	get_bid_data	${status}
 	[return]	${bid}
 
 

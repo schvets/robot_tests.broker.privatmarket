@@ -27,16 +27,10 @@ def fill_file_data(url, title, date_modified, date_published):
     })
 
 
-def bid_data(status):
-    status_dictionary = {
-                       u'Невалидна': 'invalid',
-                       u'Отправлена': 'sent'
-                       }
-
-    status_name = status_dictionary.get(status)
+def get_bid_data(status):
     return privatmarket_munchify({
         "data": {
-            "status": status_name
+            "status": status
         }
     })
 
