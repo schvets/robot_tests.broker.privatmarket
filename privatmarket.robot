@@ -438,7 +438,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Mark Step							_asking_question_wait_for_allert
 	Wait Until Element Is Enabled		xpath=//div[@class='alert-info ng-scope ng-binding']	timeout=${COMMONWAIT}
 	Wait Until Element Not Stale		xpath=//div[@class='alert-info ng-scope ng-binding']	40
-	Wait Until Element Contains			xpath=//div[@class='alert-info ng-scope ng-binding']	Ваш вопрос успешно отправлен. Спасибо за обращение!	timeout=10
+	Wait Until Element Contains			xpath=//div[@class='alert-info ng-scope ng-binding']	Ваш вопрос успешно помещен в очередь на отправку. Спасибо за обращение!	timeout=10
 	Wait For Ajax
 	Wait Until Element Not Stale		css=span[ng-click='act.hideModal()']	40
 	Click Element						css=span[ng-click='act.hideModal()']
@@ -484,7 +484,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Scroll Page To Element				${locator_tenderClaim.buttonSend}
 	Click Button						${locator_tenderClaim.buttonSend}
 	Wait For Ajax Overflow Vanish
-	Close confirmation					Ваша заявка была успешно отправлена!
+	Close confirmation					Ваша заявка была успешно помещена в очередь на отправку!
 	Mark Step							_claim_creation_save_information
 	Wait Until Element Is Visible		css=div.afp-info.ng-scope.ng-binding
 	wait until element contains			css=div.afp-info.ng-scope.ng-binding	Номер заявки
@@ -571,7 +571,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 Змінити status
 	[Arguments]  ${fieldvalue}
 	Mark Step	_change_status
-	debug
 #	лише клікаємо зберегти, нічого не змінюючи
 
 
@@ -594,6 +593,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	[Arguments]  ${username}  ${tender_uaid}
 	${status} =	Get Text	xpath=//table[@class='bids']//tr[1]/td[4]
 	${bid} =	bid_data	${status}
+	debug
 	[return]	${bid}
 
 
