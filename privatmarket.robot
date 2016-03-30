@@ -390,6 +390,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	sleep								3s
 	Wait Until Element Is Not Visible	css=div.info-item-val textarea	timeout=30
 
+
 Скасувати вимогу
 	[Arguments]    ${user}  ${tender_id}  ${claim_data}  ${cancellation_data}
 	Wait Until Element Is Visible		css=a[ng-click='act.showCancelComplaintWnd(q)']	timeout=${COMMONWAIT}
@@ -545,8 +546,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Click Button						${locator_tenderClaim.buttonSend}
 
 	${test_name} =	Convert To Lowercase	${TEST_NAME}
-	Run Keyword If	'оновити статус цінової пропозиції'	in ${test_name}	Close confirmation	Ваша заявка была успешно сохранена!
-		...  ELSE	Close confirmation	Ваша заявка была успешно помещена в очередь на отправку!
+	Run Keyword If	'оновити статус цінової пропозиції' in '${test_name}'	Close confirmation	Ваша заявка была успешно помещена в очередь на отправку!
+		...  ELSE	Close confirmation	Ваша заявка была успешно сохранена!
 
 	Mark Step							_claim_edit_save_information
 	Wait Until Element Is Visible		css=div.afp-info.ng-scope.ng-binding
@@ -595,9 +596,10 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Отримати пропозицію
 	[Arguments]  ${username}  ${tender_uaid}
+	Wait For Element With Reload	//button[@ng-click='act.createAfp()' and contains(., 'Подать заявку')]	1
 	${button_of_send_claim_text} =	Get text	${locator_tenderClaim.buttonCreate}
-	${status} =	Set Variable If	'Подать заявку' in '${button_of_send_claim_text}'	invalid	unknown
-	${bid} =	get_bid_data	${status}
+	${status} =						Set Variable If	'Подать заявку' in '${button_of_send_claim_text}'	invalid	unknown
+	${bid} =						get_bid_data	${status}
 	[return]	${bid}
 
 
@@ -710,10 +712,11 @@ Login
 	Click Element						xpath=//span[.='Мой кабинет']
 	Wait Until Element Is Visible		id=p24__login__field	${COMMONWAIT}
 	Execute Javascript					$('#p24__login__field').val(${USERS.users['${username}'].login})
-	Check If Element Stale				xpath=//div[@id="login_modal" and @style='display: block;']//input[@type='password']
-	Input Text							xpath=//div[@id="login_modal" and @style='display: block;']//input[@type='password']	${USERS.users['${username}'].password}
-	Click Element						xpath=//div[@id="login_modal" and @style='display: block;']//button[@type='submit']
-	Wait Until Element Is Visible		css=ul.user-menu  timeout=30
+	Check If Element Stale				xpath=//div[@id='login_modal' and @style='display: block;']//input[@type='password']
+	Input Text							xpath=//div[@id='login_modal' and @style='display: block;']//input[@type='password']	${USERS.users['${username}'].password}
+	Click Element						xpath=//div[@id='login_modal' and @style='display: block;']//button[@type='submit']
+	Wait Until Element Is Visible		css=a[data-target='#select_cabinet']  timeout=30
+
 
 
 Wait For Ajax
