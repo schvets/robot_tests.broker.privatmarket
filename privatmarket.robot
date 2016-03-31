@@ -8,7 +8,7 @@ Library  DebugLibrary
 Library  privatmarket_service.py
 
 *** Variables ***
-${COMMONWAIT}	30
+${COMMONWAIT}	40
 
 ${tender_data_title}											xpath=//div[contains(@class,'title-div')]
 ${tender_data_description}										css=div.description
@@ -102,7 +102,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Go to									${USERS.users['${ARGUMENTS[0]}'].homepage}
 	Wait Until Element Is Enabled			id=tenders	timeout=${COMMONWAIT}
 	Switch To Frame							id=tenders
-	Wait For Ajax
+	Sleep									5s
 	Wait Until Element Is Visible			xpath=//*[@id='sidebar']//input	timeout=${COMMONWAIT}
 	Wait Until Element Not Stale			xpath=//*[@id='sidebar']//input	40
 	Wait Until Element Is Enabled			xpath=(//div[@class='tender-name_info tender-col'])[1]	timeout=${COMMONWAIT}
@@ -114,7 +114,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	${check_result} =						Run Keyword If	'Войти в обучающий режим' in '${current_type}'	Set Variable  True
 	Run Keyword If							${check_result} and ${education_type}	Switch To Education Mode
 
-	Wait For Ajax
 	Wait Until Element Not Stale			xpath=(//div[@class='tenders_sm_info'])[1]	40
 	Wait Until Element Is Enabled			xpath=(//div[@class='tenders_sm_info'])[1]	timeout=${COMMONWAIT}
 	Clear Element Text						xpath=//*[@id='sidebar']//input
@@ -125,10 +124,11 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait Until Element Not Stale			css=span[id='${ARGUMENTS[1]}'] div.tenders_sm_info	40
 	Mark Step								befor_click
 	Click Element By JS						span[id='${ARGUMENTS[1]}'] div.tenders_sm_info
-	Wait For Ajax
+
 	sleep									5s
+	Switch To Frame							id=tenders
 	Wait Until Element Is Not Visible		xpath=//*[@id='sidebar']//input	20s
-	Wait Until Element Is Visible			xpath=//div[contains(@class,'title-div')]	timeout=${COMMONWAIT}
+	Wait Until Element Is Visible			css=section#nolotSection	timeout=${COMMONWAIT}
 	Wait Until Element Not Stale			xpath=//div[contains(@class,'title-div')]	40
 	Mark Step								_tender_search_end
 
@@ -450,6 +450,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Click Element						css=span[ng-click='act.hideModal()']
 	Wait Until Element Is Not Visible	xpath=//input[@ng-model="model.question.title"]	timeout=20
 	Mark Step							_asking_question_end
+	Sleep								120s
 
 
 Оновити сторінку з тендером
@@ -701,7 +702,8 @@ Login
 
 
 Wait For Ajax
-	Wait For Condition	return window.jQuery!=undefined && jQuery.active==0	${COMMONWAIT}
+	sleep				2s
+	Wait For Condition	return window.jQuery!=undefined && jQuery.active==0	60s
 
 
 Wait Until Element Not Stale
