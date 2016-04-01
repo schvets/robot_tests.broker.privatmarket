@@ -572,6 +572,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	privatmarket.Пошук тендера по ідентифікатору	${ARGUMENTS[0]}	${ARGUMENTS[1]}
 	Wait For Ajax
 	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}
+	Wait For Element Value				css=input[ng-model='model.person.lastName']
+	Scroll Page To Element				${locator_tenderClaim.buttonCancel}
 	Wait Enable And Click Element		${locator_tenderClaim.buttonCancel}
 	Close Confirmation					Ваша заявка успешно отменена!
 	Wait Until Element Is Enabled		${locator_tenderClaim.buttonCreate}	${COMMONWAIT}
@@ -758,9 +760,9 @@ Change Feild Value
 Close Confirmation
 	[Arguments]	${confirmation_text}
 	Wait For Ajax
-	Wait Until Element Is Visible		css=p.ng-binding	${COMMONWAIT}	${COMMONWAIT}
+	Wait Until Element Is Visible		css=p.ng-binding	${COMMONWAIT}
 	Wait Until Element Contains			css=p.ng-binding	${confirmation_text}	${COMMONWAIT}
-	sleep								2s
+	Scroll Page To Element				css=p.ng-binding
 	Wait Visibulity And Click Element	xpath=//button[@ng-click='close()']
 	Wait Until Element Is Not Visible	xpath=//button[@ng-controller='inFrameModalCtrl']	${COMMONWAIT}
 
@@ -830,7 +832,7 @@ Try Search Element
 	Reload And Switch To Tab			${tab_number}
 	Mark Step							_i_reloaded
 	Wait For Ajax
-	Wait Until Element Is Enabled		${locator}	2
+	Wait Until Element Is Enabled		${locator}	3
 	[return]	true
 
 
