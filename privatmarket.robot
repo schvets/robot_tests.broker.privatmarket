@@ -128,7 +128,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	sleep									5s
 	Switch To Frame							id=tenders
 	Wait Until Element Is Not Visible		xpath=//*[@id='sidebar']//input	20s
-	Wait Until Element Is Visible			css=section#nolotSection	timeout=${COMMONWAIT}
+	Wait Until Element Is Visible			css=a[ng-click='adb.showCl = !adb.showCl;']	timeout=${COMMONWAIT}
 	Wait Until Element Not Stale			xpath=//div[contains(@class,'title-div')]	40
 	Mark Step								_tender_search_end
 
