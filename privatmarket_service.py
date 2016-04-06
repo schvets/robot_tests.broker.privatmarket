@@ -1,7 +1,8 @@
 # coding=utf-8
-
 from munch import munchify as privatmarket_munchify
 from selenium.common.exceptions import StaleElementReferenceException
+from datetime import datetime
+from pytz import timezone
 
 
 def get_month_number(month_name):
@@ -46,7 +47,7 @@ def get_currency_type(currency):
         return currency
 
 
-def get_Classifications_type(classifications):
+def get_classification_type(classifications):
     classifications_dictionary = {
         u'ДК 016:2010': u'ДКПП'
     }
@@ -55,3 +56,11 @@ def get_Classifications_type(classifications):
         return classifications_type
     else:
         return classifications
+
+
+def get_time_with_offset(date):
+    date_obj = datetime.strptime(date, "%Y-%m-%d %H:%M")
+    # date_obj = datetime.strptime(date, "%Y-%m-%d %H:%M:%S")
+    time_zone = timezone('Europe/Kiev')
+    localized_date = time_zone.localize(date_obj)
+    return localized_date

@@ -74,9 +74,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Підготувати клієнт для користувача
 	[Arguments]  ${username}
-	log  ${username}
 	[Documentation]  Відкрити брaвзер, створити обєкт api wrapper, тощо
-
 
 	${service args}=    Create List	--ignore-ssl-errors=true	--ssl-protocol=tlsv1
 	${browser} = 	Convert To Lowercase	${USERS.users['${username}'].browser}
@@ -336,7 +334,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	[Arguments]  ${element}  ${item}
 	Wait For Element With Reload	${tender_data_${element}}	1
 	${start_date} =					Отримати дату та час	${element}	1	${item}
-	[return]  ${start_date}
+	${result} =	get_time_with_offset	${start_date}
+	[return]  ${result}
 
 
 Отримати інформацію з value.currency
@@ -359,7 +358,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	${first_part} =		Отримати строку	${element}	1	${item}
 	${second_part} =	Отримати строку	${element}	2	${item}
 	${result} =			Set Variable	${first_part} ${second_part}
-	${currency_type} =	get_Classifications_type	${result}
+	${currency_type} =	get_classification_type	${result}
 	[return]  ${currency_type}
 
 
