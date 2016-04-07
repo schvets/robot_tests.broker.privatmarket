@@ -60,7 +60,6 @@ def get_classification_type(classifications):
 
 def get_time_with_offset(date):
     date_obj = datetime.strptime(date, "%Y-%m-%d %H:%M")
-    # date_obj = datetime.strptime(date, "%Y-%m-%d %H:%M:%S")
     time_zone = timezone('Europe/Kiev')
     localized_date = time_zone.localize(date_obj)
-    return localized_date
+    return localized_date.strftime('%Y-%m-%d %H:%M:%S.%f%z')
