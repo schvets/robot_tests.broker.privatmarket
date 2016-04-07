@@ -2,6 +2,8 @@
 
 from munch import munchify as privatmarket_munchify
 from selenium.common.exceptions import StaleElementReferenceException
+from datetime import datetime
+from pytz import timezone
 
 
 def get_month_number(month_name):
@@ -35,12 +37,41 @@ def get_bid_data(status):
     })
 
 
-def is_element_not_stale(webelement):
+def is_element_not_stale(web_element):
     try:
-        webelement.is_enabled()
+        web_element.is_enabled()
     except StaleElementReferenceException:
         return True
     return False
+
+
+def get_currency_type(currency):
+    currency_dictionary = {
+        u'грн': 'UAH'
+    }
+    currency_type = currency_dictionary.get(currency)
+    if currency_type:
+        return currency_type
+    else:
+        return currency
+
+
+def get_classification_type(classifications):
+    classifications_dictionary = {
+        u'ДК 016:2010': u'ДКПП'
+    }
+    classifications_type = classifications_dictionary.get(classifications)
+    if classifications_type:
+        return classifications_type
+    else:
+        return classifications
+
+
+def get_time_with_offset(date):
+    date_obj = datetime.strptime(date, "%Y-%m-%d %H:%M")
+    time_zone = timezone('Europe/Kiev')
+    localized_date = time_zone.localize(date_obj)
+    return localized_date.strftime('%Y-%m-%d %H:%M:%S.%f%z')
 
 
 def get_procurement_method_type(method_name):
