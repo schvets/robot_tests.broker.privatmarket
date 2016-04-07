@@ -100,7 +100,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Go to									${USERS.users['${ARGUMENTS[0]}'].homepage}
 	Wait Until Element Is Enabled			id=tenders	timeout=${COMMONWAIT}
 	Switch To Frame							id=tenders
-	Sleep									5s
+	Sleep									3s
 	Wait Until Element Is Visible			xpath=//*[@id='sidebar']//input	timeout=${COMMONWAIT}
 	Wait Until Element Not Stale			xpath=//*[@id='sidebar']//input	40
 	Wait Until Element Is Enabled			xpath=(//div[@class='tender-name_info tender-col'])[1]	timeout=${COMMONWAIT}
@@ -108,16 +108,17 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	${suite_name} = 	Convert To Lowercase	${SUITE_NAME}
 	${education_type} =	Run Keyword If	'limited' in '${suite_name}'	Set Variable	False
 		...  ELSE	Set Variable	True
-	${current_type} =						Get text	css=div.test-mode-aside
-	${check_result} =						Run Keyword If	'Войти в обучающий режим' in '${current_type}'	Set Variable  True
-	Run Keyword If							${check_result} and ${education_type}	Switch To Education Mode
-
-	Wait Until Element Not Stale			xpath=(//div[@class='tenders_sm_info'])[1]	40
-	Wait Until Element Is Enabled			xpath=(//div[@class='tenders_sm_info'])[1]	timeout=${COMMONWAIT}
-	Clear Element Text						xpath=//*[@id='sidebar']//input
-	sleep									1s
-	Input Text								xpath=//*[@id='sidebar']//input	${ARGUMENTS[1]}
-	Wait For Tender							${ARGUMENTS[1]}
+#	${current_type} =						Get text	css=div.test-mode-aside
+#	${check_result} =						Run Keyword If	'Войти в обучающий режим' in '${current_type}'	Set Variable  True
+#	Run Keyword If							${check_result} and ${education_type}	Switch To Education Mode
+#
+#	Wait Until Element Not Stale			xpath=(//div[@class='tenders_sm_info'])[1]	40
+#	Wait Until Element Is Enabled			xpath=(//div[@class='tenders_sm_info'])[1]	timeout=${COMMONWAIT}
+#	Clear Element Text						xpath=//*[@id='sidebar']//input
+#	sleep									1s
+#	Input Text								xpath=//*[@id='sidebar']//input	${ARGUMENTS[1]}
+	Mark Step	start search
+	Wait For Tender							${ARGUMENTS[1]}	${education_type}
 	sleep									3s
 	Wait Until Element Not Stale			css=span[id='${ARGUMENTS[1]}'] div.tenders_sm_info	40
 	Mark Step								befor_click
@@ -475,7 +476,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	privatmarket.Пошук тендера по ідентифікатору	${ARGUMENTS[0]}   ${ARGUMENTS[1]}
 
 	Відкрити заявку
-	sleep								5s
+#	sleep								5s
+	Mark Step							fill_in_data
 	Wait Until Element Not Stale		${locator_tenderClaim.fieldEmail}	40
 	Run Keyword If	'multiLotTender' in '${SUITE_NAME}'	Input Text	${locator_tenderClaim.checkedLot.fieldPrice}	${Arguments[2].data.lotValues[1]['value']['amount']}
 		...  ELSE	Input Text	${locator_tenderClaim.fieldPrice}	${Arguments[2].data.value.amount}
@@ -513,10 +515,10 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait Until Element Not Stale		${locator_tenderClaim.buttonCreate}	30
 	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}
 	sleep								3s
-	Wait Until Element Is Not Visible	${locator_tenderClaim.buttonCreate}	50S
+	Wait Until Element Is Not Visible	${locator_tenderClaim.buttonCreate}	50s
 	Wait For Element Value				css=input[ng-model='model.person.lastName']
 	Mark Step							_claim_creation_wait_data_load
-	sleep								5s
+	sleep								3s
 	Wait Until Element Is Enabled		${locator_tenderClaim.fieldEmail}	20
 
 
@@ -571,6 +573,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	privatmarket.Пошук тендера по ідентифікатору	${ARGUMENTS[0]}	${ARGUMENTS[1]}
 	Wait For Ajax
 	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}
+	Wait For Element Value				css=input[ng-model='model.person.lastName']
+	Scroll Page To Element				${locator_tenderClaim.buttonCancel}
 	Wait Enable And Click Element		${locator_tenderClaim.buttonCancel}
 	Close Confirmation					Ваша заявка успешно отменена!
 	Wait Until Element Is Enabled		${locator_tenderClaim.buttonCreate}	${COMMONWAIT}
@@ -588,7 +592,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Відкрити заявку
 	Input Text							${locator_tenderClaim.fieldEmail}	${USERS.users['${user}'].email}
 
-	Mark Step							_3
 	Wait Until Element Is Enabled		css=button[ng-click='act.chooseFile()']	${COMMONWAIT}
 	Scroll Page To Element				css=button[ng-click='act.chooseFile()']
 	sleep  3s
@@ -681,7 +684,10 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait For Element With Reload					css=a[ng-click='act.takePart()']	1
 	Scroll Page To Element							css=a[ng-click='act.takePart()']
 	Wait Until Element Is Visible					css=a[ng-click='act.takePart()']  timeout=30
-	Sleep											5s
+
+	${request_string} =	Convert To String
+		...  return (function(){var link = angular.element($("a[ng-click='act.takePart()']")).scope().model.ad.auctionUrl; if(!link || link=='None'){return false;} else return true;})()
+	Wait For Condition								${request_string}	${COMMONWAIT}
 	${result} =	Execute Javascript					return angular.element($("a[ng-click='act.takePart()']")).scope().model.ad.auctionUrl;
 	[return]  ${result}
 
@@ -696,8 +702,7 @@ Login
 	Input Text							xpath=//div[@id="login_modal" and @style='display: block;']//input[@type='password']	${USERS.users['${username}'].password}
 	Click Element						xpath=//div[@id="login_modal" and @style='display: block;']//button[@type='submit']
 	Wait Until Element Is Visible		css=ul.user-menu  timeout=30
-	Check If Element Stale				xpath=//div[@id="login_modal" and @style='display: block;']//input[@type='password']
-	Wait Until Element Is Not Visible	xpath=//div[@id="login_modal" and @style='display: block;']//input[@type='password']	timeout=40
+	Wait Until Element Is Visible		css=a[data-target='#select_cabinet']  timeout=${COMMONWAIT}
 
 
 Wait For Ajax
@@ -741,25 +746,16 @@ Wait Visibulity And Click Element
 
 Mark Step
 	[Arguments]  ${stepName}
-	log	_${stepName}
-
-
-Change Feild Value
-	[Arguments]	${locator}	${value}
-	Wait For Ajax
-	${cssLocator} =	Get Substring	${locator}	4
-	sleep							4s
-	Wait For Condition				return window.$($("${cssLocator}")).val()!=''	${COMMONWAIT}
-	Input Text						${locator}	${value}
-	Mark Step						_feild_value_was_changed
+	${time} =	Get Time
+	log to console	_${stepName} - ${time}
 
 
 Close Confirmation
 	[Arguments]	${confirmation_text}
 	Wait For Ajax
-	Wait Until Element Is Visible		css=p.ng-binding	${COMMONWAIT}	${COMMONWAIT}
+	Wait Until Element Is Visible		css=p.ng-binding	${COMMONWAIT}
 	Wait Until Element Contains			css=p.ng-binding	${confirmation_text}	${COMMONWAIT}
-	sleep								2s
+	Scroll Page To Element				css=p.ng-binding
 	Wait Visibulity And Click Element	xpath=//button[@ng-click='close()']
 	Wait Until Element Is Not Visible	xpath=//button[@ng-controller='inFrameModalCtrl']	${COMMONWAIT}
 
@@ -783,12 +779,31 @@ Scroll Page To Element
 
 
 Wait For Tender
-	[Arguments]	${tender_id}
-	Wait Until Keyword Succeeds			10min	15s	Try Search Tender	${tender_id}
+	[Arguments]	${tender_id}  ${education_type}
+	Mark Step  in_Wait For Tender
+	Wait Until Keyword Succeeds	10min	10s	Try Search Tender	${tender_id}	${education_type}
 
 
 Try Search Tender
-	[Arguments]	${tender_id}
+	[Arguments]	${tender_id}  ${education_type}
+	#проверим правильный ли режим
+	Mark Step	in_Try Search Tender
+	${current_type} =					Get text	css=div.test-mode-aside
+	${check_result} =					Run Keyword If	'Войти в обучающий режим' in '${current_type}'	Set Variable  True
+	Mark Step	check_mode
+	Run Keyword If	${check_result} and ${education_type}	Run Keywords	Switch To Education Mode
+	...   AND   Wait Until Element Not Stale		xpath=(//div[@class='tenders_sm_info'])[1]	40
+	...   AND   Wait Until Element Is Enabled		xpath=(//div[@class='tenders_sm_info'])[1]	timeout=${COMMONWAIT}
+
+	#заполним поле поиска
+	${text_in_search} =					Get Value	css=input.search-query-input
+	Mark Step	fill_in_text
+	Run Keyword Unless	'${tender_id}' == '${text_in_search}'	Run Keywords	Clear Element Text	css=input.search-query-input
+	...   AND   sleep					1s
+	...   AND   Input Text				css=input.search-query-input	${tender_id}
+
+	#выполним поиск
+	Mark Step	try_search
 	Click Element						xpath=//div[@class="search-aside"]/span
 	Wait For Ajax Overflow Vanish
 	Wait Until Element Is Enabled		id=${tender_id}	timeout=10
@@ -829,7 +844,7 @@ Try Search Element
 	Reload And Switch To Tab			${tab_number}
 	Mark Step							_i_reloaded
 	Wait For Ajax
-	Wait Until Element Is Enabled		${locator}	2
+	Wait Until Element Is Enabled		${locator}	3
 	[return]	true
 
 
