@@ -66,6 +66,31 @@ ${locator_tenderClaim.buttonGoBack}				css=a[ng-click='act.ret2Ad()']
 ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 
+${tender_data_cancellations[0].status}					xpath=//*[@id='nolotSection']/div[1]/div[1]
+${tender_data_cancellations[0].reason}					xpath=//*[@id='nolotSection']/div[1]/div[2]
+${tender_data_cancellations[0].documents[0].title}		css=.file-name.ng-binding
+${tender_data_title_en}									css=.title-div.ng-binding
+${tender_data_title_ru}									css=.title-div.ng-binding
+${tender_data_description_en}							css=#tenderDescription
+${tender_data_description_ru}							css=#tenderDescription
+
+
+${tender_data_procuringEntity.address.countryName}		xpath=//div[@id='procurerAddr']/div[2]
+${tender_data_procuringEntity.address.locality}			xpath=//div[@id='procurerAddr']/div[2]
+${tender_data_procuringEntity.address.postalCode}		xpath=//div[@id='procurerAddr']/div[2]
+${tender_data_procuringEntity.address.region}			xpath=//div[@id='procurerAddr']/div[2]
+${tender_data_procuringEntity.address.streetAddress}	xpath=//div[@id='procurerAddr']/div[2]
+
+${tender_data_procuringEntity.contactPoint.name}		xpath=//div[@class='delivery-info']/div[2]/div[@class='info-item-val ng-binding']
+${tender_data_procuringEntity.contactPoint.telephone}	xpath=//div[@class='delivery-info']/div[4]/div[@class='info-item-val ng-binding']
+${tender_data_procuringEntity.contactPoint.url}			xpath=//div[@class='delivery-info']/div[5]/div[@class='info-item-val ng-binding']
+${tender_data_procuringEntity.identifier.legalName}		xpath=//div[@id='procurerLegalName']/div[2]
+${tender_data_procuringEntity.identifier.scheme}		xpath=//div[@id='procurerId']/div[1]
+${tender_data_procuringEntity.identifier.id}			xpath=//div[@id='procurerId']/div[2]
+
+${tender_data_documents[0].title}						css=.file-name.ng-binding
+
+
 *** Keywords ***
 Підготувати дані для оголошення тендера
 	${INITIAL_TENDER_DATA} =  test_tender_data
@@ -227,6 +252,22 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Run Keyword If	'${element}' == 'questions[0].title'		Wait For Element With Reload	${tender_data_${element}}	2
 	Run Keyword If	'${element}' == 'questions[0].answer'		Wait For Element With Reload	${tender_data_${element}}	2
 
+	Run Keyword And Return If	'${element}' == 'cancellations[0].status'					Отримати інформацію з ${element}	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'cancellations[0].documents[0].title'		Отримати інформацію з ${element}	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'title_en'									Отримати текст елемента	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'title_ru'									Отримати текст елемента	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'description_en'							Отримати текст елемента	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'description_ru'							Отримати текст елемента	${element}	${item}
+
+	Run Keyword And Return If	'${element}' == 'procuringEntity.address.countryName'		Отримати строку між комами	${element}	1	${item}
+	Run Keyword And Return If	'${element}' == 'procuringEntity.address.locality'			Отримати строку між комами	${element}	3	${item}
+	Run Keyword And Return If	'${element}' == 'procuringEntity.address.postalCode'		Отримати строку між комами	${element}	0	${item}
+	Run Keyword And Return If	'${element}' == 'procuringEntity.address.region'			Отримати строку між комами	${element}	2	${item}
+	Run Keyword And Return If	'${element}' == 'procuringEntity.address.streetAddress'		Отримати строку між комами	${element}	4	${item}
+	Run Keyword And Return If	'${element}' == 'procuringEntity.identifier.scheme'			Отримати строку		${element}	0	${item}
+	Run Keyword And Return If	'${element}' == 'documents[0].title'						Отримати інформацію з ${element}	${element}	${item}
+
+
 	Wait Until Element Is Visible	${tender_data_${element}}	timeout=${COMMONWAIT}
 	${result_full} =				Get Text	${tender_data_${element}}
 	${result} =						Strip String	${result_full}
@@ -363,6 +404,35 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	[return]  ${currency_type}
 
 
+Отримати інформацію з cancellations[0].status
+	[Arguments]    ${element}  ${item}
+	${text} =	Отримати текст елемента  ${element}  ${item}
+	run keyword and return if  'Отменено' in '${text}'  Повернути статус active
+
+
+Отримати інформацію з cancellations[0].documents[0].title
+	[Arguments]		${element}	${item}
+	${text} =		Отримати текст елемента  ${element}  ${item}
+	${newText} =	Replace String		${text}	\\	\\\\
+	[return]	${newText}
+
+Отримати інформацію з documents[0].title
+	[Arguments]		${element}	${item}
+	${text} =		Отримати текст елемента  ${element}  ${item}
+	${newText} =	Replace String		${text}	\\	\\\\
+	[return]	${newText}
+
+Отримати строку між комами
+	[Arguments]  ${element_name}  ${position_number}  ${item}
+	${result_full} =				Отримати текст елемента	${element_name}	${item}
+	${result} =						Strip String	${result_full}
+	${values_list} =				Split String	${result}	,
+	${result} =						Strip String	${values_list[${position_number}]}
+	[return]	${result}
+
+Повернути статус active
+    [return]  active
+
 Внести зміни в тендер
 	[Arguments]  @{ARGUMENTS}
 	Fail  Функція не підтримується майданчиком
@@ -388,7 +458,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Завантажити документацію до вимоги
 	[Arguments]  ${user}  ${tender_id}  ${complaints}  ${document}
-	${correctFilePath} = 				Replace String	${document}	\\	\/
+	${correctFilePath} = 				Replace String		${document}	\\	\/
 	Execute Javascript					$("#fileToUpload").removeClass();
 	Choose File							css=input#fileToUpload	${correctFilePath}
 	sleep								5s
