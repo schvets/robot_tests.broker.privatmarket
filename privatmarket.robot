@@ -90,6 +90,11 @@ ${tender_data_procuringEntity.identifier.id}			xpath=//div[@id='procurerId']/div
 
 ${tender_data_documents[0].title}						css=.file-name.ng-binding
 
+${tender_data_items.additionalClassifications.[0].description}		xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
+${tender_data_items.additionalClassifications.[0].id}				xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
+${tender_data_items.additionalClassifications.[0].scheme}			xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
+
+${tender_data_causeDescription}							css=#tenderType>div
 
 *** Keywords ***
 Підготувати дані для оголошення тендера
@@ -264,8 +269,15 @@ ${tender_data_documents[0].title}						css=.file-name.ng-binding
 	Run Keyword And Return If	'${element}' == 'procuringEntity.address.postalCode'		Отримати строку між комами	${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'procuringEntity.address.region'			Отримати строку між комами	${element}	2	${item}
 	Run Keyword And Return If	'${element}' == 'procuringEntity.address.streetAddress'		Отримати строку між комами	${element}	4	${item}
-	Run Keyword And Return If	'${element}' == 'procuringEntity.identifier.scheme'			Отримати строку		${element}	0	${item}
+	Run Keyword And Return If	'${element}' == 'procuringEntity.identifier.scheme'			Отримати інформацію з ${element}	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'documents[0].title'						Отримати інформацію з ${element}	${element}	${item}
+
+	Run Keyword And Return If	'${element}' == 'items.additionalClassifications.[0].description'			Отримати інформацію з ${element}	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'items.additionalClassifications.[0].id'					Отримати інформацію з ${element}	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'items.additionalClassifications.[0].scheme'				Отримати інформацію з ${element}	${element}	${item}
+
+	Run Keyword And Return If	'${element}' == 'causeDescription'							Отримати інформацію з ${element}	${element}	${item}
+
 
 
 	Wait Until Element Is Visible	${tender_data_${element}}	timeout=${COMMONWAIT}
@@ -421,6 +433,41 @@ ${tender_data_documents[0].title}						css=.file-name.ng-binding
 	${text} =		Отримати текст елемента  ${element}  ${item}
 	${newText} =	Replace String		${text}	\\	\\\\
 	[return]	${newText}
+
+Отримати інформацію з items.additionalClassifications.[0].description
+	[Arguments]		${element}	${item}
+	${text} =		Отримати текст елемента  ${element}  ${item}
+	${newText} =	Replace String Using Regexp		${text}	.*\\d	${EMPTY}
+	${result} =		Strip String	${newText}
+	[return]	${result}
+
+Отримати інформацію з items.additionalClassifications.[0].id
+	[Arguments]		${element}	${item}
+	${text} =		Отримати текст елемента  ${element}  ${item}
+	${newText} =	Get Regexp Matches		${text}	: (\\d.*\\d)	1
+	${result} = 	convert to string  ${newText[0]}
+	[return]	${result}
+
+Отримати інформацію з items.additionalClassifications.[0].scheme
+	[Arguments]		${element}	${item}
+	${text} =		Отримати текст елемента  ${element}  ${item}
+	${newText} =	Get Regexp Matches		${text}	Классификатор (.*):	1
+	${convertText} = 	convert to string  ${newText[0]}
+	${result} =	get_Classifications_type	${convertText}
+	[return]	${result}
+
+Отримати інформацію з causeDescription
+	[Arguments]		${element}	${item}
+	Wait Enable And Click Element		css=#tenderType>span
+	${text} =		Отримати текст елемента  ${element}  ${item}
+	[return]	${text}
+
+Отримати інформацію з procuringEntity.identifier.scheme
+	[Arguments]		${element}	${item}
+	${text} =		Отримати текст елемента  ${element}  ${item}
+	${newText} =		Replace String		${text}	:	${EMPTY}
+	${result} =	get_Identification_Scheme	${newText}
+	[return]	${result}
 
 Отримати строку між комами
 	[Arguments]  ${element_name}  ${position_number}  ${item}

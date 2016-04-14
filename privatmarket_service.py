@@ -55,3 +55,15 @@ def get_Classifications_type(classifications):
         return classifications_type
     else:
         return classifications
+
+
+def get_Identification_Scheme(scheme):
+    scheme_dictionary = {
+        u'ЕГРПОУ': u'UA-EDR',
+        u'ЄДРПОУ': u'UA-EDR'
+    }
+    identification_Scheme = scheme_dictionary.get(scheme)
+    if identification_Scheme:
+        return identification_Scheme
+    else:
+        return scheme
