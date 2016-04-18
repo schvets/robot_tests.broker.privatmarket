@@ -114,7 +114,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait Until Element Not Stale			css=span[id='${ARGUMENTS[1]}'] div.tenders_sm_info	40
 	Click Element By JS						span[id='${ARGUMENTS[1]}'] div.tenders_sm_info
 
-	sleep									5s
+	sleep									3s
 	Switch To Frame							id=tenders
 	Wait Until Element Is Not Visible		xpath=//*[@id='sidebar']//input	20s
 	Wait Until Element Is Visible			css=div#tenderStatus	timeout=${COMMONWAIT}
@@ -412,6 +412,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Click Element						css=span[ng-click='act.hideModal()']
 	sleep								3s
 	Wait Until Element Is Not Visible	css=div.info-item-val textarea	timeout=30
+	Element Should Not Be Visible		css=div.error
 
 
 Скасувати вимогу
@@ -511,6 +512,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 	Run Keyword If	'open' in '${SUITE_NAME}'	Run Keywords	Click Element	css=a[ng-click='act.ret2Ad()']
 	...   AND   Wait For Element With Reload	xpath=//table[@class='bids']//tr[1]/td[4 and contains(., 'Отправлена')]	1
+
 	[return]	${Arguments[2]}
 
 
@@ -586,6 +588,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Змінити status
 	[Arguments]  ${fieldvalue}
+	[return]  true
 #	лише клікаємо зберегти, нічого не змінюючи
 
 
@@ -608,10 +611,9 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Отримати пропозицію
 	[Arguments]  ${username}  ${tender_uaid}
-	debug
-	Wait For Element With Reload	//button[@ng-click='act.createAfp()' and contains(., 'Подать заявку')]	1
+	Wait For Element With Reload	xpath=//table[@class='bids']//tr[1]/td[4 and contains(., 'Недействительная')]	1
 	${button_of_send_claim_text} =	Get text	${locator_tenderClaim.buttonCreate}
-	${status} =						Set Variable If	'Подать заявку' in '${button_of_send_claim_text}'	invalid	unknown
+	${status} =						Set Variable	invalid
 	${bid} =						get_bid_data	${status}
 	[return]	${bid}
 
@@ -846,6 +848,7 @@ Switch To Education Mode
 
 Reload And Switch To Tab
 	[Arguments]  ${tab_number}
+	Mark Step					in_reload
 	Reload Page
 	Switch To Frame		id=tenders
 	Switch To Tab		${tab_number}
@@ -860,11 +863,13 @@ Switch To Tab
 
 Wait For Element With Reload
 	[Arguments]  ${locator}  ${tab_number}
+	Mark Step					in_wait
 	Wait Until Keyword Succeeds			4min	10s	Try Search Element	${locator}	${tab_number}
 
 
 Try Search Element
 	[Arguments]	${locator}  ${tab_number}
+	Mark Step					in_search
 	Reload And Switch To Tab			${tab_number}
 	Wait For Ajax
 	Wait Until Element Is Enabled		${locator}	3
