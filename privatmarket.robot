@@ -28,11 +28,11 @@ ${tender_data_items.description}								css=section[ng-repeat='adb in model.item
 ${tender_data_items.deliveryDate.endDate}						xpath=//div[contains(@class,'delivery-info')]//div[.='Конец:']/following-sibling::div
 ${tender_data_items.deliveryLocation.latitude}					css=span.latitude
 ${tender_data_items.deliveryLocation.longitude}					css=span.longitude
-${tender_data_items.deliveryAddress.countryName}				xpath=//div[.='Адрес:']/following-sibling::div
-${tender_data_items.deliveryAddress.postalCode}					xpath=//div[.='Адрес:']/following-sibling::div
-${tender_data_items.deliveryAddress.region}						xpath=//div[.='Адрес:']/following-sibling::div
-${tender_data_items.deliveryAddress.locality}					xpath=//div[.='Адрес:']/following-sibling::div
-${tender_data_items.deliveryAddress.streetAddress}				xpath=//div[.='Адрес:']/following-sibling::div
+${tender_data_items.deliveryAddress.countryName}				css=prz-address[addr='adb.deliveryAddress'] span#countryName
+${tender_data_items.deliveryAddress.postalCode}					css=prz-address[addr='adb.deliveryAddress'] span#postalCode
+${tender_data_items.deliveryAddress.region}						css=prz-address[addr='adb.deliveryAddress'] span#region
+${tender_data_items.deliveryAddress.locality}					css=prz-address[addr='adb.deliveryAddress'] span#locality
+${tender_data_items.deliveryAddress.streetAddress}				css=prz-address[addr='adb.deliveryAddress'] span#streetAddress
 ${tender_data_items.classification.scheme}						xpath=//div[@ng-if="adb.classification"]
 ${tender_data_items.classification.id}							xpath=//div[@ng-if="adb.classification"]
 ${tender_data_items.classification.description}					xpath=//div[@ng-if="adb.classification"]
@@ -192,8 +192,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Run Keyword And Return If	'${element}' == 'value.currency'				Отримати інформацію з ${element}	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'value.valueAddedTaxIncluded'	Отримати інформацію з ${element}	${element}	${item}
 
-	Run Keyword And Return If	'${element}' == 'items.classification.scheme'						Отримати строку		${element}	1	${item}
-	Run Keyword And Return If	'${element}' == 'items.classification.id'							Отримати строку		${element}	2	${item}
+	Run Keyword And Return If	'${element}' == 'items.classification.scheme'						Отримати інформацію з ${element}	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'items.classification.id'							Отримати строку		${element}	3	${item}
 	Run Keyword And Return If	'${element}' == 'items.description'									Отримати текст елемента	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'items.quantity'									Отримати ціле число	${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'items.classification.description'					Отримати класифікацію		${element}	${item}
@@ -201,11 +201,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].id'				Отримати строку	${element}	3	${item}
 	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].description'	Отримати класифікацію	${element}	${item}
 
-	Run Keyword And Return If	'${element}' == 'items.deliveryAddress.postalCode'		Отримати частину адреси	${element}	0	${item}
-	Run Keyword And Return If	'${element}' == 'items.deliveryAddress.countryName'		Отримати частину адреси	${element}	1	${item}
-	Run Keyword And Return If	'${element}' == 'items.deliveryAddress.region'			Отримати частину адреси	${element}	2	${item}
-	Run Keyword And Return If	'${element}' == 'items.deliveryAddress.locality'		Отримати частину адреси	${element}	3	${item}
-	Run Keyword And Return If	'${element}' == 'items.deliveryAddress.streetAddress'	Отримати частину адреси	${element}	4	${item}
 	Run Keyword And Return If	'${element}' == 'items.deliveryDate.endDate'			Отримати дату та час	${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'items.unit.name'						Отримати назву			${element}	${item}
 	Run Keyword And Return If	'${element}' == 'items.unit.code'						Отримати код			${element}	${item}
@@ -267,17 +262,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	${year} =			Convert To String	${values_list[2 + ${shift}]}
 	${time} =			Convert To String	${values_list[3 + ${shift}]}
 	${result}=			Convert To String	${year}-${month}-${day} ${time}
-	[return]	${result}
-
-
-Отримати частину адреси
-	[Arguments]  ${element_name}  ${position_number}  ${item}
-	${result_full} =	Отримати текст елемента	${element_name}	${item}
-	${result} =			Strip String	${result_full}
-	${values_list} =	Split String	${result}		,${SPACE}
-	${length} =	Get Length	${values_list}
-	${result} =	Run Keyword If	'${position_number}' == '4' and ${length} > 5	Set variable	${values_list[4]}, ${values_list[5]}
-		...  ELSE	Set variable	${values_list[${position_number}]}
 	[return]	${result}
 
 
@@ -344,6 +328,15 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 
 Отримати інформацію з items.additionalClassifications[0].scheme
+	[Arguments]    ${element}  ${item}
+	${first_part} =		Отримати строку	${element}	1	${item}
+	${second_part} =	Отримати строку	${element}	2	${item}
+	${result} =			Set Variable	${first_part} ${second_part}
+	${currency_type} =	get_classification_type	${result}
+	[return]  ${currency_type}
+
+
+Отримати інформацію з items.classification.scheme
 	[Arguments]    ${element}  ${item}
 	${first_part} =		Отримати строку	${element}	1	${item}
 	${second_part} =	Отримати строку	${element}	2	${item}

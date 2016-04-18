@@ -58,7 +58,8 @@ def get_currency_type(currency):
 
 def get_classification_type(classifications):
     classifications_dictionary = {
-        u'ДК 016:2010': u'ДКПП'
+        u'ДК 016:2010': u'ДКПП',
+        u'ДК 021:2015': u'CPV'
     }
     classifications_type = classifications_dictionary.get(classifications)
     if classifications_type:
