@@ -128,13 +128,13 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 	Wait Until Element Is Visible			css=div.info-item-val a
 	Wait Until Element Not Stale			css=div.info-item-val a	40
-	@{itemsList}=							Get Webelements	//div[@class='info-item-val']/a
+	@{itemsList}=							Get Webelements	xpath=(//div[@ng-click='adb.showCl = !adb.showCl;']/a)
 	${item_list_length} = 					Get Length	${itemsList}
 
 	: FOR    ${INDEX}    IN RANGE    0    ${item_list_length}
 		\  ${locator_index} =				Evaluate	${INDEX}+1
-		\  Wait Until Element Is Visible	xpath=(//div[@class='info-item-val']/a)[${locator_index}]
-		\  Scroll Page To Element			xpath=(//div[@class='info-item-val']/a)[${locator_index}]
+		\  Wait Until Element Is Visible	xpath=(//div[@ng-click='adb.showCl = !adb.showCl;']/a)[${locator_index}]
+		\  Scroll Page To Element			xpath=(//div[@ng-click='adb.showCl = !adb.showCl;']/a)[${locator_index}]
 		\  Wait Until Element Not Stale		${itemsList[${INDEX}]}	40
 		\  Click Element					${itemsList[${INDEX}]}
 		\  Wait Until Element Is Visible	xpath=(//div[@ng-if='adb.classification'])[${locator_index}]
