@@ -2,6 +2,8 @@
 
 from munch import munchify as privatmarket_munchify
 from selenium.common.exceptions import StaleElementReferenceException
+from datetime import datetime
+from pytz import timezone
 
 
 def get_month_number(month_name):
@@ -27,6 +29,14 @@ def fill_file_data(url, title, date_modified, date_published):
     })
 
 
+def get_bid_data(status):
+    return privatmarket_munchify({
+        "data": {
+            "status": status
+        }
+    })
+
+
 def is_element_not_stale(web_element):
     try:
         web_element.is_enabled()
@@ -46,15 +56,37 @@ def get_currency_type(currency):
         return currency
 
 
-def get_Classifications_type(classifications):
+def get_classification_type(classifications):
     classifications_dictionary = {
-        u'ДК 016:2010': u'ДКПП'
+        u'ДК 016:2010': u'ДКПП',
+        u'ДК 021:2015': u'CPV'
     }
     classifications_type = classifications_dictionary.get(classifications)
     if classifications_type:
         return classifications_type
     else:
         return classifications
+
+
+def get_time_with_offset(date):
+    date_obj = datetime.strptime(date, "%Y-%m-%d %H:%M")
+    time_zone = timezone('Europe/Kiev')
+    localized_date = time_zone.localize(date_obj)
+    return localized_date.strftime('%Y-%m-%d %H:%M:%S.%f%z')
+
+
+def get_procurement_method_type(method_name):
+    type_dictionary = {
+                       u'Допороговая закупка': 'belowThreshold',
+                       u'Открытые торги': 'aboveThresholdUA',
+                       u'Открытые торги с публикацией на англ.языке': 'aboveThresholdEU',
+                       u'Отчет о заключении договора': 'reporting',
+                       u'Переговорная процедура': 'negotiation',
+                       u'Срочная переговорная процедура': 'negotiation.quick',
+                       u'Открытые торги (особенности обороны)': 'aboveThresholdUA.defense'
+                       }
+    type_name = type_dictionary.get(method_name)
+    return type_name
 
 
 def get_Identification_Scheme(scheme):
