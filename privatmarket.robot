@@ -504,7 +504,9 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	${result}=							Get Regexp Matches	${claim_id}	Номер заявки: (\\d*),	1
 
 	Run Keyword If	'open' in '${SUITE_NAME}'	Run Keywords	Click Element	css=a[ng-click='act.ret2Ad()']
-	...   AND   Wait For Element With Reload	xpath=//table[@class='bids']//tr[1]/td[4 and contains(., 'Отправлена')]	1
+#	TODO раскомментировать
+	...   AND   log to console  tututututututututu
+#	...   AND   Wait For Element With Reload	xpath=//table[@class='bids']//tr[1]/td[4 and contains(., 'Отправлена')]	1
 
 	[return]	${Arguments[2]}
 
@@ -625,7 +627,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait Until Element Is Enabled		css=button[ng-click='act.chooseFile()']	${COMMONWAIT}
 	Scroll Page To Element				css=button[ng-click='act.chooseFile()']
 	sleep  3s
-	${fileContent} =					readFileContent	${filePath}
 	${correctFilePath} = 				Replace String		${filePath}	\\	\/
 
 	Execute Javascript					$("#fileToUpload").removeClass();
@@ -667,21 +668,34 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Scroll Page To Element				css=button[ng-click='act.chooseFile()']
 	sleep  2s
 
-	${fileContent} =					readFileContent	${filePath}
 	${correctFilePath} = 				Replace String		${filePath}	\\	\/
-
 	Execute Javascript					$("#fileToUpload").removeClass();
 	Execute Javascript					angular.element($("input[ng-model='model.fileName']")).scope().$parent.act.changeFile(angular.element("div.file-item").scope().file);
-	Choose File   						css=input#fileToUpload    ${correctFilePath}
-
-	Wait Until Element Is Not Visible	css=div[ng-show='progressVisible'] div.progress-bar	timeout=30
-	Sleep								5s
-	Wait Until Element Is Visible		xpath=(//div[contains(@class, 'file-item')])[1]	timeout=30
-	Click Button						${locator_tenderClaim.buttonSend}
-	Close confirmation					Ваша заявка была успешно сохранена!
+	Choose File							css=input#fileToUpload    ${correctFilePath}
 
 	${uploaded_file_data} =				Зберегти доданий файл	${filePath}
 	[return]  ${uploaded_file_data}
+
+
+Змінити документацію в ставці
+	[Arguments]  ${privat_doc}  ${bidid}  ${docid}
+	Відкрити заявку
+	Scroll Page To Element		css=button[ng-click='act.chooseFile()']
+	Run Keyword					Змінити ${bidid.data.confidentiality} для файлу	${bidid}
+
+	${uploaded_file_data} =		Зберегти доданий файл	none
+	[return]  ${uploaded_file_data}
+
+
+Змінити buyerOnly для файлу
+	[Arguments]  ${bidid}
+	Click Element					css=div[ng-if='model.canSecretFiles']
+	Wait For Ajax
+	Wait Until Element Is Enabled	css=textarea[ng-model='model.fvHideReason']
+	Input Text						css=textarea[ng-model='model.fvHideReason']		${bidid.data.confidentialityRationale}
+	Click Button					xpath=//button[contains(@ng-click,'act.setFvHidden')]
+	Close confirmation				Файл был успешно скрыт!
+
 
 
 Обробити скаргу
