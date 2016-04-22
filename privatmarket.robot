@@ -128,13 +128,13 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 	Wait Until Element Is Visible			css=div.info-item-val a
 	Wait Until Element Not Stale			css=div.info-item-val a	40
-	@{itemsList}=							Get Webelements	xpath=(//div[@ng-click='adb.showCl = !adb.showCl;']/a)
+	@{itemsList}=							Get Webelements	xpath=(//a[@ng-click='adb.showCl = !adb.showCl;'])
 	${item_list_length} = 					Get Length	${itemsList}
 
 	: FOR    ${INDEX}    IN RANGE    0    ${item_list_length}
 		\  ${locator_index} =				Evaluate	${INDEX}+1
-		\  Wait Until Element Is Visible	xpath=(//div[@ng-click='adb.showCl = !adb.showCl;']/a)[${locator_index}]
-		\  Scroll Page To Element			xpath=(//div[@ng-click='adb.showCl = !adb.showCl;']/a)[${locator_index}]
+		\  Wait Until Element Is Visible	xpath=(//a[@ng-click='adb.showCl = !adb.showCl;'])[${locator_index}]
+		\  Scroll Page To Element			xpath=(//a[@ng-click='adb.showCl = !adb.showCl;'])[${locator_index}]
 		\  Wait Until Element Not Stale		${itemsList[${INDEX}]}	40
 		\  Click Element					${itemsList[${INDEX}]}
 		\  Wait Until Element Is Visible	xpath=(//div[@ng-if='adb.classification'])[${locator_index}]
@@ -200,6 +200,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].scheme'			Отримати інформацію з ${element}	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].id'				Отримати строку	${element}	3	${item}
 	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].description'	Отримати класифікацію	${element}	${item}
+	Run Keyword And Return If	'items.deliveryAddres' in '${element}'								Отримати текст елемента	${element}	${item}
 
 	Run Keyword And Return If	'${element}' == 'items.deliveryDate.endDate'			Отримати дату та час	${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'items.unit.name'						Отримати назву			${element}	${item}
@@ -447,11 +448,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Input text							xpath=//textarea[@ng-model='model.question.description']	${ARGUMENTS[2].data.description}
 	Input text							xpath=//input[@ng-model='model.person.email']				${USERS.users['${ARGUMENTS[0]}'].email}
 	Click Button						xpath=//button[@ng-click='act.sendQuestion()']
-	Wait For Ajax
-	Wait Until Element Is Enabled		xpath=//div[@class='alert-info ng-scope ng-binding']	timeout=${COMMONWAIT}
-	Wait Until Element Not Stale		xpath=//div[@class='alert-info ng-scope ng-binding']	40
-	Wait Until Element Contains			xpath=//div[@class='alert-info ng-scope ng-binding']	Ваш вопрос успешно помещен в очередь на отправку. Спасибо за обращение!	timeout=10
-	Wait For Ajax
+	Wait For Notification				Ваш вопрос успешно помещен в очередь на отправку. Спасибо за обращение!
 	Wait Until Element Not Stale		css=span[ng-click='act.hideModal()']	40
 	Click Element						css=span[ng-click='act.hideModal()']
 	Wait Until Element Is Not Visible	xpath=//input[@ng-model="model.question.title"]	timeout=20
@@ -492,7 +489,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Run Keyword If	'open' in '${SUITE_NAME}'	Run Keywords	Click element	css=input[ng-disabled='model.selfQualifiedDisabled']
 	...   AND   Click element	css=input[ng-disabled='model.selfEligibleDisabled']
 
-	sleep								5s
+	sleep								1s
 	Scroll Page To Element				${locator_tenderClaim.buttonSend}
 	Click Button						${locator_tenderClaim.buttonSend}
 	Wait For Ajax Overflow Vanish
@@ -532,7 +529,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	sleep								3s
 	Wait Until Element Is Not Visible	${locator_tenderClaim.buttonCreate}	50s
 	Wait For Element Value				css=input[ng-model='model.person.lastName']
-	sleep								3s
 	Wait Until Element Is Enabled		${locator_tenderClaim.fieldEmail}	20
 
 
@@ -619,7 +615,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 
 Завантажити документ в ставку
-	[Arguments]  ${user}  ${filePath}  ${tenderId}
+	[Arguments]  ${user}  ${filePath}  ${tenderId}  ${doc_type}=documents
 	privatmarket.Пошук тендера по ідентифікатору	${user}   ${tenderId}
 	Відкрити заявку
 	Input Text							${locator_tenderClaim.fieldEmail}	${USERS.users['${user}'].email}
@@ -627,6 +623,9 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait Until Element Is Enabled		css=button[ng-click='act.chooseFile()']	${COMMONWAIT}
 	Scroll Page To Element				css=button[ng-click='act.chooseFile()']
 	sleep  3s
+
+	${list_item} =	get_doc_identifier	${doc_type}
+	Select From List By Value			css=select[ng-model='model.currFileVfv']	${list_item}
 	${correctFilePath} = 				Replace String		${filePath}	\\	\/
 
 	Execute Javascript					$("#fileToUpload").removeClass();
@@ -643,6 +642,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait Until Element Is Not Visible	css=div[ng-show='progressVisible'] div.progress-bar	timeout=30
 	Sleep								5s
 	Wait Until Element Is Visible		xpath=(//div[contains(@class, 'file-item')])[1]	timeout=30
+
 	Click Button						${locator_tenderClaim.buttonSend}
 	Close confirmation					Ваша заявка была успешно сохранена!
 	${dateModified}						Get text	css=span.file-tlm
@@ -654,8 +654,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Scroll Page To Element				css=a[ng-click='act.showDocWin(b)']
 	Click Element						css=a[ng-click='act.showDocWin(b)']
 	Wait For Ajax
-	Wait Until Element Is Enabled		css=div.modal div.file-item	5s
-	${url} = 							Execute Javascript	var scope = angular.element($("div.modal div.file-item")).scope(); return scope.file.url
+	Wait Until Element Is Enabled		xpath=(//div[@ng-click='openUrl(file.url)'])[last()]	5s
+	${url} = 							Execute Javascript	var scope = angular.element($("div[ng-click='openUrl(file.url)']")).last().scope(); return scope.file.url
 	${uploaded_file_data} =				fill_file_data  ${url}  ${filePath}  ${dateModified}  ${dateModified}
 	${upload_response} = 				Create Dictionary
 	Set To Dictionary					${upload_response}	upload_response	${uploaded_file_data}
@@ -681,21 +681,21 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	[Arguments]  ${privat_doc}  ${bidid}  ${docid}
 	Відкрити заявку
 	Scroll Page To Element		css=button[ng-click='act.chooseFile()']
-	Run Keyword					Змінити ${bidid.data.confidentiality} для файлу	${bidid}
 
-	${uploaded_file_data} =		Зберегти доданий файл	none
+	Run Keyword					Змінити ${bidid.data.confidentiality} для файлу	${bidid}
+	${file_name} =				Get text	xpath=(//span[@class='file-name ng-binding'])[last()]
+	${uploaded_file_data} =		Зберегти доданий файл	${file_name}
 	[return]  ${uploaded_file_data}
 
 
 Змінити buyerOnly для файлу
 	[Arguments]  ${bidid}
-	Click Element					css=div[ng-if='model.canSecretFiles']
+	Click Element					xpath=(//div[@ng-if='model.canSecretFiles'])[last()]
 	Wait For Ajax
 	Wait Until Element Is Enabled	css=textarea[ng-model='model.fvHideReason']
 	Input Text						css=textarea[ng-model='model.fvHideReason']		${bidid.data.confidentialityRationale}
 	Click Button					xpath=//button[contains(@ng-click,'act.setFvHidden')]
-	Close confirmation				Файл был успешно скрыт!
-
+	Wait For Notification			Файл был успешно скрыт!
 
 
 Обробити скаргу
@@ -796,6 +796,15 @@ Close Confirmation
 	Scroll Page To Element				css=p.ng-binding
 	Wait Visibulity And Click Element	xpath=//button[@ng-click='close()']
 	Wait Until Element Is Not Visible	xpath=//button[@ng-controller='inFrameModalCtrl']	${COMMONWAIT}
+	Wait For Ajax
+
+
+Wait For Notification
+	[Arguments]	${message_text}
+	Wait For Ajax
+	Wait Until Element Is Enabled		xpath=//div[@class='alert-info ng-scope ng-binding']	timeout=${COMMONWAIT}
+	Wait Until Element Contains			xpath=//div[@class='alert-info ng-scope ng-binding']	${message_text}	timeout=10
+	Wait For Ajax
 
 
 Wait For Element Value
