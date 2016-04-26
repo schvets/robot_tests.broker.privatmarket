@@ -192,7 +192,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 		...  ELSE	Convert To Integer	0
 
 	${lot} =	Run Keyword If	'multiLot' in '${SUITE_NAME}'	Отримати номер позиції	${ARGUMENTS[1]}	lots\\[(\\d)\\]
-	...  ELSE	Convert To Integer	None
+	...  ELSE	Set Variable	None
 
 	#switch to correct tab
 	${tab_num} =	Set Variable If
