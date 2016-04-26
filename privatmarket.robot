@@ -214,7 +214,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	[Arguments]  ${item}  ${base_element}
 
 	${element} = 	Replace String	${base_element}	items[${item}]	items
-	${element} = 	Replace String	${base_element}	lots[${item}]	lots
+	${element} = 	Replace String	${element}	lots[${item}]	lots
 
 	Run Keyword And Return If	'${element}' == 'value.amount'					Отримати число			${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'minimalStep.amount'			Отримати число			${element}	0	${item}
@@ -460,14 +460,15 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 
 Задати питання
-	[Arguments]  ${provider}  ${title}  ${description}
-	privatmarket.Пошук тендера по ідентифікатору	${provider}	${title}
+	[Arguments]  ${provider}  ${tender_id}  ${question}
+	privatmarket.Пошук тендера по ідентифікатору	${provider}	${tender_id}
 	Wait For Ajax
 	Switch To Tab						2
 	Wait Until Element Not Stale		xpath=//button[@ng-click='act.sendEnquiry()']	40
 	Wait Until Element Is Enabled		xpath=//button[@ng-click='act.sendEnquiry()']				timeout=10
 	Click Button						xpath=//button[@ng-click='act.sendEnquiry()']
-	Заповнити форму питання				${title}	${description}	${USERS.users['${provider}'].email}
+	Заповнити форму питання				${question.data.title}	${question.data.description}	${USERS.users['${provider}'].email}
+	[return]  True
 
 
 Заповнити форму питання
@@ -493,6 +494,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Обрати потрібний лот за id	${lot_id}
 	Wait Enable And Click Element	css=a[ng-click='act.sendLotEnquiry()']
 	Заповнити форму питання			${question.data.title}	${question.data.description}	${USERS.users['${provider}'].email}
+	[return]  True
 
 
 
