@@ -145,6 +145,15 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Обрати потрібний лот
 	[Arguments]  ${lot}
+	#show more info about lots
+	Wait Until Element Is Visible					css=a[ng-click='model.shwFull = !model.shwFull']	timeout=${COMMONWAIT}
+	${attribute} =	Get Element Attribute			css=a[ng-click='model.shwFull = !model.shwFull'] span@id
+	Mark Step  ${attribute}
+	Run Keyword If	'showMore' in '${attribute}'	Click Element	css=a[ng-click='model.shwFull = !model.shwFull']
+#	Sleep     2s
+	${attribute} =	Get Element Attribute			css=a[ng-click='model.shwFull = !model.shwFull'] span@id
+	Mark Step  ${attribute}
+
 	Return From Keyword If	'None' in '${lot}'	False
 	Wait Until Element Is Visible		xpath=//div[@class='lot-head']/b	timeout=${COMMONWAIT}
 	${current_lot} = 					Get Text	css=div.lot-head b
@@ -163,12 +172,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait Until Element Is Visible		xpath=(//div[@ng-repeat='lot in model.lotPortion'])[${lot}]	timeout=${COMMONWAIT}
 	Click Element						xpath=(//div[@ng-repeat='lot in model.lotPortion'])[${lot}]
 	Mark Step  Choose_lot_3
-	Wait Until Element Is Not Visible	xpath=(//div[@ng-repeat='lot in mp.ng-binding'odel.lotPortion'])[${lot}]	timeout=${COMMONWAIT}
+	Wait Until Element Is Not Visible	xpath=(//div[@ng-repeat='lot in model.lotPortion'])[${lot}]	timeout=${COMMONWAIT}
 	Mark Step  Choose_lot_4
-	Wait Until Element Is Visible		css=span#showMore	timeout=${COMMONWAIT}
-	#show more info about lots
-	${attribute} =	Get Element Attribute	css=span#showMore@ng-click
-	Run Keyword Unless	'!model.shwFull' in '${attribute}'	Click Element	css=span#showMore
 
 
 Обрати потрібний лот за id
