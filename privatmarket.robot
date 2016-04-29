@@ -451,7 +451,8 @@ ${tender_data_causeDescription}							css=#tenderType>div
 Отримати інформацію з cancellations[0].status
 	[Arguments]  ${element}  ${item}
 	${text} =	Отримати текст елемента  ${element}  ${item}
-	Run Keyword And Return If  'Отменено' in '${text}'  Повернути статус active
+	${result} =	Set Variable If	'Отменено' in '${text}'	active
+	[return]  ${result}
 
 
 Отримати інформацію з cancellations[0].documents[0].title
@@ -501,10 +502,6 @@ ${tender_data_causeDescription}							css=#tenderType>div
 	${result} =		get_identification_icheme	${newText}
 	[return]	${result}
 
-
-
-Повернути статус active
-    [return]  active
 
 Внести зміни в тендер
 	[Arguments]  @{ARGUMENTS}
