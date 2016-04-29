@@ -76,11 +76,11 @@ ${tender_data_description_en}							css=#tenderDescription
 ${tender_data_description_ru}							css=#tenderDescription
 
 
-${tender_data_procuringEntity.address.countryName}		xpath=//div[@id='procurerAddr']/div[2]
-${tender_data_procuringEntity.address.locality}			xpath=//div[@id='procurerAddr']/div[2]
-${tender_data_procuringEntity.address.postalCode}		xpath=//div[@id='procurerAddr']/div[2]
-${tender_data_procuringEntity.address.region}			xpath=//div[@id='procurerAddr']/div[2]
-${tender_data_procuringEntity.address.streetAddress}	xpath=//div[@id='procurerAddr']/div[2]
+${tender_data_procuringEntity.address.countryName}		css=#procurerAddr #countryName
+${tender_data_procuringEntity.address.locality}			css=#procurerAddr #locality
+${tender_data_procuringEntity.address.postalCode}		css=#procurerAddr #postalCode
+${tender_data_procuringEntity.address.region}			css=#procurerAddr #region
+${tender_data_procuringEntity.address.streetAddress}	css=#procurerAddr #streetAddress
 
 ${tender_data_procuringEntity.contactPoint.name}		xpath=//div[@class='delivery-info']/div[2]/div[@class='info-item-val ng-binding']
 ${tender_data_procuringEntity.contactPoint.telephone}	xpath=//div[@class='delivery-info']/div[4]/div[@class='info-item-val ng-binding']
@@ -249,11 +249,7 @@ ${tender_data_causeDescription}							css=#tenderType>div
 	Run Keyword And Return If	'${element}' == 'description_en'							Отримати текст елемента	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'description_ru'							Отримати текст елемента	${element}	${item}
 
-	Run Keyword And Return If	'${element}' == 'procuringEntity.address.countryName'		Отримати строку між комами	${element}	1	${item}
-	Run Keyword And Return If	'${element}' == 'procuringEntity.address.locality'			Отримати строку між комами	${element}	3	${item}
-	Run Keyword And Return If	'${element}' == 'procuringEntity.address.postalCode'		Отримати строку між комами	${element}	0	${item}
-	Run Keyword And Return If	'${element}' == 'procuringEntity.address.region'			Отримати строку між комами	${element}	2	${item}
-	Run Keyword And Return If	'${element}' == 'procuringEntity.address.streetAddress'		Отримати строку між комами	${element}	4	${item}
+
 	Run Keyword And Return If	'${element}' == 'procuringEntity.identifier.scheme'			Отримати інформацію з ${element}	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'documents[0].title'						Отримати інформацію з ${element}	${element}	${item}
 
@@ -442,7 +438,7 @@ ${tender_data_causeDescription}							css=#tenderType>div
 	${text} =		Отримати текст елемента  ${element}  ${item}
 	${newText} =	Get Regexp Matches		${text}	Классификатор (.*):	1
 	${convertText} = 	convert to string  ${newText[0]}
-	${result} =	get_Classifications_type	${convertText}
+	${result} =	get_classification_type	${convertText}
 	[return]	${result}
 
 Отримати інформацію з causeDescription
@@ -458,13 +454,7 @@ ${tender_data_causeDescription}							css=#tenderType>div
 	${result} =	get_Identification_Scheme	${newText}
 	[return]	${result}
 
-Отримати строку між комами
-	[Arguments]  ${element_name}  ${position_number}  ${item}
-	${result_full} =				Отримати текст елемента	${element_name}	${item}
-	${result} =						Strip String	${result_full}
-	${values_list} =				Split String	${result}	,
-	${result} =						Strip String	${values_list[${position_number}]}
-	[return]	${result}
+
 
 Повернути статус active
     [return]  active
