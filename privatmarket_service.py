@@ -79,7 +79,7 @@ def get_procurement_method_type(method_name):
     type_dictionary = {
                        u'Допороговая закупка': 'belowThreshold',
                        u'Открытые торги': 'aboveThresholdUA',
-                       u'Открытые торги с публикацией на англ.языке': 'aboveThresholdEU',
+                       u'Открытые торги с публикацией на англ. языке': 'aboveThresholdEU',
                        u'Отчет о заключении договора': 'reporting',
                        u'Переговорная процедура': 'negotiation',
                        u'Срочная переговорная процедура': 'negotiation.quick',
@@ -89,13 +89,24 @@ def get_procurement_method_type(method_name):
     return type_name
 
 
-def get_Identification_Scheme(scheme):
+def get_identification_scheme(scheme):
     scheme_dictionary = {
         u'ЕГРПОУ': u'UA-EDR',
         u'ЄДРПОУ': u'UA-EDR'
     }
-    identification_Scheme = scheme_dictionary.get(scheme)
-    if identification_Scheme:
-        return identification_Scheme
+    identification_scheme = scheme_dictionary.get(scheme)
+    if identification_scheme:
+        return identification_scheme
     else:
         return scheme
+
+
+def get_doc_identifier(doc_type_name):
+    type_dictionary = {
+                       'eligibility_documents': 20,
+                       'qualification_documents': 21,
+                       'documents': 48,
+                       'financial_documents': 49
+                       }
+    type_name = type_dictionary.get(doc_type_name)
+    return str(type_name)
