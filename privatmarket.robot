@@ -248,8 +248,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Run Keyword And Return If	'items.deliveryAddres' in '${element}'								Отримати текст елемента				${element}	${item}
 
 	Run Keyword And Return If	'${element}' == 'items.deliveryDate.endDate'			Отримати дату та час	${element}	0			${item}
-	Run Keyword And Return If	'${element}' == 'items.unit.name'						Отримати назву			${element}	${item}
-	Run Keyword And Return If	'${element}' == 'items.unit.code'						Отримати код			${element}	${item}
+	Run Keyword And Return If	'${element}' == 'items.unit.name'						Отримати назву			${element}	1			${item}
+	Run Keyword And Return If	'${element}' == 'items.unit.code'						Отримати код			${element}	1			${item}
 	Run Keyword And Return If	'${element}' == 'items.deliveryLocation.latitude'		Отримати число			${element}	0			${item}
 	Run Keyword And Return If	'${element}' == 'items.deliveryLocation.longitude'		Отримати число			${element}	0			${item}
 	Run Keyword And Return If	'${element}' == 'auctionPeriod.startDate'				Отримати інформацію з ${element}	${element}	${item}
@@ -316,24 +316,23 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 Отримати класифікацію
 	[Arguments]  ${element_name}  ${item}
 	${result_full} =	Отримати текст елемента	${element_name}	${item}
-	${reg_expresion} =	Set Variable	[0-9A-zА-Яа-яёЁЇїІіЄєҐґ\\s\\:]+\: \\w+[\\d\\.\\-]+ ([А-Яа-яёЁЇїІіЄєҐґ\\s;,\\"_\\(\\)]+)
+	${reg_expresion} =	Set Variable	[0-9A-zА-Яа-яёЁЇїІіЄєҐґ\\s\\:]+\: \\w+[\\d\\.\\-]+ ([А-Яа-яёЁЇїІіЄєҐґ\\s;,\\"_\\(\\)\\.]+)
 	${result} =			Get Regexp Matches	${result_full}	${reg_expresion}	1
 	[return]	${result[0]}
 
 
 Отримати назву
-	[Arguments]  ${element_name}  ${item}
-	${result_full} =	Отримати текст елемента	${element_name}	${item}
-	${result} =	Run Keyword If	'килограмм' in '${result_full}'	Set Variable	кілограм
-		...  ELSE	Set Variable	${result_full}
+	[Arguments]  ${element_name}  ${position_number}  ${item}
+	${result_full} =	Отримати строку	${element_name}	${position_number}	${item}
+	${result} =			get_unit_name	${result_full}
 	[return]	${result}
 
 
 Отримати код
-	[Arguments]  ${element_name}  ${item}
-	${result_full} =	Отримати текст елемента	${element_name}	${item}
-	${result} =	Run Keyword If	'килограмм' in '${result_full}'	Set Variable	KGM
-		...  ELSE	Set Variable	${result_full}
+	[Arguments]  ${element_name}  ${position_number}  ${item}
+	${result_full} =	Отримати строку	${element_name}	${position_number}	${item}
+	${unit_name} = 		get_unit_name	${result_full}
+	${result} =			get_unit_code	${unit_name}
 	[return]	${result}
 
 
@@ -534,10 +533,16 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 	Відкрити заявку
 	Wait Until Element Not Stale		${locator_tenderClaim.fieldEmail}	40
-	Run Keyword If	'multiLotTender' in '${SUITE_NAME}'	Input Text	${locator_tenderClaim.checkedLot.fieldPrice}	${Arguments[2].data.lotValues[1]['value']['amount']}
-		...  ELSE	Input Text	${locator_tenderClaim.fieldPrice}	${Arguments[2].data.value.amount}
 
-	click element						${locator_tenderClaim.fieldEmail}
+	${amount} =	Set Variable If
+		...  'multiLotTender' in '${SUITE_NAME}'	${Arguments[2].data.lotValues[1]['value']['amount']}
+		...  ${Arguments[2].data.value.amount}
+	${amount} = 	Convert To Number	${amount}
+
+	Run Keyword If	'multiLotTender' in '${SUITE_NAME}'	Input Text	${locator_tenderClaim.checkedLot.fieldPrice}	${amount}
+		...  ELSE	Input Text	${locator_tenderClaim.fieldPrice}	${amount}
+
+	Click Element						${locator_tenderClaim.fieldEmail}
 	Input Text							${locator_tenderClaim.fieldEmail}	${USERS.users['${ARGUMENTS[0]}'].email}
 
 	#Just for aboveThreshold tests
@@ -556,9 +561,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	${result}=							Get Regexp Matches	${claim_id}	Номер заявки: (\\d*),	1
 
 	Run Keyword If	'aboveThreshold' in '${SUITE_NAME}'	Run Keywords	Click Element	css=a[ng-click='act.ret2Ad()']
-#	TODO раскомментировать
-	...   AND   log to console  tututututututututu
-#	...   AND   Wait For Element With Reload	xpath=//table[@class='bids']//tr[1]/td[4 and contains(., 'Отправлена')]	1
+	...   AND   Wait For Element With Reload	xpath=//table[@class='bids']//tr[1]/td[4 and contains(., 'Отправлена')]	1
 
 	[return]	${Arguments[2]}
 
@@ -755,7 +758,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Обробити скаргу
 	[Arguments]  @{ARGUMENTS}
-#	TODO  Не реализована возможность
 	Fail  Функція не підтримується майданчиком
 
 
