@@ -508,7 +508,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	[return]  True
 
 
-
 Оновити сторінку з тендером
 	[Arguments]  @{ARGUMENTS}
 	[Documentation]
@@ -537,7 +536,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	${amount} =	Set Variable If
 		...  'multiLotTender' in '${SUITE_NAME}'	${Arguments[2].data.lotValues[1]['value']['amount']}
 		...  ${Arguments[2].data.value.amount}
-	${amount} = 	Convert To Number	${amount}
+	${amount} = 	Convert To String	${amount}
 
 	Run Keyword If	'multiLotTender' in '${SUITE_NAME}'	Input Text	${locator_tenderClaim.checkedLot.fieldPrice}	${amount}
 		...  ELSE	Input Text	${locator_tenderClaim.fieldPrice}	${amount}
