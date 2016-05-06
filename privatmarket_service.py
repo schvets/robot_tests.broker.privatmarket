@@ -138,7 +138,7 @@ def get_unit_name(current_name):
 
 def get_unit_code(name):
     dictionary = {
-        u'килограмм': u'KGM',
+        u'килограммы': u'KGM',
         u'пара': u'PR',
         u'літр': u'LTR',
         u'набір': u'SET',
