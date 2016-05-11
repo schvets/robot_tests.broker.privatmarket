@@ -192,22 +192,23 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	[Arguments]  @{ARGUMENTS}
 	[Documentation]
 	...	${ARGUMENTS[0]} ==  username
-	...	${ARGUMENTS[1]} ==  element
+	...	${ARGUMENTS[1]} ==  tender ID
+	...	${ARGUMENTS[2]} ==  element
 
 	Switch browser					${ARGUMENTS[0]}
 	Wait Until Element Is Visible		xpath=//div[contains(@class,'title-div')]	timeout=${COMMONWAIT}
 
 	#check tender type
-	${item} =	Run Keyword If	'multiItem' in '${SUITE_NAME}'	Отримати номер позиції	${ARGUMENTS[1]}	items\\[(\\d)\\]
+	${item} =	Run Keyword If	'multiItem' in '${SUITE_NAME}'	Отримати номер позиції	${ARGUMENTS[2]}	items\\[(\\d)\\]
 		...  ELSE	Convert To Integer	0
 
-	${lot} =	Run Keyword If	'multiLot' in '${SUITE_NAME}'	Отримати номер позиції	${ARGUMENTS[1]}	lots\\[(\\d)\\]
+	${lot} =	Run Keyword If	'multiLot' in '${SUITE_NAME}'	Отримати номер позиції	${ARGUMENTS[2]}	lots\\[(\\d)\\]
 	...  ELSE	Set Variable	None
 
 	#switch to correct tab
 	${tab_num} =	Set Variable If
-		...  'questions' in '${ARGUMENTS[1]}'	2
-		...  'complaints' in '${ARGUMENTS[1]}'	3
+		...  'questions' in '${ARGUMENTS[2]}'	2
+		...  'complaints' in '${ARGUMENTS[2]}'	3
 		...  1
 	Switch To Tab	${tab_num}
 
@@ -216,7 +217,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	...   AND   Обрати потрібний лот	${lot}
 
 	#get information
-	${result} =	Отримати інформацію зі сторінки	${item}	${ARGUMENTS[1]}
+	${result} =	Отримати інформацію зі сторінки	${item}	${ARGUMENTS[2]}
 	[return]	${result}
 
 
@@ -789,7 +790,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 #Custom Keywords
 Login
 	[Arguments]  ${username}
-	Click Element						xpath=//span[.='Мой кабинет']
+	Click Element						xpath=//span[.='Вход']
 	Wait Until Element Is Visible		id=p24__login__field	${COMMONWAIT}
 	Execute Javascript					$('#p24__login__field').val(${USERS.users['${username}'].login})
 	Check If Element Stale				xpath=//div[@id="login_modal" and @style='display: block;']//input[@type='password']
