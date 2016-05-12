@@ -13,6 +13,7 @@ ${COMMONWAIT}	40
 ${tender_data_title}											xpath=//div[contains(@class,'title-div')]
 ${tender_data_description}										css=div.description
 ${tender_data_procurementMethodType}							css=div#tenderType
+${tender_data_status}											css=div#tenderStatus
 ${tender_data_value.amount}										css=div[ng-if='model.budjet'] div.info-item-val
 ${tender_data_value.currency}									css=div[ng-if='model.budjet'] div.info-item-val
 ${tender_data_value.valueAddedTaxIncluded}						css=div[ng-if='model.budjet'] div.info-item-val
@@ -237,6 +238,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Run Keyword And Return If	'${element}' == 'bids'							Перевірити присутність bids
 	Run Keyword And Return If	'${element}' == 'value.currency'				Отримати інформацію з ${element}	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'value.valueAddedTaxIncluded'	Отримати інформацію з ${element}	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'status'						Отримати інформацію з ${element}	${element}
 
 	Run Keyword And Return If	'${element}' == 'items.classification.scheme'						Отримати інформацію з ${element}	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'items.classification.id'							Отримати строку		${element}		3			${item}
@@ -397,6 +399,13 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	${method_name} =	Get text	${tender_data_${element_name}}
 	${method_type} =	get_procurement_method_type	${method_name}
 	[return]  ${method_type}
+
+
+Отримати інформацію з status
+	[Arguments]  ${element_name}
+	${status_name} =	Get text	${tender_data_${element_name}}
+	${status_type} =	get_status_type	${status_name}
+	[return]  ${status_type}
 
 
 Внести зміни в тендер

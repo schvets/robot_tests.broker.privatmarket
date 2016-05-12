@@ -164,3 +164,19 @@ def get_unit_code(name):
         return expected_name
     else:
         return name
+
+
+def get_status_type(status_name):
+    type_dictionary = {
+                       u'Период уточнений': 'active.enquiries',
+                       u'Период уточнений завершен': 'active.enquiries.ended',
+                       u'Подача предложений': 'active.tendering',
+                       u'Идут торги': 'active.auction',
+                       u'Квалификация победителя': 'active.qualification',
+                       u'Предложения рассмотрены': 'active.awarded',
+                       u'Закупка не состоялась': 'unsuccessful',
+                       u'Завершено': 'complete',
+                       u'Отменено': 'cancelled'
+                       }
+    type_name = type_dictionary.get(status_name)
+    return type_name
