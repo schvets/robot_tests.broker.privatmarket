@@ -554,7 +554,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Input Text							${locator_tenderClaim.fieldEmail}	${USERS.users['${ARGUMENTS[0]}'].email}
 
 	#Just for aboveThreshold tests
-	Run Keyword If	'aboveThreshold' in '${SUITE_NAME}'	Run Keywords	Click element	css=input[ng-disabled='model.selfQualifiedDisabled']
+	Run Keyword If	'open' in '${SUITE_NAME}'	Run Keywords	Click element	css=input[ng-disabled='model.selfQualifiedDisabled']
 	...   AND   Click element	css=input[ng-disabled='model.selfEligibleDisabled']
 
 	sleep								1s
@@ -568,7 +568,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	${claim_id}=						Get text			css=div.afp-info.ng-scope.ng-binding
 	${result}=							Get Regexp Matches	${claim_id}	Номер заявки: (\\d*),	1
 
-	Run Keyword If	'aboveThreshold' in '${SUITE_NAME}'	Run Keywords	Click Element	css=a[ng-click='act.ret2Ad()']
+	Run Keyword If	'open' in '${SUITE_NAME}'	Run Keywords	Click Element	css=a[ng-click='act.ret2Ad()']
 	...   AND   Wait For Element With Reload	xpath=//table[@class='bids']//tr[1]/td[4 and contains(., 'Отправлена')]	1
 
 	[return]	${Arguments[2]}
@@ -582,11 +582,9 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Відкрити заявку
 	Wait For Ajax
-	Wait Until Element Is Visible		xpath=//span[@class='state-label ng-binding']
+	Wait Until Element Is Visible		css=div#tenderStatus	${COMMONWAIT}
 
-	${tender_status} =	Run Keyword If	'multiLotTender' in '${SUITE_NAME}'	Get text	xpath=(//span[@class='state-label ng-binding'])[2]
-		...  ELSE	Get text	xpath=//span[@class='state-label ng-binding']
-
+	${tender_status} =					Get text	css=div#tenderStatus
 	Run Keyword Unless	'до початку періоду подачі' in '${TEST_NAME}'	Run Keyword If	'${tender_status}' == 'Период уточнений завершен'	Wait For Element With Reload	${locator_tenderClaim.buttonCreate}	1
 
 	Scroll Page To Element				${locator_tenderClaim.buttonCreate}
@@ -610,7 +608,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	sleep								5s
 
 	Run Keyword 						Змінити ${fieldname}	${fieldvalue}
-	Run Keyword Unless	'aboveThreshold' in '${SUITE_NAME}'	Run Keywords	Click Element	${locator_tenderClaim.fieldEmail}
+	Run Keyword Unless	'open' in '${SUITE_NAME}'	Run Keywords	Click Element	${locator_tenderClaim.fieldEmail}
 	...   AND   Input Text	${locator_tenderClaim.fieldEmail}	${USERS.users['${username}'].email}
 
 	Scroll Page To Element				${locator_tenderClaim.buttonSend}
