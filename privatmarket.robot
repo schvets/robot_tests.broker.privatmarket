@@ -13,6 +13,7 @@ ${COMMONWAIT}	40
 ${tender_data_title}											xpath=//div[contains(@class,'title-div')]
 ${tender_data_description}										css=div.description
 ${tender_data_procurementMethodType}							css=div#tenderType
+${tender_data_status}											css=div#tenderStatus
 ${tender_data_value.amount}										css=div[ng-if='model.budjet'] div.info-item-val
 ${tender_data_value.currency}									css=div[ng-if='model.budjet'] div.info-item-val
 ${tender_data_value.valueAddedTaxIncluded}						css=div[ng-if='model.budjet'] div.info-item-val
@@ -222,22 +223,23 @@ ${tender_data_causeDescription}							css=#tenderType>div
 	[Arguments]  @{ARGUMENTS}
 	[Documentation]
 	...	${ARGUMENTS[0]} ==  username
-	...	${ARGUMENTS[1]} ==  element
+	...	${ARGUMENTS[1]} ==  tender ID
+	...	${ARGUMENTS[2]} ==  element
 
 	Switch browser					${ARGUMENTS[0]}
 	Wait Until Element Is Visible		xpath=//div[contains(@class,'title-div')]	timeout=${COMMONWAIT}
 
 	#check tender type
-	${item} =	Run Keyword If	'multiItem' in '${SUITE_NAME}'	Отримати номер позиції	${ARGUMENTS[1]}	items\\[(\\d)\\]
+	${item} =	Run Keyword If	'multiItem' in '${SUITE_NAME}'	Отримати номер позиції	${ARGUMENTS[2]}	items\\[(\\d)\\]
 		...  ELSE	Convert To Integer	0
 
-	${lot} =	Run Keyword If	'multiLot' in '${SUITE_NAME}'	Отримати номер позиції	${ARGUMENTS[1]}	lots\\[(\\d)\\]
+	${lot} =	Run Keyword If	'multiLot' in '${SUITE_NAME}'	Отримати номер позиції	${ARGUMENTS[2]}	lots\\[(\\d)\\]
 	...  ELSE	Set Variable	None
 
 	#switch to correct tab
 	${tab_num} =	Set Variable If
-		...  'questions' in '${ARGUMENTS[1]}'	2
-		...  'complaints' in '${ARGUMENTS[1]}'	3
+		...  'questions' in '${ARGUMENTS[2]}'	2
+		...  'complaints' in '${ARGUMENTS[2]}'	3
 		...  1
 	Switch To Tab	${tab_num}
 
@@ -246,7 +248,7 @@ ${tender_data_causeDescription}							css=#tenderType>div
 	...   AND   Обрати потрібний лот	${lot}
 
 	#get information
-	${result} =	Отримати інформацію зі сторінки	${item}	${ARGUMENTS[1]}
+	${result} =	Отримати інформацію зі сторінки	${item}	${ARGUMENTS[2]}
 	[return]	${result}
 
 
@@ -266,6 +268,7 @@ ${tender_data_causeDescription}							css=#tenderType>div
 	Run Keyword And Return If	'${element}' == 'bids'							Перевірити присутність bids
 	Run Keyword And Return If	'${element}' == 'value.currency'				Отримати інформацію з ${element}	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'value.valueAddedTaxIncluded'	Отримати інформацію з ${element}	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'status'						Отримати інформацію з ${element}	${element}
 
 	Run Keyword And Return If	'${element}' == 'items.classification.scheme'						Отримати інформацію з ${element}	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'items.classification.id'							Отримати строку		${element}		3			${item}
@@ -278,8 +281,8 @@ ${tender_data_causeDescription}							css=#tenderType>div
 	Run Keyword And Return If	'items.deliveryAddres' in '${element}'								Отримати текст елемента				${element}	${item}
 
 	Run Keyword And Return If	'${element}' == 'items.deliveryDate.endDate'			Отримати дату та час	${element}	0			${item}
-	Run Keyword And Return If	'${element}' == 'items.unit.name'						Отримати назву			${element}	${item}
-	Run Keyword And Return If	'${element}' == 'items.unit.code'						Отримати код			${element}	${item}
+	Run Keyword And Return If	'${element}' == 'items.unit.name'						Отримати назву			${element}	1			${item}
+	Run Keyword And Return If	'${element}' == 'items.unit.code'						Отримати код			${element}	1			${item}
 	Run Keyword And Return If	'${element}' == 'items.deliveryLocation.latitude'		Отримати число			${element}	0			${item}
 	Run Keyword And Return If	'${element}' == 'items.deliveryLocation.longitude'		Отримати число			${element}	0			${item}
 	Run Keyword And Return If	'${element}' == 'auctionPeriod.startDate'				Отримати інформацію з ${element}	${element}	${item}
@@ -365,24 +368,23 @@ ${tender_data_causeDescription}							css=#tenderType>div
 Отримати класифікацію
 	[Arguments]  ${element_name}  ${item}
 	${result_full} =	Отримати текст елемента	${element_name}	${item}
-	${reg_expresion} =	Set Variable	[0-9A-zА-Яа-яёЁЇїІіЄєҐґ\\s\\:]+\: \\w+[\\d\\.\\-]+ ([А-Яа-яёЁЇїІіЄєҐґ\\s;,\\"_\\(\\)]+)
+	${reg_expresion} =	Set Variable	[0-9A-zА-Яа-яёЁЇїІіЄєҐґ\\s\\:]+\: \\w+[\\d\\.\\-]+ ([А-Яа-яёЁЇїІіЄєҐґ\\s;,\\"_\\(\\)\\.]+)
 	${result} =			Get Regexp Matches	${result_full}	${reg_expresion}	1
 	[return]	${result[0]}
 
 
 Отримати назву
-	[Arguments]  ${element_name}  ${item}
-	${result_full} =	Отримати текст елемента	${element_name}	${item}
-	${result} =	Run Keyword If	'килограмм' in '${result_full}'	Set Variable	кілограм
-		...  ELSE	Set Variable	${result_full}
+	[Arguments]  ${element_name}  ${position_number}  ${item}
+	${result_full} =	Отримати строку	${element_name}	${position_number}	${item}
+	${result} =			get_unit_name	${result_full}
 	[return]	${result}
 
 
 Отримати код
-	[Arguments]  ${element_name}  ${item}
-	${result_full} =	Отримати текст елемента	${element_name}	${item}
-	${result} =	Run Keyword If	'килограмм' in '${result_full}'	Set Variable	KGM
-		...  ELSE	Set Variable	${result_full}
+	[Arguments]  ${element_name}  ${position_number}  ${item}
+	${result_full} =	Отримати строку	${element_name}	${position_number}	${item}
+	${unit_name} = 		get_unit_name	${result_full}
+	${result} =			get_unit_code	${unit_name}
 	[return]	${result}
 
 
@@ -446,6 +448,13 @@ ${tender_data_causeDescription}							css=#tenderType>div
 	${method_name} =	Get text	${tender_data_${element_name}}
 	${method_type} =	get_procurement_method_type	${method_name}
 	[return]  ${method_type}
+
+
+Отримати інформацію з status
+	[Arguments]  ${element_name}
+	${status_name} =	Get text	${tender_data_${element_name}}
+	${status_type} =	get_status_type	${status_name}
+	[return]  ${status_type}
 
 
 Отримати інформацію з cancellations[0].status
@@ -613,7 +622,6 @@ ${tender_data_causeDescription}							css=#tenderType>div
 	[return]  True
 
 
-
 Оновити сторінку з тендером
 	[Arguments]  @{ARGUMENTS}
 	[Documentation]
@@ -638,10 +646,16 @@ ${tender_data_causeDescription}							css=#tenderType>div
 
 	Відкрити заявку
 	Wait Until Element Not Stale		${locator_tenderClaim.fieldEmail}	40
-	Run Keyword If	'multiLotTender' in '${SUITE_NAME}'	Input Text	${locator_tenderClaim.checkedLot.fieldPrice}	${Arguments[2].data.lotValues[1]['value']['amount']}
-		...  ELSE	Input Text	${locator_tenderClaim.fieldPrice}	${Arguments[2].data.value.amount}
 
-	click element						${locator_tenderClaim.fieldEmail}
+	${amount} =	Set Variable If
+		...  'multiLotTender' in '${SUITE_NAME}'	${Arguments[2].data.lotValues[1]['value']['amount']}
+		...  ${Arguments[2].data.value.amount}
+	${amount} = 	Convert To String	${amount}
+
+	Run Keyword If	'multiLotTender' in '${SUITE_NAME}'	Input Text	${locator_tenderClaim.checkedLot.fieldPrice}	${amount}
+		...  ELSE	Input Text	${locator_tenderClaim.fieldPrice}	${amount}
+
+	Click Element						${locator_tenderClaim.fieldEmail}
 	Input Text							${locator_tenderClaim.fieldEmail}	${USERS.users['${ARGUMENTS[0]}'].email}
 
 	#Just for aboveThreshold tests
@@ -660,9 +674,7 @@ ${tender_data_causeDescription}							css=#tenderType>div
 	${result}=							Get Regexp Matches	${claim_id}	Номер заявки: (\\d*),	1
 
 	Run Keyword If	'aboveThreshold' in '${SUITE_NAME}'	Run Keywords	Click Element	css=a[ng-click='act.ret2Ad()']
-#	TODO раскомментировать
-	...   AND   log to console  tututututututututu
-#	...   AND   Wait For Element With Reload	xpath=//table[@class='bids']//tr[1]/td[4 and contains(., 'Отправлена')]	1
+	...   AND   Wait For Element With Reload	xpath=//table[@class='bids']//tr[1]/td[4 and contains(., 'Отправлена')]	1
 
 	[return]	${Arguments[2]}
 
@@ -859,7 +871,6 @@ ${tender_data_causeDescription}							css=#tenderType>div
 
 Обробити скаргу
 	[Arguments]  @{ARGUMENTS}
-#	TODO  Не реализована возможность
 	Fail  Функція не підтримується майданчиком
 
 
@@ -892,7 +903,7 @@ ${tender_data_causeDescription}							css=#tenderType>div
 #Custom Keywords
 Login
 	[Arguments]  ${username}
-	Click Element						xpath=//span[.='Мой кабинет']
+	Click Element						xpath=//span[.='Вход']
 	Wait Until Element Is Visible		id=p24__login__field	${COMMONWAIT}
 	Execute Javascript					$('#p24__login__field').val(${USERS.users['${username}'].login})
 	Check If Element Stale				xpath=//div[@id="login_modal" and @style='display: block;']//input[@type='password']

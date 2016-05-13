@@ -110,3 +110,85 @@ def get_doc_identifier(doc_type_name):
                        }
     type_name = type_dictionary.get(doc_type_name)
     return str(type_name)
+
+
+def get_unit_name(current_name):
+    dictionary = {
+        u'килограммы': {u'килограмм', u'килограмма', u'килограммов'},
+        u'пара': {u'пара', u'пары', u'пар'},
+        u'літр': {u'литр', u'литра', u'литров'},
+        u'набір': {u'набор', u'набора', u'наборов'},
+        u'пачок': {u'пачка', u'пачек', u'пачки'},
+        u'метри': {u'метр', u'метра', u'метров'},
+        u'лот': {u'лот', u'лоты', u'лотов'},
+        u'послуга': {u'услуга', u'услуг', u'услуги'},
+        u'метри кубічні': {u'метр кубический', u'метра кубического', u'метров кубических'},
+        u'ящик': {u'ящик', u'ящика', u'ящиков'},
+        u'рейс': {u'рейс', u'рейса', u'рейсов'},
+        u'тони': {u'тонна', u'тонны', u'тонн'},
+        u'метри квадратні': {u'метр квадратный', u'метра квадратного', u'метров квадратных'},
+        u'кілометри': {u'километр', u'километров', u'километра'},
+        u'штуки': {u'штука', u'штуки', u'штук'},
+        u'місяць': {u'месяц', u'месяца', u'месяцев'},
+        u'пачка': {u'пачка', u'пачек', u'пачкики'},
+        u'упаковка': {u'упковка', u'упаковок', u'упаковки'},
+        u'гектар': {u'гектар', u'гектара', u'гектаров'},
+        u'блок': {u'блок', u'блока', u'блоков'}
+    }
+
+    expected_name = None
+    dictionary.get(current_name)
+    for name, variants in dictionary.iteritems():
+        if current_name in variants:
+            expected_name = name
+
+    if expected_name:
+        return expected_name
+    else:
+        return current_name
+
+
+def get_unit_code(name):
+    dictionary = {
+        u'килограммы': u'KGM',
+        u'пара': u'PR',
+        u'літр': u'LTR',
+        u'набір': u'SET',
+        u'пачок': u'NMP',
+        u'метри': u'MTR',
+        u'лот': u'LO',
+        u'послуга': u'E48',
+        u'метри кубічні': u'MTQ',
+        u'ящик': u'BX',
+        u'рейс': u'E54',
+        u'тони': u'TNE',
+        u'метри квадратні': u'MTK',
+        u'кілометри': u'KMT',
+        u'штуки': u'H87',
+        u'місяць': u'MON',
+        u'пачка': u'RM',
+        u'упаковка': u'PK',
+        u'гектар': u'HAR',
+        u'блок': u'D64'
+    }
+    expected_name = dictionary.get(name)
+    if expected_name:
+        return expected_name
+    else:
+        return name
+
+
+def get_status_type(status_name):
+    type_dictionary = {
+                       u'Период уточнений': 'active.enquiries',
+                       u'Период уточнений завершен': 'active.enquiries.ended',
+                       u'Подача предложений': 'active.tendering',
+                       u'Идут торги': 'active.auction',
+                       u'Квалификация победителя': 'active.qualification',
+                       u'Предложения рассмотрены': 'active.awarded',
+                       u'Закупка не состоялась': 'unsuccessful',
+                       u'Завершено': 'complete',
+                       u'Отменено': 'cancelled'
+                       }
+    type_name = type_dictionary.get(status_name)
+    return type_name
