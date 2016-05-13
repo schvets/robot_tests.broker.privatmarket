@@ -478,14 +478,14 @@ ${tender_data_causeDescription}							css=#tenderType>div
 	[Arguments]  ${element}  ${item}
 	${text} =		Отримати текст елемента  ${element}  ${item}
 	${newText} =	Get Regexp Matches		${text}	: (\\d.*\\d)	1
-	${result} = 	convert to string  ${newText[0]}
+	${result} = 	Convert To String  ${newText[0]}
 	[return]	${result}
 
 Отримати інформацію з items.additionalClassifications.[0].scheme
 	[Arguments]  ${element}  ${item}
 	${text} =			Отримати текст елемента  ${element}  ${item}
 	${newText} =		Get Regexp Matches		${text}	Классификатор (.*):	1
-	${convertText} = 	convert to string  ${newText[0]}
+	${convertText} = 	Convert To String  ${newText[0]}
 	${result} =			get_classification_type	${convertText}
 	[return]	${result}
 
