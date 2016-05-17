@@ -17,7 +17,7 @@ ${tender_data_status}											css=div#tenderStatus
 ${tender_data_value.amount}										css=div[ng-if='model.budjet'] div.info-item-val
 ${tender_data_value.currency}									css=div[ng-if='model.budjet'] div.info-item-val
 ${tender_data_value.valueAddedTaxIncluded}						css=div[ng-if='model.budjet'] div.info-item-val
-${tender_data_tenderID}											xpath=//div[.='Тендер ID:']/following-sibling::div
+${tender_data_tenderID}											css=div#tenderId
 ${tender_data_procuringEntity.name}								css=a[ng-click='act.openCard()']
 ${tender_data_enquiryPeriod.startDate}							xpath=(//div[@class='period ng-scope']/div[@class='info-item'])[1]
 ${tender_data_enquiryPeriod.endDate}							xpath=(//div[@class='period ng-scope']/div[@class='info-item'])[2]
@@ -493,7 +493,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	[Arguments]  ${element}  ${item}
 	${text} =		Отримати текст елемента  ${element}  ${item}
 	${newText} =	Replace String		${text}	:	${EMPTY}
-	${result} =		get_identification_icheme	${newText}
+	${result} =		get_identification_scheme	${newText}
 	[return]	${result}
 
 
