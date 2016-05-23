@@ -8,8 +8,10 @@ from pytz import timezone
 
 def get_month_number(month_name):
     monthes = [u"янв.", u"февр.", u"марта", u"апр.", u"мая", u"июня",
-               u"июля", u"авг.", u"сент.", u"окт.", u"нояб.", u"дек."]
-    return monthes.index(month_name) + 1
+               u"июля", u"авг.", u"сент.", u"окт.", u"нояб.", u"дек.",
+               u"січ.", u"лют.", u"бер.", u"квіт.", u"трав.", u"черв.",
+               u"лип.", u"серп.", u"вер.", u"жовт.", u"лист.", u"груд."]
+    return monthes.index(month_name)%12 + 1
 
 
 def read_file_content(file_path):
@@ -77,16 +79,19 @@ def get_time_with_offset(date):
 
 def get_procurement_method_type(method_name):
     type_dictionary = {
-                       u'Допороговая закупка': 'belowThreshold',
-                       u'Открытые торги': 'aboveThresholdUA',
-                       u'Открытые торги с публикацией на англ. языке': 'aboveThresholdEU',
-                       u'Отчет о заключении договора': 'reporting',
-                       u'Переговорная процедура': 'negotiation',
-                       u'Срочная переговорная процедура': 'negotiation.quick',
-                       u'Открытые торги (особенности обороны)': 'aboveThresholdUA.defense'
+                       u'Допорогові закупівлі': 'belowThreshold',
+                       u'Відкриті торги': 'aboveThresholdUA',
+                       u'Відкриті торги з публікацією англ.мовою': 'aboveThresholdEU',
+                       u'Звіт про укладений договір': 'reporting',
+                       u'Переговорна процедура': 'negotiation',
+                       u'Переговорна процедура за нагальною потребою': 'negotiation.quick',
+                       u'Переговорна процедура (для потреб оборони)': 'aboveThresholdUA.defense'
                        }
     type_name = type_dictionary.get(method_name)
-    return type_name
+    if type_name:
+        return type_name
+    else:
+        return method_name
 
 
 def get_identification_scheme(scheme):
