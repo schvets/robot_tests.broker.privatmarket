@@ -28,7 +28,7 @@ ${tender_data_complaintPeriod.endDate}							css=span#cmplPeriodEnd
 ${tender_data_minimalStep.amount}								css=div[ng-if='model.ad.minimalStep.amount'] div.info-item-val
 ${tender_data_minimalStep_lot.amount}							css=div[ng-if='model.checkedLot.minimalStep.amount'] div.info-item-val
 ${tender_data_items.description}								css=a[ng-click='adb.showCl = !adb.showCl;']
-${tender_data_items.deliveryDate.endDate}						xpath=//div[contains(@class,'delivery-info')]//div[.='Конец:']/following-sibling::div
+${tender_data_items.deliveryDate.endDate}						xpath=//div[contains(@class,'delivery-info')]//div[.='Кінець:']/following-sibling::div
 ${tender_data_items.deliveryLocation.latitude}					css=span.latitude
 ${tender_data_items.deliveryLocation.longitude}					css=span.longitude
 ${tender_data_items.deliveryAddress.countryName}				css=prz-address[addr='adb.deliveryAddress'] span#countryName
@@ -42,9 +42,9 @@ ${tender_data_items.classification.description}					xpath=//div[@ng-if="adb.clas
 ${tender_data_items.additionalClassifications[0].scheme}		xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
 ${tender_data_items.additionalClassifications[0].id}			xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
 ${tender_data_items.additionalClassifications[0].description}	xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
-${tender_data_items.unit.name}									xpath=//div[.='Количество:']/following-sibling::div
-${tender_data_items.unit.code}									xpath=//div[.='Количество:']/following-sibling::div
-${tender_data_items.quantity}									xpath=//div[.='Количество:']/following-sibling::div
+${tender_data_items.unit.name}									xpath=//div[.='Кількість:']/following-sibling::div
+${tender_data_items.unit.code}									xpath=//div[.='Кількість:']/following-sibling::div
+${tender_data_items.quantity}									xpath=//div[.='Кількість:']/following-sibling::div
 ${tender_data_questions[0].description}							css=div.description
 ${tender_data_questions[0].date}								xpath=//div[@class = 'question-head title']/b[2]
 ${tender_data_questions[0].title}								css=div.question-head.title span
@@ -158,6 +158,10 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 	Wait Until Element Is Visible			css=div.info-item-val a
 	Wait Until Element Not Stale			css=div.info-item-val a	40
+
+	#before the test we should always have the first lot to be opened
+	Run Keyword If	${number_of_lots} > 1	Обрати потрібний лот за id	1 l-
+
 	@{item_list}=							Get Webelements	xpath=//a[@ng-click='adb.showCl = !adb.showCl;']
 	${item_list_length} = 					Get Length	${item_list}
 
@@ -226,29 +230,42 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Обрати потрібний лот за id
 	[Arguments]  ${lot_id}
-	Wait For Element With Reload	css=div.lot-chooser	1
-	Click Element					css=div.lot-chooser
-	Click Element					xpath=//div[@ng-repeat='lot in model.lotPortion' and contains(., '${lot_id}')]
+	Wait For Element With Reload		css=div.lot-chooser	1
+	Click Element						css=div.lot-chooser
+	debug
+	Wait Visibulity And Click Element	xpath=//div[@ng-repeat='lot in model.lotPortion' and contains(., '${lot_id}')]
 
 
 Отримати порядковий номер предмету
-	[Arguments]  ${item_id}  ${element}
-	@{items_list} =			Get Webelements	${tender_data_${element}}
-	${item_list_length} = 	Get Length	${items_list}
+	[Arguments]  ${item_id}
+	${number_of_tries} = 	Evaluate	${number_of_lots} + 1
+	: FOR    ${INDEX}    IN RANGE    1    ${number_of_tries}
+		\  Обрати потрібний лот за id	${INDEX} l-
+		\  log to console     lot - ${INDEX}
+		\  ${item_index} = 	Перевірити присутність предмету	${item_id}
+		\  debug
+		\  Return From Keyword If	${item_index} != ${None}	${item_index}
+	[return]  ${None}
 
-	: FOR    ${INDEX}    IN RANGE    0    ${item_list_length}
-		\  ${locator_index} =		Evaluate	${INDEX}+1
+
+Перевірити присутність предмету
+	[Arguments]  ${item_id}
+	${number_of_tries} = 	Evaluate	${number_of_items} + 1
+	: FOR    ${INDEX}    IN RANGE    1    ${number_of_tries}
+		\  log to console          '    item - ${INDEX}'
 		\  log to console			step 2
-		\  ${element_text} =		Get text	xpath=(//a[@ng-click='adb.showCl = !adb.showCl;'])[${locator_index}]
+		\  ${element_text} =		Get text	xpath=(//a[@ng-click='adb.showCl = !adb.showCl;'])[${INDEX}]
 		\  log to console			step 3: '${item_id}' in '${element_text}'
 		\  Return From Keyword If	'${item_id}' in '${element_text}'	${INDEX}
+	[return]  ${None}
 
 
 Отримати інформацію із предмету
 	[Arguments]  ${username}  ${tender_uaid}  ${item_id}  ${element}
 	Відкрити потрібну інформацію по тендеру	${username}	${element}
-	${item} =	Отримати порядковий номер предмету		${item_id}	${element}
+	${item} =	Отримати порядковий номер предмету		${item_id}
 	${element} = 	Set Variable	items.${element}
+	debug
 
 	Run Keyword And Return If	'${element}' == 'items.classification.scheme'						Отримати інформацію з ${element}	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'items.classification.id'							Отримати строку		${element}		3			${item}
@@ -274,7 +291,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Отримати інформацію із нецінового показника
 	[Arguments]  ${username}  ${tender_uaid}  ${feature_id}  ${field_name}
-	debug
 	[Return]  ${field_value}
 
 
@@ -328,7 +344,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Отримати текст елемента
 	[Arguments]  ${element_name}  ${item}=${0}
-	debug
 	Wait Until Element Is Visible	${tender_data_${element_name}}
 	@{itemsList}=					Get Webelements	${tender_data_${element_name}}
 	${num} =						Set Variable	${item}
