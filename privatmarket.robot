@@ -148,7 +148,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Switch To Frame							id=tenders
 	Wait Until Element Is Not Visible		xpath=//*[@id='sidebar']//input	20s
 	Wait Until Element Is Visible			css=div#tenderStatus	timeout=${COMMONWAIT}
-	Wait Until Element Not Stale			xpath=//div[contains(@class,'title-div')]	40
+	Wait Until Element Not Stale			${tender_data_title}	40
 
 
 Відкрити детальну інформацію по позиціям
@@ -159,9 +159,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait Until Element Is Visible			css=div.info-item-val a
 	Wait Until Element Not Stale			css=div.info-item-val a	40
 
-	#before the test we should always have the first lot to be opened
-	Run Keyword If	${number_of_lots} > 1	Обрати потрібний лот за id	1 l-
-
 	@{item_list}=							Get Webelements	xpath=//a[@ng-click='adb.showCl = !adb.showCl;']
 	${item_list_length} = 					Get Length	${item_list}
 
@@ -170,15 +167,19 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 		\  Wait Until Element Is Visible	xpath=(//a[@ng-click='adb.showCl = !adb.showCl;'])[${locator_index}]
 		\  Scroll Page To Element			xpath=(//a[@ng-click='adb.showCl = !adb.showCl;'])[${locator_index}]
 		\  Wait Until Element Not Stale		${item_list[${INDEX}]}	40
-		\  Click Element					${item_list[${INDEX}]}
-		\  Wait Until Element Is Visible	xpath=(//div[@ng-if='adb.classification'])[${locator_index}]
+		\  ${status} =	Run Keyword And Return Status	Element Should Be Visible	xpath=(//div[@ng-if='adb.classification'])[${locator_index}]
+		\  Run Keyword Unless	${status}	Click Element	${item_list[${INDEX}]}
+		\  Wait Until Element Is Visible	xpath=(//div[@ng-if='adb.classification'])[${locator_index}]	timeout=${COMMONWAIT}
 
 
 Відкрити потрібну інформацію по тендеру
 	[Arguments]  ${username}  ${field}
-
 	Switch browser					${username}
-	Wait Until Element Is Visible		xpath=//div[contains(@class,'title-div')]	timeout=${COMMONWAIT}
+	Wait Until Element Is Visible	${tender_data_title}	timeout=${COMMONWAIT}
+
+	#choose UK language
+	${status} =	Run Keyword And Return Status	Element Should Be Visible	css=a#lang_uk
+	Run Keyword If	${status}	Click Element	css=a#lang_uk
 
 	#switch to correct tab
 	${tab_num} =	Set Variable If
@@ -186,13 +187,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 		...  'complaint' in '${field}'	3
 		...  1
 	Switch To Tab	${tab_num}
-
-	#choose UK language
-	${status} =	Run Keyword And Return Status	Element Should Be Visible	css=a#lang_uk
-	Run Keyword If	${status}	Click Element	css=a#lang_uk
-
-	#show extra information if it is needed
-	Run Keyword If	${tab_num} == 1	Run Keywords	Відкрити детальну інформацію по позиціям
 
 
 Обрати потрібний лот
@@ -204,8 +198,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	${attribute} =	Get Element Attribute			css=a[ng-click='model.shwFull = !model.shwFull'] span@id
 	Mark Step  ${attribute}
 	Run Keyword If	'showMore' in '${attribute}'	Click Element	css=a[ng-click='model.shwFull = !model.shwFull']
-	${attribute} =	Get Element Attribute			css=a[ng-click='model.shwFull = !model.shwFull'] span@id
-	Mark Step  ${attribute}
+#	${attribute} =	Get Element Attribute			css=a[ng-click='model.shwFull = !model.shwFull'] span@id
+#	Mark Step  ${attribute}
 
 	Wait Until Element Is Visible		xpath=//div[@class='lot-head']/b	timeout=${COMMONWAIT}
 	${current_lot} = 					Get Text	css=div.lot-head b
@@ -230,42 +224,36 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Обрати потрібний лот за id
 	[Arguments]  ${lot_id}
-	Wait For Element With Reload		css=div.lot-chooser	1
-	Click Element						css=div.lot-chooser
-	debug
-	Wait Visibulity And Click Element	xpath=//div[@ng-repeat='lot in model.lotPortion' and contains(., '${lot_id}')]
+	log to console      obraty lot ${lot_id}
+	Wait Until Element Is Visible		css=div.lot-chooser	1
+	Click Element						css=div.lot-chooser div[ng-click='toggle()']
+	Wait Until Element Is Visible		xpath=//div[@ng-repeat='lot in model.lotPortion' and contains(., '${lot_id}')]	timeout=${COMMONWAIT}
+	Wait Enable And Click Element		xpath=//div[@ng-repeat='lot in model.lotPortion' and contains(., '${lot_id}')]
+	Wait For Ajax
 
 
-Отримати порядковий номер предмету
+Отримати положення предмету
 	[Arguments]  ${item_id}
-	${number_of_tries} = 	Evaluate	${number_of_lots} + 1
-	: FOR    ${INDEX}    IN RANGE    1    ${number_of_tries}
-		\  Обрати потрібний лот за id	${INDEX} l-
-		\  log to console     lot - ${INDEX}
-		\  ${item_index} = 	Перевірити присутність предмету	${item_id}
-		\  debug
-		\  Return From Keyword If	${item_index} != ${None}	${item_index}
-	[return]  ${None}
-
-
-Перевірити присутність предмету
-	[Arguments]  ${item_id}
-	${number_of_tries} = 	Evaluate	${number_of_items} + 1
-	: FOR    ${INDEX}    IN RANGE    1    ${number_of_tries}
-		\  log to console          '    item - ${INDEX}'
-		\  log to console			step 2
-		\  ${element_text} =		Get text	xpath=(//a[@ng-click='adb.showCl = !adb.showCl;'])[${INDEX}]
-		\  log to console			step 3: '${item_id}' in '${element_text}'
-		\  Return From Keyword If	'${item_id}' in '${element_text}'	${INDEX}
-	[return]  ${None}
+	Wait Until Element Is Visible	css=#lotSection	timeout=${COMMONWAIT}
+	${tender_data} = 			Execute Javascript	return angular.element("#lotSection").scope().model.ad;
+	${item_num}	${lot_num} = 	get_lot_num_by_item	${tender_data}	${item_id}
+	${item_num_temp} = 			Evaluate	${item_num}%${number_of_lots}
+	${item_num} = 	Set Variable If	${number_of_lots} > 0	${item_num_temp}
+	log to console     ${item_id} - ${item_num} - ${lot_num} - ${item_num_temp}
+	[return]  ${item_num}  ${lot_num}
 
 
 Отримати інформацію із предмету
 	[Arguments]  ${username}  ${tender_uaid}  ${item_id}  ${element}
 	Відкрити потрібну інформацію по тендеру	${username}	${element}
-	${item} =	Отримати порядковий номер предмету		${item_id}
+	${item}	${lot} =	Отримати положення предмету		${item_id}
+
+	Run Keyword If	${lot} != 0	Обрати потрібний лот за id	${lot} l-
+
+	#show extra information if it is needed
+	Run Keywords	Відкрити детальну інформацію по позиціям
+
 	${element} = 	Set Variable	items.${element}
-	debug
 
 	Run Keyword And Return If	'${element}' == 'items.classification.scheme'						Отримати інформацію з ${element}	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'items.classification.id'							Отримати строку		${element}		3			${item}
@@ -999,6 +987,7 @@ Wait Visibulity And Click Element
 	[Arguments]  ${elementLocator}
 	Wait Until Element Is Visible	${elementLocator}	${COMMONWAIT}
 	Click Element					${elementLocator}
+	Wait For Ajax
 
 
 Mark Step

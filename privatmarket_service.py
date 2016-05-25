@@ -197,3 +197,25 @@ def get_status_type(status_name):
                        }
     type_name = type_dictionary.get(status_name)
     return type_name
+
+
+def get_lot_num_by_item(tender_data, item_index):
+    items = tender_data['items']
+    lots = tender_data['lots']
+
+    item_num = 0
+    lot_num = 0
+    related_lot = None
+
+    for item in items:
+        if item_index in item['description']:
+            related_lot = item['relatedLot']
+            break
+        item_num += 1
+
+    for lot in lots:
+        lot_num += 1
+        if related_lot in lot['id']:
+            break
+
+    return (item_num, lot_num)
