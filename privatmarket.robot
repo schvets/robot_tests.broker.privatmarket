@@ -52,6 +52,8 @@ ${tender_data_questions[0].answer}								css=div[ng-bind-html='q.answer']
 ${tender_data_lots.title}										css=div.lot-head span.ng-binding
 ${tender_data_lots.description}									css=section.lot-description section.description
 ${tender_data_lots.value.amount}								css=section.lot-description div[ng-if='model.checkedLot.value'] div.info-item-val
+${tender_data_lots.value.currency}								css=section.lot-description div[ng-if='model.checkedLot.value'] div.info-item-val
+${tender_data_lots.value.valueAddedTaxIncluded}					css=section.lot-description div[ng-if='model.checkedLot.value'] div.info-item-val
 ${tender_data_bids}												xpath=(//table[@class='bids']//tr)[2]
 ${tender_data_cancellations[0].status}							xpath=//*[@id='nolotSection']/div[1]/div[1]
 ${tender_data_cancellations[0].reason}							xpath=//*[@id='nolotSection']/div[1]/div[2]
@@ -196,11 +198,13 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	#show more info about lots
 	Return From Keyword If	'None' in '${lot}'	False
 
+	#show more info of lot
 	Wait Until Element Is Visible					css=a[ng-click='model.shwFull = !model.shwFull']	timeout=${COMMONWAIT}
 	${attribute} =	Get Element Attribute			css=a[ng-click='model.shwFull = !model.shwFull'] span@id
 	Mark Step  ${attribute}
 	Run Keyword If	'showMore' in '${attribute}'	Click Element	css=a[ng-click='model.shwFull = !model.shwFull']
 
+	#save
 	Wait Until Element Is Visible		xpath=//div[@class='lot-head']/b	timeout=${COMMONWAIT}
 	${current_lot} = 					Get Text	css=div.lot-head b
 	${current_lot} = 					Get Regexp Matches	${current_lot}	№(\\d)	1
@@ -280,6 +284,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Отримати інформацію із нецінового показника
 	[Arguments]  ${username}  ${tender_uaid}  ${feature_id}  ${field_name}
+	debug
 	[Return]  ${field_value}
 
 
@@ -306,7 +311,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Run Keyword And Return If	'${element}' == 'description_en'				Отримати текст елемента	${element}
 	Run Keyword And Return If	'${element}' == 'description_ru'				Отримати текст елемента	${element}
 
-	Run Keyword And Return If	'${element}' == 'lots.value.amount'						Отримати число			${element}	0			${item}
 	Run Keyword And Return If	'${element}' == 'auctionPeriod.startDate'				Отримати інформацію з ${element}	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'procurementMethodType'					Отримати інформацію з ${element}	${element}
 
@@ -324,9 +328,24 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 
 Отримати інформацію із лоту
-	[Arguments]  ${username}  ${tender_uaid}  ${object_id}  ${field_name}
-	${result} = 	${None}
-	${element} = 	Replace String	${element}	lots[${item}]	lots
+	[Arguments]  ${username}  ${tender_uaid}  ${object_id}  ${element}
+	Відкрити потрібну інформацію по тендеру		${username}	${element}
+
+	#show more info of lot
+	Wait Until Element Is Visible					css=a[ng-click='model.shwFull = !model.shwFull']	timeout=${COMMONWAIT}
+	${attribute} =	Get Element Attribute			css=a[ng-click='model.shwFull = !model.shwFull'] span@id
+	Mark Step  ${attribute}
+	Run Keyword If	'showMore' in '${attribute}'	Click Element	css=a[ng-click='model.shwFull = !model.shwFull']
+
+	Обрати потрібний лот за id					${object_id}
+
+	Run Keyword And Return If	'${element}' == 'lots.value.amount'				Отримати число	${element}	0
+	Run Keyword And Return If	'${element}' == 'value.valueAddedTaxIncluded'	Отримати інформацію з ${element}	lot.${element}
+	Run Keyword And Return If	'${element}' == 'value.currency'				Отримати інформацію з ${element}	lot.${element}
+
+	Wait Until Element Is Visible	${tender_data_lots.${element}}	timeout=${COMMONWAIT}
+	${result_full} =				Get Text	${tender_data_${element}}
+	${result} =						Strip String	${result_full}
 
 	[return]	${result}
 
@@ -432,6 +451,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Отримати інформацію з value.valueAddedTaxIncluded
 	[Arguments]  ${element_name}
+	debug
 	${value_added_tax_included} =	Get text	${tender_data_${element_name}}
 	${result} =	Set Variable If	'з ПДВ' in '${value_added_tax_included}'	True
 	${result} =	Convert To Boolean	${result}
