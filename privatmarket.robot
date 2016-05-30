@@ -284,7 +284,19 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 Отримати інформацію із нецінового показника
 	[Arguments]  ${username}  ${tender_uaid}  ${feature_id}  ${field_name}
 	Run Keyword If	${number_of_lots} > 0	Обрати потрібний лот за id	1 l-
-	debug
+
+	${result} = 	Run Keyword If	'${field_name}' == 'description'	Get Text	xpath=//div[contains(., '${feature_id}')]/following-sibling::div[@ng-click='feature.showCl = !feature.showCl;']
+	${result} = 	Run Keyword If	'${field_name}' == 'title'			Get Text	xpath=//div[contains(@class,'info-item-label') and contains(., '${feature_id}')]
+	${result} = 	Run Keyword If	'${field_name}' == 'featureOf'		Get Text	xpath=//div[contains(., '${feature_id}')]/preceding-sibling::section[contains(@class, 'description')]
+
+	#get featureOf identifier
+	${result} =	Set Variable If
+		...  'По закупівлі' in '${result}'	tenderer
+		...  'По лоту' in '${result}'	lot
+		...  'По позиціям' in '${result}'	item
+		...  1
+
+	${result} =		Strip String	${result_full}
 	[Return]  ${field_value}
 
 
