@@ -103,7 +103,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 Підготувати клієнт для користувача
 	[Arguments]  ${username}
 	[Documentation]  Відкрити брaвзер, створити обєкт api wrapper, тощо
-
 	${service args}=	Create List	--ignore-ssl-errors=true	--ssl-protocol=tlsv1
 	${browser} =		Convert To Lowercase	${USERS.users['${username}'].browser}
 
@@ -284,6 +283,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Отримати інформацію із нецінового показника
 	[Arguments]  ${username}  ${tender_uaid}  ${feature_id}  ${field_name}
+	Run Keyword If	${number_of_lots} > 0	Обрати потрібний лот за id	1 l-
 	debug
 	[Return]  ${field_value}
 
@@ -330,6 +330,9 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 Отримати інформацію із лоту
 	[Arguments]  ${username}  ${tender_uaid}  ${object_id}  ${element}
 	Відкрити потрібну інформацію по тендеру		${username}	${element}
+	log to console	we got - ${element}
+	${element_for_work} = 	Convert To String	lots.${element}
+	log to console	we are looking for - ${element} - ${element_for_work}
 
 	#show more info of lot
 	Wait Until Element Is Visible					css=a[ng-click='model.shwFull = !model.shwFull']	timeout=${COMMONWAIT}
@@ -339,12 +342,12 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 	Обрати потрібний лот за id					${object_id}
 
-	Run Keyword And Return If	'${element}' == 'lots.value.amount'				Отримати число	${element}	0
-	Run Keyword And Return If	'${element}' == 'value.valueAddedTaxIncluded'	Отримати інформацію з ${element}	lot.${element}
-	Run Keyword And Return If	'${element}' == 'value.currency'				Отримати інформацію з ${element}	lot.${element}
+	Run Keyword And Return If	'${element}' == 'value.amount'				Отримати число	${element_for_work}	0
+	Run Keyword And Return If	'${element}' == 'value.valueAddedTaxIncluded'	Отримати інформацію з ${element}	${element_for_work}
+	Run Keyword And Return If	'${element}' == 'value.currency'				Отримати інформацію з ${element}	${element_for_work}
 
-	Wait Until Element Is Visible	${tender_data_lots.${element}}	timeout=${COMMONWAIT}
-	${result_full} =				Get Text	${tender_data_${element}}
+	Wait Until Element Is Visible	${tender_data_${element_for_work}}	timeout=${COMMONWAIT}
+	${result_full} =				Get Text	${tender_data_${element_for_work}}
 	${result} =						Strip String	${result_full}
 
 	[return]	${result}
@@ -451,7 +454,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Отримати інформацію з value.valueAddedTaxIncluded
 	[Arguments]  ${element_name}
-	debug
 	${value_added_tax_included} =	Get text	${tender_data_${element_name}}
 	${result} =	Set Variable If	'з ПДВ' in '${value_added_tax_included}'	True
 	${result} =	Convert To Boolean	${result}
