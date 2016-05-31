@@ -325,9 +325,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Run Keyword And Return If	'${element}' == 'auctionPeriod.startDate'				Отримати інформацію з ${element}	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'procurementMethodType'					Отримати інформацію з ${element}	${element}
 
-	Run Keyword If	'${element}' == 'questions[0].title'		Wait For Element With Reload	${tender_data_${element}}	2
-	Run Keyword If	'${element}' == 'questions[0].answer'		Wait For Element With Reload	${tender_data_${element}}	2
-
 	Run Keyword And Return If	'${element}' == 'cancellations[0].status'					Отримати інформацію з ${element}	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'cancellations[0].documents[0].title'		Отримати інформацію з ${element}	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'procuringEntity.identifier.scheme'			Отримати інформацію з ${element}	${element}	${item}
@@ -359,6 +356,19 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	${result_full} =				Get Text	${tender_data_${element_for_work}}
 	${result} =						Strip String	${result_full}
 
+	[return]	${result}
+
+
+Отримати інформацію із запитання
+	[Arguments]  ${username}  ${tender_uaid}  ${object_id}  ${field_name}
+	Відкрити потрібну інформацію по тендеру	${username}			${element}
+	debug
+
+	Run Keyword If	'${element}' == 'questions[0].title'		Wait For Element With Reload	${tender_data_${element}}	2
+	Run Keyword If	'${element}' == 'questions[0].answer'		Wait For Element With Reload	${tender_data_${element}}	2
+	Wait Until Element Is Visible	${tender_data_${element}}	timeout=${COMMONWAIT}
+	${result_full} =				Get Text	${tender_data_${element}}
+	${result} =						Strip String	${result_full}
 	[return]	${result}
 
 
