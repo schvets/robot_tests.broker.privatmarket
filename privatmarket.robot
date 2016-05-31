@@ -229,6 +229,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	[Arguments]  ${lot_id}
 	Mark Step      obraty lot ${lot_id}
 	Wait Until Element Is Visible		css=div.lot-chooser	1
+	Wait Until Element Is Enabled		css=div.lot-chooser	1
 	Click Element						css=div.lot-chooser div[ng-click='toggle()']
 	Wait Until Element Is Visible		xpath=//div[@ng-repeat='lot in model.lotPortion' and contains(., '${lot_id}')]	timeout=${COMMONWAIT}
 	Wait Enable And Click Element		xpath=//div[@ng-repeat='lot in model.lotPortion' and contains(., '${lot_id}')]
@@ -283,21 +284,19 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Отримати інформацію із нецінового показника
 	[Arguments]  ${username}  ${tender_uaid}  ${feature_id}  ${field_name}
-	Run Keyword If	${number_of_lots} > 0	Обрати потрібний лот за id	1 l-
+	Відкрити потрібну інформацію по тендеру	${username}  ${field_name}
 
-	${result} = 	Run Keyword If	'${field_name}' == 'description'	Get Text	xpath=//div[contains(., '${feature_id}')]/following-sibling::div[@ng-click='feature.showCl = !feature.showCl;']
-	${result} = 	Run Keyword If	'${field_name}' == 'title'			Get Text	xpath=//div[contains(@class,'info-item-label') and contains(., '${feature_id}')]
-	${result} = 	Run Keyword If	'${field_name}' == 'featureOf'		Get Text	xpath=//div[contains(., '${feature_id}')]/preceding-sibling::section[contains(@class, 'description')]
+	Run Keyword If	${number_of_lots} > 1	Обрати потрібний лот за id	1 l-
 
-	#get featureOf identifier
-	${result} =	Set Variable If
-		...  'По закупівлі' in '${result}'	tenderer
-		...  'По лоту' in '${result}'	lot
-		...  'По позиціям' in '${result}'	item
-		...  1
+	${result} = 	Run Keyword If	'${field_name}' == 'title'	Get Text	xpath=//div[contains(@class,'info-item-label') and contains(., '${feature_id}')]
+		...	ELSE IF		'${field_name}' == 'description'		Get Text	xpath=//div[contains(., '${feature_id}')]/following-sibling::div[@ng-click='feature.showCl = !feature.showCl;']
+		...	ELSE IF		'${field_name}' == 'featureOf'			Отримати інформацію з featureOf	${feature_id}	${field_name}
+		...	ELSE		There is no such feature parameter.
 
-	${result} =		Strip String	${result_full}
-	[Return]  ${field_value}
+	${result} =		Convert To String	${result}
+	${result} =		Replace String	${result}	.:	.
+	${result} =		Strip String		${result}
+	[Return]  ${result}
 
 
 Отримати інформацію із тендера
@@ -342,9 +341,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 Отримати інформацію із лоту
 	[Arguments]  ${username}  ${tender_uaid}  ${object_id}  ${element}
 	Відкрити потрібну інформацію по тендеру		${username}	${element}
-	log to console	we got - ${element}
 	${element_for_work} = 	Convert To String	lots.${element}
-	log to console	we are looking for - ${element} - ${element_for_work}
 
 	#show more info of lot
 	Wait Until Element Is Visible					css=a[ng-click='model.shwFull = !model.shwFull']	timeout=${COMMONWAIT}
@@ -580,6 +577,20 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 		...  0 == ${number_of_lots}	minimalStep.amount
 		...  minimalStep_lot.amount
 	${result} =	Отримати число	${locator}	${position_number}
+	[return]	${result}
+
+
+Отримати інформацію з featureOf
+	[Arguments]  ${feature_id}  ${element}
+	${result} = 	Get Text	xpath=//div[contains(@class, 'info-item ng-scope') and contains(., '${feature_id}')]/section[contains(@class, 'description')]
+
+	#get featureOf identifier
+	${result} =	Set Variable If
+		...  'По закупівлі' in '${result}'	tenderer
+		...  'По лоту' in '${result}'		lot
+		...  'По позиціям' in '${result}'	item
+		...  ${result}
+
 	[return]	${result}
 
 
