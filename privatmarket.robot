@@ -45,10 +45,10 @@ ${tender_data_items.additionalClassifications[0].description}	xpath=//div[@ng-re
 ${tender_data_items.unit.name}									xpath=//div[.='Кількість:']/following-sibling::div
 ${tender_data_items.unit.code}									xpath=//div[.='Кількість:']/following-sibling::div
 ${tender_data_items.quantity}									xpath=//div[.='Кількість:']/following-sibling::div
-${tender_data_questions[0].description}							css=div.description
-${tender_data_questions[0].date}								xpath=//div[@class = 'question-head title']/b[2]
-${tender_data_questions[0].title}								css=div.question-head.title span
-${tender_data_questions[0].answer}								css=div[ng-bind-html='q.answer']
+${tender_data_questions.description}							css=div.description
+${tender_data_questions.date}									xpath=//div[@class = 'question-head title']/b[2]
+${tender_data_questions.title}									css=div.question-head.title span
+${tender_data_questions.answer}									css=div[ng-bind-html='q.answer']
 ${tender_data_lots.title}										css=div.lot-head span.ng-binding
 ${tender_data_lots.description}									css=section.lot-description section.description
 ${tender_data_lots.value.amount}								css=section.lot-description div[ng-if='model.checkedLot.value'] div.info-item-val
@@ -231,6 +231,14 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait Until Element Is Visible		css=div.lot-chooser	1
 	Wait Until Element Is Enabled		css=div.lot-chooser	1
 	Click Element						css=div.lot-chooser div[ng-click='toggle()']
+
+	log to console	we clicked
+	${status} =	Run Keyword And Return Status	Element Should Be Visible	xpath=//div[@ng-repeat='lot in model.lotPortion' and contains(., '${lot_id}')]
+	log to console	our status: ${status}
+	Run Keyword Unless	${status}	Click Element	css=div.lot-chooser div[ng-click='toggle()']
+	${status} =	Run Keyword And Return Status	Element Should Be Visible	xpath=//div[@ng-repeat='lot in model.lotPortion' and contains(., '${lot_id}')]
+	log to console	after second try: ${status}
+
 	Wait Until Element Is Visible		xpath=//div[@ng-repeat='lot in model.lotPortion' and contains(., '${lot_id}')]	timeout=${COMMONWAIT}
 	Wait Enable And Click Element		xpath=//div[@ng-repeat='lot in model.lotPortion' and contains(., '${lot_id}')]
 	Sleep								1s
@@ -301,6 +309,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Отримати інформацію із тендера
 	[Arguments]  ${username}  ${item}  ${element}
+	debug
 	Відкрити потрібну інформацію по тендеру	${username}	${element}
 
 	Run Keyword And Return If	'${element}' == 'value.amount'					Отримати число			${element}	0
@@ -308,7 +317,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Run Keyword And Return If	'${element}' == 'enquiryPeriod.endDate'			Отримати дату та час	${element}
 	Run Keyword And Return If	'${element}' == 'tenderPeriod.startDate'		Отримати дату та час	${element}
 	Run Keyword And Return If	'${element}' == 'tenderPeriod.endDate'			Отримати дату та час	${element}
-	Run Keyword And Return If	'${element}' == 'questions[0].date'				Отримати дату та час	${element}
 	Run Keyword And Return If	'${element}' == 'complaintPeriod.endDate'		Отримати дату та час	${element}
 	Run Keyword And Return If	'${element}' == 'bids'							Перевірити присутність bids
 	Run Keyword And Return If	'${element}' == 'value.currency'				Отримати інформацію з ${element}	${element}
@@ -361,13 +369,16 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Отримати інформацію із запитання
 	[Arguments]  ${username}  ${tender_uaid}  ${object_id}  ${field_name}
-	Відкрити потрібну інформацію по тендеру	${username}			${element}
+	${element_for_work} = 	Convert To String	questions.${field_name}
+	Відкрити потрібну інформацію по тендеру	${username}	${element_for_work}
 	debug
 
-	Run Keyword If	'${element}' == 'questions[0].title'		Wait For Element With Reload	${tender_data_${element}}	2
-	Run Keyword If	'${element}' == 'questions[0].answer'		Wait For Element With Reload	${tender_data_${element}}	2
-	Wait Until Element Is Visible	${tender_data_${element}}	timeout=${COMMONWAIT}
-	${result_full} =				Get Text	${tender_data_${element}}
+	Run Keyword If	'${element_for_work}' == 'questions.title'			Wait For Element With Reload	${tender_data_${element_for_work}}	2
+	Run Keyword If	'${element_for_work}' == 'questions.answer'			Wait For Element With Reload	${tender_data_${element_for_work}}	2
+	Run Keyword And Return If	'${element_for_work}' == 'questions.date'		Отримати дату та час	${element_for_work}
+
+	Wait Until Element Is Visible	${tender_data_${element_for_work}}	timeout=${COMMONWAIT}
+	${result_full} =				Get Text	${tender_data_${element_for_work}}
 	${result} =						Strip String	${result_full}
 	[return]	${result}
 
