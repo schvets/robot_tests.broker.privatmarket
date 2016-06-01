@@ -192,52 +192,16 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Switch To Tab	${tab_num}
 
 
-Обрати потрібний лот
-	[Arguments]  ${lot}
-	#show more info about lots
-	Return From Keyword If	'None' in '${lot}'	False
-
-	#show more info of lot
-	Wait Until Element Is Visible					css=a[ng-click='model.shwFull = !model.shwFull']	timeout=${COMMONWAIT}
-	${attribute} =	Get Element Attribute			css=a[ng-click='model.shwFull = !model.shwFull'] span@id
-	Mark Step  ${attribute}
-	Run Keyword If	'showMore' in '${attribute}'	Click Element	css=a[ng-click='model.shwFull = !model.shwFull']
-
-	#save
-	Wait Until Element Is Visible		xpath=//div[@class='lot-head']/b	timeout=${COMMONWAIT}
-	${current_lot} = 					Get Text	css=div.lot-head b
-	${current_lot} = 					Get Regexp Matches	${current_lot}	№(\\d)	1
-	${current_lot} = 					Convert To Integer	${current_lot[0]}
-	${lot} = 							Evaluate	${lot}+1
-
-	#If current lot is that one we need, then just leave it
-	Mark Step  Choose_lot_0
-	Mark Step  ${lot} == ${current_lot}
-	Return From Keyword If	${lot} == ${current_lot}	True
-	Mark Step  Choose_lot_1
-	Wait For Element With Reload		css=div.lot-chooser	1
-	Click Element						css=div.lot-chooser
-	Mark Step  Choose_lot_2
-	Wait Until Element Is Visible		xpath=(//div[@ng-repeat='lot in model.lotPortion'])[${lot}]	timeout=${COMMONWAIT}
-	Click Element						xpath=(//div[@ng-repeat='lot in model.lotPortion'])[${lot}]
-	Mark Step  Choose_lot_3
-	Wait Until Element Is Not Visible	xpath=(//div[@ng-repeat='lot in model.lotPortion'])[${lot}]	timeout=${COMMONWAIT}
-	Mark Step  Choose_lot_4
-
-
 Обрати потрібний лот за id
 	[Arguments]  ${lot_id}
-	Mark Step      obraty lot ${lot_id}
+	Mark Step							obraty lot ${lot_id}
+	Sleep								2s
 	Wait Until Element Is Visible		css=div.lot-chooser	1
 	Wait Until Element Is Enabled		css=div.lot-chooser	1
 	Click Element						css=div.lot-chooser div[ng-click='toggle()']
 
-	log to console	we clicked
 	${status} =	Run Keyword And Return Status	Element Should Be Visible	xpath=//div[@ng-repeat='lot in model.lotPortion' and contains(., '${lot_id}')]
-	log to console	our status: ${status}
-	Run Keyword Unless	${status}	Click Element	css=div.lot-chooser div[ng-click='toggle()']
-	${status} =	Run Keyword And Return Status	Element Should Be Visible	xpath=//div[@ng-repeat='lot in model.lotPortion' and contains(., '${lot_id}')]
-	log to console	after second try: ${status}
+	Mark Step							our status: ${status}
 
 	Wait Until Element Is Visible		xpath=//div[@ng-repeat='lot in model.lotPortion' and contains(., '${lot_id}')]	timeout=${COMMONWAIT}
 	Wait Enable And Click Element		xpath=//div[@ng-repeat='lot in model.lotPortion' and contains(., '${lot_id}')]
@@ -309,7 +273,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Отримати інформацію із тендера
 	[Arguments]  ${username}  ${item}  ${element}
-	debug
 	Відкрити потрібну інформацію по тендеру	${username}	${element}
 
 	Run Keyword And Return If	'${element}' == 'value.amount'					Отримати число			${element}	0
@@ -371,7 +334,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	[Arguments]  ${username}  ${tender_uaid}  ${object_id}  ${field_name}
 	${element_for_work} = 	Convert To String	questions.${field_name}
 	Відкрити потрібну інформацію по тендеру	${username}	${element_for_work}
-	debug
 
 	Run Keyword If	'${element_for_work}' == 'questions.title'			Wait For Element With Reload	${tender_data_${element_for_work}}	2
 	Run Keyword If	'${element_for_work}' == 'questions.answer'			Wait For Element With Reload	${tender_data_${element_for_work}}	2
@@ -642,33 +604,33 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	${claim_resp} =	Create Dictionary	data=${claim_data}
 	[return]  ${claim_resp}
 
+#TODO Multiple keywords with name 'Завантажити документацію до вимоги' found. Give the full name of the keyword you want to use:
+#Завантажити документацію до вимоги
+#	[Arguments]  ${user}  ${tender_id}  ${complaints}  ${document}
+#	${correctFilePath} = 				Replace String	${document}	\\	\/
+#	Execute Javascript					$("#fileToUpload").removeClass();
+#	Choose File							css=input#fileToUpload	${correctFilePath}
+#	sleep								5s
+#	Wait Until Element Is Visible		css=div.file-item
+#	[return]  ${document}
 
-Завантажити документацію до вимоги
-	[Arguments]  ${user}  ${tender_id}  ${complaints}  ${document}
-	${correctFilePath} = 				Replace String	${document}	\\	\/
-	Execute Javascript					$("#fileToUpload").removeClass();
-	Choose File							css=input#fileToUpload	${correctFilePath}
-	sleep								5s
-	Wait Until Element Is Visible		css=div.file-item
-	[return]  ${document}
 
-
-Подати вимогу
-	[Arguments]  ${user}  ${tender_id}  ${complaints}  ${confrimation_data}
-	Click Button						xpath=//button[@ng-click='act.sendComplaint()']
-	Wait For Ajax
-	Wait Until Element Is Enabled		css=div.alert-info	timeout=${COMMONWAIT}
-	Wait Until Element Not Stale		css=div.alert-info	40
-	Wait Until Element Contains			css=div.alert-info	Ваше требование успешно отправлено!	timeout=10
-	Wait For Ajax
-	sleep								3s
-	Wait Until Element Is Not Visible	xpath=//input[@ng-model="model.question.title"]	timeout=${COMMONWAIT}
-	Wait For Ajax
-	Wait Until Element Not Stale		css=span[ng-click='act.hideModal()']	40
-	Click Element						css=span[ng-click='act.hideModal()']
-	sleep								3s
-	Wait Until Element Is Not Visible	css=div.info-item-val textarea	timeout=30
-	Element Should Not Be Visible		css=div.error
+#Подати вимогу
+#	[Arguments]  ${user}  ${tender_id}  ${complaints}  ${confrimation_data}
+#	Click Button						xpath=//button[@ng-click='act.sendComplaint()']
+#	Wait For Ajax
+#	Wait Until Element Is Enabled		css=div.alert-info	timeout=${COMMONWAIT}
+#	Wait Until Element Not Stale		css=div.alert-info	40
+#	Wait Until Element Contains			css=div.alert-info	Ваше требование успешно отправлено!	timeout=10
+#	Wait For Ajax
+#	sleep								3s
+#	Wait Until Element Is Not Visible	xpath=//input[@ng-model="model.question.title"]	timeout=${COMMONWAIT}
+#	Wait For Ajax
+#	Wait Until Element Not Stale		css=span[ng-click='act.hideModal()']	40
+#	Click Element						css=span[ng-click='act.hideModal()']
+#	sleep								3s
+#	Wait Until Element Is Not Visible	css=div.info-item-val textarea	timeout=30
+#	Element Should Not Be Visible		css=div.error
 
 
 Скасувати вимогу
@@ -1060,7 +1022,7 @@ Wait Visibulity And Click Element
 Mark Step
 	[Arguments]  ${stepName}
 	${time} =	Get Time
-	Log To Console	_${stepName} - ${time}
+	Log	_${stepName} - ${time}
 
 
 Close Confirmation
