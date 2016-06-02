@@ -198,7 +198,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Sleep								2s
 	Wait Until Element Is Visible		css=div.lot-chooser	1
 	Wait Until Element Is Enabled		css=div.lot-chooser	1
-	Click Element						css=div.lot-chooser div[ng-click='toggle()']
+	Click Element						css=div.lot-chooser>div.toggle-div
 
 	${status} =	Run Keyword And Return Status	Element Should Be Visible	xpath=//div[@ng-repeat='lot in model.lotPortion' and contains(., '${lot_id}')]
 	Mark Step							our status: ${status}
@@ -1022,7 +1022,7 @@ Wait Visibulity And Click Element
 Mark Step
 	[Arguments]  ${stepName}
 	${time} =	Get Time
-	Log	_${stepName} - ${time}
+	Log to console	_${stepName} - ${time}
 
 
 Close Confirmation
