@@ -17,7 +17,7 @@ ${tender_data_status}											css=div#tenderStatus
 ${tender_data_value.amount}										css=div[ng-if='model.budjet'] div.info-item-val
 ${tender_data_value.currency}									css=div[ng-if='model.budjet'] div.info-item-val
 ${tender_data_value.valueAddedTaxIncluded}						css=div[ng-if='model.budjet'] div.info-item-val
-${tender_data_tenderID}											xpath=//div[.='Тендер ID:']/following-sibling::div
+${tender_data_tenderID}											css=#tenderId
 ${tender_data_procuringEntity.name}								css=a[ng-click='act.openCard()']
 ${tender_data_enquiryPeriod.startDate}							xpath=(//div[@class='period ng-scope']/div[@class='info-item'])[1]
 ${tender_data_enquiryPeriod.endDate}							xpath=(//div[@class='period ng-scope']/div[@class='info-item'])[2]
@@ -26,10 +26,12 @@ ${tender_data_tenderPeriod.endDate}								xpath=(//div[@class='period ng-scope'
 ${tender_data_auctionPeriod.startDate}							xpath=(//div[@class='period ng-scope']/div[@class='info-item'])[5]
 ${tender_data_minimalStep.amount}								css=div[ng-if='model.ad.minimalStep.amount'] div.info-item-val
 ${tender_data_items.description}								css=a[ng-click='adb.showCl = !adb.showCl;']
-${tender_data_items.deliveryDate.endDate}						xpath=//div[contains(@class,'delivery-info')]//div[.='Конец:']/following-sibling::div
+${tender_data_items.deliveryDate.endDate}						xpath=//div[contains(@class,'delivery-info')]//div[.='Кінець:']/following-sibling::div
 ${tender_data_items.deliveryLocation.latitude}					css=span.latitude
 ${tender_data_items.deliveryLocation.longitude}					css=span.longitude
 ${tender_data_items.deliveryAddress.countryName}				css=prz-address[addr='adb.deliveryAddress'] span#countryName
+${tender_data_items.deliveryAddress.countryName_ru}				css=prz-address[addr='adb.deliveryAddress'] span#countryName
+${tender_data_items.deliveryAddress.countryName_en}				css=prz-address[addr='adb.deliveryAddress'] span#countryName
 ${tender_data_items.deliveryAddress.postalCode}					css=prz-address[addr='adb.deliveryAddress'] span#postalCode
 ${tender_data_items.deliveryAddress.region}						css=prz-address[addr='adb.deliveryAddress'] span#region
 ${tender_data_items.deliveryAddress.locality}					css=prz-address[addr='adb.deliveryAddress'] span#locality
@@ -40,9 +42,9 @@ ${tender_data_items.classification.description}					xpath=//div[@ng-if="adb.clas
 ${tender_data_items.additionalClassifications[0].scheme}		xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
 ${tender_data_items.additionalClassifications[0].id}			xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
 ${tender_data_items.additionalClassifications[0].description}	xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
-${tender_data_items.unit.name}									xpath=//div[.='Количество:']/following-sibling::div
-${tender_data_items.unit.code}									xpath=//div[.='Количество:']/following-sibling::div
-${tender_data_items.quantity}									xpath=//div[.='Количество:']/following-sibling::div
+${tender_data_items.unit.name}									xpath=//div[.='Кількість:']/following-sibling::div
+${tender_data_items.unit.code}									xpath=//div[.='Кількість:']/following-sibling::div
+${tender_data_items.quantity}									xpath=//div[.='Кількість:']/following-sibling::div
 ${tender_data_questions[0].description}							css=div.description
 ${tender_data_questions[0].date}								xpath=//div[@class = 'question-head title']/b[2]
 ${tender_data_questions[0].title}								css=div.question-head.title span
@@ -90,7 +92,7 @@ ${tender_data_procuringEntity.contactPoint.name}		xpath=//div[@class='delivery-i
 ${tender_data_procuringEntity.contactPoint.telephone}	xpath=//div[@class='delivery-info']/div[4]/div[@class='info-item-val ng-binding']
 ${tender_data_procuringEntity.contactPoint.url}			xpath=//div[@class='delivery-info']/div[5]/div[@class='info-item-val ng-binding']
 ${tender_data_procuringEntity.identifier.legalName}		xpath=//div[@id='procurerLegalName']/div[2]
-${tender_data_procuringEntity.identifier.scheme}		xpath=//div[@id='procurerId']/div[1]
+${tender_data_procuringEntity.identifier.scheme}		xpath=//div[@class='delivery-info ng-scope']/div[2]/div[2]
 ${tender_data_procuringEntity.identifier.id}			xpath=//div[@id='procurerId']/div[2]
 
 ${tender_data_documents[0].title}						css=.file-name.ng-binding
@@ -100,6 +102,24 @@ ${tender_data_items.additionalClassifications.[0].id}				xpath=//div[@ng-repeat=
 ${tender_data_items.additionalClassifications.[0].scheme}			xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
 
 ${tender_data_causeDescription}							css=#tenderType>div
+
+${tender_data_awards[0].status}									xpath=//div[@class='modal-body info-div ng-scope']/div[10]/div[2]
+${tender_data_awards[0].suppliers[0].address.countryName}		xpath=(//prz-address[@id='procurerAddr'])[2]//*[@id='countryName']
+${tender_data_awards[0].suppliers[0].address.locality}			xpath=(//prz-address[@id="procurerAddr"])[2]//*[@id='locality']
+${tender_data_awards[0].suppliers[0].address.postalCode}		xpath=(//prz-address[@id="procurerAddr"])[2]//*[@id='postalCode']
+${tender_data_awards[0].suppliers[0].address.region}			xpath=(//prz-address[@id="procurerAddr"])[2]//*[@id='region']
+${tender_data_awards[0].suppliers[0].address.streetAddress}		xpath=(//prz-address[@id="procurerAddr"])[2]//*[@id='streetAddress']
+${tender_data_awards[0].suppliers[0].contactPoint.telephone}	xpath=//div[@class='modal-body info-div ng-scope']/div[7]/div[2]
+${tender_data_awards[0].suppliers[0].contactPoint.name}			xpath=//div[@class='modal-body info-div ng-scope']/div[6]/div[2]
+${tender_data_awards[0].suppliers[0].contactPoint.email}		xpath=//div[@class='modal-body info-div ng-scope']/div[8]/div[2]
+${tender_data_awards[0].suppliers[0].identifier.scheme}			xpath=//div[@class='modal-body info-div ng-scope']/div[2]/div[2]
+${tender_data_awards[0].suppliers[0].identifier.legalName}		xpath=//div[@class='modal-body info-div ng-scope']/div[1]/div[2]
+${tender_data_awards[0].suppliers[0].identifier.id}				xpath=//div[@class='modal-body info-div ng-scope']/div[3]/div[2]
+${tender_data_awards[0].suppliers[0].name}						xpath=//div[@class='modal-body info-div ng-scope']/div[1]/div[2]
+${tender_data_awards[0].value.valueAddedTaxIncluded}			xpath=//div[@class='modal-body info-div ng-scope']/div[9]/div[2]
+${tender_data_awards[0].value.currency}							xpath=//div[@class='modal-body info-div ng-scope']/div[9]/div[2]
+${tender_data_awards[0].value.amount}							xpath=//div[@class='modal-body info-div ng-scope']/div[9]/div[2]
+
 
 *** Keywords ***
 Підготувати дані для оголошення тендера
@@ -243,6 +263,10 @@ ${tender_data_causeDescription}							css=#tenderType>div
 		...  1
 	Switch To Tab	${tab_num}
 
+	#choose UK language
+ 	${status} =	 Run Keyword And Return Status	Element Should Be Visible	css=a#lang_uk
+	 Run Keyword If	${status}	Click Element	css=a#lang_uk
+
 	#show extra information if it need
 	Run Keyword If	${tab_num} == 1	Run Keywords	Відкрити детальну інформацию по позиціям
 	...   AND   Обрати потрібний лот	${lot}
@@ -278,6 +302,8 @@ ${tender_data_causeDescription}							css=#tenderType>div
 	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].scheme'			Отримати інформацію з ${element}	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].id'				Отримати строку	${element}			3			${item}
 	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].description'	Отримати класифікацію				${element}	${item}
+	Run Keyword And Return If	'${element}' == 'items.deliveryAddress.countryName_en'				Отримати інформацію з елемента зі зміною локалізації	${element}	${item}	en
+	Run Keyword And Return If	'${element}' == 'items.deliveryAddress.countryName_ru'				Отримати інформацію з елемента зі зміною локалізації	${element}	${item}	ru
 	Run Keyword And Return If	'items.deliveryAddres' in '${element}'								Отримати текст елемента				${element}	${item}
 
 	Run Keyword And Return If	'${element}' == 'items.deliveryDate.endDate'			Отримати дату та час	${element}	0			${item}
@@ -292,15 +318,13 @@ ${tender_data_causeDescription}							css=#tenderType>div
 	Run Keyword If	'${element}' == 'questions[0].answer'		Wait For Element With Reload	${tender_data_${element}}	2
 
 	Run Keyword And Return If	'${element}' == 'cancellations[0].status'					Отримати інформацію з ${element}	${element}	${item}
-	Run Keyword And Return If	'${element}' == 'cancellations[0].documents[0].title'		Отримати інформацію з ${element}	${element}	${item}
-	Run Keyword And Return If	'${element}' == 'title_en'									Отримати текст елемента	${element}	${item}
-	Run Keyword And Return If	'${element}' == 'title_ru'									Отримати текст елемента	${element}	${item}
-	Run Keyword And Return If	'${element}' == 'description_en'							Отримати текст елемента	${element}	${item}
-	Run Keyword And Return If	'${element}' == 'description_ru'							Отримати текст елемента	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'title_en'									Отримати інформацію з елемента зі зміною локалізації	${element}	${item}	en
+	Run Keyword And Return If	'${element}' == 'title_ru'									Отримати інформацію з елемента зі зміною локалізації	${element}	${item}	ru
+	Run Keyword And Return If	'${element}' == 'description_en'							Отримати інформацію з елемента зі зміною локалізації	${element}	${item}	en
+	Run Keyword And Return If	'${element}' == 'description_ru'							Отримати інформацію з елемента зі зміною локалізації	${element}	${item}	ru
 
 
-	Run Keyword And Return If	'${element}' == 'procuringEntity.identifier.scheme'			Отримати інформацію з ${element}	${element}	${item}
-	Run Keyword And Return If	'${element}' == 'documents[0].title'						Отримати інформацію з ${element}	${element}	${item}
+
 
 	Run Keyword And Return If	'${element}' == 'items.additionalClassifications.[0].description'			Отримати інформацію з ${element}	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'items.additionalClassifications.[0].id'					Отримати інформацію з ${element}	${element}	${item}
@@ -309,8 +333,15 @@ ${tender_data_causeDescription}							css=#tenderType>div
 	Run Keyword And Return If	'${element}' == 'causeDescription'							Отримати інформацію з ${element}	${element}	${item}
 
 
-
 	Run Keyword And Return If	'${element}' == 'lots.value.amount'		Отримати число	${element}	0	${item}
+
+	Run Keyword And Return If	'${element}' == 'awards[0].status'								Отримати інформацію з ${element}	${element}	${item}
+#Run Keyword And Return If	'awards[0].suppliers[0]' in '${element}'						Отримати інформацію з елемента для постачальника	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'awards[0].value.valueAddedTaxIncluded'			Отримати інформацію з ${element}	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'awards[0].value.currency'						Отримати інформацію з ${element}	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'awards[0].value.amount'						Отримати інформацію з ${element}	${element}	${item}
+
+
 
 	Wait Until Element Is Visible	${tender_data_${element}}	timeout=${COMMONWAIT}
 	${result_full} =				Get Text	${tender_data_${element}}
@@ -420,7 +451,7 @@ ${tender_data_causeDescription}							css=#tenderType>div
 Отримати інформацію з value.valueAddedTaxIncluded
 	[Arguments]  ${element_name}  ${item}
 	${value_added_tax_included} =	Get text	${tender_data_${element_name}}
-	${result} =	Set Variable If	'c НДС' in '${value_added_tax_included}'	True
+	${result} =	Set Variable If	'з ПДВ' in '${value_added_tax_included}'	True
 	${result} =	Convert To Boolean	${result}
 	[return]  ${result}
 
@@ -460,21 +491,9 @@ ${tender_data_causeDescription}							css=#tenderType>div
 Отримати інформацію з cancellations[0].status
 	[Arguments]  ${element}  ${item}
 	${text} =	Отримати текст елемента  ${element}  ${item}
-	${result} =	Set Variable If	'Отменено' in '${text}'	active
+	${result} =	Set Variable If	'Відмінено' in '${text}'	active
 	[return]  ${result}
 
-
-Отримати інформацію з cancellations[0].documents[0].title
-	[Arguments]  ${element}  ${item}
-	${text} =		Отримати текст елемента  ${element}  ${item}
-	${newText} =	Replace String	${text}	\\	\\\\
-	[return]	${newText}
-
-Отримати інформацію з documents[0].title
-	[Arguments]  ${element}  ${item}
-	${text} =		Отримати текст елемента  ${element}  ${item}
-	${newText} =	Replace String		${text}	\\	\\\\
-	[return]	${newText}
 
 Отримати інформацію з items.additionalClassifications.[0].description
 	[Arguments]  ${element}  ${item}
@@ -504,12 +523,50 @@ ${tender_data_causeDescription}							css=#tenderType>div
 	${text} =	Отримати текст елемента  ${element}  ${item}
 	[return]	${text}
 
-Отримати інформацію з procuringEntity.identifier.scheme
+
+Отримати інформацію з елемента зі зміною локалізації
+	[Arguments]  ${element}  ${item}  ${localization}
+	Click Element						css=a#lang_${localization}
+	Wait For Ajax
+	Wait Until Element Is Visible		css=span#lang_${localization}	timeout=${COMMONWAIT}
+	Wait Until Element Is Visible		css=#nolotSection div[class='info-item'] a	timeout=${COMMONWAIT}
+	Wait Until Element Is Enabled		css=#nolotSection div[class='info-item'] a	timeout=${COMMONWAIT}
+	Click Element						css=#nolotSection div[class='info-item'] a
+	${text} =							Отримати текст елемента  ${element}  ${item}
+	[return]	${text}
+
+
+Отримати інформацію з awards[0].status
 	[Arguments]  ${element}  ${item}
-	${text} =		Отримати текст елемента  ${element}  ${item}
-	${newText} =	Replace String		${text}	:	${EMPTY}
-	${result} =		get_identification_icheme	${newText}
-	[return]	${result}
+	Click Element						xpath=//tr[@class=' bold']/td[2]/a
+	Wait Until Element Is Visible		xpath=//div[@class='modal-body info-div ng-scope']/div[10]/div[2]	timeout=${COMMONWAIT}
+	Wait For Ajax
+	${text} =							Отримати текст елемента  ${element}  ${item}
+	${newText} =						Set Variable If	'Розглядається ' in '${text}'	active
+	[return]	${newText}
+
+
+Отримати інформацію з awards[0].value.amount
+	[Arguments]  ${element}  ${item}
+	${text} =							Отримати число			${element}	0	${item}
+	Click Element						css=.icon-remove.pull-right
+	Wait Until Element Is Not Visible	css=.icon-remove.pull-right
+	[return]	${text}
+
+
+Отримати інформацію з awards[0].value.currency
+	[Arguments]  ${element}  ${item}
+	${currency} =						Отримати строку	${element}	1	${item}
+	${currency_type} =					get_currency_type	${currency}
+	[return]	${currency_type}
+
+
+Отримати інформацію з awards[0].value.valueAddedTaxIncluded
+	[Arguments]  ${element}  ${item}
+	${value_added_tax_included} =		Get text	${tender_data_${element}}
+	${result} =							Set Variable If	'з ПДВ' in '${value_added_tax_included}'	True
+	${newResult} =						Convert To Boolean	${result}
+	[return]	${newResult}
 
 
 Внести зміни в тендер

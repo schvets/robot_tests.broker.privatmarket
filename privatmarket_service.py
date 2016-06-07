@@ -8,8 +8,10 @@ from pytz import timezone
 
 def get_month_number(month_name):
     monthes = [u"янв.", u"февр.", u"марта", u"апр.", u"мая", u"июня",
-               u"июля", u"авг.", u"сент.", u"окт.", u"нояб.", u"дек."]
-    return monthes.index(month_name) + 1
+               u"июля", u"авг.", u"сент.", u"окт.", u"нояб.", u"дек.",
+               u"січ.", u"лют.", u"бер.", u"квіт.", u"трав.", u"черв.",
+               u"лип.", u"серп.", u"вер.", u"жовт.", u"лист.", u"груд."]
+    return monthes.index(month_name)%12 + 1
 
 
 def read_file_content(file_path):
@@ -89,18 +91,6 @@ def get_procurement_method_type(method_name):
     return type_name
 
 
-def get_identification_scheme(scheme):
-    scheme_dictionary = {
-        u'ЕГРПОУ': u'UA-EDR',
-        u'ЄДРПОУ': u'UA-EDR'
-    }
-    identification_scheme = scheme_dictionary.get(scheme)
-    if identification_scheme:
-        return identification_scheme
-    else:
-        return scheme
-
-
 def get_doc_identifier(doc_type_name):
     type_dictionary = {
                        'eligibility_documents': 20,
@@ -117,7 +107,7 @@ def get_unit_name(current_name):
         u'килограммы': {u'килограмм', u'килограмма', u'килограммов'},
         u'пара': {u'пара', u'пары', u'пар'},
         u'літр': {u'литр', u'литра', u'литров'},
-        u'набір': {u'набор', u'набора', u'наборов'},
+        u'набір': {u'комплект', u'комплекта', u'комплектов'},
         u'пачок': {u'пачка', u'пачек', u'пачки'},
         u'метри': {u'метр', u'метра', u'метров'},
         u'лот': {u'лот', u'лоты', u'лотов'},
