@@ -79,16 +79,19 @@ def get_time_with_offset(date):
 
 def get_procurement_method_type(method_name):
     type_dictionary = {
-                       u'Допороговая закупка': 'belowThreshold',
-                       u'Открытые торги': 'aboveThresholdUA',
-                       u'Открытые торги с публикацией на англ. языке': 'aboveThresholdEU',
-                       u'Отчет о заключении договора': 'reporting',
-                       u'Переговорная процедура': 'negotiation',
-                       u'Срочная переговорная процедура': 'negotiation.quick',
-                       u'Открытые торги (особенности обороны)': 'aboveThresholdUA.defense'
+                       u'Допорогові закупівлі': 'belowThreshold',
+                       u'Відкриті торги': 'aboveThresholdUA',
+                       u'Відкриті торги з публікацією англ.мовою': 'aboveThresholdEU',
+                       u'Звіт про укладений договір': 'reporting',
+                       u'Переговорна процедура': 'negotiation',
+                       u'Переговорна процедура за нагальною потребою': 'negotiation.quick',
+                       u'Переговорна процедура (для потреб оборони)': 'aboveThresholdUA.defense'
                        }
     type_name = type_dictionary.get(method_name)
-    return type_name
+    if type_name:
+        return type_name
+    else:
+        return method_name
 
 
 def get_doc_identifier(doc_type_name):
@@ -104,7 +107,7 @@ def get_doc_identifier(doc_type_name):
 
 def get_unit_name(current_name):
     dictionary = {
-        u'килограммы': {u'килограмм', u'килограмма', u'килограммов'},
+        u'кілограм': {u'килограмм', u'килограмма', u'килограммов'},
         u'пара': {u'пара', u'пары', u'пар'},
         u'літр': {u'литр', u'литра', u'литров'},
         u'набір': {u'комплект', u'комплекта', u'комплектов'},
@@ -140,7 +143,7 @@ def get_unit_name(current_name):
 
 def get_unit_code(name):
     dictionary = {
-        u'килограммы': u'KGM',
+        u'кілограм': u'KGM',
         u'пара': u'PR',
         u'літр': u'LTR',
         u'набір': u'SET',
@@ -182,3 +185,25 @@ def get_status_type(status_name):
                        }
     type_name = type_dictionary.get(status_name)
     return type_name
+
+
+def get_lot_num_by_item(tender_data, item_index):
+    items = tender_data['items']
+    lots = tender_data['lots']
+
+    item_num = 0
+    lot_num = 0
+    related_lot = None
+
+    for item in items:
+        if item_index in item['description']:
+            related_lot = item['relatedLot']
+            break
+        item_num += 1
+
+    for lot in lots:
+        lot_num += 1
+        if related_lot in lot['id']:
+            break
+
+    return (item_num, lot_num)
