@@ -215,7 +215,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	${tender_data} = 			Execute Javascript	return angular.element("#lotSection").scope().model.ad;
 	${item_num}	${lot_num} = 	get_lot_num_by_item	${tender_data}	${item_id}
 	${item_num_temp} = 			Evaluate	${item_num}%${number_of_lots}
-	${item_num} = 	Set Variable If	${number_of_lots} > 0	${item_num_temp}
+	${item_num} = 	            Set Variable If	${number_of_lots} > 0	${item_num_temp}
 	Mark Step     ${item_id} - ${item_num} - ${lot_num} - ${item_num_temp}
 	[return]  ${item_num}  ${lot_num}
 
@@ -257,6 +257,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 Отримати інформацію із нецінового показника
 	[Arguments]  ${username}  ${tender_uaid}  ${feature_id}  ${field_name}
 	Відкрити потрібну інформацію по тендеру	${username}  ${field_name}
+	Wait For Element With Reload            xpath=//div[contains(@class,'info-item-label') and contains(., '${feature_id}')]  1
 
 	Run Keyword If	${number_of_lots} > 1	Обрати потрібний лот за id	1 l-
 
@@ -266,7 +267,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 		...	ELSE		There is no such feature parameter.
 
 	${result} =		Convert To String	${result}
-	${result} =		Replace String	${result}	.:	.
+	${result} =		Replace String	    ${result}	.:	.
 	${result} =		Strip String		${result}
 	[Return]  ${result}
 
@@ -565,7 +566,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Отримати інформацію з featureOf
 	[Arguments]  ${feature_id}  ${element}
-	${result} = 	Get Text	xpath=//div[contains(@class, 'info-item ng-scope') and contains(., '${feature_id}')]/section[contains(@class, 'description')]
+	${result} = 	Get Text	xpath=//div[contains(@class, 'info-item ng-scope') and contains(., '${feature_id}')]/parent::div//section[contains(@class, 'description')]
 
 	#get featureOf identifier
 	${result} =	Set Variable If
@@ -1116,7 +1117,7 @@ Switch To Tab
 
 Wait For Element With Reload
 	[Arguments]  ${locator}  ${tab_number}
-	Mark Step					in_wait
+	Mark Step					        in_wait
 	Wait Until Keyword Succeeds			4min	10s	Try Search Element	${locator}	${tab_number}
 
 
