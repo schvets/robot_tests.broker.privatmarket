@@ -14,8 +14,8 @@ ${tender_data_title}											xpath=//div[contains(@class,'title-div')]
 ${tender_data_description}										css=div.description
 ${tender_data_procurementMethodType}							css=div#tenderType
 ${tender_data_status}											css=div#tenderStatus
-${tender_data_value.amount}										css=div[ng-if='model.budjet'] div.info-item-val
-${tender_data_value.currency}									css=div[ng-if='model.budjet'] div.info-item-val
+${tender_data_value.amount}										css=#tenderBudget
+${tender_data_value.currency}									css=#tenderBudgetCcy
 ${tender_data_value.valueAddedTaxIncluded}						css=div[ng-if='model.budjet'] div.info-item-val
 ${tender_data_tenderID}											css=div#tenderId
 ${tender_data_procuringEntity.name}								css=a[ng-click='act.openCard()']
@@ -125,7 +125,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	[Documentation]
 	...	${ARGUMENTS[0]} ==  username
 	...	${ARGUMENTS[1]} ==  tenderId
-	Mark Step								${ARGUMENTS[1]}
+	Mark Step								${ARGUMENTS[1]} + ${ARGUMENTS[0]}
 
 	Switch browser							${ARGUMENTS[0]}
 	Go to									${USERS.users['${ARGUMENTS[0]}'].homepage}
@@ -223,6 +223,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 Отримати інформацію із предмету
 	[Arguments]  ${username}  ${tender_uaid}  ${item_id}  ${element}
 	Відкрити потрібну інформацію по тендеру	${username}	${element}
+
 	${item}	${lot} =	Отримати положення предмету		${item_id}
 
 	Run Keyword If	${lot} != 0	Обрати потрібний лот за id	${lot} l-
@@ -382,14 +383,15 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 Отримати дату та час
 	[Arguments]  ${element_name}  ${item}=${0}
 	${result_full} =	Отримати текст елемента	${element_name}	${item}
-	${work_string} =	Replace String		${result_full}	${SPACE},${SPACE}	${SPACE}
-	${work_string} =	Replace String		${result_full}	,${SPACE}	${SPACE}
-	${values_list} =	Split String		${work_string}
-	${day} =			Convert To String	${values_list[0]}
-	${month} =			get_month_number	${values_list[1]}
-	${year} =			Convert To String	${values_list[2]}
-	${time} =			Convert To String	${values_list[3]}
-	${result}=			Convert To String	${year}-${month}-${day} ${time}
+	${work_string} =	Replace String			${result_full}	${SPACE},${SPACE}	${SPACE}
+	${work_string} =	Replace String			${result_full}	,${SPACE}	${SPACE}
+	${values_list} =	Split String			${work_string}
+	${day} =			Convert To String		${values_list[0]}
+	${month} =			get_month_number		${values_list[1]}
+	${year} =			Convert To String		${values_list[2]}
+	${time} =			Convert To String		${values_list[3]}
+	${result}=			Convert To String		${year}-${month}-${day} ${time}
+	${result} = 		get_time_with_offset	${result}
 	[return]	${result}
 
 
@@ -471,7 +473,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Отримати інформацію з status
 	[Arguments]  ${element_name}
-	${status_name} =	Get text	${tender_data_${element_name}}
+	${status_name} =	Get text		${tender_data_${element_name}}
+	Run Keyword And Ignore Error	Wait Until Element Does Not Contain	${tender_data_${element_name}}	'Прием предложений завершен'	5
 	${status_type} =	get_status_type	${status_name}
 	[return]  ${status_type}
 
@@ -547,15 +550,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 
 Отримати інформацію з minimalStep.amount
-	[Arguments]  ${element}  ${position_number}
-	${locator} =	Set Variable If
-		...  0 == ${number_of_lots}	minimalStep.amount
-		...  minimalStep_lot.amount
-	${result} =	Отримати число	${locator}	${position_number}
-	[return]	${result}
-
-
-Отримати інформацію з complaintPeriod.endDate
 	[Arguments]  ${element}  ${position_number}
 	${locator} =	Set Variable If
 		...  0 == ${number_of_lots}	minimalStep.amount
@@ -709,8 +703,10 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	...	${ARGUMENTS[1]} ==  tenderId
 	...	${ARGUMENTS[2]} ==  bid
 
-	Run Keyword If	'без прив’язки до лоту' in '${TEST_NAME}'	Fail  Така ситуація не може виникнути
-	Run Keyword If	'без нецінового показника' in '${TEST_NAME}'	Fail  Така ситуація не може виникнути
+	Run Keyword If	'без прив’язки до лоту' in '${TEST_NAME}'		Fail  Така ситуація не може виникнути
+	Run Keyword If	'без нецінових показників' in '${TEST_NAME}'	Fail  Така ситуація не може виникнути
+#	TODO delete before commit
+	Run Keyword If	'до початку періоду подачі' in '${TEST_NAME}'	Fail  Така ситуація не може виникнути
 
 	Switch browser						${ARGUMENTS[0]}
 	privatmarket.Пошук тендера по ідентифікатору	${ARGUMENTS[0]}   ${ARGUMENTS[1]}
@@ -718,12 +714,10 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Відкрити заявку
 	Wait Until Element Not Stale		${locator_tenderClaim.fieldEmail}	40
 
-	${amount} =	Set Variable If
-		...  'multiLotTender' in '${SUITE_NAME}'	${Arguments[2].data.lotValues[1]['value']['amount']}
-		...  ${Arguments[2].data.value.amount}
+	${amount} =		Set Variable		${Arguments[2].data.value.amount}
 	${amount} = 	Convert To String	${amount}
 
-	Run Keyword If	'multiLotTender' in '${SUITE_NAME}'	Input Text	${locator_tenderClaim.checkedLot.fieldPrice}	${amount}
+	Run Keyword If	${number_of_lots} > 0	Input Text	${locator_tenderClaim.checkedLot.fieldPrice}	${amount}
 		...  ELSE	Input Text	${locator_tenderClaim.fieldPrice}	${amount}
 
 	Click Element						${locator_tenderClaim.fieldEmail}
@@ -737,15 +731,16 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Scroll Page To Element				${locator_tenderClaim.buttonSend}
 	Click Button						${locator_tenderClaim.buttonSend}
 	Wait For Ajax Overflow Vanish
-	Close confirmation					Ваша заявка была успешно помещена в очередь на отправку!
+
+	Close confirmation					Ваша заявка була успішно включена до черги на відправку!
 	Wait Until Element Is Visible		css=div.afp-info.ng-scope.ng-binding
-	wait until element contains			css=div.afp-info.ng-scope.ng-binding	Номер заявки
+	Wait Until Element Contains			css=div.afp-info.ng-scope.ng-binding	Номер заявки
 	Wait For Ajax
-	${claim_id}=						Get text			css=div.afp-info.ng-scope.ng-binding
-	${result}=							Get Regexp Matches	${claim_id}	Номер заявки: (\\d*),	1
+	${claim_id} =						Get text			css=div.afp-info.ng-scope.ng-binding
+	${result} =							Get Regexp Matches	${claim_id}	Номер заявки: (\\d*),	1
 
 	Run Keyword If	'open' in '${SUITE_NAME}'	Run Keywords	Click Element	css=a[ng-click='act.ret2Ad()']
-	...   AND   Wait For Element With Reload	xpath=//table[@class='bids']//tr[1]/td[4 and contains(., 'Отправлена')]	1
+	...   AND   Wait For Element With Reload	xpath=//table[@class='bids']//tr[1]/td[4 and contains(., 'Відправлена')]	1
 
 	[return]	${Arguments[2]}
 
@@ -792,7 +787,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 	${test_name} =	Convert To Lowercase	${TEST_NAME}
 	Run Keyword If	'оновити статус цінової пропозиції' in '${test_name}'	Close confirmation	Ваша заявка была успешно помещена в очередь на отправку!
-		...  ELSE	Close confirmation	Ваша заявка была успешно сохранена!
+		...  ELSE	Close confirmation	Ваша заявка була успішно збережена!
 
 	Wait Until Element Is Visible		css=div.afp-info.ng-scope.ng-binding
 	Wait For Ajax
@@ -801,12 +796,12 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	[return]	${fieldname}
 
 
-Змінити parameters.0.value
+Змінити parameters[0].value
 	[Arguments]  ${fieldvalue}
 	Select From List	xpath=(//select[@ng-model='feature.userValue'])[1]	${fieldvalue}
 
 
-Змінити lotValues.0.value.amount
+Змінити lotValues[0].value.amount
 	[Arguments]  ${fieldvalue}
 	Input Text	${locator_tenderClaim.checkedLot.fieldPrice}	${fieldvalue}
 
@@ -882,7 +877,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait Until Element Is Visible		xpath=(//div[contains(@class, 'file-item')])[1]	timeout=30
 
 	Click Button						${locator_tenderClaim.buttonSend}
-	Close confirmation					Ваша заявка была успешно сохранена!
+	Close confirmation					Ваша заявка була успішно збережена!
 	${dateModified}						Get text	css=span.file-tlm
 	Click Element						${locator_tenderClaim.buttonGoBack}
 	wait until element is visible		css=table.bids tr
