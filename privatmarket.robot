@@ -132,22 +132,22 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait Until Element Is Enabled			id=tenders	timeout=${COMMONWAIT}
 	Switch To Frame							id=tenders
 	Sleep									3s
-	Wait Until Element Is Visible			xpath=//*[@id='sidebar']//input	timeout=${COMMONWAIT}
-	Wait Until Element Not Stale			xpath=//*[@id='sidebar']//input	40
-	Wait Until Element Is Enabled			xpath=(//div[@class='tender-name_info tender-col'])[1]	timeout=${COMMONWAIT}
+	Wait Until Element Is Visible			css=input#search-query-input
+	Wait Until Element Not Stale			css=input#search-query-input	40
+	Wait Until Element Is Enabled			xpath=//tr[@ng-repeat='t in model.tenderList']	timeout=${COMMONWAIT}
 
-	${suite_name} = 	Convert To Lowercase	${SUITE_NAME}
-	${education_type} =	Run Keyword If	'negotiation' in '${suite_name}'	Set Variable	False
-		...  ELSE	Set Variable	True
+	${suite_name} = 						Convert To Lowercase	${SUITE_NAME}
+	${education_type} = 					Set Variable If
+		...  'negotiation' in '${suite_name}'	False
+		...  True
 
 	Wait For Tender							${ARGUMENTS[1]}	${education_type}
-	sleep									3s
-	Wait Until Element Not Stale			css=span[id='${ARGUMENTS[1]}'] div.tenders_sm_info	40
-	Click Element By JS						span[id='${ARGUMENTS[1]}'] div.tenders_sm_info
+	sleep									2s
+	Click Element							css=tr[id='${ARGUMENTS[1]}']
 
-	sleep									3s
+	sleep									2s
 	Switch To Frame							id=tenders
-	Wait Until Element Is Not Visible		xpath=//*[@id='sidebar']//input	20s
+	Wait Until Element Is Not Visible		css=input#search-query-input	20s
 	Wait Until Element Is Visible			css=div#tenderStatus	timeout=${COMMONWAIT}
 	Wait Until Element Not Stale			${tender_data_title}	40
 
@@ -155,22 +155,22 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 Відкрити детальну інформацію про позицію
 	[Arguments]  ${item}
 	#check if extra information is already opened
-	Mark Step     step1
-	${locator_index} =					Evaluate	${item}+1
+	Mark Step							step1
+	${locator_index} =					Evaluate	${item}
 	Wait Until Page Contains Element	xpath=//div[@ng-show='adb.showCl']	5s
 	${element_class} =					Get Element Attribute	xpath=(//div[@ng-show='adb.showCl'])[${locator_index}]@class
 	Run Keyword Unless	'ng-hide' in '${element_class}'	Return From Keyword	False
-	Mark Step     step2
+	Mark Step							step2
 
 	Wait Until Element Is Visible		css=div.info-item-val a	timeout=${COMMONWAIT}
 	Wait Until Element Not Stale		css=div.info-item-val a	10
-	Mark Step     step3
+	Mark Step							step3
 
 	${locator} = 						Set Variable	xpath=(//a[@ng-click='adb.showCl = !adb.showCl;'])[${locator_index}]
 	Wait Until Element Is Visible		${locator}	timeout=${COMMONWAIT}
 	Scroll Page To Element				${locator}
 	Wait Until Element Not Stale		${locator}	10
-	Mark Step     step4
+	Mark Step							step4
 	Click Element	${locator}
 	Wait Until Element Is Visible		xpath=(//div[@ng-if='adb.classification'])[${locator_index}]	timeout=10
 	Mark Step     step5
@@ -205,29 +205,52 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait Until Element Is Visible		css=div.lot-chooser	1
 	Wait Until Element Is Enabled		css=div.lot-chooser	1
 	Click Element						css=div.lot-chooser>div.toggle-div
-
+#	debug   choose lot by id
 	${status} =	Run Keyword And Return Status	Element Should Be Visible	xpath=//div[@ng-repeat='lot in model.lotPortion' and contains(., '${lot_id}')]
 	Mark Step							our status: ${status}
 
 	Wait Until Element Is Visible		xpath=//div[@ng-repeat='lot in model.lotPortion' and contains(., '${lot_id}')]	timeout=${COMMONWAIT}
 	Wait Enable And Click Element		xpath=//div[@ng-repeat='lot in model.lotPortion' and contains(., '${lot_id}')]
+	Wait Until Element Is Not Visible	xpath=//div[@ng-repeat='lot in model.lotPortion' and contains(., '${lot_id}')]	timeout=${COMMONWAIT}
 	Sleep								1s
-	Mark Step      lot obrano
+	Mark Step							lot obrano
+
+
+Обрати потрібний лот за порядковим номером
+	[Arguments]  ${number}
+	#if lot is just one we don't have to switch
+	Sleep								2s
+	${is_multilot} =					Run Keyword And Return Status	Element Should Be Visible	css=div.lot-chooser
+	Run Keyword Unless					${is_multilot}	Return From Keyword	${False}
+
+	Mark Step							obraty lot ${number}
+	Sleep								2s
+	Wait Until Element Is Visible		css=div.lot-chooser	1
+	Wait Until Element Is Enabled		css=div.lot-chooser	1
+	Click Element						css=div.lot-chooser>div.toggle-div
+#	${status} =	Run Keyword And Return Status	Element Should Be Visible	xpath=(//div[@ng-repeat='lot in model.lotPortion'])[${number}]
+#	Mark Step							our status: ${status}
+
+	Wait Enable And Click Element		xpath=(//div[@ng-repeat='lot in model.lotPortion'])[${number}]
+	Wait Until Element Is Not Visible	xpath=(//div[@ng-repeat='lot in model.lotPortion'])[${number}]	timeout=${COMMONWAIT}
+	Sleep								1s
+	Mark Step							lot obrano
 
 
 Отримати положення предмету
 	[Arguments]  ${item_id}
 	Run Keyword If	'у ново' in '${TEST_NAME}'	Reload And Switch To Tab	1
 
-	${is_multilot} =					Run Keyword And Return Status	Element Should Be Visible	css=div.lot-chooser
-	Run Keyword Unless					${is_multilot}	Return From Keyword	${0}	${0}
+	${is_multilot} =							Run Keyword And Return Status	Element Should Be Visible	css=div.lot-chooser
+	Run Keyword Unless							${is_multilot}	Return From Keyword	${0}	${0}
 
-	Wait Until Element Is Visible	css=#lotSection	timeout=${COMMONWAIT}
-	${tender_data} = 			Execute Javascript	return angular.element("#lotSection").scope().model.ad;
-	${item_num}	${lot_num} = 	get_lot_num_by_item	${tender_data}	${item_id}
-	${item_num_temp} = 			Evaluate	${item_num}%${number_of_lots}
-	${item_num} = 				Set Variable If	${number_of_lots} > 0	${item_num_temp}
-	Mark Step					${item_id} - ${item_num} - ${lot_num} - ${item_num_temp}
+	Wait Until Element Is Visible				css=#lotSection	timeout=${COMMONWAIT}
+	Mark Step                                   info by tender
+	${tender_data} = 							Execute Javascript	return angular.element("#lotSection").scope().model.ad;
+	${item_num}	${lot_num}	${lots_count} = 	get_lot_num_by_item	${tender_data}	${item_id}
+	${item_num_temp} = 							Evaluate	${item_num}%${lots_count}
+	${item_num} = 								Set Variable If	${lots_count} > 0	${item_num_temp}
+	Mark Step									${item_id} - ${item_num} - ${lot_num} - ${item_num_temp}
 	[return]  ${item_num}  ${lot_num}
 
 
@@ -237,10 +260,11 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Відкрити потрібну інформацію по тендеру	${username}	${element}
 
 	${item}	${lot} =	Отримати положення предмету		${item_id}
-	Обрати потрібний лот за id	${lot} l-
+	Обрати потрібний лот за порядковим номером			${lot}
 
 	#show extra information if it is needed
 	Відкрити детальну інформацію про позицію	${item}
+#	debug   get info by object
 
 	${element} = 	Set Variable	items.${element}
 
@@ -271,7 +295,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Відкрити потрібну інформацію по тендеру	${username}  ${field_name}
 	Wait For Element With Reload            xpath=//div[contains(@class,'info-item-label') and contains(., '${feature_id}')]  1
 
-	Обрати потрібний лот за id	1 l-
+	Обрати потрібний лот за порядковим номером	1
 
 	${result} = 	Run Keyword If	'${field_name}' == 'title'	Get Text	xpath=//div[contains(@class,'info-item-label') and contains(., '${feature_id}')]
 		...	ELSE IF		'${field_name}' == 'description'		Get Text	xpath=//div[contains(., '${feature_id}')]/following-sibling::div[@ng-click='feature.showCl = !feature.showCl;']
@@ -1038,6 +1062,7 @@ Mark Step
 	[Arguments]  ${stepName}
 	${time} =	Get Time
 	Log to console	_${stepName} - ${time}
+	Log Many	_${stepName} - ${time}
 
 
 Close Confirmation
@@ -1087,31 +1112,31 @@ Try Search Tender
 	[Arguments]	${tender_id}  ${education_type}
 	#проверим правильный ли режим
 	Mark Step	in_Try Search Tender
-	${current_type} =					Get text	css=div.test-mode-aside
-	${check_result} =					Run Keyword If	'Войти в обучающий режим' in '${current_type}'	Set Variable  True
-	Run Keyword If	${check_result} and ${education_type}	Run Keywords	Switch To Education Mode
-	...   AND   Wait Until Element Not Stale		xpath=(//div[@class='tenders_sm_info'])[1]	40
-	...   AND   Wait Until Element Is Enabled		xpath=(//div[@class='tenders_sm_info'])[1]	timeout=${COMMONWAIT}
+	${education_is_off} = 	Run Keyword And Return Status		Element Should Not Be Visible	css=a#test-mode-off
+	Run Keyword If	${education_type} and ${education_is_off}	Run Keywords	Switch To Education Mode
 
 	#заполним поле поиска
-	${text_in_search} =					Get Value	css=input.search-query-input
-	Run Keyword Unless	'${tender_id}' == '${text_in_search}'	Run Keywords	Clear Element Text	css=input.search-query-input
-	...   AND   sleep					1s
-	...   AND   Input Text				css=input.search-query-input	${tender_id}
+	${text_in_search} =					Get Value	css=input#search-query-input
+	Run Keyword Unless	'${tender_id}' == '${text_in_search}'	Run Keywords	Clear Element Text	css=input#search-query-input
+	...   AND   sleep		1s
+	...   AND   Input Text	css=input#search-query-input	${tender_id}
 
 	#выполним поиск
-	Click Element						xpath=//div[@class="search-aside"]/span
+	Click Element						css=button#search-query-button
 	Wait For Ajax Overflow Vanish
 	Wait Until Element Is Enabled		id=${tender_id}	timeout=10
 	[return]	True
 
 
 Switch To Education Mode
-	Wait Until Element Is Enabled		css=div.test-mode-aside a	timeout=${COMMONWAIT}
-	Sleep								3s
-	Click Element						css=div.test-mode-aside a
-	Wait Until Element Contains			css=div.test-mode-aside a	Выйти из обучающего режима	${COMMONWAIT}
+	Sleep								2s
+	Wait Until Element Is Enabled		css=a#test-model-switch	timeout=${COMMONWAIT}
+	Click Element						css=a#test-model-switch
+	Wait Until Element Is Visible		css=a#test-mode-off	${COMMONWAIT}
 	Wait For Ajax Overflow Vanish
+	Sleep								2s
+	Wait Until Element Not Stale		xpath=//tr[@ng-repeat='t in model.tenderList']	timeout=${COMMONWAIT}
+	Wait Until Element Is Enabled		xpath=//tr[@ng-repeat='t in model.tenderList']	timeout=${COMMONWAIT}
 
 
 Reload And Switch To Tab

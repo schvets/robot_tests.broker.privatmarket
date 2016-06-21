@@ -223,4 +223,5 @@ def get_lot_num_by_item(tender_data, item_index):
         if related_lot in lot['id']:
             break
 
-    return (item_num, lot_num)
+    lots_count = len(lots)
+    return (item_num, lot_num, lots_count)
