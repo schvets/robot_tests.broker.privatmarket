@@ -161,7 +161,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	#check if extra information is already opened
 	Mark Step							step1
 	Wait Until Page Contains Element	xpath=//div[@ng-show='adb.showCl']	5s
-	debug     in choosing position
 	${element_class} =					Get Element Attribute	xpath=(//div[@ng-show='adb.showCl'])[${item}]@class
 	Run Keyword Unless	'ng-hide' in '${element_class}'	Return From Keyword	False
 	Mark Step							step2
@@ -195,8 +194,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 		...  'complaint' in '${field}'	3
 		...  1
 	Switch To Tab	${tab_num}
-	Wait Until Element Is Visible			css=div#tenderStatus	timeout=10
-	Wait Until Element Not Stale			${tender_data_title}	10
+	Sleep			2s
 
 
 Обрати потрібний лот за id
@@ -269,21 +267,21 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 	${element} = 	Set Variable	items.${element}
 
-	Run Keyword And Return If	'${element}' == 'items.classification.scheme'						Отримати інформацію з ${element}	${element}	${item}
-	Run Keyword And Return If	'${element}' == 'items.classification.id'							Отримати строку		${element}		3			${item}
-	Run Keyword And Return If	'${element}' == 'items.description'									Отримати текст елемента	${element}	${item}
-	Run Keyword And Return If	'${element}' == 'items.quantity'									Отримати ціле число	${element}		0			${item}
-	Run Keyword And Return If	'${element}' == 'items.classification.description'					Отримати класифікацію				${element}	${item}
-	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].scheme'			Отримати інформацію з ${element}	${element}	${item}
-	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].id'				Отримати строку	${element}			3			${item}
-	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].description'	Отримати класифікацію				${element}	${item}
-	Run Keyword And Return If	'items.deliveryAddres' in '${element}'								Отримати текст елемента				${element}	${item}
+	Run Keyword And Return If	'${element}' == 'items.classification.scheme'						Отримати інформацію з items.classification.scheme'	${element}		${item}
+	Run Keyword And Return If	'${element}' == 'items.classification.id'							Отримати строку										${element}	3	${item}
+	Run Keyword And Return If	'${element}' == 'items.description'									Отримати текст елемента								${element}		${item}
+	Run Keyword And Return If	'${element}' == 'items.quantity'									Отримати число										${element}	0	${item}
+	Run Keyword And Return If	'${element}' == 'items.classification.description'					Отримати класифікацію								${element}		${item}
+	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].scheme'			Отримати інформацію з ${element}					${element}		${item}
+	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].id'				Отримати строку										${element}	3	${item}
+	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].description'	Отримати класифікацію								${element}		${item}
+	Run Keyword And Return If	'items.deliveryAddres' in '${element}'								Отримати текст елемента								${element}		${item}
 
-	Run Keyword And Return If	'${element}' == 'items.deliveryDate.endDate'			Отримати дату та час	${element}	${item}
-	Run Keyword And Return If	'${element}' == 'items.unit.name'						Отримати назву			${element}	1			${item}
-	Run Keyword And Return If	'${element}' == 'items.unit.code'						Отримати код			${element}	1			${item}
-	Run Keyword And Return If	'${element}' == 'items.deliveryLocation.latitude'		Отримати число			${element}	0			${item}
-	Run Keyword And Return If	'${element}' == 'items.deliveryLocation.longitude'		Отримати число			${element}	0			${item}
+	Run Keyword And Return If	'${element}' == 'items.deliveryDate.endDate'			Отримати дату та час	${element}		${item}
+	Run Keyword And Return If	'${element}' == 'items.unit.name'						Отримати назву			${element}	1	${item}
+	Run Keyword And Return If	'${element}' == 'items.unit.code'						Отримати код			${element}	1	${item}
+	Run Keyword And Return If	'${element}' == 'items.deliveryLocation.latitude'		Отримати число			${element}	0	${item}
+	Run Keyword And Return If	'${element}' == 'items.deliveryLocation.longitude'		Отримати число			${element}	0	${item}
 
 	Wait Until Element Is Visible	${tender_data_${element}}	timeout=${COMMONWAIT}
 	${result_full} =				Get Text	${tender_data_${element}}
@@ -320,20 +318,19 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Run Keyword And Return If	'${element}' == 'tenderPeriod.endDate'			Отримати дату та час	${element}
 	Run Keyword And Return If	'${element}' == 'complaintPeriod.endDate'		Отримати дату та час	${element}
 	Run Keyword And Return If	'${element}' == 'bids'							Перевірити присутність bids
-	Run Keyword And Return If	'${element}' == 'value.currency'				Отримати інформацію з ${element}	${element}
-	Run Keyword And Return If	'${element}' == 'value.valueAddedTaxIncluded'	Отримати інформацію з ${element}	${element}
-	Run Keyword And Return If	'${element}' == 'status'						Отримати інформацію з ${element}	${element}
-	Run Keyword And Return If	'${element}' == 'documents[0].title'			Отримати інформацію з ${element}	${element}
-	Run Keyword And Return If	'${element}' == 'causeDescription'				Отримати інформацію з ${element}	${element}
-	Run Keyword And Return If	'${element}' == 'minimalStep.amount'			Отримати інформацію з ${element}	${element}	0
-	Run Keyword And Return If	'${element}' == 'title_en'						Отримати текст елемента	${element}
-	Run Keyword And Return If	'${element}' == 'title_ru'						Отримати текст елемента	${element}
-	Run Keyword And Return If	'${element}' == 'description_en'				Отримати текст елемента	${element}
-	Run Keyword And Return If	'${element}' == 'description_ru'				Отримати текст елемента	${element}
+	Run Keyword And Return If	'${element}' == 'value.currency'				Отримати інформацію з value.currency				${element}
+	Run Keyword And Return If	'${element}' == 'value.valueAddedTaxIncluded'	Отримати інформацію з value.valueAddedTaxIncluded	${element}
+	Run Keyword And Return If	'${element}' == 'status'						Отримати інформацію з status						${element}
+	Run Keyword And Return If	'${element}' == 'documents[0].title'			Отримати інформацію з documents[0].title			${element}
+	Run Keyword And Return If	'${element}' == 'causeDescription'				Отримати інформацію з causeDescription				${element}
+	Run Keyword And Return If	'${element}' == 'minimalStep.amount'			Отримати інформацію з minimalStep.amount			${element}	0
+	Run Keyword And Return If	'${element}' == 'title_en'						Отримати текст елемента	title_en
+	Run Keyword And Return If	'${element}' == 'title_ru'						Отримати текст елемента	title_ru
+	Run Keyword And Return If	'${element}' == 'description_en'				Отримати текст елемента	description_en
+	Run Keyword And Return If	'${element}' == 'description_ru'				Отримати текст елемента	description_ru
 
-	Run Keyword And Return If	'${element}' == 'auctionPeriod.startDate'				Отримати інформацію з ${element}	${element}	${item}
-	Run Keyword And Return If	'${element}' == 'procurementMethodType'					Отримати інформацію з ${element}	${element}
-
+	Run Keyword And Return If	'${element}' == 'auctionPeriod.startDate'					Отримати інформацію з ${element}	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'procurementMethodType'						Отримати інформацію з ${element}	${element}
 	Run Keyword And Return If	'${element}' == 'cancellations[0].status'					Отримати інформацію з ${element}	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'cancellations[0].documents[0].title'		Отримати інформацію з ${element}	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'procuringEntity.identifier.scheme'			Отримати інформацію з ${element}	${element}	${item}
@@ -388,8 +385,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Отримати текст елемента
 	[Arguments]  ${element_name}  ${item}=${1}
-#	${index} =  					Run Keyword If	${item} != 0	Evaluate	${item}-1
-#	...  ELSE	Set Variable	${item}
 	${index} =  					Evaluate	${item}-1
 	Wait Until Element Is Visible	${tender_data_${element_name}}
 	@{itemsList}=					Get Webelements	${tender_data_${element_name}}
@@ -417,7 +412,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	[Arguments]  ${element_name}
 	${value}=	Get text			${tender_data_${element_name}}
 	${value}=	Replace String		${value}	${SPACE}	${EMPTY}
-	${result}=	Convert To Number	${value}
+	${result}=	Convert To Number	${value}	2
 	[return]	${result}
 
 
@@ -446,7 +441,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 Отримати класифікацію
 	[Arguments]  ${element_name}  ${item}=${1}
 	${result_full} =	Отримати текст елемента	${element_name}	${item}
-	debug       get class
 	${reg_expresion} =	Set Variable	[0-9A-zА-Яа-яёЁЇїІіЄєҐґ\\s\\:]+\: \\w+[\\d\\.\\-]+ ([А-Яа-яёЁЇїІіЄєҐґ\\s;,\\"_\\(\\)\\.]+)
 	${result} =			Get Regexp Matches	${result_full}	${reg_expresion}	1
 	[return]	${result[0]}
@@ -491,7 +485,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Отримати інформацію з value.currency
 	[Arguments]    ${element_name}
-	${currency} =	Отримати строку	${element_name}	1
+	${currency} =	Отримати текст елемента	${element_name}
 	${currency_type} =	get_currency_type	${currency}
 	[return]  ${currency_type}
 
@@ -554,8 +548,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	${first_part} =		Отримати строку	${element}	1	${item}
 	${second_part} =	Отримати строку	${element}	2	${item}
 	${result} =			Set Variable	${first_part} ${second_part}
-	${currency_type} =	get_classification_type	${result}
-	[return]  ${currency_type}
+	${class_type} =	get_classification_type	${result}
+	[return]  ${class_type}
 
 
 Отримати інформацію з items.additionalClassifications.[0].description
