@@ -243,8 +243,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	[Arguments]  ${item_id}
 	${with_lot} = 	Run Keyword And Return Status		Wait Until Element Is Visible		css=#lotSection	timeout=${COMMONWAIT}
 
-	Run Keyword If		'add_item' in ${TEST_TAGS}		Wait Until Keyword Succeeds	2min	10s	Check Condition With Reload	${with_lot}	1	>	items
-		...	ELSE IF		'add_lot' in ${TEST_TAGS}		Wait Until Keyword Succeeds	2min	10s	Check Condition With Reload	${with_lot}	1	>	lots
+	Run Keyword If		'add_item' in ${TEST_TAGS}		Wait Until Keyword Succeeds	2min	10s	Check Condition With Reload	1	${item_id}
+		...	ELSE IF		'add_lot' in ${TEST_TAGS}		Wait Until Keyword Succeeds	2min	10s	Check Condition With Reload	1	${item_id}
 
 	${tender_data} = 							Execute Javascript	return angular.element("#tenderId").scope().model.ad;
 	mark step									${tender_data}
@@ -267,7 +267,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 	${element} = 	Set Variable	items.${element}
 
-	Run Keyword And Return If	'${element}' == 'items.classification.scheme'						Отримати інформацію з items.classification.scheme'	${element}		${item}
+	Run Keyword And Return If	'${element}' == 'items.classification.scheme'						Отримати інформацію з items.classification.scheme	${element}		${item}
 	Run Keyword And Return If	'${element}' == 'items.classification.id'							Отримати строку										${element}	3	${item}
 	Run Keyword And Return If	'${element}' == 'items.description'									Отримати текст елемента								${element}		${item}
 	Run Keyword And Return If	'${element}' == 'items.quantity'									Отримати число										${element}	0	${item}
@@ -1170,26 +1170,15 @@ Try Search Element
 
 
 Check Condition With Reload
-	[Arguments]  ${with_lots}  ${tab_number}  ${condition}  ${object}
+	[Arguments]  ${tab_number}  ${item_id}
+
 	Mark Step	in_check_condition_with_reload
-
-	${locator} = 	Set Variable If
-		...  ${with_lots}	\#lotSection
-		...  should_be_locator
-
-
-	Reload And Switch To Tab			${tab_number}
+	Reload And Switch To Tab	${tab_number}
 	Wait For Ajax
-	Wait Until Element Is Enabled		css=${locator}	3s
 
-
-	${tender_data} = 									Execute Javascript	return angular.element("${locator}").scope().model.ad;
-	${current_items_count}  ${current_lots_count} = 	get_item_lot_count	${tender_data}
-
-	${result} = 	Set Variable If
-		...  'items' in '${object}' and ${current_${object}_count} ${condition} ${number_of_items}/${number_of_lots}	${True}
-		...  'lots' in '${object}' and ${current_${object}_count} ${condition} ${number_of_lots}	${True}
-		...  ${False}
+	${tender_data} = 	Execute Javascript	return angular.element("#tenderId").scope().model.ad;
+	${result} = 		is_object_present	${tender_data}	${item_id}
+	Run Keyword Unless	${result}	Fail
 
 	[return]	${result}
 

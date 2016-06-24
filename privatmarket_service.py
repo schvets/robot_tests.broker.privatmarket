@@ -243,10 +243,21 @@ def get_lot_num_by_item(tender_data, item_index):
     return item_num, lot_num, lots_count
 
 
-def get_item_lot_count(tender_data):
-    items = tender_data['items']
-    lots = tender_data['lots']
+def is_object_present(tender_data, object_id):
+    result = False
 
-    lots_count = len(lots)
-    items_count = len(items)
-    return items_count, lots_count
+    if 'i-' in object_id:
+        items = tender_data['items']
+        for item in items:
+            if object_id in item['description']:
+                result = True
+                break
+
+    if 'l-' in object_id:
+        lots = tender_data['lots']
+        for lot in lots:
+            if object_id in lot['description']:
+                result = True
+                break
+
+    return result
