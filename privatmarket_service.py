@@ -11,7 +11,7 @@ def get_month_number(month_name):
                u"июля", u"авг.", u"сент.", u"окт.", u"нояб.", u"дек.",
                u"січ.", u"лют.", u"бер.", u"квіт.", u"трав.", u"черв.",
                u"лип.", u"серп.", u"вер.", u"жовт.", u"лист.", u"груд."]
-    return monthes.index(month_name)%12 + 1
+    return monthes.index(month_name) % 12 + 1
 
 
 def read_file_content(file_path):
@@ -79,14 +79,14 @@ def get_time_with_offset(date):
 
 def get_procurement_method_type(method_name):
     type_dictionary = {
-                       u'Допорогові закупівлі': 'belowThreshold',
-                       u'Відкриті торги': 'aboveThresholdUA',
-                       u'Відкриті торги з публікацією англ.мовою': 'aboveThresholdEU',
-                       u'Звіт про укладений договір': 'reporting',
-                       u'Переговорна процедура': 'negotiation',
-                       u'Переговорна процедура за нагальною потребою': 'negotiation.quick',
-                       u'Переговорна процедура (для потреб оборони)': 'aboveThresholdUA.defense'
-                       }
+        u'Допорогові закупівлі': 'belowThreshold',
+        u'Відкриті торги': 'aboveThresholdUA',
+        u'Відкриті торги з публікацією англ.мовою': 'aboveThresholdEU',
+        u'Звіт про укладений договір': 'reporting',
+        u'Переговорна процедура': 'negotiation',
+        u'Переговорна процедура за нагальною потребою': 'negotiation.quick',
+        u'Переговорна процедура (для потреб оборони)': 'aboveThresholdUA.defense'
+    }
     type_name = type_dictionary.get(method_name)
     if type_name:
         return type_name
@@ -96,11 +96,11 @@ def get_procurement_method_type(method_name):
 
 def get_doc_identifier(doc_type_name):
     type_dictionary = {
-                       'eligibility_documents': 20,
-                       'qualification_documents': 21,
-                       'documents': 48,
-                       'financial_documents': 49
-                       }
+        'eligibility_documents': 20,
+        'qualification_documents': 21,
+        'documents': 48,
+        'financial_documents': 49
+    }
     type_name = type_dictionary.get(doc_type_name)
     return str(type_name)
 
@@ -173,37 +173,79 @@ def get_unit_code(name):
 
 def get_status_type(status_name):
     type_dictionary = {
-                       u'Период уточнений': 'active.enquiries',
-                       u'Период уточнений завершен': 'active.enquiries.ended',
-                       u'Подача предложений': 'active.tendering',
-                       u'Идут торги': 'active.auction',
-                       u'Квалификация победителя': 'active.qualification',
-                       u'Предложения рассмотрены': 'active.awarded',
-                       u'Закупка не состоялась': 'unsuccessful',
-                       u'Завершено': 'complete',
-                       u'Отменено': 'cancelled'
-                       }
+        u'Період уточнень': 'active.enquiries',
+        u'Період уточнень завершено': 'active.enquiries.ended',
+        u'Подача пропозицій': 'active.tendering',
+        u'Очікування пропозицій': 'active.auction',
+        u'Кваліфікація переможця': 'active.qualification',
+        u'Пропозиції розглянуто': 'active.awarded',
+        u'Закупівля не відбулась': 'unsuccessful',
+        u'Pавершена закупівля': 'complete',
+        u'Відмінена закупівля': 'cancelled'
+    }
     type_name = type_dictionary.get(status_name)
+    if type_name:
+        return type_name
+    else:
+        return status_name
+
     return type_name
 
 
 def get_lot_num_by_item(tender_data, item_index):
     items = tender_data['items']
-    lots = tender_data['lots']
 
-    item_num = 0
     lot_num = 0
+    item_num = 1
+    lots_count = 0
     related_lot = None
+    count_of_items_in_lot_dictionary = {}
 
-    for item in items:
-        if item_index in item['description']:
+    if 'lots' in tender_data:
+        lots = tender_data['lots']
+        lots_count = len(lots)
+        lot_num = 1
+
+        for item in items:
             related_lot = item['relatedLot']
-            break
-        item_num += 1
+            if related_lot in count_of_items_in_lot_dictionary:
+                count_of_items_in_lot_dictionary[related_lot] += 1
+            else:
+                count_of_items_in_lot_dictionary[related_lot] = 1
 
-    for lot in lots:
-        lot_num += 1
-        if related_lot in lot['id']:
-            break
+            if item_index in item['description']:
+                break
 
-    return (item_num, lot_num)
+        for lot in lots:
+            if related_lot in lot['id']:
+                break
+            lot_num += 1
+
+        item_num = count_of_items_in_lot_dictionary[related_lot]
+    else:
+        for item in items:
+            if item_index in item['id']:
+                break
+                item_num += 1
+
+    return item_num, lot_num, lots_count
+
+
+def is_object_present(tender_data, object_id):
+    result = False
+
+    if 'i-' in object_id:
+        items = tender_data['items']
+        for item in items:
+            if object_id in item['description']:
+                result = True
+                break
+
+    if 'l-' in object_id:
+        lots = tender_data['lots']
+        for lot in lots:
+            if object_id in lot['description']:
+                result = True
+                break
+
+    return result
