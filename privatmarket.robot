@@ -313,7 +313,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Run Keyword And Return If	'${element}' == 'items.deliveryAddress.countryName_ru'				Отримати інформацію з елемента зі зміною локалізації			${element}	${item}	ru
 	Run Keyword And Return If	'${element}' == 'items.deliveryAddress.countryName_en'				Отримати інформацію з елемента зі зміною локалізації			${element}	${item}	en
 	Run Keyword And Return If	'${element}' == 'items.classification.scheme'						Отримати інформацію з items.classification.scheme				${element}	${item}
-	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].scheme'			Отримати інформацію з items.additionalClassifications[0].scheme	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].scheme'			Отримати інформацію з items.addClassifications[0].scheme		${element}	${item}
 	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].id'				Отримати строку													${element}	3		${item}
 	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].description'	Отримати класифікацію											${element}	${item}
 	Run Keyword And Return If	'${element}' == 'items.additionalClassifications.[0].description'	Отримати інформацію з items.addClassifications.[0].description	${element}	${item}
@@ -570,6 +570,15 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	${text} =	Отримати текст елемента  ${element}
 	${result} =	Set Variable If	'Відмінено' in '${text}'	active
 	[return]  ${result}
+
+
+Отримати інформацію з items.addClassifications[0].scheme
+	[Arguments]  ${element}  ${item}
+	${first_part} =		Отримати строку	${element}	1	${item}
+	${second_part} =	Отримати строку	${element}	2	${item}
+	${result} =			Set Variable	${first_part} ${second_part}
+	${class_type} =	get_classification_type	${result}
+	[return]  ${class_type}
 
 
 Отримати інформацію з items.addClassifications.[0].description
