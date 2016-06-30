@@ -32,6 +32,8 @@ ${tender_data_items.deliveryDate.endDate}						xpath=//div[contains(@class,'deli
 ${tender_data_items.deliveryLocation.latitude}					css=span.latitude
 ${tender_data_items.deliveryLocation.longitude}					css=span.longitude
 ${tender_data_items.deliveryAddress.countryName}				css=prz-address[addr='adb.deliveryAddress'] span#countryName
+${tender_data_items.deliveryAddress.countryName_ru}				css=prz-address[addr='adb.deliveryAddress'] span#countryName
+${tender_data_items.deliveryAddress.countryName_en}				css=prz-address[addr='adb.deliveryAddress'] span#countryName
 ${tender_data_items.deliveryAddress.postalCode}					css=prz-address[addr='adb.deliveryAddress'] span#postalCode
 ${tender_data_items.deliveryAddress.region}						css=prz-address[addr='adb.deliveryAddress'] span#region
 ${tender_data_items.deliveryAddress.locality}					css=prz-address[addr='adb.deliveryAddress'] span#locality
@@ -55,26 +57,6 @@ ${tender_data_lots.value.amount}								css=#lotAmount
 ${tender_data_lots.value.currency}								css=#lotCcy
 ${tender_data_lots.value.valueAddedTaxIncluded}					css=#lotTax
 ${tender_data_bids}												xpath=(//table[@class='bids']//tr)[2]
-${tender_data_cancellations[0].status}							xpath=//*[@id='nolotSection']/div[1]/div[1]
-${tender_data_cancellations[0].reason}							xpath=//*[@id='nolotSection']/div[1]/div[2]
-${tender_data_cancellations[0].documents[0].title}				css=.file-name.ng-binding
-${tender_data_title_en}											css=.title-div.ng-binding
-${tender_data_title_ru}											css=.title-div.ng-binding
-${tender_data_description_en}									css=#tenderDescription
-${tender_data_description_ru}									css=#tenderDescription
-${tender_data_procuringEntity.address.countryName}				css=#procurerAddr #countryName
-${tender_data_procuringEntity.address.locality}					css=#procurerAddr #locality
-${tender_data_procuringEntity.address.postalCode}				css=#procurerAddr #postalCode
-${tender_data_procuringEntity.address.region}					css=#procurerAddr #region
-${tender_data_procuringEntity.address.streetAddress}			css=#procurerAddr #streetAddress
-${tender_data_procuringEntity.contactPoint.name}				xpath=//div[@class='delivery-info']/div[2]/div[@class='info-item-val ng-binding']
-${tender_data_procuringEntity.contactPoint.telephone}			xpath=//div[@class='delivery-info']/div[4]/div[@class='info-item-val ng-binding']
-${tender_data_procuringEntity.contactPoint.url}					xpath=//div[@class='delivery-info']/div[5]/div[@class='info-item-val ng-binding']
-${tender_data_procuringEntity.identifier.legalName}				xpath=//div[@id='procurerLegalName']/div[2]
-${tender_data_procuringEntity.identifier.scheme}				xpath=//div[@id='procurerId']/div[1]
-${tender_data_procuringEntity.identifier.id}					xpath=//div[@id='procurerId']/div[2]
-${tender_data_causeDescription}									css=#tenderType>div
-${tender_data_documents[0].title}								css=.file-name.ng-binding
 ${complaints[0].title}											xpath=(//div[@class='title']/span)[1]
 ${complaints[0].description}									xpath=(//div[@ng-bind-html='q.description'])[1]
 ${complaints[0].documents.title}								xpath=(//span[@class='file-name'])[1]
@@ -84,6 +66,7 @@ ${locator_tenderCreation.buttonEdit}			xpath=//button[@ng-click='act.createAfp()
 ${locator_tenderCreation.buttonSave}			css=button.btn.btn-success
 ${locator_tenderCreation.buttonBack}			xpath=//a[@ng-click='act.goBack()']
 ${locator_tenderCreation.description}			css=textarea[ng-model='model.filterData.adbName']
+
 ${locator_tenderClaim.buttonCreate}				css=button[ng-click='act.createAfp()']
 ${locator_tenderClaim.fieldPrice}				xpath=//input[@ng-model='model.price']
 ${locator_tenderClaim.checkedLot.fieldPrice}	xpath=//input[@ng-model='model.checkedLot.userPrice']
@@ -93,6 +76,56 @@ ${locator_tenderClaim.buttonCancel}				css=button[ng-click='act.delAfp()']
 ${locator_tenderClaim.buttonGoBack}				css=a[ng-click='act.ret2Ad()']
 ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
+
+${tender_data_cancellations[0].status}						xpath=//div[@class='info-div']/div[last()]/div/div[1]/div[1]
+${tender_data_cancellations[0].reason}						xpath=//div[@class='info-div']/div[last()]/div/div[1]/div[2]
+${tender_data_cancellations[0].documents[0].title}			css=.file-name.ng-binding
+${tender_data_cancellations[0].documents[0].description}	xpath=//div[@class='file-descriptor']/span[2]
+${tender_data_title_en}										css=.title-div.ng-binding
+${tender_data_title_ru}										css=.title-div.ng-binding
+${tender_data_description_en}								css=#tenderDescription
+${tender_data_description_ru}								css=#tenderDescription
+
+
+${tender_data_procuringEntity.address.countryName}		css=#procurerAddr #countryName
+${tender_data_procuringEntity.address.locality}			css=#procurerAddr #locality
+${tender_data_procuringEntity.address.postalCode}		css=#procurerAddr #postalCode
+${tender_data_procuringEntity.address.region}			css=#procurerAddr #region
+${tender_data_procuringEntity.address.streetAddress}	css=#procurerAddr #streetAddress
+
+${tender_data_procuringEntity.contactPoint.name}		xpath=//div[@class='delivery-info']/div[2]/div[@class='info-item-val ng-binding']
+${tender_data_procuringEntity.contactPoint.telephone}	xpath=//div[@class='delivery-info']/div[4]/div[@class='info-item-val ng-binding']
+${tender_data_procuringEntity.contactPoint.url}			xpath=//div[@class='delivery-info']/div[5]/div[@class='info-item-val ng-scope']
+${tender_data_procuringEntity.identifier.legalName}		xpath=//div[@id='procurerLegalName']/div[2]
+${tender_data_procuringEntity.identifier.scheme}		xpath=//div[@class='delivery-info ng-scope']/div[2]/div[2]
+${tender_data_procuringEntity.identifier.id}			xpath=//div[@id='procurerId']/div[2]
+
+${tender_data_documents[0].title}						css=#tenderDocs .file-name
+
+${tender_data_items.additionalClassifications.[0].description}		xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
+${tender_data_items.additionalClassifications.[0].id}				xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
+${tender_data_items.additionalClassifications.[0].scheme}			xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
+
+${tender_data_causeDescription}							css=#tenderType>div
+
+${tender_data_awards[0].status}									xpath=//div[@class='modal-body info-div ng-scope']/div[10]/div[2]
+${tender_data_awards[0].suppliers[0].address.countryName}		xpath=(//prz-address[@id='procurerAddr'])[2]//*[@id='countryName']
+${tender_data_awards[0].suppliers[0].address.locality}			xpath=(//prz-address[@id="procurerAddr"])[2]//*[@id='locality']
+${tender_data_awards[0].suppliers[0].address.postalCode}		xpath=(//prz-address[@id="procurerAddr"])[2]//*[@id='postalCode']
+${tender_data_awards[0].suppliers[0].address.region}			xpath=(//prz-address[@id="procurerAddr"])[2]//*[@id='region']
+${tender_data_awards[0].suppliers[0].address.streetAddress}		xpath=(//prz-address[@id="procurerAddr"])[2]//*[@id='streetAddress']
+${tender_data_awards[0].suppliers[0].contactPoint.telephone}	xpath=//div[@class='modal-body info-div ng-scope']/div[7]/div[2]
+${tender_data_awards[0].suppliers[0].contactPoint.name}			xpath=//div[@class='modal-body info-div ng-scope']/div[6]/div[2]
+${tender_data_awards[0].suppliers[0].contactPoint.email}		xpath=//div[@class='modal-body info-div ng-scope']/div[8]/div[2]
+${tender_data_awards[0].suppliers[0].identifier.scheme}			xpath=//div[@class='modal-body info-div ng-scope']/div[2]/div[2]
+${tender_data_awards[0].suppliers[0].identifier.legalName}		xpath=//div[@class='modal-body info-div ng-scope']/div[1]/div[2]
+${tender_data_awards[0].suppliers[0].identifier.id}				xpath=//div[@class='modal-body info-div ng-scope']/div[3]/div[2]
+${tender_data_awards[0].suppliers[0].name}						xpath=//div[@class='modal-body info-div ng-scope']/div[1]/div[2]
+${tender_data_awards[0].value.valueAddedTaxIncluded}			xpath=//div[@class='modal-body info-div ng-scope']/div[9]/div[2]
+${tender_data_awards[0].value.currency}							xpath=//div[@class='modal-body info-div ng-scope']/div[9]/div[2]
+${tender_data_awards[0].value.amount}							xpath=//div[@class='modal-body info-div ng-scope']/div[9]/div[2]
+${tender_data_awards[0].documents[0].title}						css=.modal-body .file-name
+${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-div ng-scope']/div[4]/div[2]
 
 *** Keywords ***
 Підготувати дані для оголошення тендера
@@ -267,21 +300,28 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 	${element} = 	Set Variable	items.${element}
 
-	Run Keyword And Return If	'${element}' == 'items.classification.scheme'						Отримати інформацію з items.classification.scheme	${element}		${item}
-	Run Keyword And Return If	'${element}' == 'items.classification.id'							Отримати строку										${element}	3	${item}
-	Run Keyword And Return If	'${element}' == 'items.description'									Отримати текст елемента								${element}		${item}
-	Run Keyword And Return If	'${element}' == 'items.quantity'									Отримати число										${element}	0	${item}
-	Run Keyword And Return If	'${element}' == 'items.classification.description'					Отримати класифікацію								${element}		${item}
-	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].scheme'			Отримати інформацію з ${element}					${element}		${item}
-	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].id'				Отримати строку										${element}	3	${item}
-	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].description'	Отримати класифікацію								${element}		${item}
-	Run Keyword And Return If	'items.deliveryAddres' in '${element}'								Отримати текст елемента								${element}		${item}
+	Run Keyword And Return If	'${element}' == 'items.classification.scheme'						Отримати інформацію з ${element}	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'items.classification.id'							Отримати строку		${element}		3			${item}
+	Run Keyword And Return If	'${element}' == 'items.description'									Отримати текст елемента				${element}	${item}
+	Run Keyword And Return If	'${element}' == 'items.quantity'									Отримати ціле число	${element}		0			${item}
+	Run Keyword And Return If	'${element}' == 'items.classification.description'					Отримати класифікацію				${element}	${item}
+	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].scheme'			Отримати інформацію з ${element}	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].id'				Отримати строку	${element}			3			${item}
+	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].description'	Отримати класифікацію				${element}	${item}
+	Run Keyword And Return If	'${element}' == 'items.deliveryAddress.countryName_en'				Отримати інформацію з елемента зі зміною локалізації	${element}	${item}	en
+	Run Keyword And Return If	'${element}' == 'items.deliveryAddress.countryName_ru'				Отримати інформацію з елемента зі зміною локалізації	${element}	${item}	ru
+	Run Keyword And Return If	'items.deliveryAddres' in '${element}'								Отримати текст елемента				${element}	${item}
 
 	Run Keyword And Return If	'${element}' == 'items.deliveryDate.endDate'			Отримати дату та час	${element}		${item}
 	Run Keyword And Return If	'${element}' == 'items.unit.name'						Отримати назву			${element}	1	${item}
 	Run Keyword And Return If	'${element}' == 'items.unit.code'						Отримати код			${element}	1	${item}
 	Run Keyword And Return If	'${element}' == 'items.deliveryLocation.latitude'		Отримати число			${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'items.deliveryLocation.longitude'		Отримати число			${element}	0	${item}
+
+
+	Run Keyword And Return If	'${element}' == 'items.additionalClassifications.[0].description'			Отримати інформацію з ${element}	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'items.additionalClassifications.[0].id'					Отримати інформацію з ${element}	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'items.additionalClassifications.[0].scheme'				Отримати інформацію з ${element}	${element}	${item}
 
 	Wait Until Element Is Visible	${tender_data_${element}}	timeout=${COMMONWAIT}
 	${result_full} =				Get Text	${tender_data_${element}}
@@ -318,22 +358,27 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Run Keyword And Return If	'${element}' == 'tenderPeriod.endDate'			Отримати дату та час	${element}
 	Run Keyword And Return If	'${element}' == 'complaintPeriod.endDate'		Отримати дату та час	${element}
 	Run Keyword And Return If	'${element}' == 'bids'							Перевірити присутність bids
-	Run Keyword And Return If	'${element}' == 'value.currency'				Отримати інформацію з value.currency				${element}
-	Run Keyword And Return If	'${element}' == 'value.valueAddedTaxIncluded'	Отримати інформацію з value.valueAddedTaxIncluded	${element}
-	Run Keyword And Return If	'${element}' == 'status'						Отримати інформацію з status						${element}
-	Run Keyword And Return If	'${element}' == 'documents[0].title'			Отримати інформацію з documents[0].title			${element}
-	Run Keyword And Return If	'${element}' == 'causeDescription'				Отримати інформацію з causeDescription				${element}
-	Run Keyword And Return If	'${element}' == 'minimalStep.amount'			Отримати інформацію з minimalStep.amount			${element}	0
-	Run Keyword And Return If	'${element}' == 'title_en'						Отримати текст елемента	title_en
-	Run Keyword And Return If	'${element}' == 'title_ru'						Отримати текст елемента	title_ru
-	Run Keyword And Return If	'${element}' == 'description_en'				Отримати текст елемента	description_en
-	Run Keyword And Return If	'${element}' == 'description_ru'				Отримати текст елемента	description_ru
+	Run Keyword And Return If	'${element}' == 'value.currency'				Отримати інформацію з ${element}	${element}
+	Run Keyword And Return If	'${element}' == 'value.valueAddedTaxIncluded'	Отримати інформацію з ${element}	${element}
+	Run Keyword And Return If	'${element}' == 'status'						Отримати інформацію з ${element}	${element}
+	Run Keyword And Return If	'${element}' == 'causeDescription'				Отримати інформацію з ${element}	${element}
+	Run Keyword And Return If	'${element}' == 'minimalStep.amount'			Отримати інформацію з ${element}	${element}	0
+	Run Keyword And Return If	'${element}' == 'title_en'						Отримати інформацію з елемента зі зміною локалізації	${element}	0	en
+	Run Keyword And Return If	'${element}' == 'title_ru'						Отримати інформацію з елемента зі зміною локалізації	${element}	0	ru
+	Run Keyword And Return If	'${element}' == 'description_en'				Отримати інформацію з елемента зі зміною локалізації	${element}	0	en
+	Run Keyword And Return If	'${element}' == 'description_ru'				Отримати інформацію з елемента зі зміною локалізації	${element}	0	ru
+	Run Keyword And Return If	'${element}' == 'auctionPeriod.startDate'		Отримати інформацію з ${element}	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'procurementMethodType'			Отримати інформацію з ${element}	${element}
+	Run Keyword And Return If	'${element}' == 'cancellations[0].status'		Отримати інформацію з ${element}	${element}
 
-	Run Keyword And Return If	'${element}' == 'auctionPeriod.startDate'					Отримати інформацію з ${element}	${element}	${item}
-	Run Keyword And Return If	'${element}' == 'procurementMethodType'						Отримати інформацію з ${element}	${element}
-	Run Keyword And Return If	'${element}' == 'cancellations[0].status'					Отримати інформацію з ${element}	${element}	${item}
-	Run Keyword And Return If	'${element}' == 'cancellations[0].documents[0].title'		Отримати інформацію з ${element}	${element}	${item}
-	Run Keyword And Return If	'${element}' == 'procuringEntity.identifier.scheme'			Отримати інформацію з ${element}	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'causeDescription'											Отримати інформацію з ${element}	${element}
+	Run Keyword And Return If	'${element}' == 'lots.value.amount'											Отримати число	${element}	0	${item}
+	Run Keyword And Return If	'${element}' == 'awards[0].status'											Отримати інформацію з ${element}	${element}
+	Run Keyword And Return If	'${element}' == 'awards[0].value.valueAddedTaxIncluded'						Отримати інформацію з ${element}	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'awards[0].value.currency'									Отримати інформацію з ${element}	${element}
+	Run Keyword And Return If	'${element}' == 'awards[0].value.amount'									Отримати інформацію з ${element}	${element}
+	Run Keyword And Return If	'${element}' == 'awards[0].documents[0].title'								Отримати інформацію з ${element}	${element}
+
 
 	Wait Until Element Is Visible	${tender_data_${element}}	timeout=${COMMONWAIT}
 	${result_full} =				Get Text	${tender_data_${element}}
@@ -479,7 +524,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	[Arguments]  ${element}
 	Wait For Element With Reload	${tender_data_${element}}	1
 	${start_date} =					Отримати дату та час	${element}
-	${result} =	get_time_with_offset	${start_date}
+	${result} =						get_time_with_offset	${start_date}
 	[return]  ${result}
 
 
@@ -525,31 +570,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 Отримати інформацію з cancellations[0].status
 	[Arguments]  ${element}
 	${text} =	Отримати текст елемента  ${element}
-	${result} =	Set Variable If	'Отменено' in '${text}'	active
+	${result} =	Set Variable If	'Відмінено' in '${text}'	active
 	[return]  ${result}
-
-
-Отримати інформацію з cancellations[0].documents[0].title
-	[Arguments]  ${element}
-	${text} =		Отримати текст елемента  ${element}
-	${newText} =	Replace String	${text}	\\	\\\\
-	[return]	${newText}
-
-
-Отримати інформацію з documents[0].title
-	[Arguments]  ${element}
-	${text} =		Отримати текст елемента  ${element}
-	${newText} =	Replace String		${text}	\\	\\\\
-	[return]	${newText}
-
-
-Отримати інформацію з items.additionalClassifications[0].scheme
-	[Arguments]  ${element}  ${item}
-	${first_part} =		Отримати строку	${element}	1	${item}
-	${second_part} =	Отримати строку	${element}	2	${item}
-	${result} =			Set Variable	${first_part} ${second_part}
-	${class_type} =	get_classification_type	${result}
-	[return]  ${class_type}
 
 
 Отримати інформацію з items.additionalClassifications.[0].description
@@ -578,27 +600,60 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 
 Отримати інформацію з causeDescription
-	[Arguments]  ${element}  ${item}
+	[Arguments]  ${element}  ${item}=${0}
 	Wait Enable And Click Element		css=#tenderType>span
 	${text} =	Отримати текст елемента  ${element}  ${item}
 	[return]	${text}
 
 
-Отримати інформацію з procuringEntity.identifier.scheme
+Отримати інформацію з елемента зі зміною локалізації
+	[Arguments]  ${element}  ${item}  ${localization}
+	Click Element						css=a#lang_${localization}
+	Wait For Ajax
+	Wait Until Element Is Visible		css=span#lang_${localization}	timeout=${COMMONWAIT}
+	Wait Until Element Is Visible		css=#nolotSection div[class='info-item'] a	timeout=${COMMONWAIT}
+	Wait Until Element Is Enabled		css=#nolotSection div[class='info-item'] a	timeout=${COMMONWAIT}
+	Click Element						css=#nolotSection div[class='info-item'] a
+	${text} =							Отримати текст елемента  ${element}  ${item}
+	[return]	${text}
+
+
+Отримати інформацію з awards[0].documents[0].title
+	[Arguments]  ${element}
+	Click Element						xpath=//tr[@class=' bold']/td[2]/a
+	Wait Until Element Is Visible		xpath=//div[@class='modal-body info-div ng-scope']/div[10]/div[2]	timeout=${COMMONWAIT}
+	Wait For Ajax
+	${text} =							Отримати текст елемента  ${element}
+	[return]	${text}
+
+Отримати інформацію з awards[0].status
+	[Arguments]  ${element}
+	${text} =							Отримати текст елемента  ${element}
+	${newText} =						Set Variable If	'Розглядається' in '${text}'	active
+	[return]	${newText}
+
+
+Отримати інформацію з awards[0].value.amount
+	[Arguments]  ${element}
+	${text} =							Отримати число			${element}	0
+	Click Element						css=.icon-remove.pull-right
+	Wait Until Element Is Not Visible	css=.icon-remove.pull-right
+	[return]	${text}
+
+
+Отримати інформацію з awards[0].value.currency
+	[Arguments]  ${element}
+	${currency} =						Отримати строку	${element}	1
+	${currency_type} =					get_currency_type	${currency}
+	[return]	${currency_type}
+
+
+Отримати інформацію з awards[0].value.valueAddedTaxIncluded
 	[Arguments]  ${element}  ${item}
-	${text} =		Отримати текст елемента  ${element}  ${item}
-	${newText} =	Replace String		${text}	:	${EMPTY}
-	${result} =		get_identification_scheme	${newText}
-	[return]	${result}
-
-
-Отримати інформацію з minimalStep.amount
-	[Arguments]  ${element}  ${position_number}
-	${locator} =	Set Variable If
-		...  0 == ${number_of_lots}	minimalStep.amount
-		...  minimalStep_lot.amount
-	${result} =	Отримати сумму	${locator}
-	[return]	${result}
+	${value_added_tax_included} =		Get text	${tender_data_${element}}
+	${result} =							Set Variable If	'з ПДВ' in '${value_added_tax_included}'	True
+	${newResult} =						Convert To Boolean	${result}
+	[return]	${newResult}
 
 
 Отримати інформацію з featureOf
@@ -719,7 +774,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Задати питання до лоту
 	[Arguments]  ${provider}  ${tender_id}  ${lot_id}  ${question}
-	Обрати потрібний лот за id		${lot_id}
+	Обрати потрібний лот за id	${lot_id}
 	Wait Enable And Click Element	css=a[ng-click='act.sendLotEnquiry()']
 	Заповнити форму питання			${question.data.title}	${question.data.description}	${USERS.users['${provider}'].email}
 	[return]  True
@@ -735,7 +790,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	[Documentation]
 	...	${ARGUMENTS[0]} ==  username
 	...	${ARGUMENTS[1]} ==  tenderId
-	Mark Step											reload page
+
 	privatmarket.Пошук тендера по ідентифікатору		@{ARGUMENTS}[0]	@{ARGUMENTS}[1]
 
 
@@ -746,10 +801,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	...	${ARGUMENTS[1]} ==  tenderId
 	...	${ARGUMENTS[2]} ==  bid
 
-	Run Keyword If	'без прив’язки до лоту' in '${TEST_NAME}'		Fail  Така ситуація не може виникнути
-	Run Keyword If	'без нецінових показників' in '${TEST_NAME}'	Fail  Така ситуація не може виникнути
-#	TODO delete before commit
-	Run Keyword If	'до початку періоду подачі' in '${TEST_NAME}'	Fail  Така ситуація не може виникнути
+	Run Keyword If	'без прив’язки до лоту' in '${TEST_NAME}'	Fail  Така ситуація не може виникнути
+	Run Keyword If	'без нецінового показника' in '${TEST_NAME}'	Fail  Така ситуація не може виникнути
 
 	Switch browser						${ARGUMENTS[0]}
 	privatmarket.Пошук тендера по ідентифікатору	${ARGUMENTS[0]}   ${ARGUMENTS[1]}
@@ -757,10 +810,12 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Відкрити заявку
 	Wait Until Element Not Stale		${locator_tenderClaim.fieldEmail}	40
 
-	${amount} =		Set Variable		${Arguments[2].data.value.amount}
+	${amount} =	Set Variable If
+		...  'multiLotTender' in '${SUITE_NAME}'	${Arguments[2].data.lotValues[1]['value']['amount']}
+		...  ${Arguments[2].data.value.amount}
 	${amount} = 	Convert To String	${amount}
 
-	Run Keyword If	${number_of_lots} > 0	Input Text	${locator_tenderClaim.checkedLot.fieldPrice}	${amount}
+	Run Keyword If	'multiLotTender' in '${SUITE_NAME}'	Input Text	${locator_tenderClaim.checkedLot.fieldPrice}	${amount}
 		...  ELSE	Input Text	${locator_tenderClaim.fieldPrice}	${amount}
 
 	Click Element						${locator_tenderClaim.fieldEmail}
@@ -774,16 +829,15 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Scroll Page To Element				${locator_tenderClaim.buttonSend}
 	Click Button						${locator_tenderClaim.buttonSend}
 	Wait For Ajax Overflow Vanish
-
-	Close confirmation					Ваша заявка була успішно включена до черги на відправку!
+	Close confirmation					Ваша заявка была успешно помещена в очередь на отправку!
 	Wait Until Element Is Visible		css=div.afp-info.ng-scope.ng-binding
-	Wait Until Element Contains			css=div.afp-info.ng-scope.ng-binding	Номер заявки
+	wait until element contains			css=div.afp-info.ng-scope.ng-binding	Номер заявки
 	Wait For Ajax
-	${claim_id} =						Get text			css=div.afp-info.ng-scope.ng-binding
-	${result} =							Get Regexp Matches	${claim_id}	Номер заявки: (\\d*),	1
+	${claim_id}=						Get text			css=div.afp-info.ng-scope.ng-binding
+	${result}=							Get Regexp Matches	${claim_id}	Номер заявки: (\\d*),	1
 
 	Run Keyword If	'open' in '${SUITE_NAME}'	Run Keywords	Click Element	css=a[ng-click='act.ret2Ad()']
-	...   AND   Wait For Element With Reload	xpath=//table[@class='bids']//tr[1]/td[4 and contains(., 'Відправлена')]	1
+	...   AND   Wait For Element With Reload	xpath=//table[@class='bids']//tr[1]/td[4 and contains(., 'Отправлена')]	1
 
 	[return]	${Arguments[2]}
 
@@ -830,7 +884,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 	${test_name} =	Convert To Lowercase	${TEST_NAME}
 	Run Keyword If	'оновити статус цінової пропозиції' in '${test_name}'	Close confirmation	Ваша заявка была успешно помещена в очередь на отправку!
-		...  ELSE	Close confirmation	Ваша заявка була успішно збережена!
+		...  ELSE	Close confirmation	Ваша заявка была успешно сохранена!
 
 	Wait Until Element Is Visible		css=div.afp-info.ng-scope.ng-binding
 	Wait For Ajax
@@ -839,12 +893,12 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	[return]	${fieldname}
 
 
-Змінити parameters[0].value
+Змінити parameters.0.value
 	[Arguments]  ${fieldvalue}
 	Select From List	xpath=(//select[@ng-model='feature.userValue'])[1]	${fieldvalue}
 
 
-Змінити lotValues[0].value.amount
+Змінити lotValues.0.value.amount
 	[Arguments]  ${fieldvalue}
 	Input Text	${locator_tenderClaim.checkedLot.fieldPrice}	${fieldvalue}
 
@@ -920,7 +974,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait Until Element Is Visible		xpath=(//div[contains(@class, 'file-item')])[1]	timeout=30
 
 	Click Button						${locator_tenderClaim.buttonSend}
-	Close confirmation					Ваша заявка була успішно збережена!
+	Close confirmation					Ваша заявка была успешно сохранена!
 	${dateModified}						Get text	css=span.file-tlm
 	Click Element						${locator_tenderClaim.buttonGoBack}
 	wait until element is visible		css=table.bids tr
@@ -1028,7 +1082,7 @@ Wait Until Element Not Stale
 	sleep 			2s
 	${left_time} =	Evaluate  ${time}-2
 	${element_state} =	Check If Element Stale	${locator}
-	Run Keyword If  ${element_state} and ${left_time} > 0	Wait Until Element Not Stale	${locator}	${left_time}
+	run keyword if  ${element_state} and ${left_time} > 0	Wait Until Element Not Stale	${locator}	${left_time}
 
 
 Check If Element Stale
@@ -1156,7 +1210,7 @@ Switch To Tab
 
 Wait For Element With Reload
 	[Arguments]  ${locator}  ${tab_number}
-	Mark Step					        in_wait
+	Mark Step					in_wait
 	Wait Until Keyword Succeeds			4min	10s	Try Search Element	${locator}	${tab_number}
 
 

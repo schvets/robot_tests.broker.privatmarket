@@ -94,18 +94,6 @@ def get_procurement_method_type(method_name):
         return method_name
 
 
-def get_identification_scheme(scheme):
-    scheme_dictionary = {
-        u'ЕГРПОУ': u'UA-EDR',
-        u'ЄДРПОУ': u'UA-EDR'
-    }
-    identification_scheme = scheme_dictionary.get(scheme)
-    if identification_scheme:
-        return identification_scheme
-    else:
-        return scheme
-
-
 def get_doc_identifier(doc_type_name):
     type_dictionary = {
         'eligibility_documents': 20,
