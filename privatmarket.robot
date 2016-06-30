@@ -369,7 +369,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Run Keyword And Return If	'${element}' == 'procurementMethodType'			Отримати інформацію з procurementMethodType				${element}
 	Run Keyword And Return If	'${element}' == 'cancellations[0].status'		Отримати інформацію з cancellations[0].status			${element}
 
-	Run Keyword And Return If	'${element}' == 'lots.value.amount'							Отримати число										${element}	0	${item}
+	Run Keyword And Return If	'${element}' == 'lots.value.amount'							Отримати сумму										${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'causeDescription'							Отримати інформацію з causeDescription				${element}
 	Run Keyword And Return If	'${element}' == 'awards[0].status'							Отримати інформацію з awards[0].status				${element}
 	Run Keyword And Return If	'${element}' == 'awards[0].value.currency'					Отримати інформацію з value.currency				${element}
@@ -389,8 +389,8 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Відкрити потрібну інформацію по тендеру		${username}	${element}
 	${element_for_work} = 	Convert To String	lots.${element}
 
-	Run Keyword If	'add_lot' in ${TEST_TAGS}		Wait Until Keyword Succeeds	2min	10s		Check Condition With Reload	${True}	1	>	lots
-		...	ELSE IF		'delete_lot' in ${TEST_TAGS}	Wait Until Keyword Succeeds	2min	10s	Check Condition With Reload	${True}	1	<	lots
+	Run Keyword If	'add_lot' in ${TEST_TAGS}		Wait Until Keyword Succeeds	2min	10s		Check Condition With Reload	1	${object_id}
+		...	ELSE IF		'delete_lot' in ${TEST_TAGS}	Wait Until Keyword Succeeds	2min	10s	Check Condition With Reload	1	${object_id}
 
 	#show more info of lot
 	Wait Until Element Is Visible					css=a[ng-click='model.shwFull = !model.shwFull']	timeout=${COMMONWAIT}
@@ -400,9 +400,9 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 	Обрати потрібний лот за id						${object_id}
 
-	Run Keyword And Return If	'${element}' == 'value.amount'					Отримати сумму						${element_for_work}
-	Run Keyword And Return If	'${element}' == 'value.valueAddedTaxIncluded'	Отримати інформацію з ${element}	${element_for_work}
-	Run Keyword And Return If	'${element}' == 'value.currency'				Отримати інформацію з ${element}	${element_for_work}
+	Run Keyword And Return If	'${element}' == 'value.amount'					Отримати сумму							${element_for_work}
+	Run Keyword And Return If	'${element}' == 'value.valueAddedTaxIncluded'	Отримати інформацію про включення ПДВ	${element_for_work}
+	Run Keyword And Return If	'${element}' == 'value.currency'				Отримати інформацію з ${element}		${element_for_work}
 
 	Wait Until Element Is Visible	${tender_data_${element_for_work}}	timeout=${COMMONWAIT}
 	${result_full} =				Get Text	${tender_data_${element_for_work}}
@@ -563,6 +563,15 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Run Keyword And Ignore Error	Wait Until Element Does Not Contain	${tender_data_${element_name}}	'Прием предложений завершен'	5
 	${status_type} =	get_status_type	${status_name}
 	[return]  ${status_type}
+
+
+Отримати інформацію з minimalStep.amount
+	[Arguments]  ${element}  ${position_number}
+	${locator} =	Set Variable If
+		...  0 == ${number_of_lots}	minimalStep.amount
+		...  minimalStep_lot.amount
+	${result} =	Отримати сумму	${locator}
+	[return]	${result}
 
 
 Отримати інформацію з cancellations[0].status
