@@ -300,28 +300,26 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 	${element} = 	Set Variable	items.${element}
 
-	Run Keyword And Return If	'${element}' == 'items.classification.scheme'						Отримати інформацію з ${element}	${element}	${item}
-	Run Keyword And Return If	'${element}' == 'items.classification.id'							Отримати строку		${element}		3			${item}
-	Run Keyword And Return If	'${element}' == 'items.description'									Отримати текст елемента				${element}	${item}
-	Run Keyword And Return If	'${element}' == 'items.quantity'									Отримати ціле число	${element}		0			${item}
-	Run Keyword And Return If	'${element}' == 'items.classification.description'					Отримати класифікацію				${element}	${item}
-	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].scheme'			Отримати інформацію з ${element}	${element}	${item}
-	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].id'				Отримати строку	${element}			3			${item}
-	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].description'	Отримати класифікацію				${element}	${item}
-	Run Keyword And Return If	'${element}' == 'items.deliveryAddress.countryName_en'				Отримати інформацію з елемента зі зміною локалізації	${element}	${item}	en
-	Run Keyword And Return If	'${element}' == 'items.deliveryAddress.countryName_ru'				Отримати інформацію з елемента зі зміною локалізації	${element}	${item}	ru
-	Run Keyword And Return If	'items.deliveryAddres' in '${element}'								Отримати текст елемента				${element}	${item}
-
+	Run Keyword And Return If	'${element}' == 'items.classification.id'				Отримати строку			${element}	3	${item}
+	Run Keyword And Return If	'${element}' == 'items.description'						Отримати текст елемента	${element}		${item}
+	Run Keyword And Return If	'${element}' == 'items.quantity'						Отримати число			${element}	0	${item}
+	Run Keyword And Return If	'${element}' == 'items.classification.description'		Отримати класифікацію	${element}		${item}
 	Run Keyword And Return If	'${element}' == 'items.deliveryDate.endDate'			Отримати дату та час	${element}		${item}
 	Run Keyword And Return If	'${element}' == 'items.unit.name'						Отримати назву			${element}	1	${item}
 	Run Keyword And Return If	'${element}' == 'items.unit.code'						Отримати код			${element}	1	${item}
 	Run Keyword And Return If	'${element}' == 'items.deliveryLocation.latitude'		Отримати число			${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'items.deliveryLocation.longitude'		Отримати число			${element}	0	${item}
 
-
-	Run Keyword And Return If	'${element}' == 'items.additionalClassifications.[0].description'			Отримати інформацію з ${element}	${element}	${item}
-	Run Keyword And Return If	'${element}' == 'items.additionalClassifications.[0].id'					Отримати інформацію з ${element}	${element}	${item}
-	Run Keyword And Return If	'${element}' == 'items.additionalClassifications.[0].scheme'				Отримати інформацію з ${element}	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'items.deliveryAddress.countryName_ru'				Отримати інформацію з елемента зі зміною локалізації			${element}	${item}	ru
+	Run Keyword And Return If	'${element}' == 'items.deliveryAddress.countryName_en'				Отримати інформацію з елемента зі зміною локалізації			${element}	${item}	en
+	Run Keyword And Return If	'${element}' == 'items.classification.scheme'						Отримати інформацію з items.classification.scheme				${element}	${item}
+	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].scheme'			Отримати інформацію з items.additionalClassifications[0].scheme	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].id'				Отримати строку													${element}	3		${item}
+	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].description'	Отримати класифікацію											${element}	${item}
+	Run Keyword And Return If	'${element}' == 'items.additionalClassifications.[0].description'	Отримати інформацію з items.addClassifications.[0].description	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'items.additionalClassifications.[0].id'			Отримати інформацію з items.addClassifications.[0].id			${element}	${item}
+	Run Keyword And Return If	'${element}' == 'items.additionalClassifications.[0].scheme'		Отримати інформацію з items.addClassifications.[0].scheme		${element}	${item}
+	Run Keyword And Return If	'items.deliveryAddres' in '${element}'								Отримати текст елемента				${element}	${item}
 
 	Wait Until Element Is Visible	${tender_data_${element}}	timeout=${COMMONWAIT}
 	${result_full} =				Get Text	${tender_data_${element}}
@@ -358,26 +356,26 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Run Keyword And Return If	'${element}' == 'tenderPeriod.endDate'			Отримати дату та час	${element}
 	Run Keyword And Return If	'${element}' == 'complaintPeriod.endDate'		Отримати дату та час	${element}
 	Run Keyword And Return If	'${element}' == 'bids'							Перевірити присутність bids
-	Run Keyword And Return If	'${element}' == 'value.currency'				Отримати інформацію з ${element}	${element}
-	Run Keyword And Return If	'${element}' == 'value.valueAddedTaxIncluded'	Отримати інформацію з ${element}	${element}
-	Run Keyword And Return If	'${element}' == 'status'						Отримати інформацію з ${element}	${element}
-	Run Keyword And Return If	'${element}' == 'causeDescription'				Отримати інформацію з ${element}	${element}
-	Run Keyword And Return If	'${element}' == 'minimalStep.amount'			Отримати інформацію з ${element}	${element}	0
+	Run Keyword And Return If	'${element}' == 'value.currency'				Отримати інформацію з value.currency					${element}
+	Run Keyword And Return If	'${element}' == 'value.valueAddedTaxIncluded'	Отримати інформацію про включення ПДВ					${element}
+	Run Keyword And Return If	'${element}' == 'status'						Отримати інформацію з status							${element}
+	Run Keyword And Return If	'${element}' == 'causeDescription'				Отримати інформацію з causeDescription					${element}
+	Run Keyword And Return If	'${element}' == 'minimalStep.amount'			Отримати інформацію з minimalStep.amount				${element}	0
 	Run Keyword And Return If	'${element}' == 'title_en'						Отримати інформацію з елемента зі зміною локалізації	${element}	0	en
 	Run Keyword And Return If	'${element}' == 'title_ru'						Отримати інформацію з елемента зі зміною локалізації	${element}	0	ru
 	Run Keyword And Return If	'${element}' == 'description_en'				Отримати інформацію з елемента зі зміною локалізації	${element}	0	en
 	Run Keyword And Return If	'${element}' == 'description_ru'				Отримати інформацію з елемента зі зміною локалізації	${element}	0	ru
-	Run Keyword And Return If	'${element}' == 'auctionPeriod.startDate'		Отримати інформацію з ${element}	${element}	${item}
-	Run Keyword And Return If	'${element}' == 'procurementMethodType'			Отримати інформацію з ${element}	${element}
-	Run Keyword And Return If	'${element}' == 'cancellations[0].status'		Отримати інформацію з ${element}	${element}
+	Run Keyword And Return If	'${element}' == 'auctionPeriod.startDate'		Отримати інформацію з auctionPeriod.startDate			${element}	${item}
+	Run Keyword And Return If	'${element}' == 'procurementMethodType'			Отримати інформацію з procurementMethodType				${element}
+	Run Keyword And Return If	'${element}' == 'cancellations[0].status'		Отримати інформацію з cancellations[0].status			${element}
 
-	Run Keyword And Return If	'${element}' == 'causeDescription'											Отримати інформацію з ${element}	${element}
-	Run Keyword And Return If	'${element}' == 'lots.value.amount'											Отримати число	${element}	0	${item}
-	Run Keyword And Return If	'${element}' == 'awards[0].status'											Отримати інформацію з ${element}	${element}
-	Run Keyword And Return If	'${element}' == 'awards[0].value.valueAddedTaxIncluded'						Отримати інформацію з ${element}	${element}	${item}
-	Run Keyword And Return If	'${element}' == 'awards[0].value.currency'									Отримати інформацію з ${element}	${element}
-	Run Keyword And Return If	'${element}' == 'awards[0].value.amount'									Отримати інформацію з ${element}	${element}
-	Run Keyword And Return If	'${element}' == 'awards[0].documents[0].title'								Отримати інформацію з ${element}	${element}
+	Run Keyword And Return If	'${element}' == 'lots.value.amount'							Отримати число										${element}	0	${item}
+	Run Keyword And Return If	'${element}' == 'causeDescription'							Отримати інформацію з causeDescription				${element}
+	Run Keyword And Return If	'${element}' == 'awards[0].status'							Отримати інформацію з awards[0].status				${element}
+	Run Keyword And Return If	'${element}' == 'awards[0].value.currency'					Отримати інформацію з value.currency				${element}
+	Run Keyword And Return If	'${element}' == 'awards[0].value.amount'					Отримати інформацію з awards[0].value.amount		${element}
+	Run Keyword And Return If	'${element}' == 'awards[0].documents[0].title'				Отримати інформацію з awards[0].documents[0].title	${element}
+	Run Keyword And Return If	'${element}' == 'awards[0].value.valueAddedTaxIncluded'		Отримати інформацію про включення ПДВ				${element}
 
 
 	Wait Until Element Is Visible	${tender_data_${element}}	timeout=${COMMONWAIT}
@@ -418,9 +416,9 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	${element_for_work} = 	Convert To String	questions.${field_name}
 	Відкрити потрібну інформацію по тендеру	${username}	${element_for_work}
 
-	Run Keyword If	'${element_for_work}' == 'questions.title'			Wait For Element With Reload	${tender_data_${element_for_work}}	2
-	Run Keyword If	'${element_for_work}' == 'questions.answer'			Wait For Element With Reload	${tender_data_${element_for_work}}	2
-	Run Keyword And Return If	'${element_for_work}' == 'questions.date'		Отримати дату та час	${element_for_work}
+	Run Keyword If	'${element_for_work}' == 'questions.title'				Wait For Element With Reload	${tender_data_${element_for_work}}	2
+	Run Keyword If	'${element_for_work}' == 'questions.answer'				Wait For Element With Reload	${tender_data_${element_for_work}}	2
+	Run Keyword And Return If	'${element_for_work}' == 'questions.date'	Отримати дату та час			${element_for_work}
 
 	Wait Until Element Is Visible	${tender_data_${element_for_work}}	timeout=${COMMONWAIT}
 	${result_full} =				Get Text	${tender_data_${element_for_work}}
@@ -535,7 +533,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	[return]  ${currency_type}
 
 
-Отримати інформацію з value.valueAddedTaxIncluded
+Отримати інформацію про включення ПДВ
 	[Arguments]  ${element_name}
 	${value_added_tax_included} =	Get text	${tender_data_${element_name}}
 	${result} =	Set Variable If	'з ПДВ' in '${value_added_tax_included}'	True
@@ -574,7 +572,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	[return]  ${result}
 
 
-Отримати інформацію з items.additionalClassifications.[0].description
+Отримати інформацію з items.addClassifications.[0].description
 	[Arguments]  ${element}  ${item}
 	${text} =		Отримати текст елемента  ${element}  ${item}
 	${newText} =	Replace String Using Regexp		${text}	.*\\d	${EMPTY}
@@ -582,7 +580,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	[return]	${result}
 
 
-Отримати інформацію з items.additionalClassifications.[0].id
+Отримати інформацію з items.addClassifications.[0].id
 	[Arguments]  ${element}  ${item}
 	${text} =		Отримати текст елемента  ${element}  ${item}
 	${newText} =	Get Regexp Matches		${text}	: (\\d.*\\d)	1
@@ -590,7 +588,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	[return]	${result}
 
 
-Отримати інформацію з items.additionalClassifications.[0].scheme
+Отримати інформацію з items.addClassifications.[0].scheme
 	[Arguments]  ${element}  ${item}
 	${text} =			Отримати текст елемента  ${element}  ${item}
 	${newText} =		Get Regexp Matches		${text}	Классификатор (.*):	1
@@ -639,21 +637,6 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Click Element						css=.icon-remove.pull-right
 	Wait Until Element Is Not Visible	css=.icon-remove.pull-right
 	[return]	${text}
-
-
-Отримати інформацію з awards[0].value.currency
-	[Arguments]  ${element}
-	${currency} =						Отримати строку	${element}	1
-	${currency_type} =					get_currency_type	${currency}
-	[return]	${currency_type}
-
-
-Отримати інформацію з awards[0].value.valueAddedTaxIncluded
-	[Arguments]  ${element}  ${item}
-	${value_added_tax_included} =		Get text	${tender_data_${element}}
-	${result} =							Set Variable If	'з ПДВ' in '${value_added_tax_included}'	True
-	${newResult} =						Convert To Boolean	${result}
-	[return]	${newResult}
 
 
 Отримати інформацію з featureOf
