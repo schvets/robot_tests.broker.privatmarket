@@ -100,7 +100,8 @@ ${tender_data_procuringEntity.identifier.legalName}		xpath=//div[@id='procurerLe
 ${tender_data_procuringEntity.identifier.scheme}		xpath=//div[@class='delivery-info ng-scope']/div[2]/div[2]
 ${tender_data_procuringEntity.identifier.id}			xpath=//div[@id='procurerId']/div[2]
 
-${tender_data_documents[0].title}						css=#tenderDocs .file-name
+${tender_data_documents[0].title}						xpath=//prozorro-doc[contains(@ng-repeat, \"documentOf:'tender'\")]//*[@class='file-name ng-binding']
+${tender_data_lots.documents[0].title}					xpath=//prozorro-doc[contains(@ng-repeat, \"documentOf:'lot'\")]//*[@class='file-name ng-binding']
 
 ${tender_data_items.additionalClassifications.[0].description}		xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
 ${tender_data_items.additionalClassifications.[0].id}				xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
@@ -139,7 +140,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	${service args}=	Create List	--ignore-ssl-errors=true	--ssl-protocol=tlsv1
 	${browser} =		Convert To Lowercase	${USERS.users['${username}'].browser}
 
-	${desired_capabilities} =    Create Dictionary    nativeEvents      ${False}
+	${desired_capabilities} =    Create Dictionary    nativeEvents=${False}
 
 	Run Keyword If	'phantomjs' in '${browser}'	Run Keywords	Create Webdriver	PhantomJS	${username}	service_args=${service args}
 	...   AND   Go To			${USERS.users['${username}'].homepage}
@@ -280,7 +281,6 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 		...	ELSE IF		'add_lot' in ${TEST_TAGS}		Wait Until Keyword Succeeds	2min	10s	Check Condition With Reload	1	${item_id}
 
 	${tender_data} = 							Execute Javascript	return angular.element("#tenderId").scope().model.ad;
-	mark step									${tender_data}
 
 	${item_num}	${lot_num}	${lots_count} = 	get_lot_num_by_item	${tender_data}	${item_id}
 	Mark Step									${item_id} - ${item_num} - ${lot_num}
@@ -378,6 +378,8 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Run Keyword And Return If	'${element}' == 'awards[0].value.valueAddedTaxIncluded'		Отримати інформацію про включення ПДВ				${element}
 
 
+	Run Keyword If		'add_tender_doc' in ${TEST_TAGS}		Wait For Element With Reload	${tender_data_documents[0].title}	1
+
 	Wait Until Element Is Visible	${tender_data_${element}}	timeout=${COMMONWAIT}
 	${result_full} =				Get Text	${tender_data_${element}}
 	${result} =						Strip String	${result_full}
@@ -424,6 +426,11 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	${result_full} =				Get Text	${tender_data_${element_for_work}}
 	${result} =						Strip String	${result_full}
 	[return]	${result}
+
+
+Отримати документ
+	[Arguments]  ${username}  ${tender_uaid}  ${doc_url}
+	[return]  Doc Title   Doc text
 
 
 Отримати текст елемента
