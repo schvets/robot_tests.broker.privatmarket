@@ -224,9 +224,9 @@ def get_lot_num_by_item(tender_data, item_index):
         item_num = count_of_items_in_lot_dictionary[related_lot]
     else:
         for item in items:
-            if item_index in item['id']:
+            if item_index in item['description']:
                 break
-                item_num += 1
+            item_num += 1
 
     return item_num, lot_num, lots_count
 
