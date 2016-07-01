@@ -574,7 +574,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	[return]  ${result}
 
 
-Отримати інформацію з items.additionalClassifications[0].scheme
+Отримати інформацію з items.addClassifications[0].scheme
 	[Arguments]  ${element}  ${item}
 	${first_part} =		Отримати строку	${element}	1	${item}
 	${second_part} =	Отримати строку	${element}	2	${item}
