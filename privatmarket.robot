@@ -113,7 +113,7 @@ ${tender_data_awards[0].suppliers[0].contactPoint.telephone}	xpath=//div[@class=
 ${tender_data_awards[0].suppliers[0].contactPoint.name}			xpath=//div[@class='modal-body info-div ng-scope']/div[6]/div[2]
 ${tender_data_awards[0].suppliers[0].contactPoint.email}		xpath=//div[@class='modal-body info-div ng-scope']/div[8]/div[2]
 ${tender_data_awards[0].suppliers[0].identifier.scheme}			xpath=//div[@class='modal-body info-div ng-scope']/div[2]/div[2]
-${tender_data_awards[0].suppliers[0].identifier.legalName}		xpath=//div[@class='modal-body info-div ng-scope']/div[1]/div[2]
+#${tender_data_awards[0].suppliers[0].identifier.legalName}		xpath=//div[@class='modal-body info-div ng-scope']/div[1]/div[2]
 ${tender_data_awards[0].suppliers[0].identifier.id}				xpath=//div[@class='modal-body info-div ng-scope']/div[3]/div[2]
 ${tender_data_awards[0].suppliers[0].name}						xpath=//div[@class='modal-body info-div ng-scope']/div[1]/div[2]
 ${tender_data_awards[0].value.valueAddedTaxIncluded}			xpath=//div[@class='modal-body info-div ng-scope']/div[9]/div[2]
@@ -623,6 +623,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Wait Until Element Is Visible		css=#nolotSection div[class='info-item'] a	timeout=${COMMONWAIT}
 	Wait Until Element Is Enabled		css=#nolotSection div[class='info-item'] a	timeout=${COMMONWAIT}
 	Click Element						css=#nolotSection div[class='info-item'] a
+	Run Keyword If	${item} > 0			Відкрити детальну інформацію про позицію	${item}
 	${text} =							Отримати текст елемента  ${element}  ${item}
 	[return]	${text}
 
