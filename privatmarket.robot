@@ -316,9 +316,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].scheme'			Отримати інформацію з items.addClassifications[0].scheme		${element}	${item}
 	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].id'				Отримати строку													${element}	3		${item}
 	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].description'	Отримати класифікацію											${element}	${item}
-	Run Keyword And Return If	'${element}' == 'items.additionalClassifications.[0].description'	Отримати інформацію з items.addClassifications.[0].description	${element}	${item}
-	Run Keyword And Return If	'${element}' == 'items.additionalClassifications.[0].id'			Отримати інформацію з items.addClassifications.[0].id			${element}	${item}
-	Run Keyword And Return If	'${element}' == 'items.additionalClassifications.[0].scheme'		Отримати інформацію з items.addClassifications.[0].scheme		${element}	${item}
+
 	Run Keyword And Return If	'items.deliveryAddres' in '${element}'								Отримати текст елемента				${element}	${item}
 
 	Wait Until Element Is Visible	${tender_data_${element}}	timeout=${COMMONWAIT}
@@ -372,7 +370,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Run Keyword And Return If	'${element}' == 'lots.value.amount'							Отримати сумму										${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'causeDescription'							Отримати інформацію з causeDescription				${element}
 	Run Keyword And Return If	'${element}' == 'awards[0].status'							Отримати інформацію з awards[0].status				${element}
-	Run Keyword And Return If	'${element}' == 'awards[0].value.currency'					Отримати інформацію з value.currency				${element}
+	Run Keyword And Return If	'${element}' == 'awards[0].value.currency'					Отримати інформацію з awards[0].value.currency				${element}
 	Run Keyword And Return If	'${element}' == 'awards[0].value.amount'					Отримати інформацію з awards[0].value.amount		${element}
 	Run Keyword And Return If	'${element}' == 'awards[0].documents[0].title'				Отримати інформацію з awards[0].documents[0].title	${element}
 	Run Keyword And Return If	'${element}' == 'awards[0].value.valueAddedTaxIncluded'		Отримати інформацію про включення ПДВ				${element}
@@ -590,10 +588,10 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 Отримати інформацію з items.addClassifications[0].scheme
 	[Arguments]  ${element}  ${item}
-	${first_part} =		Отримати строку	${element}	1	${item}
-	${second_part} =	Отримати строку	${element}	2	${item}
+	${first_part} =		Отримати строку	${element}	1	${item}
+	${second_part} =	Отримати строку	${element}	2	${item}
 	${result} =			Set Variable	${first_part} ${second_part}
-	${class_type} =	get_classification_type	${result}
+	${class_type} =		get_classification_type	${result}
 	[return]  ${class_type}
 
 
