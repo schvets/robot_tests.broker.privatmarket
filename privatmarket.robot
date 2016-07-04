@@ -47,10 +47,6 @@ ${tender_data_items.additionalClassifications[0].description}	xpath=//div[@ng-re
 ${tender_data_items.unit.name}									xpath=//div[.='Кількість:']/following-sibling::div
 ${tender_data_items.unit.code}									xpath=//div[.='Кількість:']/following-sibling::div
 ${tender_data_items.quantity}									xpath=//div[.='Кількість:']/following-sibling::div
-${tender_data_questions.description}							css=div.description
-${tender_data_questions.date}									xpath=//div[@class = 'question-head title']/b[2]
-${tender_data_questions.title}									css=div.question-head.title span
-${tender_data_questions.answer}									css=div[ng-bind-html='q.answer']
 ${tender_data_lots.title}										css=div.lot-head span.ng-binding
 ${tender_data_lots.description}									css=section.lot-description section.description
 ${tender_data_lots.value.amount}								css=#lotAmount
@@ -413,16 +409,21 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 Отримати інформацію із запитання
 	[Arguments]  ${username}  ${tender_uaid}  ${object_id}  ${field_name}
-	${element_for_work} = 	Convert To String	questions.${field_name}
-	Відкрити потрібну інформацію по тендеру	${username}	${element_for_work}
+	Відкрити потрібну інформацію по тендеру	${username}	questions
 
-	Run Keyword If	'${element_for_work}' == 'questions.title'				Wait For Element With Reload	${tender_data_${element_for_work}}	2
-	Run Keyword If	'${element_for_work}' == 'questions.answer'				Wait For Element With Reload	${tender_data_${element_for_work}}	2
-	Run Keyword And Return If	'${element_for_work}' == 'questions.date'	Отримати дату та час			${element_for_work}
+	${element_for_work} = 	Set Variable If
+		...  '${field_name}' == 'title'			xpath=//div[@class='question-head title' and contains(.,'${object_id}')]/span
+		...  '${field_name}' == 'answer'		xpath=//div[contains(.,'${object_id}')]/following-sibling::div/div[@ng-bind-html='q.answer']
+		...  '${field_name}' == 'date'			xpath=//div[@class = 'question-head title' and contains(., '${object_id}')]/b[2]
+		...  '${field_name}' == 'description'	xpath=//div[contains(.,'${object_id}')]/following-sibling::div[@ng-bind-html='q.description']
+		...  ${field_name}
 
-	Wait Until Element Is Visible	${tender_data_${element_for_work}}	timeout=${COMMONWAIT}
-	${result_full} =				Get Text	${tender_data_${element_for_work}}
-	${result} =						Strip String	${result_full}
+	Run Keyword And Return If	'${field_name}' == 'date'	Отримати дату та час	${element_for_work}
+
+	Wait For Element With Reload	${element_for_work}	2
+	Wait Until Element Is Visible	${element_for_work}	timeout=${COMMONWAIT}
+	${result_full} =				Get Text			${element_for_work}
+	${result} =						Strip String		${result_full}
 	[return]	${result}
 
 
@@ -1236,6 +1237,7 @@ Check Condition With Reload
 	Mark Step	in_check_condition_with_reload
 	Reload And Switch To Tab	${tab_number}
 	Wait For Ajax
+	sleep       2s
 
 	${tender_data} = 	Execute Javascript	return angular.element("#tenderId").scope().model.ad;
 	${result} = 		is_object_present	${tender_data}	${item_id}
