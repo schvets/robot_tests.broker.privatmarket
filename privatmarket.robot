@@ -53,10 +53,10 @@ ${tender_data_lots.value.amount}								css=#lotAmount
 ${tender_data_lots.value.currency}								css=#lotCcy
 ${tender_data_lots.value.valueAddedTaxIncluded}					css=#lotTax
 ${tender_data_bids}												xpath=(//table[@class='bids']//tr)[2]
-${complaints[0].title}											xpath=(//div[@class='title']/span)[1]
-${complaints[0].description}									xpath=(//div[@ng-bind-html='q.description'])[1]
-${complaints[0].documents.title}								xpath=(//span[@class='file-name'])[1]
-${complaints[0].status}											xpath=(//div[contains(@ng-if,'q.status')])[1]
+#${complaints.title}												xpath=(//div[@class='title']/span)[1]
+#${complaints.description}										xpath=(//div[@ng-bind-html='q.description'])[1]
+#${complaints.documents.title}									xpath=(//span[@class='file-name'])[1]
+#${complaints.status}											xpath=(//div[contains(@ng-if,'q.status')])[1]
 
 ${locator_tenderCreation.buttonEdit}			xpath=//button[@ng-click='act.createAfp()']
 ${locator_tenderCreation.buttonSave}			css=button.btn.btn-success
@@ -211,7 +211,6 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 Відкрити потрібну інформацію по тендеру
 	[Arguments]  ${username}  ${field}
-#	Switch browser					${username}
 	Wait Until Element Is Visible	${tender_data_title}	timeout=${COMMONWAIT}
 
 	#choose UK language
@@ -348,7 +347,6 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Run Keyword And Return If	'${element}' == 'enquiryPeriod.endDate'			Отримати дату та час	${element}
 	Run Keyword And Return If	'${element}' == 'tenderPeriod.startDate'		Отримати дату та час	${element}
 	Run Keyword And Return If	'${element}' == 'tenderPeriod.endDate'			Отримати дату та час	${element}
-	Run Keyword And Return If	'${element}' == 'complaintPeriod.endDate'		Отримати дату та час	${element}
 	Run Keyword And Return If	'${element}' == 'bids'							Перевірити присутність bids
 	Run Keyword And Return If	'${element}' == 'value.currency'				Отримати інформацію з value.currency					${element}
 	Run Keyword And Return If	'${element}' == 'value.valueAddedTaxIncluded'	Отримати інформацію про включення ПДВ					${element}
@@ -425,6 +423,76 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	${result_full} =				Get Text			${element_for_work}
 	${result} =						Strip String		${result_full}
 	[return]	${result}
+
+
+Отримати інформацію із скарги
+	[Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${field_name}  ${award_index}
+	mark step     Отримати інформацію із скарги ----- was called
+	Відкрити потрібну інформацію по тендеру	${username}	complaint
+
+	${element_for_work} = 	Set Variable If
+		...  '${field_name}' == 'title'				xpath=//div[contains(., '${complaintID}')]//span[contains(@class, 'claimHead')]
+		...  '${field_name}' == 'description'		xpath=//div[contains(., '${complaintID}')]//div[@ng-bind-html='q.description']
+		...  '${field_name}' == 'answer'			xpath=//div[contains(., '${complaintID}')]//div[@class ='question-head title']/span
+		...  '${field_name}' == 'data'				xpath=//div[contains(., '${complaintID}')]//div[@class ='question-head title']/b[2]
+		...  '${field_name}' == 'complaintID'		xpath=//div[contains(., '${complaintID}')]//span[@id='cmpl0']
+		...  '${field_name}' == 'status'			xpath=//div[contains(., '${complaintID}')]//span[@id='cmplStatus0']
+		...  '${field_name}' == 'resolutionType'	xpath=//div[contains(., '${complaintID}')]//div[@class='qa-title']
+		...  '${field_name}' == 'resolution'		xpath=//div[contains(., '${complaintID}')]//div[contains(@class, 'qa-body')]
+
+
+	Wait For Element With Reload	${element_for_work}	3
+	Wait Until Element Is Visible	${element_for_work}	timeout=${COMMONWAIT}
+
+	Run Keyword And Return If	'${field_name}' == 'date'			Отримати дату та час				${element_for_work}
+	Run Keyword And Return If	'${field_name}' == 'status'			Отримати complaint.status			${element_for_work}
+	Run Keyword And Return If	'${field_name}' == 'resolutionType'	Отримати complaint.resolutionType	${element_for_work}
+
+	${result_full} = 			Get Text	${element_for_work}
+	${result_full} = 			Replace String	${result_full}	, id:	${EMPTY}
+	${result} = 				Strip String	${result_full}
+	Mark Step      result=${result}
+
+	[return]	${result}
+
+
+Отримати complaint.status
+	[Arguments]  ${element}
+	${result_full} = 	Get Text	${element}
+	${result} = 	Set Variable If
+		...  '${result_full}' == 'Вiдправлено'	claim
+		...  '${result_full}' == 'Вирiшено'	resolution
+		...  '${result_full}' == 'Отримано вiдповiдь'	answered
+		...  ${result_full}
+
+	[return]	${result}
+
+
+Отримати complaint.resolutionType
+	[Arguments]  ${element}
+	${result_full} = 	Get Text	${element}
+	${result} = 	Set Variable If
+		...  '${result_full}' == 'Резолюція'	resolved
+		...  ${result_full}
+
+	[return]	${result}
+
+
+Отримати поле документації до скарги
+	[Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${given_value}  ${field_name}  ${award_index}
+	Відкрити потрібну інформацію по тендеру	${username}	complaint
+
+	${element_for_work} = 	Set Variable If
+		...  '${field_name}' == 'title'	xpath=//div[contains(., '${complaintID}')]//span[contains(@class, 'file-name')]
+
+	#get doc title
+	${is_element_visible} = 	Run Keyword And Return Status	Element Should Be Visible	${element_for_work}
+	Run Keyword If	'${field_name}' == 'title' and ${is_element_visible} == ${False}	Click Element	xpath=//div[contains(., '${complaintID}')]//a[@ng-click='q.showFiles = !q.showFiles']
+
+	Wait Until Element Is Visible	${element_for_work}	timeout=${COMMONWAIT}
+	${result_full} =	Get Text	${element_for_work}
+	${result} =			Strip String	${result_full}
+	[return]  ${result}
 
 
 Отримати документ
@@ -1219,7 +1287,7 @@ Switch To Tab
 Wait For Element With Reload
 	[Arguments]  ${locator}  ${tab_number}
 	Mark Step					in_wait
-	Wait Until Keyword Succeeds			4min	10s	Try Search Element	${locator}	${tab_number}
+	Wait Until Keyword Succeeds			1min	10s	Try Search Element	${locator}	${tab_number}
 
 
 Try Search Element
