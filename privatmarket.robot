@@ -53,10 +53,6 @@ ${tender_data_lots.value.amount}								css=#lotAmount
 ${tender_data_lots.value.currency}								css=#lotCcy
 ${tender_data_lots.value.valueAddedTaxIncluded}					css=#lotTax
 ${tender_data_bids}												xpath=(//table[@class='bids']//tr)[2]
-#${complaints.title}												xpath=(//div[@class='title']/span)[1]
-#${complaints.description}										xpath=(//div[@ng-bind-html='q.description'])[1]
-#${complaints.documents.title}									xpath=(//span[@class='file-name'])[1]
-#${complaints.status}											xpath=(//div[contains(@ng-if,'q.status')])[1]
 
 ${locator_tenderCreation.buttonEdit}			xpath=//button[@ng-click='act.createAfp()']
 ${locator_tenderCreation.buttonSave}			css=button.btn.btn-success
@@ -115,7 +111,6 @@ ${tender_data_awards[0].suppliers[0].contactPoint.telephone}	xpath=//div[@class=
 ${tender_data_awards[0].suppliers[0].contactPoint.name}			xpath=//div[@class='modal-body info-div ng-scope']/div[6]/div[2]
 ${tender_data_awards[0].suppliers[0].contactPoint.email}		xpath=//div[@class='modal-body info-div ng-scope']/div[8]/div[2]
 ${tender_data_awards[0].suppliers[0].identifier.scheme}			xpath=//div[@class='modal-body info-div ng-scope']/div[2]/div[2]
-#${tender_data_awards[0].suppliers[0].identifier.legalName}		xpath=//div[@class='modal-body info-div ng-scope']/div[1]/div[2]
 ${tender_data_awards[0].suppliers[0].identifier.id}				xpath=//div[@class='modal-body info-div ng-scope']/div[3]/div[2]
 ${tender_data_awards[0].suppliers[0].name}						xpath=//div[@class='modal-body info-div ng-scope']/div[1]/div[2]
 ${tender_data_awards[0].value.valueAddedTaxIncluded}			xpath=//div[@class='modal-body info-div ng-scope']/div[9]/div[2]
@@ -427,19 +422,19 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 Отримати інформацію із скарги
 	[Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${field_name}  ${award_index}
-	mark step     Отримати інформацію із скарги ----- was called
 	Відкрити потрібну інформацію по тендеру	${username}	complaint
+	Дочекатися статусу вимоги				${complaintID}  ${TEST_NAME}
 
 	${element_for_work} = 	Set Variable If
-		...  '${field_name}' == 'title'				xpath=//div[contains(., '${complaintID}')]//span[contains(@class, 'claimHead')]
-		...  '${field_name}' == 'description'		xpath=//div[contains(., '${complaintID}')]//div[@ng-bind-html='q.description']
-		...  '${field_name}' == 'answer'			xpath=//div[contains(., '${complaintID}')]//div[@class ='question-head title']/span
-		...  '${field_name}' == 'data'				xpath=//div[contains(., '${complaintID}')]//div[@class ='question-head title']/b[2]
-		...  '${field_name}' == 'complaintID'		xpath=//div[contains(., '${complaintID}')]//span[@id='cmpl0']
-		...  '${field_name}' == 'status'			xpath=//div[contains(., '${complaintID}')]//span[@id='cmplStatus0']
-		...  '${field_name}' == 'resolutionType'	xpath=//div[contains(., '${complaintID}')]//div[@class='qa-title']
-		...  '${field_name}' == 'resolution'		xpath=//div[contains(., '${complaintID}')]//div[contains(@class, 'qa-body')]
-
+		...  '${field_name}' == 'title'				xpath=//div[@class='faq ng-scope' and contains(., '${complaintID}')]//span[contains(@class, 'claimHead')]
+		...  '${field_name}' == 'description'		xpath=//div[@class='faq ng-scope' and contains(., '${complaintID}')]//div[@ng-bind-html='q.description']
+		...  '${field_name}' == 'answer'			xpath=//div[@class='faq ng-scope' and contains(., '${complaintID}')]//div[@class ='question-head title']/span
+		...  '${field_name}' == 'data'				xpath=//div[@class='faq ng-scope' and contains(., '${complaintID}')]//div[@class ='question-head title']/b[2]
+		...  '${field_name}' == 'complaintID'		xpath=//div[@class='faq ng-scope' and contains(., '${complaintID}')]//span[@id='cmpl0']
+		...  '${field_name}' == 'status'			xpath=//div[@class='faq ng-scope' and contains(., '${complaintID}')]//span[@id='cmplStatus0']
+		...  '${field_name}' == 'resolutionType'	xpath=//div[@class='faq ng-scope' and contains(., '${complaintID}')]//div[@class='qa-title']
+		...  '${field_name}' == 'resolution'		xpath=//div[@class='faq ng-scope' and contains(., '${complaintID}')]//div[contains(@class, 'qa-body')]
+		...  '${field_name}' == 'satisfied'			xpath=//div[@class='faq ng-scope' and contains(., '${complaintID}')]//span[@id='cmplStatus0']
 
 	Wait For Element With Reload	${element_for_work}	3
 	Wait Until Element Is Visible	${element_for_work}	timeout=${COMMONWAIT}
@@ -447,22 +442,42 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Run Keyword And Return If	'${field_name}' == 'date'			Отримати дату та час				${element_for_work}
 	Run Keyword And Return If	'${field_name}' == 'status'			Отримати complaint.status			${element_for_work}
 	Run Keyword And Return If	'${field_name}' == 'resolutionType'	Отримати complaint.resolutionType	${element_for_work}
+	Run Keyword And Return If	'${field_name}' == 'satisfied'		Отримати complaint.satisfied		${element_for_work}
 
 	${result_full} = 			Get Text	${element_for_work}
 	${result_full} = 			Replace String	${result_full}	, id:	${EMPTY}
 	${result} = 				Strip String	${result_full}
-	Mark Step      result=${result}
+	Mark Step					result=${result}
 
 	[return]	${result}
+
+
+Дочекатися статусу вимоги
+	[Arguments]  ${complaintID}  ${test_name}
+	${test_name} =	Replace String	${test_name}	\'	${EMPTY}
+
+	${status} = 	Set Variable If
+		...  'поданого статусу' in '${test_name}'	Вiдправлено
+		...  'resolved' in '${test_name}'			Вирiшена
+		...  'answered' in '${test_name}'			Отримано вiдповiдь
+		...  'was called' in '${test_name}'			Вiдмiнено
+		...  'задоволення вимоги' in '${test_name}'	Вирiшена
+		...  ${None}
+
+	Return From Keyword If	'${status}' == '${None}'	${True}
+
+	Wait For Element With Reload	xpath=//div[@class='faq ng-scope' and contains(., '${complaintID}')]//span[contains(., '${status}')]	3
+	[return]	${True}
 
 
 Отримати complaint.status
 	[Arguments]  ${element}
 	${result_full} = 	Get Text	${element}
 	${result} = 	Set Variable If
-		...  '${result_full}' == 'Вiдправлено'	claim
-		...  '${result_full}' == 'Вирiшено'	resolution
+		...  '${result_full}' == 'Вiдправлено'			claim
+		...  '${result_full}' == 'Вирiшена'				resolved
 		...  '${result_full}' == 'Отримано вiдповiдь'	answered
+		...  '${result_full}' == 'Вiдмiнено'			was called
 		...  ${result_full}
 
 	[return]	${result}
@@ -473,6 +488,16 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	${result_full} = 	Get Text	${element}
 	${result} = 	Set Variable If
 		...  '${result_full}' == 'Резолюція'	resolved
+		...  ${result_full}
+
+	[return]	${result}
+
+
+Отримати complaint.satisfied
+	[Arguments]  ${element}
+	${result_full} = 	Get Text	${element}
+	${result} = 	Set Variable If
+		...  '${result_full}' == 'Вирiшена'	${true}
 		...  ${result_full}
 
 	[return]	${result}
@@ -751,7 +776,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Fail  Функція не підтримується майданчиком
 
 
-Створити вимогу
+Створити вимогу про виправлення умов закупівлі
 	[Arguments]  ${user}  ${tender_id}  ${complaints}
 	privatmarket.Пошук тендера по ідентифікатору	${user}	${tenderId}
 	Switch To Tab						3
@@ -818,7 +843,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Wait Until Element Contains			css=span#cmplStatus0	Отменено	timeout=${COMMONWAIT}
 
 
-Задати питання
+Задати запитання на тендер
 	[Arguments]  ${provider}  ${tender_id}  ${question}
 	privatmarket.Пошук тендера по ідентифікатору	${provider}	${tender_id}
 	Wait For Ajax
@@ -848,7 +873,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Wait Until Element Is Not Visible	xpath=//input[@ng-model='model.question.title']	timeout=20
 
 
-Задати питання до лоту
+Задати запитання на лот
 	[Arguments]  ${provider}  ${tender_id}  ${lot_id}  ${question}
 	Обрати потрібний лот за id	${lot_id}
 	Wait Enable And Click Element	css=a[ng-click='act.sendLotEnquiry()']
@@ -856,7 +881,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	[return]  True
 
 
-Задати питання на предмет
+Задати Питання На Предмет
 	[Arguments]  ${provider}  ${tender_id}  ${item_id}  ${question}
 	log	Is not ready yet!
 
@@ -1287,15 +1312,16 @@ Switch To Tab
 Wait For Element With Reload
 	[Arguments]  ${locator}  ${tab_number}
 	Mark Step					in_wait
-	Wait Until Keyword Succeeds			1min	10s	Try Search Element	${locator}	${tab_number}
+	Wait Until Keyword Succeeds			3min	10s	Try Search Element	${locator}	${tab_number}
 
 
 Try Search Element
 	[Arguments]	${locator}  ${tab_number}
-	Mark Step					in_search
-	Reload And Switch To Tab			${tab_number}
+	Mark Step						in_search
+	Reload And Switch To Tab		${tab_number}
 	Wait For Ajax
-	Wait Until Element Is Enabled		${locator}	3
+	Sleep							2s
+	Wait Until Element Is Enabled	${locator}	3
 	[return]	True
 
 
