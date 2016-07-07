@@ -867,10 +867,12 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Input text							xpath=//textarea[@ng-model='model.question.description']	${description}
 	Input text							xpath=//input[@ng-model='model.person.email']				${email}
 	Click Button						xpath=//button[@ng-click='act.sendQuestion()']
-	Wait For Notification				Ваш вопрос успешно помещен в очередь на отправку. Спасибо за обращение!
+	Wait For Notification				Ваше запитання успішно включено до черги на відправку. Дякуємо за звернення!
 	Wait Until Element Not Stale		css=span[ng-click='act.hideModal()']	40
 	Click Element						css=span[ng-click='act.hideModal()']
 	Wait Until Element Is Not Visible	xpath=//input[@ng-model='model.question.title']	timeout=20
+	#wait for synchronization
+	Sleep								150s
 
 
 Задати запитання на лот
@@ -881,9 +883,17 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	[return]  True
 
 
-Задати Питання На Предмет
+Задати запитання на предмет
 	[Arguments]  ${provider}  ${tender_id}  ${item_id}  ${question}
-	log	Is not ready yet!
+	Mark Step	${provider} - ${tender_id} - ${item_id} - ${question}
+
+	${item}	${lot} =	Отримати положення предмету		${item_id}
+	Обрати потрібний лот за порядковим номером			${lot}
+	Відкрити детальну інформацію про позицію	${item}
+
+	Wait Enable And Click Element	xpath=//a[@ng-click='act.sendItemEnquiry(adb.id)']
+	Заповнити форму питання			${question.data.title}	${question.data.description}	${USERS.users['${provider}'].email}
+	[return]  True
 
 
 Оновити сторінку з тендером
