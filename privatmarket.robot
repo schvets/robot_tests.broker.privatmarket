@@ -47,20 +47,12 @@ ${tender_data_items.additionalClassifications[0].description}	xpath=//div[@ng-re
 ${tender_data_items.unit.name}									xpath=//div[.='Кількість:']/following-sibling::div
 ${tender_data_items.unit.code}									xpath=//div[.='Кількість:']/following-sibling::div
 ${tender_data_items.quantity}									xpath=//div[.='Кількість:']/following-sibling::div
-${tender_data_questions.description}							css=div.description
-${tender_data_questions.date}									xpath=//div[@class = 'question-head title']/b[2]
-${tender_data_questions.title}									css=div.question-head.title span
-${tender_data_questions.answer}									css=div[ng-bind-html='q.answer']
 ${tender_data_lots.title}										css=div.lot-head span.ng-binding
 ${tender_data_lots.description}									css=section.lot-description section.description
 ${tender_data_lots.value.amount}								css=#lotAmount
 ${tender_data_lots.value.currency}								css=#lotCcy
 ${tender_data_lots.value.valueAddedTaxIncluded}					css=#lotTax
 ${tender_data_bids}												xpath=(//table[@class='bids']//tr)[2]
-${complaints[0].title}											xpath=(//div[@class='title']/span)[1]
-${complaints[0].description}									xpath=(//div[@ng-bind-html='q.description'])[1]
-${complaints[0].documents.title}								xpath=(//span[@class='file-name'])[1]
-${complaints[0].status}											xpath=(//div[contains(@ng-if,'q.status')])[1]
 
 ${locator_tenderCreation.buttonEdit}			xpath=//button[@ng-click='act.createAfp()']
 ${locator_tenderCreation.buttonSave}			css=button.btn.btn-success
@@ -100,7 +92,8 @@ ${tender_data_procuringEntity.identifier.legalName}		xpath=//div[@id='procurerLe
 ${tender_data_procuringEntity.identifier.scheme}		xpath=//div[@class='delivery-info ng-scope']/div[2]/div[2]
 ${tender_data_procuringEntity.identifier.id}			xpath=//div[@id='procurerId']/div[2]
 
-${tender_data_documents[0].title}						css=#tenderDocs .file-name
+${tender_data_documents[0].title}						xpath=//prozorro-doc[contains(@ng-repeat, \"documentOf:'tender'\")]//*[@class='file-name ng-binding']
+${tender_data_lots.documents[0].title}					xpath=//prozorro-doc[contains(@ng-repeat, \"documentOf:'lot'\")]//*[@class='file-name ng-binding']
 ${tender_data_causeDescription}							css=#tenderType>div>div:nth-of-type(2)
 ${tender_data_cause}									css=#tenderType>div>div:nth-of-type(1)
 
