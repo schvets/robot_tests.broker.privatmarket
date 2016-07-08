@@ -104,7 +104,7 @@ ${tender_data_documents[0].title}						css=#tenderDocs .file-name
 ${tender_data_causeDescription}							css=#tenderType>div>div:nth-of-type(2)
 ${tender_data_cause}									css=#tenderType>div>div:nth-of-type(1)
 
-${tender_data_awards[0].status}									xpath=//div[@class='modal-body info-div ng-scope']/div[4]/div[2]
+${tender_data_awards[0].status}									xpath=//div[@class='modal-body info-div ng-scope']/div[10]/div[2]
 ${tender_data_awards[0].suppliers[0].address.countryName}		xpath=(//prz-address[@id='procurerAddr'])[2]//*[@id='countryName']
 ${tender_data_awards[0].suppliers[0].address.locality}			xpath=(//prz-address[@id="procurerAddr"])[2]//*[@id='locality']
 ${tender_data_awards[0].suppliers[0].address.postalCode}		xpath=(//prz-address[@id="procurerAddr"])[2]//*[@id='postalCode']
@@ -135,7 +135,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	${service args}=	Create List	--ignore-ssl-errors=true	--ssl-protocol=tlsv1
 	${browser} =		Convert To Lowercase	${USERS.users['${username}'].browser}
 
-	${desired_capabilities} =    Create Dictionary    nativeEvents      ${False}
+	${desired_capabilities} =    Create Dictionary    nativeEvents=${False}
 
 	Run Keyword If	'phantomjs' in '${browser}'	Run Keywords	Create Webdriver	PhantomJS	${username}	service_args=${service args}
 	...   AND   Go To			${USERS.users['${username}'].homepage}
@@ -210,7 +210,6 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 Відкрити потрібну інформацію по тендеру
 	[Arguments]  ${username}  ${field}
-#	Switch browser					${username}
 	Wait Until Element Is Visible	${tender_data_title}	timeout=${COMMONWAIT}
 
 	#choose UK language
@@ -276,7 +275,6 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 		...	ELSE IF		'add_lot' in ${TEST_TAGS}		Wait Until Keyword Succeeds	2min	10s	Check Condition With Reload	1	${item_id}
 
 	${tender_data} = 							Execute Javascript	return angular.element("#tenderId").scope().model.ad;
-	mark step									${tender_data}
 
 	${item_num}	${lot_num}	${lots_count} = 	get_lot_num_by_item	${tender_data}	${item_id}
 	Mark Step									${item_id} - ${item_num} - ${lot_num}
@@ -348,7 +346,6 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Run Keyword And Return If	'${element}' == 'enquiryPeriod.endDate'			Отримати дату та час	${element}
 	Run Keyword And Return If	'${element}' == 'tenderPeriod.startDate'		Отримати дату та час	${element}
 	Run Keyword And Return If	'${element}' == 'tenderPeriod.endDate'			Отримати дату та час	${element}
-	Run Keyword And Return If	'${element}' == 'complaintPeriod.endDate'		Отримати дату та час	${element}
 	Run Keyword And Return If	'${element}' == 'bids'							Перевірити присутність bids
 	Run Keyword And Return If	'${element}' == 'value.currency'				Отримати інформацію з value.currency					${element}
 	Run Keyword And Return If	'${element}' == 'value.valueAddedTaxIncluded'	Отримати інформацію про включення ПДВ					${element}
@@ -374,6 +371,8 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Run Keyword And Return If	'${element}' == 'contracts[0].status'						Отримати інформацію з contracts[0].status			${element}
 	Run Keyword And Return If	'${element}' == 'awards[0].suppliers[0].name'				Отримати інформацію з awards[0].suppliers[0].name	${element}
 
+
+	Run Keyword If		'add_tender_doc' in ${TEST_TAGS}		Wait For Element With Reload	${tender_data_documents[0].title}	1
 
 	Wait Until Element Is Visible	${tender_data_${element}}	timeout=${COMMONWAIT}
 	${result_full} =				Get Text	${tender_data_${element}}
@@ -410,17 +409,127 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 Отримати інформацію із запитання
 	[Arguments]  ${username}  ${tender_uaid}  ${object_id}  ${field_name}
-	${element_for_work} = 	Convert To String	questions.${field_name}
-	Відкрити потрібну інформацію по тендеру	${username}	${element_for_work}
+	Відкрити потрібну інформацію по тендеру	${username}	questions
 
-	Run Keyword If	'${element_for_work}' == 'questions.title'				Wait For Element With Reload	${tender_data_${element_for_work}}	2
-	Run Keyword If	'${element_for_work}' == 'questions.answer'				Wait For Element With Reload	${tender_data_${element_for_work}}	2
-	Run Keyword And Return If	'${element_for_work}' == 'questions.date'	Отримати дату та час			${element_for_work}
+	${element_for_work} = 	Set Variable If
+		...  '${field_name}' == 'title'			xpath=//div[@class='question-head title' and contains(.,'${object_id}')]/span
+		...  '${field_name}' == 'answer'		xpath=//div[contains(.,'${object_id}')]/following-sibling::div/div[@ng-bind-html='q.answer']
+		...  '${field_name}' == 'date'			xpath=//div[@class = 'question-head title' and contains(., '${object_id}')]/b[2]
+		...  '${field_name}' == 'description'	xpath=//div[contains(.,'${object_id}')]/following-sibling::div[@ng-bind-html='q.description']
+		...  ${field_name}
 
-	Wait Until Element Is Visible	${tender_data_${element_for_work}}	timeout=${COMMONWAIT}
-	${result_full} =				Get Text	${tender_data_${element_for_work}}
-	${result} =						Strip String	${result_full}
+	Run Keyword And Return If	'${field_name}' == 'date'	Отримати дату та час	${element_for_work}
+
+	Wait For Element With Reload	${element_for_work}	2
+	Wait Until Element Is Visible	${element_for_work}	timeout=${COMMONWAIT}
+	${result_full} =				Get Text			${element_for_work}
+	${result} =						Strip String		${result_full}
 	[return]	${result}
+
+
+Отримати інформацію із скарги
+	[Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${field_name}  ${award_index}
+	Відкрити потрібну інформацію по тендеру	${username}	complaint
+	Дочекатися статусу вимоги				${complaintID}  ${TEST_NAME}
+
+	${element_for_work} = 	Set Variable If
+		...  '${field_name}' == 'title'				xpath=//div[@class='faq ng-scope' and contains(., '${complaintID}')]//span[contains(@class, 'claimHead')]
+		...  '${field_name}' == 'description'		xpath=//div[@class='faq ng-scope' and contains(., '${complaintID}')]//div[@ng-bind-html='q.description']
+		...  '${field_name}' == 'answer'			xpath=//div[@class='faq ng-scope' and contains(., '${complaintID}')]//div[@class ='question-head title']/span
+		...  '${field_name}' == 'data'				xpath=//div[@class='faq ng-scope' and contains(., '${complaintID}')]//div[@class ='question-head title']/b[2]
+		...  '${field_name}' == 'complaintID'		xpath=//div[@class='faq ng-scope' and contains(., '${complaintID}')]//span[@id='cmpl0']
+		...  '${field_name}' == 'status'			xpath=//div[@class='faq ng-scope' and contains(., '${complaintID}')]//span[@id='cmplStatus0']
+		...  '${field_name}' == 'resolutionType'	xpath=//div[@class='faq ng-scope' and contains(., '${complaintID}')]//div[@class='qa-title']
+		...  '${field_name}' == 'resolution'		xpath=//div[@class='faq ng-scope' and contains(., '${complaintID}')]//div[contains(@class, 'qa-body')]
+		...  '${field_name}' == 'satisfied'			xpath=//div[@class='faq ng-scope' and contains(., '${complaintID}')]//span[@id='cmplStatus0']
+
+	Wait For Element With Reload	${element_for_work}	3
+	Wait Until Element Is Visible	${element_for_work}	timeout=${COMMONWAIT}
+
+	Run Keyword And Return If	'${field_name}' == 'date'			Отримати дату та час				${element_for_work}
+	Run Keyword And Return If	'${field_name}' == 'status'			Отримати complaint.status			${element_for_work}
+	Run Keyword And Return If	'${field_name}' == 'resolutionType'	Отримати complaint.resolutionType	${element_for_work}
+	Run Keyword And Return If	'${field_name}' == 'satisfied'		Отримати complaint.satisfied		${element_for_work}
+
+	${result_full} = 			Get Text	${element_for_work}
+	${result_full} = 			Replace String	${result_full}	, id:	${EMPTY}
+	${result} = 				Strip String	${result_full}
+	Mark Step					result=${result}
+
+	[return]	${result}
+
+
+Дочекатися статусу вимоги
+	[Arguments]  ${complaintID}  ${test_name}
+	${test_name} =	Replace String	${test_name}	\'	${EMPTY}
+
+	${status} = 	Set Variable If
+		...  'поданого статусу' in '${test_name}'	Вiдправлено
+		...  'resolved' in '${test_name}'			Вирiшена
+		...  'answered' in '${test_name}'			Отримано вiдповiдь
+		...  'was called' in '${test_name}'			Вiдмiнено
+		...  'задоволення вимоги' in '${test_name}'	Вирiшена
+		...  ${None}
+
+	Return From Keyword If	'${status}' == '${None}'	${True}
+
+	Wait For Element With Reload	xpath=//div[@class='faq ng-scope' and contains(., '${complaintID}')]//span[contains(., '${status}')]	3
+	[return]	${True}
+
+
+Отримати complaint.status
+	[Arguments]  ${element}
+	${result_full} = 	Get Text	${element}
+	${result} = 	Set Variable If
+		...  '${result_full}' == 'Вiдправлено'			claim
+		...  '${result_full}' == 'Вирiшена'				resolved
+		...  '${result_full}' == 'Отримано вiдповiдь'	answered
+		...  '${result_full}' == 'Вiдмiнено'			was called
+		...  ${result_full}
+
+	[return]	${result}
+
+
+Отримати complaint.resolutionType
+	[Arguments]  ${element}
+	${result_full} = 	Get Text	${element}
+	${result} = 	Set Variable If
+		...  '${result_full}' == 'Резолюція'	resolved
+		...  ${result_full}
+
+	[return]	${result}
+
+
+Отримати complaint.satisfied
+	[Arguments]  ${element}
+	${result_full} = 	Get Text	${element}
+	${result} = 	Set Variable If
+		...  '${result_full}' == 'Вирiшена'	${true}
+		...  ${result_full}
+
+	[return]	${result}
+
+
+Отримати поле документації до скарги
+	[Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${given_value}  ${field_name}  ${award_index}
+	Відкрити потрібну інформацію по тендеру	${username}	complaint
+
+	${element_for_work} = 	Set Variable If
+		...  '${field_name}' == 'title'	xpath=//div[contains(., '${complaintID}')]//span[contains(@class, 'file-name')]
+
+	#get doc title
+	${is_element_visible} = 	Run Keyword And Return Status	Element Should Be Visible	${element_for_work}
+	Run Keyword If	'${field_name}' == 'title' and ${is_element_visible} == ${False}	Click Element	xpath=//div[contains(., '${complaintID}')]//a[@ng-click='q.showFiles = !q.showFiles']
+
+	Wait Until Element Is Visible	${element_for_work}	timeout=${COMMONWAIT}
+	${result_full} =	Get Text	${element_for_work}
+	${result} =			Strip String	${result_full}
+	[return]  ${result}
+
+
+Отримати документ
+	[Arguments]  ${username}  ${tender_uaid}  ${doc_url}
+	[return]  Doc Title   Doc text
 
 
 Отримати текст елемента
@@ -722,7 +831,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Fail  Функція не підтримується майданчиком
 
 
-Створити вимогу
+Створити вимогу про виправлення умов закупівлі
 	[Arguments]  ${user}  ${tender_id}  ${complaints}
 	privatmarket.Пошук тендера по ідентифікатору	${user}	${tenderId}
 	Switch To Tab						3
@@ -789,7 +898,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Wait Until Element Contains			css=span#cmplStatus0	Отменено	timeout=${COMMONWAIT}
 
 
-Задати питання
+Задати запитання на тендер
 	[Arguments]  ${provider}  ${tender_id}  ${question}
 	privatmarket.Пошук тендера по ідентифікатору	${provider}	${tender_id}
 	Wait For Ajax
@@ -813,13 +922,15 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Input text							xpath=//textarea[@ng-model='model.question.description']	${description}
 	Input text							xpath=//input[@ng-model='model.person.email']				${email}
 	Click Button						xpath=//button[@ng-click='act.sendQuestion()']
-	Wait For Notification				Ваш вопрос успешно помещен в очередь на отправку. Спасибо за обращение!
+	Wait For Notification				Ваше запитання успішно включено до черги на відправку. Дякуємо за звернення!
 	Wait Until Element Not Stale		css=span[ng-click='act.hideModal()']	40
 	Click Element						css=span[ng-click='act.hideModal()']
 	Wait Until Element Is Not Visible	xpath=//input[@ng-model='model.question.title']	timeout=20
+	#wait for synchronization
+	Sleep								150s
 
 
-Задати питання до лоту
+Задати запитання на лот
 	[Arguments]  ${provider}  ${tender_id}  ${lot_id}  ${question}
 	Обрати потрібний лот за id	${lot_id}
 	Wait Enable And Click Element	css=a[ng-click='act.sendLotEnquiry()']
@@ -827,9 +938,17 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	[return]  True
 
 
-Задати питання на предмет
+Задати запитання на предмет
 	[Arguments]  ${provider}  ${tender_id}  ${item_id}  ${question}
-	log	Is not ready yet!
+	Mark Step	${provider} - ${tender_id} - ${item_id} - ${question}
+
+	${item}	${lot} =	Отримати положення предмету		${item_id}
+	Обрати потрібний лот за порядковим номером			${lot}
+	Відкрити детальну інформацію про позицію	${item}
+
+	Wait Enable And Click Element	xpath=//a[@ng-click='act.sendItemEnquiry(adb.id)']
+	Заповнити форму питання			${question.data.title}	${question.data.description}	${USERS.users['${provider}'].email}
+	[return]  True
 
 
 Оновити сторінку з тендером
@@ -1258,15 +1377,16 @@ Switch To Tab
 Wait For Element With Reload
 	[Arguments]  ${locator}  ${tab_number}
 	Mark Step					in_wait
-	Wait Until Keyword Succeeds			4min	10s	Try Search Element	${locator}	${tab_number}
+	Wait Until Keyword Succeeds			3min	10s	Try Search Element	${locator}	${tab_number}
 
 
 Try Search Element
 	[Arguments]	${locator}  ${tab_number}
-	Mark Step					in_search
-	Reload And Switch To Tab			${tab_number}
+	Mark Step						in_search
+	Reload And Switch To Tab		${tab_number}
 	Wait For Ajax
-	Wait Until Element Is Enabled		${locator}	3
+	Sleep							2s
+	Wait Until Element Is Enabled	${locator}	3
 	[return]	True
 
 
@@ -1276,6 +1396,7 @@ Check Condition With Reload
 	Mark Step	in_check_condition_with_reload
 	Reload And Switch To Tab	${tab_number}
 	Wait For Ajax
+	sleep       2s
 
 	${tender_data} = 	Execute Javascript	return angular.element("#tenderId").scope().model.ad;
 	${result} = 		is_object_present	${tender_data}	${item_id}

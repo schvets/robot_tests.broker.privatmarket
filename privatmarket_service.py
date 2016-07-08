@@ -244,7 +244,7 @@ def is_object_present(tender_data, object_id):
     if 'l-' in object_id:
         lots = tender_data['lots']
         for lot in lots:
-            if object_id in lot['description']:
+            if object_id in lot['title']:
                 result = True
                 break
 
