@@ -724,7 +724,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	${text} =	Отримати текст елемента		${element}	${item}
 	${cause_type} =	Set Variable If
 		...  'Закупівля творів' in '${text}'	artContestIP
-		...  'Відсутність конкуренції' in '${text}'	additionalPurchase
+		...  'Відсутність конкуренції' in '${text}'	noCompetition
 		...  'Нагальна потреба' in '${text}'	quick
 		...  'двічі відмінено тендер' in '${text}'	twiceUnsuccessful
 		...  'додаткову закупівлю' in '${text}'	additionalPurchase
