@@ -204,7 +204,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 
 Відкрити потрібну інформацію по тендеру
-	[Arguments]  ${username}  ${field}
+	[Arguments]  ${field}
 	Wait Until Element Is Visible	${tender_data_title}	timeout=${COMMONWAIT}
 
 	#choose UK language
@@ -279,7 +279,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 Отримати інформацію із предмету
 	[Arguments]  ${username}  ${tender_uaid}  ${item_id}  ${element}
 	Mark Step	${username} - ${tender_uaid} - ${item_id} - ${element}
-	Відкрити потрібну інформацію по тендеру	${username}	${element}
+	Відкрити потрібну інформацію по тендеру	${element}
 
 	${item}	${lot} =	Отримати положення предмету		${item_id}
 	Обрати потрібний лот за порядковим номером			${lot}
@@ -316,8 +316,8 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 Отримати інформацію із нецінового показника
 	[Arguments]  ${username}  ${tender_uaid}  ${feature_id}  ${field_name}
-	Відкрити потрібну інформацію по тендеру	${username}  ${field_name}
-	Wait For Element With Reload            xpath=//div[contains(@class,'info-item-label') and contains(., '${feature_id}')]  1
+	Відкрити потрібну інформацію по тендеру	${field_name}
+	Wait For Element With Reload			xpath=//div[contains(@class,'info-item-label') and contains(., '${feature_id}')]  1
 
 	Обрати потрібний лот за порядковим номером	1
 
@@ -334,7 +334,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 Отримати інформацію із тендера
 	[Arguments]  ${username}  ${item}  ${element}
-	Відкрити потрібну інформацію по тендеру	${username}	${element}
+	Відкрити потрібну інформацію по тендеру	${element}
 
 	Run Keyword And Return If	'${element}' == 'value.amount'					Отримати сумму			${element}
 	Run Keyword And Return If	'${element}' == 'enquiryPeriod.startDate'		Отримати дату та час	${element}
@@ -377,7 +377,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 Отримати інформацію із лоту
 	[Arguments]  ${username}  ${tender_uaid}  ${object_id}  ${element}
-	Відкрити потрібну інформацію по тендеру		${username}	${element}
+	Відкрити потрібну інформацію по тендеру		${element}
 	${element_for_work} = 	Convert To String	lots.${element}
 
 	Run Keyword If	'add_lot' in ${TEST_TAGS}		Wait Until Keyword Succeeds	2min	10s		Check Condition With Reload	1	${object_id}
@@ -407,7 +407,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 Отримати інформацію із запитання
 	[Arguments]  ${username}  ${tender_uaid}  ${object_id}  ${field_name}
-	Відкрити потрібну інформацію по тендеру	${username}	questions
+	Відкрити потрібну інформацію по тендеру		questions
 
 	${element_for_work} = 	Set Variable If
 		...  '${field_name}' == 'title'			xpath=//div[@class='question-head title' and contains(.,'${object_id}')]/span
@@ -427,7 +427,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 Отримати інформацію із скарги
 	[Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${field_name}  ${award_index}
-	Відкрити потрібну інформацію по тендеру	${username}	complaint
+	Відкрити потрібну інформацію по тендеру	complaint
 	Дочекатися статусу вимоги				${complaintID}  ${TEST_NAME}
 
 	${element_for_work} = 	Set Variable If
@@ -510,7 +510,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 Отримати поле документації до скарги
 	[Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${given_value}  ${field_name}  ${award_index}
-	Відкрити потрібну інформацію по тендеру	${username}	complaint
+	Відкрити потрібну інформацію по тендеру	complaint
 
 	${element_for_work} = 	Set Variable If
 		...  '${field_name}' == 'title'	xpath=//div[contains(., '${complaintID}')]//span[contains(@class, 'file-name')]
@@ -822,7 +822,8 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 Створити вимогу про виправлення умов закупівлі
 	[Arguments]  ${user}  ${tender_id}  ${complaints}  ${document}
-	Switch To Tab						3
+	Відкрити потрібну інформацію по тендеру	complaint
+
 	Wait Enable And Click Element		css=button#btnSendClaim
 	Wait For Ajax
 	Wait For Element Value				css=input[ng-model='model.person.phone']
@@ -840,7 +841,8 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Wait Until Element Contains			css=div.alert-info	Ваша вимога успішно відправлена!	timeout=10
 	${claim_data} =	Create Dictionary	id=123
 	${claim_resp} =	Create Dictionary	data=${claim_data}
-	Sleep								30s
+	
+	Sleep								90s
 	[return]  ${claim_resp}
 
 
@@ -961,14 +963,13 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Run Keyword If	'без прив’язки до лоту' in '${TEST_NAME}'	Fail  Така ситуація не може виникнути
 	Run Keyword If	'без нецінового показника' in '${TEST_NAME}'	Fail  Така ситуація не може виникнути
 
-	Switch browser						${ARGUMENTS[0]}
 	privatmarket.Пошук тендера по ідентифікатору	${ARGUMENTS[0]}   ${ARGUMENTS[1]}
 
 	Відкрити заявку
 	Wait Until Element Not Stale		${locator_tenderClaim.fieldEmail}	40
 
 	${amount} =	Set Variable If
-		...  'multiLotTender' in '${SUITE_NAME}'	${Arguments[2].data.lotValues[1]['value']['amount']}
+		...  ${number_of_lots} > 0	${Arguments[2].data.lotValues[1]['value']['amount']}
 		...  ${Arguments[2].data.value.amount}
 	${amount} = 	Convert To String	${amount}
 
