@@ -99,7 +99,7 @@ ${tender_data_lots.documents[0].title}					xpath=//prozorro-doc[contains(@ng-rep
 ${tender_data_causeDescription}							css=#tenderType>div>div:nth-of-type(2)
 ${tender_data_cause}									css=#tenderType>div>div:nth-of-type(1)
 
-${tender_data_awards[0].status}									xpath=//div[@class='modal-body info-div ng-scope']/div[10]/div[2]
+${tender_data_awards[0].status}									xpath=//div[@class='modal-body info-div ng-scope']/div[4]/div[2]
 ${tender_data_awards[0].suppliers[0].address.countryName}		xpath=(//prz-address[@id='procurerAddr'])[2]//*[@id='countryName']
 ${tender_data_awards[0].suppliers[0].address.locality}			xpath=(//prz-address[@id="procurerAddr"])[2]//*[@id='locality']
 ${tender_data_awards[0].suppliers[0].address.postalCode}		xpath=(//prz-address[@id="procurerAddr"])[2]//*[@id='postalCode']
@@ -729,7 +729,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 		...  'двічі відмінено тендер' in '${text}'	twiceUnsuccessful
 		...  'додаткову закупівлю' in '${text}'	additionalPurchase
 		...  'додаткових будівельних робіт' in '${text}'	additionalConstruction
-		...  'Закупівля юридичних послуг' in '${text}'	additionalPurchase
+		...  'Закупівля юридичних послуг' in '${text}'	stateLegalServices
 	[return]	${cause_type}
 
 
