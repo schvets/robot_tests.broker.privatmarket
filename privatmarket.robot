@@ -95,7 +95,7 @@ ${tender_data_procuringEntity.identifier.scheme}		xpath=//div[@class='delivery-i
 ${tender_data_procuringEntity.identifier.id}			xpath=//div[@id='procurerId']/div[2]
 
 ${tender_data_documents[0].title}						xpath=//prozorro-doc[contains(@ng-repeat, \"documentOf:'tender'\")]//*[@class='file-name ng-binding']
-${tender_data_lots.documents[0].title}					xpath=//prozorro-doc[contains(@ng-repeat, \"documentOf:'lot'\")]//*[@class='file-name ng-binding']
+${tender_data_documents[1].title}						xpath=//prozorro-doc[contains(@ng-repeat, \"documentOf:'lot'\")]//*[@class='file-name ng-binding']
 ${tender_data_causeDescription}							css=#tenderType>div>div:nth-of-type(2)
 ${tender_data_cause}									css=#tenderType>div>div:nth-of-type(1)
 
@@ -138,12 +138,47 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 	Set Window Position		@{USERS.users['${username}'].position}
 	Maximize Browser Window
-	Run Keyword If	'Provider' in '${username}'	Login	${username}
+	Run Keyword Unless	'Viewer' in '${username}'	Login	${username}
 
 
 Створити тендер
 	[Arguments]  ${username}  ${tender_data}
-#	debug   in create tender
+	${items}=								Get From Dictionary	${tender_data.data}	items
+
+	Wait Until Element Is Enabled			id=tenders	timeout=${COMMONWAIT}
+	Switch To Frame							id=tenders
+	Sleep									2s
+	Wait Until Element Is Visible			css=button[ng-click='template.newTender()']
+	Click Button							css=button[ng-click='template.newTender()']
+
+	#choose UK language
+	${status} =	Run Keyword And Return Status	Element Should Be Visible	css=a#lang_uk
+	Run Keyword If	${status}	Click Element	css=a#lang_uk
+#step 0
+	#we should add choosing of procurementMethodType
+	Input Text									css=input[data-id='procurementName']				${tender_data.data.title}
+	Input Text									css=textarea[data-id='procurementDescription']		${tender_data.data.description}
+
+	#CPV
+	Click Button								xpath=(//button[@data-id='actChoose'])[1]
+	Wait Until Element Is Visible				css=section[data-id='classificationTreeModal']		${COMMONWAIT}
+	Wait Until Element Is Visible				css=input[data-id='query']							${COMMONWAIT}
+	Search By Query								css=input[data-id='query']	${items[0].classification.id}
+	Click Button								css=button[data-id='actConfirm']
+
+	#additionalClassifications
+	Click Button								css=section[data-id='additionalClassifications'] button[data-id='actChoose']
+	Wait Until Element Is Visible				css=section[data-id='classificationTreeModal']		${COMMONWAIT}
+	Wait Until Element Is Visible				css=input[data-id='query']							${COMMONWAIT}
+	Search By Query								css=input[data-id='query']							${items[0].additionalClassifications[0].id}
+	Click Button								css=button[data-id='actConfirm']
+
+	Click Button								css=button[data-id='actSave']
+	Close Confirmation							Данные успешно сохранены
+
+#step 1
+	Click Element								css=#tab_1
+	debug  in tender creation
 
 
 Пошук тендера по ідентифікатору
@@ -333,7 +368,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 
 Отримати інформацію із тендера
-	[Arguments]  ${username}  ${item}  ${element}
+	[Arguments]  ${username}  ${tender_ua_id}  ${element}
 	Відкрити потрібну інформацію по тендеру	${element}
 
 	Run Keyword And Return If	'${element}' == 'value.amount'					Отримати сумму			${element}
@@ -351,12 +386,12 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Run Keyword And Return If	'${element}' == 'title_ru'						Отримати інформацію з елемента зі зміною локалізації	${element}	0	ru
 	Run Keyword And Return If	'${element}' == 'description_en'				Отримати інформацію з елемента зі зміною локалізації	${element}	0	en
 	Run Keyword And Return If	'${element}' == 'description_ru'				Отримати інформацію з елемента зі зміною локалізації	${element}	0	ru
-	Run Keyword And Return If	'${element}' == 'auctionPeriod.startDate'		Отримати інформацію з auctionPeriod.startDate			${element}	${item}
+	Run Keyword And Return If	'${element}' == 'auctionPeriod.startDate'		Отримати інформацію з auctionPeriod.startDate			${element}
 	Run Keyword And Return If	'${element}' == 'procurementMethodType'			Отримати інформацію з procurementMethodType				${element}
 	Run Keyword And Return If	'${element}' == 'cancellations[0].status'		Отримати інформацію з cancellations[0].status			${element}
 	Run Keyword And Return If	'${element}' == 'cause'							Отримати інформацію з cause								${element}
 
-	Run Keyword And Return If	'${element}' == 'lots.value.amount'							Отримати сумму										${element}	0	${item}
+	Run Keyword And Return If	'${element}' == 'lots.value.amount'							Отримати сумму										${element}	0
 	Run Keyword And Return If	'${element}' == 'causeDescription'							Отримати інформацію з causeDescription				${element}
 	Run Keyword And Return If	'${element}' == 'awards[0].status'							Отримати інформацію з awards[0].status				${element}
 	Run Keyword And Return If	'${element}' == 'awards[0].value.currency'					Отримати інформацію з awards[0].value.currency		${element}
@@ -456,6 +491,10 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 	[return]	${result}
 
+
+Отримати інформацію із пропозиції
+	[Arguments]  ${username}  ${tenderUA_id}  ${field}
+	debug   on position
 
 Дочекатися статусу вимоги
 	[Arguments]  ${complaintID}  ${test_name}
@@ -833,21 +872,27 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Input Text							css=div.info-item-val textarea							${complaints.data.description}
 	Scroll Page To Element				xpath=//input[@ng-model='model.person.email']
 	Input Text							xpath=//input[@ng-model='model.person.email']			${USERS.users['${user}'].email}
-	Завантажити документ до вимоги		${user}	${tender_id}	${complaints}	${document}
+	Завантажити документ до вимоги		${document}
 	Click Button						css=button[ng-click='act.sendComplaint()']
 	Wait For Ajax
 	Wait Until Element Is Enabled		css=div.alert-info	timeout=${COMMONWAIT}
 	Wait Until Element Not Stale		css=div.alert-info	40
 	Wait Until Element Contains			css=div.alert-info	Ваша вимога успішно відправлена!	timeout=10
-	${claim_data} =	Create Dictionary	id=123
+	Wait Until Element Not Stale		css=span[ng-click='act.hideModal()']	40
+	Click Element						css=span[ng-click='act.hideModal()']
+	Wait Until Element Is Not Visible	xpath=//input[@ng-model='model.question.title']	timeout=20
+
+	${claim_id} = 						Get Text		css=span#cmpl0
+	${claim_id} = 						Replace String	${claim_id}	, id:	${EMPTY}
+	${claim_data} =	Create Dictionary	id=${claim_id}
 	${claim_resp} =	Create Dictionary	data=${claim_data}
 	
-	Sleep								90s
+	Sleep								15s
 	[return]  ${claim_resp}
 
 
 Завантажити документ до вимоги
-	[Arguments]  ${user}  ${tender_id}  ${complaints}  ${document}
+	[Arguments]  ${document}
 	${correctFilePath} = 				Replace String	${document}	\\	\/
 	Execute Javascript					$("#fileToUpload").removeClass();
 	Choose File							css=input#fileToUpload	${correctFilePath}
@@ -968,6 +1013,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Відкрити заявку
 	Wait Until Element Not Stale		${locator_tenderClaim.fieldEmail}	40
 
+	debug    in bid
 	${amount} =	Set Variable If
 		...  ${number_of_lots} > 0	${Arguments[2].data.lotValues[1]['value']['amount']}
 		...  ${Arguments[2].data.value.amount}
@@ -1227,6 +1273,7 @@ Login
 	Input Text							xpath=//div[@id="login_modal" and @style='display: block;']//input[@type='password']	${USERS.users['${username}'].password}
 	Click Element						xpath=//div[@id="login_modal" and @style='display: block;']//button[@type='submit']
 	Wait Until Element Is Visible		css=ul.user-menu  timeout=30
+	Sleep								1s
 	Wait Until Element Is Visible		css=a[data-target='#select_cabinet']  timeout=${COMMONWAIT}
 
 
@@ -1404,3 +1451,13 @@ Wait For Ajax Overflow Vanish
 Click element by JS
 	[Arguments]	${locator}
 	Execute Javascript					window.$("${locator}").mouseup()
+
+
+Search By Query
+	[Arguments]  ${element}  ${query}
+	Input Text							${element}	${query}+
+	Sleep								1s
+	Press Key							${element}	\\08
+	Wait Until Element Is Enabled		css=input[id='found_${query}']	${COMMONWAIT}
+	Wait Until Element Not Stale		xpath=//div[input[@id='found_${query}']]	5
+	Click Element						xpath=//div[input[@id='found_${query}']]
