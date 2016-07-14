@@ -49,6 +49,7 @@ ${tender_data_items.quantity}									xpath=//div[.='Кількість:']/follo
 ${tender_data_lots.title}										css=div.lot-head span.ng-binding
 ${tender_data_lots.description}									css=section.lot-description section.description
 ${tender_data_lots.value.amount}								css=#lotAmount
+${tender_data_lotValues[0].value.amount}						xpath=//table[@class='bids']//tr[1]/td[3]
 ${tender_data_lots.value.currency}								css=#lotCcy
 ${tender_data_lots.value.valueAddedTaxIncluded}					css=#lotTax
 ${tender_data_lots.minimalStep.amount}							css=#lotMinStepAmount
@@ -62,8 +63,7 @@ ${locator_tenderCreation.buttonBack}			xpath=//a[@ng-click='act.goBack()']
 ${locator_tenderCreation.description}			css=textarea[ng-model='model.filterData.adbName']
 
 ${locator_tenderClaim.buttonCreate}				css=button[ng-click='act.createAfp()']
-${locator_tenderClaim.fieldPrice}				xpath=//input[@ng-model='model.price']
-${locator_tenderClaim.checkedLot.fieldPrice}	xpath=//input[@ng-model='model.checkedLot.userPrice']
+${locator_tenderClaim.fieldPrice}				css=input#userPrice
 ${locator_tenderClaim.fieldEmail}				css=input[ng-model='model.person.email']
 ${locator_tenderClaim.buttonSend}				css=button[ng-click='act.sendAfp()']
 ${locator_tenderClaim.buttonCancel}				css=button[ng-click='act.delAfp()']
@@ -204,6 +204,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 		...  'negotiation' in '${suite_name}'	False
 		...  True
 
+	Mark Step								before search
 	Wait For Tender							${ARGUMENTS[1]}	${education_type}
 	sleep									2s
 	Click Element							css=tr[id='${ARGUMENTS[1]}']
@@ -391,7 +392,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Run Keyword And Return If	'${element}' == 'cancellations[0].status'		Отримати інформацію з cancellations[0].status			${element}
 	Run Keyword And Return If	'${element}' == 'cause'							Отримати інформацію з cause								${element}
 
-	Run Keyword And Return If	'${element}' == 'lots.value.amount'							Отримати сумму										${element}	0
+	Run Keyword And Return If	'${element}' == 'lots.value.amount'							Отримати сумму										${element}
 	Run Keyword And Return If	'${element}' == 'causeDescription'							Отримати інформацію з causeDescription				${element}
 	Run Keyword And Return If	'${element}' == 'awards[0].status'							Отримати інформацію з awards[0].status				${element}
 	Run Keyword And Return If	'${element}' == 'awards[0].value.currency'					Отримати інформацію з awards[0].value.currency		${element}
@@ -493,8 +494,10 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 
 Отримати інформацію із пропозиції
-	[Arguments]  ${username}  ${tenderUA_id}  ${field}
-	debug   on position
+	[Arguments]  ${username}  ${tenderUA_id}  ${element}
+
+	Run Keyword And Return If	'${element}' == 'lotValues[0].value.amount'		Отримати сумму	${element}
+
 
 Дочекатися статусу вимоги
 	[Arguments]  ${complaintID}  ${test_name}
@@ -594,10 +597,12 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	${result}=	Convert To Number	${value}
 	[return]	${result}
 
+
 Отримати сумму
 	[Arguments]  ${element_name}
 	${value}=	Get text			${tender_data_${element_name}}
 	${value}=	Replace String		${value}	${SPACE}	${EMPTY}
+	${value}=	Replace String		${value}	грн			${EMPTY}
 	${result}=	Convert To Number	${value}	2
 	[return]	${result}
 
@@ -1004,6 +1009,8 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	...	${ARGUMENTS[0]} ==  username
 	...	${ARGUMENTS[1]} ==  tenderId
 	...	${ARGUMENTS[2]} ==  bid
+	...	${ARGUMENTS[2]} ==  lots_ids
+	...	${ARGUMENTS[2]} ==  features_ids
 
 	Run Keyword If	'без прив’язки до лоту' in '${TEST_NAME}'	Fail  Така ситуація не може виникнути
 	Run Keyword If	'без нецінового показника' in '${TEST_NAME}'	Fail  Така ситуація не може виникнути
@@ -1011,16 +1018,13 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	privatmarket.Пошук тендера по ідентифікатору	${ARGUMENTS[0]}   ${ARGUMENTS[1]}
 
 	Відкрити заявку
-	Wait Until Element Not Stale		${locator_tenderClaim.fieldEmail}	40
-
-	debug    in bid
+	Wait Until Element Not Stale		${locator_tenderClaim.fieldEmail}	20
 	${amount} =	Set Variable If
-		...  ${number_of_lots} > 0	${Arguments[2].data.lotValues[1]['value']['amount']}
+		...  ${number_of_lots} > 0	${Arguments[2].data.lotValues[0].value.amount}
 		...  ${Arguments[2].data.value.amount}
 	${amount} = 	Convert To String	${amount}
 
-	Run Keyword If	'multiLotTender' in '${SUITE_NAME}'	Input Text	${locator_tenderClaim.checkedLot.fieldPrice}	${amount}
-		...  ELSE	Input Text	${locator_tenderClaim.fieldPrice}	${amount}
+	Input Text	${locator_tenderClaim.fieldPrice}	${amount}
 
 	Click Element						${locator_tenderClaim.fieldEmail}
 	Input Text							${locator_tenderClaim.fieldEmail}	${USERS.users['${ARGUMENTS[0]}'].email}
@@ -1033,15 +1037,15 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Scroll Page To Element				${locator_tenderClaim.buttonSend}
 	Click Button						${locator_tenderClaim.buttonSend}
 	Wait For Ajax Overflow Vanish
-	Close confirmation					Ваша заявка была успешно помещена в очередь на отправку!
+	Close confirmation					Ваша заявка була успішно включена до черги на відправку!
 	Wait Until Element Is Visible		css=div.afp-info.ng-scope.ng-binding
 	wait until element contains			css=div.afp-info.ng-scope.ng-binding	Номер заявки
 	Wait For Ajax
 	${claim_id}=						Get text			css=div.afp-info.ng-scope.ng-binding
 	${result}=							Get Regexp Matches	${claim_id}	Номер заявки: (\\d*),	1
 
-	Run Keyword If	'open' in '${SUITE_NAME}'	Run Keywords	Click Element	css=a[ng-click='act.ret2Ad()']
-	...   AND   Wait For Element With Reload	xpath=//table[@class='bids']//tr[1]/td[4 and contains(., 'Отправлена')]	1
+	Click Element					css=a[ng-click='act.ret2Ad()']
+	Wait For Element With Reload	xpath=//table[@class='bids']//tr[1]/td[4 and contains(., 'Відправлена')]	1
 
 	[return]	${Arguments[2]}
 
@@ -1087,8 +1091,8 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Click Button						${locator_tenderClaim.buttonSend}
 
 	${test_name} =	Convert To Lowercase	${TEST_NAME}
-	Run Keyword If	'оновити статус цінової пропозиції' in '${test_name}'	Close confirmation	Ваша заявка была успешно помещена в очередь на отправку!
-		...  ELSE	Close confirmation	Ваша заявка была успешно сохранена!
+	Run Keyword If	'оновити статус цінової пропозиції' in '${test_name}'	Close confirmation	Ваша заявка була успішно включена до черги на відправку!
+		...  ELSE	Close confirmation	Ваша заявка була успішно збережена!
 
 	Wait Until Element Is Visible		css=div.afp-info.ng-scope.ng-binding
 	Wait For Ajax
@@ -1102,15 +1106,18 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Select From List	xpath=(//select[@ng-model='feature.userValue'])[1]	${fieldvalue}
 
 
-Змінити lotValues.0.value.amount
+Змінити lotValues[0].value.amount
 	[Arguments]  ${fieldvalue}
-	Input Text	${locator_tenderClaim.checkedLot.fieldPrice}	${fieldvalue}
+	${fieldvalue} = 	Convert To String			${fieldvalue}
+	Clear Element Text								${locator_tenderClaim.fieldPrice}
+	debug     123
+	Input Text	${locator_tenderClaim.fieldPrice}	${fieldvalue}
 
 
 Змінити value.amount
 	[Arguments]  ${fieldvalue}
-	Run Keyword If	'multiLotTender' in '${SUITE_NAME}'	Input Text	${locator_tenderClaim.checkedLot.fieldPrice}	${fieldvalue}
-		...  ELSE	Input Text	${locator_tenderClaim.fieldPrice}	${fieldvalue}
+	Clear Element Text								${locator_tenderClaim.fieldPrice}
+	Input Text	${locator_tenderClaim.fieldPrice}	${fieldvalue}
 
 
 Змінити status
@@ -1178,7 +1185,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Wait Until Element Is Visible		xpath=(//div[contains(@class, 'file-item')])[1]	timeout=30
 
 	Click Button						${locator_tenderClaim.buttonSend}
-	Close confirmation					Ваша заявка была успешно сохранена!
+	Close confirmation					Ваша заявка була успішно збережена!
 	${dateModified}						Get text	css=span.file-tlm
 	Click Element						${locator_tenderClaim.buttonGoBack}
 	wait until element is visible		css=table.bids tr
