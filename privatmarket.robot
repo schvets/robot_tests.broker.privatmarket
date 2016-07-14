@@ -143,7 +143,9 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 Створити тендер
 	[Arguments]  ${username}  ${tender_data}
-	${items}=								Get From Dictionary	${tender_data.data}	items
+	${items} =								Get From Dictionary	${tender_data.data}	items
+	${features} =							Get From Dictionary	${tender_data.data}	features
+	${lots} =								Get From Dictionary	${tender_data.data}	lots
 
 	Wait Until Element Is Enabled			id=tenders	timeout=${COMMONWAIT}
 	Switch To Frame							id=tenders
@@ -164,6 +166,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Wait Until Element Is Visible				css=section[data-id='classificationTreeModal']		${COMMONWAIT}
 	Wait Until Element Is Visible				css=input[data-id='query']							${COMMONWAIT}
 	Search By Query								css=input[data-id='query']	${items[0].classification.id}
+	debug      54646
 	Click Button								css=button[data-id='actConfirm']
 
 	#additionalClassifications
@@ -177,8 +180,53 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Close Confirmation							Данные успешно сохранены
 
 #step 1
-	Click Element								css=#tab_1
-	debug  in tender creation
+	Click Element		css=#tab_1
+	Додати lots			${lots}
+#step 2
+	Додати items		${items}
+
+#step 3
+	Click Element			css=#tab_2
+	${features_count} = 	Get Length	${features}
+	Run Keyword If	${features_count} > 0	Додати features	${features}
+
+
+Додати lots
+	[Arguments]  ${lots}
+	${lots_count} = 			Get Length	${lots}
+
+	: FOR    ${index}    IN RANGE    0    ${lots_count}
+	\    Mark Step		lot_num_${index}
+	\    Click button											css=button[ng-click='model.addLot()']
+	\    Wait Until Element Is Enabled							css=input[data-id='title']	10s
+	\    Input Text		css=input[data-id='title']				${lots[${index}].title}
+	\    Input Text		css=textarea[data-id='description']		${lots[${index}].description}
+	\    ${value_amount} = 			Convert to String			${lots[${index}].value.amount}
+	\    ${minimalStep_amount} = 	Convert to String			${lots[${index}].minimalStep.amount}
+	\    debug       1234564
+	\    Input Text		css=input[data-id='valueAmount']		${value_amount}
+	\    Input Text		css=input[data-id='minimalStepAmount']	${minimalStep_amount}
+	\    Input Text		css=input[data-id='guaranteeAmount']	1
+
+
+Додати features
+	[Arguments]  ${features}
+	debug    in features
+
+
+Додати items
+	[Arguments]  ${items}
+	${items_count} = 			Get Length	${items}
+
+	: FOR    ${index}    IN RANGE    0    ${items_count}
+	\    Mark Step		item_num_${index}
+	\    Click button											css=button[ng-click='model.addItem(lot)']
+	\    Wait Until Element Is Enabled							css=input[ng-model='item.description']	10s
+	\    debug    in items
+	\    Input Text		css=input[ng-model='item.description']	${items[${index}].description}
+	\    Input Text		css=input[data-id='quantity']	${items[${index}].quantity}
+	\    Click Element   xpath=//select[@data-id='unit']/option[text()='${items[${index}].unit.name}']
+	\    Input Text   xpath=//input[@end-date='item.deliveryDate.endDate']
 
 
 Пошук тендера по ідентифікатору
@@ -889,6 +937,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 	${claim_id} = 						Get Text		css=span#cmpl0
 	${claim_id} = 						Replace String	${claim_id}	, id:	${EMPTY}
+	${claim_id} =						Strip String	${claim_id}	mode=both
 	Sleep								15s
 	[return]  ${claim_id}
 
@@ -1107,7 +1156,6 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	[Arguments]  ${fieldvalue}
 	${fieldvalue} = 	Convert To String			${fieldvalue}
 	Clear Element Text								${locator_tenderClaim.fieldPrice}
-	debug     123
 	Input Text	${locator_tenderClaim.fieldPrice}	${fieldvalue}
 
 
