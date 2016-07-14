@@ -347,7 +347,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Wait Until Element Is Visible	${tender_data_${element}}	timeout=${COMMONWAIT}
 	${result_full} =				Get Text	${tender_data_${element}}
 	${result} =						Strip String	${result_full}
-	[Return]  ${field_value}
+	[Return]  ${result}
 
 
 Отримати інформацію із нецінового показника
@@ -889,11 +889,8 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 	${claim_id} = 						Get Text		css=span#cmpl0
 	${claim_id} = 						Replace String	${claim_id}	, id:	${EMPTY}
-	${claim_data} =	Create Dictionary	id=${claim_id}
-	${claim_resp} =	Create Dictionary	data=${claim_data}
-	
 	Sleep								15s
-	[return]  ${claim_resp}
+	[return]  ${claim_id}
 
 
 Завантажити документ до вимоги
