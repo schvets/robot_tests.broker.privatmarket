@@ -166,7 +166,6 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Wait Until Element Is Visible				css=section[data-id='classificationTreeModal']		${COMMONWAIT}
 	Wait Until Element Is Visible				css=input[data-id='query']							${COMMONWAIT}
 	Search By Query								css=input[data-id='query']	${items[0].classification.id}
-	debug      54646
 	Click Button								css=button[data-id='actConfirm']
 
 	#additionalClassifications
@@ -203,9 +202,10 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	\    Input Text		css=textarea[data-id='description']		${lots[${index}].description}
 	\    ${value_amount} = 			Convert to String			${lots[${index}].value.amount}
 	\    ${minimalStep_amount} = 	Convert to String			${lots[${index}].minimalStep.amount}
-	\    debug       1234564
 	\    Input Text		css=input[data-id='valueAmount']		${value_amount}
+	\    Sleep			1s
 	\    Input Text		css=input[data-id='minimalStepAmount']	${minimalStep_amount}
+	\    Sleep			1s
 	\    Input Text		css=input[data-id='guaranteeAmount']	1
 
 
@@ -225,8 +225,11 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	\    debug    in items
 	\    Input Text		css=input[ng-model='item.description']	${items[${index}].description}
 	\    Input Text		css=input[data-id='quantity']	${items[${index}].quantity}
-	\    Click Element   xpath=//select[@data-id='unit']/option[text()='${items[${index}].unit.name}']
-	\    Input Text   xpath=//input[@end-date='item.deliveryDate.endDate']
+	\    Click Element	xpath=//select[@data-id='unit']/option[text()='${items[${index}].unit.name}']
+	\    ${deliveryDate} =	Get Regexp Matches	${items[${index}].deliveryDate.endDate}	(\\d{4}-\\d{2}-\\d{2})
+	\    ${deliveryDate} =	Convert Date	${deliveryDate}	result_format=%d-%m-%Y
+	\    Execute Javascript	$("input[ng-model='item.deliveryDate.sd.d']").datepicker('setDate', '${items[${index}].deliveryDate.endDate}');
+	\    Execute Javascript	$("input[ng-model='item.deliveryDate.ed.d']").datepicker('setDate', '${items[${index}].deliveryDate.endDate}');
 
 
 Пошук тендера по ідентифікатору
@@ -915,7 +918,29 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 Створити вимогу про виправлення умов закупівлі
 	[Arguments]  ${user}  ${tender_id}  ${complaints}  ${document}
 	Відкрити потрібну інформацію по тендеру	complaint
+	Заповнити форму вимоги	${user}  ${complaints}  ${document}
 
+	${claim_id} = 						Get Text		css=span#cmpl0
+	${claim_id} = 						Replace String	${claim_id}	, id:	${EMPTY}
+	${claim_id} =						Strip String	${claim_id}	mode=both
+	Sleep								10s
+	[return]  ${claim_id}
+
+
+Створити вимогу про виправлення умов лоту
+	[Arguments]    ${user}  ${tender_id}  ${claim}  ${lot_id}  ${document}
+	Обрати потрібний лот за id			${lot_id}
+
+	Click Element	css=a[ng-click='act.showComplaintLot()']
+	Заповнити форму вимоги	${user}  ${claim}  ${document}
+	Відкрити потрібну інформацію по тендеру	complaint
+	${claim_id} = 						Get Text		css=span#cmpl0
+	${claim_id} = 						Replace String	${claim_id}	, id:	${EMPTY}
+	${claim_id} =						Strip String	${claim_id}	mode=both
+
+
+Заповнити форму вимоги
+	[Arguments]  ${user}  ${complaints}  ${document}
 	Wait Enable And Click Element		css=button#btnSendClaim
 	Wait For Ajax
 	Wait For Element Value				css=input[ng-model='model.person.phone']
@@ -935,12 +960,6 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Click Element						css=span[ng-click='act.hideModal()']
 	Wait Until Element Is Not Visible	xpath=//input[@ng-model='model.question.title']	timeout=20
 
-	${claim_id} = 						Get Text		css=span#cmpl0
-	${claim_id} = 						Replace String	${claim_id}	, id:	${EMPTY}
-	${claim_id} =						Strip String	${claim_id}	mode=both
-	Sleep								15s
-	[return]  ${claim_id}
-
 
 Завантажити документ до вимоги
 	[Arguments]  ${document}
@@ -950,25 +969,6 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	sleep								5s
 	Wait Until Element Is Visible		css=div.file-item
 	[return]  ${document}
-
-
-#TODO Multiple keywords with name 'Завантажити документацію до вимоги' found. Give the full name of the keyword you want to use:
-#Подати вимогу
-#	[Arguments]  ${user}  ${tender_id}  ${complaints}  ${confrimation_data}
-#	Click Button						xpath=//button[@ng-click='act.sendComplaint()']
-#	Wait For Ajax
-#	Wait Until Element Is Enabled		css=div.alert-info	timeout=${COMMONWAIT}
-#	Wait Until Element Not Stale		css=div.alert-info	40
-#	Wait Until Element Contains			css=div.alert-info	Ваше требование успешно отправлено!	timeout=10
-#	Wait For Ajax
-#	sleep								3s
-#	Wait Until Element Is Not Visible	xpath=//input[@ng-model="model.question.title"]	timeout=${COMMONWAIT}
-#	Wait For Ajax
-#	Wait Until Element Not Stale		css=span[ng-click='act.hideModal()']	40
-#	Click Element						css=span[ng-click='act.hideModal()']
-#	sleep								3s
-#	Wait Until Element Is Not Visible	css=div.info-item-val textarea	timeout=30
-#	Element Should Not Be Visible		css=div.error
 
 
 Скасувати вимогу
@@ -985,6 +985,17 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=button[ng-click='act.cancelComplaint()']	timeout=${COMMONWAIT}
 	Wait Until Element Contains			css=span#cmplStatus0	Отменено	timeout=${COMMONWAIT}
+
+
+Підтвердити вирішення вимоги про виправлення умов лоту
+	[Arguments]    ${user}  ${tender_id}  ${complaintID}  ${confirmation_data}
+	Click Element			xpath=//div[contains(@ng-repeat, 'model.ad.complaints') and contains(., '${complaintID}')]//button[contains(@class, 'btn-success')]
+	Wait For Ajax
+	Wait Until Element Is Visible		css=h4.ng-binding	${COMMONWAIT}
+	Wait Until Element Contains			css=h4.ng-binding	Ваша вимога була задоволена	${COMMONWAIT}
+	Scroll Page To Element				css=h4.ng-binding
+	Wait Visibulity And Click Element	xpath=//button[@ng-click='act.hideMsg()']
+	Wait Until Element Is Not Visible	xpath=//button[@ng-click='act.hideMsg()']	${COMMONWAIT}
 
 
 Задати запитання на тендер
