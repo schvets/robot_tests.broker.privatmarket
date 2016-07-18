@@ -120,7 +120,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 *** Keywords ***
 Підготувати дані для оголошення тендера
-	[Arguments]  ${username}  ${tender_data}
+	[Arguments]  ${username}  ${tender_data}  ${role_name}
 	[return]	${tender_data}
 
 
@@ -228,7 +228,8 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	\    Input Text		css=input[data-id='quantity']	${items[${index}].quantity}
 	\    Click Element	xpath=//select[@data-id='unit']/option[text()='${items[${index}].unit.name}']
 	\    ${deliveryDate} =	Get Regexp Matches	${items[${index}].deliveryDate.endDate}	(\\d{4}-\\d{2}-\\d{2})
-	\    ${deliveryDate} =	Convert Date	${deliveryDate}	result_format=%d-%m-%Y
+	\    ${deliveryDate} =	Convert Date	${deliveryDate}	result_format=%d-%m-%
+	\    ${deliveryDate} =	Convert To String	${deliveryDate}
 	\    Execute Javascript	$("input[ng-model='item.deliveryDate.sd.d']").datepicker('setDate', '${items[${index}].deliveryDate.endDate}');
 	\    Execute Javascript	$("input[ng-model='item.deliveryDate.ed.d']").datepicker('setDate', '${items[${index}].deliveryDate.endDate}');
 
@@ -1522,7 +1523,7 @@ Search By Query
 	[Arguments]  ${element}  ${query}
 	Input Text							${element}	${query}+
 	Sleep								1s
-	Press Key							${element}	\\08
+	Press Key							${element}	\\08Wait Until Element Not Stale		css=input[id='found_${query}']	3
 	Wait Until Element Is Enabled		css=input[id='found_${query}']	${COMMONWAIT}
 	Wait Until Element Not Stale		xpath=//div[input[@id='found_${query}']]	5
 	Click Element						xpath=//div[input[@id='found_${query}']]
