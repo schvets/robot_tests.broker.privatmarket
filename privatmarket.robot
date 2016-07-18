@@ -147,6 +147,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	${features} =							Get From Dictionary	${tender_data.data}	features
 	${lots} =								Get From Dictionary	${tender_data.data}	lots
 
+
 	Wait Until Element Is Enabled			id=tenders	timeout=${COMMONWAIT}
 	Switch To Frame							id=tenders
 	Sleep									2s
@@ -654,7 +655,8 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	${value}=	Get text			${tender_data_${element_name}}
 	${value}=	Replace String		${value}	${SPACE}	${EMPTY}
 	${value}=	Replace String		${value}	грн			${EMPTY}
-	${result}=	Convert To Number	${value}	2
+	${result}=	Convert To Number	${value}
+	${result}=	Evaluate			round(${value}, 2)
 	[return]	${result}
 
 
