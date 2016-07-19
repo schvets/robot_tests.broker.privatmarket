@@ -159,7 +159,9 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 #step 0
 	#we should add choosing of procurementMethodType
 	Input Text									css=input[data-id='procurementName']				${tender_data.data.title}
+	Sleep	1s
 	Input Text									css=textarea[data-id='procurementDescription']		${tender_data.data.description}
+	Sleep	1s
 
 	#CPV
 	Mark Step									CPV
@@ -184,18 +186,18 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Click Button								css=button[data-id='actSave']
 	Close Confirmation							Данные успешно сохранены
 
-	#step 1
+#step 1
 	Mark Step									step 1
 	Click Element								css=#tab_1
 	Додати lots									${lots}
 
-	#step 2
+#step 2
 	Mark Step									step 2
 	Додати items								${items}
 	Click Button								css=button[data-id='actSave']
 	Close Confirmation							Данные успешно сохранены
 
-	#step 3
+#step 3
 	Mark Step									step 3
 	Click Element								css=#tab_2
 	${features_count} = 						Get Length	${features}
@@ -248,17 +250,20 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 Додати criterion
 	[Arguments]  ${feature}
-	@{criterion_title_list} = 		Get Webelements			css=input[ng-model='criterion.title']
 	@{criterion_value_list} = 		Get Webelements			css=input[ng-model='criterion.value']
+	@{criterion_title_list} = 		Get Webelements			css=input[ng-model='criterion.title']
 	@{criterions_data} = 			Get From Dictionary		${feature}	enum
 	${criterions_data_length} = 	Get Length	${criterions_data}
 	: FOR    ${index}    IN RANGE    0    ${criterions_data_length}
 	\    Mark Step		creterion_num_${index}
+	\    ${local_index} = 									Evaluate								${criterions_data_length}-1
+	\    ${value} = 										Evaluate								${criterions_data[${index}].value}*100
+	\    ${value} = 										Convert To String						${value}
 	\    debug       in criterion
-	\    Input Text										${criterion_title_list[${index}]}		${features[${index}].title}
-	\    ${value} = 									Evaluate	${features[${index}].value}*100
-	\    Run Keyword If	${value} != 0	Input Text		${criterion_value_list[${index}]}		${value}
-	Click button										css=div[ng-show='feature.expanded'] button[data-id='actCollapse']
+	\    Input Text			${criterion_title_list[${index}]}	${criterions_data[${index}].title}
+	\    Run Keyword Unless	${value} == 0	Input Text	${criterion_value_list[${index}]}	${value}
+
+	Click button		css=div[ng-show='feature.expanded'] button[data-id='actCollapse']
 
 
 Додати items
