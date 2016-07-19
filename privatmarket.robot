@@ -147,7 +147,6 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	${features} =							Get From Dictionary	${tender_data.data}	features
 	${lots} =								Get From Dictionary	${tender_data.data}	lots
 
-
 	Wait Until Element Is Enabled			id=tenders	timeout=${COMMONWAIT}
 	Switch To Frame							id=tenders
 	Sleep									2s
@@ -163,32 +162,44 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Input Text									css=textarea[data-id='procurementDescription']		${tender_data.data.description}
 
 	#CPV
+	Mark Step									CPV
+	Wait For Ajax
 	Click Button								xpath=(//button[@data-id='actChoose'])[1]
 	Wait Until Element Is Visible				css=section[data-id='classificationTreeModal']		${COMMONWAIT}
 	Wait Until Element Is Visible				css=input[data-id='query']							${COMMONWAIT}
 	Search By Query								css=input[data-id='query']	${items[0].classification.id}
+	Wait For Ajax
 	Click Button								css=button[data-id='actConfirm']
 
 	#additionalClassifications
+	Mark Step									additionalClassifications
 	Click Button								css=section[data-id='additionalClassifications'] button[data-id='actChoose']
 	Wait Until Element Is Visible				css=section[data-id='classificationTreeModal']		${COMMONWAIT}
 	Wait Until Element Is Visible				css=input[data-id='query']							${COMMONWAIT}
 	Search By Query								css=input[data-id='query']							${items[0].additionalClassifications[0].id}
+	Wait For Ajax
 	Click Button								css=button[data-id='actConfirm']
+	Wait For Ajax
 
 	Click Button								css=button[data-id='actSave']
 	Close Confirmation							Данные успешно сохранены
 
-#step 1
-	Click Element		css=#tab_1
-	Додати lots			${lots}
-#step 2
-	Додати items		${items}
+	#step 1
+	Mark Step									step 1
+	Click Element								css=#tab_1
+	Додати lots									${lots}
 
-#step 3
-	Click Element			css=#tab_2
-	${features_count} = 	Get Length	${features}
-	Run Keyword If	${features_count} > 0	Додати features	${features}
+	#step 2
+	Mark Step									step 2
+	Додати items								${items}
+	Click Button								css=button[data-id='actSave']
+	Close Confirmation							Данные успешно сохранены
+
+	#step 3
+	Mark Step									step 3
+	Click Element								css=#tab_2
+	${features_count} = 						Get Length	${features}
+	Run Keyword If		${features_count} > 0	Додати features	${features}
 
 
 Додати lots
@@ -197,6 +208,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 	: FOR    ${index}    IN RANGE    0    ${lots_count}
 	\    Mark Step		lot_num_${index}
+	\    Wait For Ajax
 	\    Click button											css=button[ng-click='model.addLot()']
 	\    Wait Until Element Is Enabled							css=input[data-id='title']	10s
 	\    Input Text		css=input[data-id='title']				${lots[${index}].title}
@@ -212,7 +224,41 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 Додати features
 	[Arguments]  ${features}
-	debug    in features
+	${features_count} = 		Get Length	${features}
+	Wait For Ajax
+	@{actExpand_btn_list} = 	Get Webelements	css=button[data-id='actExpand']
+	:FOR    ${ELEMENT}    IN    @{actExpand_btn_list}
+	\    Wait Until Element Is Visible	${ELEMENT}	${COMMONWAIT}
+	\    Click button	${ELEMENT}
+	\    @{actExpand_btn_list} = 	Get Webelements	css=button[data-id='actExpand']
+
+
+	: FOR    ${index}    IN RANGE    0    ${features_count}
+	\    Mark Step		feature_num_${index}
+	\    ${btn_locator} = 	Set Variable If
+	\    ...  'tenderer' == '${features[${index}].featureOf}'	css=button[ng-click='model.addFeature(\\'tenderer\\')']
+	\    ...  'item' == '${features[${index}].featureOf}'		css=button[ng-click='model.addFeature(\\'item\\', item.id)']
+	\    ...  'lot' == '${features[${index}].featureOf}'		css=button[ng-click='model.addFeature(\\'lot\\', lot.id)']
+	\    Click Button											${btn_locator}
+	\    Click Button											css=div[ng-show='feature.expanded'] button[data-id='actAdd']
+	\    Input Text												css=input[ng-model='feature.title']				${features[${index}].title}
+	\    Input Text												css=textarea[ng-model='feature.description']	${features[${index}].description}
+	\    Додати criterion										${features[${index}]}
+
+
+Додати criterion
+	[Arguments]  ${feature}
+	@{criterion_title_list} = 		Get Webelements			css=input[ng-model='criterion.title']
+	@{criterion_value_list} = 		Get Webelements			css=input[ng-model='criterion.value']
+	@{criterions_data} = 			Get From Dictionary		${feature}	enum
+	${criterions_data_length} = 	Get Length	${criterions_data}
+	: FOR    ${index}    IN RANGE    0    ${criterions_data_length}
+	\    Mark Step		creterion_num_${index}
+	\    debug       in criterion
+	\    Input Text										${criterion_title_list[${index}]}		${features[${index}].title}
+	\    ${value} = 									Evaluate	${features[${index}].value}*100
+	\    Run Keyword If	${value} != 0	Input Text		${criterion_value_list[${index}]}		${value}
+	Click button										css=div[ng-show='feature.expanded'] button[data-id='actCollapse']
 
 
 Додати items
@@ -223,15 +269,16 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	\    Mark Step		item_num_${index}
 	\    Click button											css=button[ng-click='model.addItem(lot)']
 	\    Wait Until Element Is Enabled							css=input[ng-model='item.description']	10s
-	\    debug    in items
 	\    Input Text		css=input[ng-model='item.description']	${items[${index}].description}
-	\    Input Text		css=input[data-id='quantity']	${items[${index}].quantity}
-	\    Click Element	xpath=//select[@data-id='unit']/option[text()='${items[${index}].unit.name}']
-	\    ${deliveryDate} =	Get Regexp Matches	${items[${index}].deliveryDate.endDate}	(\\d{4}-\\d{2}-\\d{2})
-	\    ${deliveryDate} =	Convert Date	${deliveryDate}	result_format=%d-%m-%
+	\    Input Text		css=input[data-id='quantity']			${items[${index}].quantity}
+	\    ${unit} = 		get_unit_ru_name						${items[${index}].unit.name}
+	\    Mark Step			choose_unit_${unit}
+	\    Click Element		xpath=//select[@data-id='unit']/option[text()='${unit}']
+	\    ${deliveryDate} =	Get Regexp Matches	${items[${index}].deliveryDate.endDate}	(\\d{4}-\\d{2}-\\d{2})	1
+	\    ${deliveryDate} =	Convert Date		${deliveryDate[0]}	result_format=%d-%m-%Y
 	\    ${deliveryDate} =	Convert To String	${deliveryDate}
-	\    Execute Javascript	$("input[ng-model='item.deliveryDate.sd.d']").datepicker('setDate', '${items[${index}].deliveryDate.endDate}');
-	\    Execute Javascript	$("input[ng-model='item.deliveryDate.ed.d']").datepicker('setDate', '${items[${index}].deliveryDate.endDate}');
+	\    Execute Javascript	$("input[ng-model='item.deliveryDate.sd.d']").datepicker('setDate', '${deliveryDate}');
+	\    Execute Javascript	$("input[ng-model='item.deliveryDate.ed.d']").datepicker('setDate', '${deliveryDate}');
 
 
 Пошук тендера по ідентифікатору
@@ -921,12 +968,13 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 Створити вимогу про виправлення умов закупівлі
 	[Arguments]  ${user}  ${tender_id}  ${complaints}  ${document}
 	Відкрити потрібну інформацію по тендеру	complaint
-	Заповнити форму вимоги	${user}  ${complaints}  ${document}
+	Wait Enable And Click Element		css=button#btnSendClaim
+	Заповнити форму вимоги				${user}  ${complaints}  ${document}
 
 	${claim_id} = 						Get Text		css=span#cmpl0
 	${claim_id} = 						Replace String	${claim_id}	, id:	${EMPTY}
 	${claim_id} =						Strip String	${claim_id}	mode=both
-	Sleep								10s
+	Sleep								5s
 	[return]  ${claim_id}
 
 
@@ -940,11 +988,12 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	${claim_id} = 						Get Text		css=span#cmpl0
 	${claim_id} = 						Replace String	${claim_id}	, id:	${EMPTY}
 	${claim_id} =						Strip String	${claim_id}	mode=both
+	Sleep								5s
+	[return]  ${claim_id}
 
 
 Заповнити форму вимоги
 	[Arguments]  ${user}  ${complaints}  ${document}
-	Wait Enable And Click Element		css=button#btnSendClaim
 	Wait For Ajax
 	Wait For Element Value				css=input[ng-model='model.person.phone']
 	Wait Until Element Is Visible		xpath=//input[@ng-model='model.complaint.user.title']	timeout=${COMMONWAIT}
@@ -992,7 +1041,17 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 Підтвердити вирішення вимоги про виправлення умов лоту
 	[Arguments]    ${user}  ${tender_id}  ${complaintID}  ${confirmation_data}
-	Click Element			xpath=//div[contains(@ng-repeat, 'model.ad.complaints') and contains(., '${complaintID}')]//button[contains(@class, 'btn-success')]
+	Підтвердити вирішення вимоги	${user}	${tender_id}	${complaintID}	${confirmation_data}
+
+
+Підтвердити вирішення вимоги про виправлення умов закупівлі
+	[Arguments]    ${user}  ${tender_id}  ${complaintID}  ${confirmation_data}
+	Підтвердити вирішення вимоги	${user}	${tender_id}	${complaintID}	${confirmation_data}
+
+
+Підтвердити вирішення вимоги
+	[Arguments]    ${user}  ${tender_id}  ${complaintID}  ${confirmation_data}
+	Click Element						xpath=//div[contains(@ng-repeat, 'model.ad.complaints') and contains(., '${complaintID}')]//button[contains(@class, 'btn-success')]
 	Wait For Ajax
 	Wait Until Element Is Visible		css=h4.ng-binding	${COMMONWAIT}
 	Wait Until Element Contains			css=h4.ng-binding	Ваша вимога була задоволена	${COMMONWAIT}
@@ -1523,7 +1582,8 @@ Search By Query
 	[Arguments]  ${element}  ${query}
 	Input Text							${element}	${query}+
 	Sleep								1s
-	Press Key							${element}	\\08Wait Until Element Not Stale		css=input[id='found_${query}']	3
+	Press Key							${element}	\\08
+	Wait Until Element Not Stale		css=input[id='found_${query}']	3
 	Wait Until Element Is Enabled		css=input[id='found_${query}']	${COMMONWAIT}
 	Wait Until Element Not Stale		xpath=//div[input[@id='found_${query}']]	5
 	Click Element						xpath=//div[input[@id='found_${query}']]
