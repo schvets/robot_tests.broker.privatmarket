@@ -249,3 +249,39 @@ def is_object_present(tender_data, object_id):
                 break
 
     return result
+
+
+def get_unit_ru_name(current_name):
+    dictionary = {
+        u'кілограми': u'килограмм',
+        u'пара': u'пара',
+        u'літр': u'литр',
+        u'набір': u'комплект',
+        u'пачок': u'пачка',
+        u'метри': u'метр',
+        u'лот': u'лот',
+        u'послуга': u'услуга',
+        u'метри кубічні': u'метр кубический',
+        u'ящик': u'ящик',
+        u'рейс': u'рейс',
+        u'тони': u'тонна',
+        u'метри квадратні': u'метр квадратный',
+        u'кілометри': u'километр',
+        u'штуки': u'штука',
+        u'місяць': u'месяц',
+        u'пачка': u'пачка',
+        u'упаковка': u'упаковка',
+        u'гектар': u'гектар',
+        u'блок': u'блок'
+    }
+
+    expected_name = dictionary.get(current_name)
+
+    if expected_name:
+        return expected_name
+    else:
+        return current_name
+
+
+def to_float(number):
+    return float(number)
