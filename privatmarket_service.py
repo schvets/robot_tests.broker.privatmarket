@@ -281,7 +281,3 @@ def get_unit_ru_name(current_name):
         return expected_name
     else:
         return current_name
-
-
-def to_float(number):
-    return float(number)
