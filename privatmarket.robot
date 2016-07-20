@@ -156,6 +156,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	#choose UK language
 	${status} =	Run Keyword And Return Status	Element Should Be Visible	css=a#lang_uk
 	Run Keyword If	${status}	Click Element	css=a#lang_uk
+	Wait For Ajax
 #step 0
 	#we should add choosing of procurementMethodType
 	Input Text									css=input[data-id='procurementName']				${tender_data.data.title}
@@ -167,6 +168,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Mark Step									CPV
 	Wait For Ajax
 	Click Button								xpath=(//button[@data-id='actChoose'])[1]
+	debug    34564132
 	Wait Until Element Is Visible				css=section[data-id='classificationTreeModal']		${COMMONWAIT}
 	Wait Until Element Is Visible				css=input[data-id='query']							${COMMONWAIT}
 	Search By Query								css=input[data-id='query']	${items[0].classification.id}
@@ -186,22 +188,40 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Click Button								css=button[data-id='actSave']
 	Close Confirmation							Данные успешно сохранены
 
-#step 1
+#step general
 	Mark Step									step 1
 	Click Element								css=#tab_1
 	Додати lots									${lots}
 
-#step 2
+#step lots/items
 	Mark Step									step 2
 	Додати items								${items}
 	Click Button								css=button[data-id='actSave']
 	Close Confirmation							Данные успешно сохранены
 
-#step 3
+#step features
 	Mark Step									step 3
 	Click Element								css=#tab_2
 	${features_count} = 						Get Length	${features}
 	Run Keyword If		${features_count} > 0	Додати features	${features}
+	Click Button								css=button[data-id='actSave']
+	Close Confirmation							Данные успешно сохранены
+	debug     the end
+
+#step docs
+	Mark Step									step 4
+	${this_section_necessity} = 				Run keyword and return status	Dictionary Should Contain Key     ${tender_data.data}	documents
+	Run Keyword If	${this_section_necessity}	Click Element					css=#tab_3
+
+#step budget
+	Mark Step									step 5
+	Click Element								css=#tab_4
+	Заповнити date+amount
+
+#step puclication
+	Mark Step									step 6
+	Click Element								css=#tab_5
+	debug     step 6
 
 
 Додати lots
@@ -234,36 +254,33 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	\    Click button	${ELEMENT}
 	\    @{actExpand_btn_list} = 	Get Webelements	css=button[data-id='actExpand']
 
-
 	: FOR    ${index}    IN RANGE    0    ${features_count}
-	\    Mark Step		feature_num_${index}
-	\    ${btn_locator} = 	Set Variable If
-	\    ...  'tenderer' == '${features[${index}].featureOf}'	css=button[ng-click='model.addFeature(\\'tenderer\\')']
-	\    ...  'item' == '${features[${index}].featureOf}'		css=button[ng-click='model.addFeature(\\'item\\', item.id)']
-	\    ...  'lot' == '${features[${index}].featureOf}'		css=button[ng-click='model.addFeature(\\'lot\\', lot.id)']
-	\    Click Button											${btn_locator}
-	\    Click Button											css=div[ng-show='feature.expanded'] button[data-id='actAdd']
-	\    Input Text												css=input[ng-model='feature.title']				${features[${index}].title}
-	\    Input Text												css=textarea[ng-model='feature.description']	${features[${index}].description}
-	\    Додати criterion										${features[${index}]}
+	\    Mark Step							feature_of_${features[${index}].featureOf}
+	\    Click Button						xpath=//button[contains(@ng-click,'${features[${index}].featureOf}') and @data-id='actAdd']
+	\    Wait Until Element Is Visible		xpath=//section[div[button[contains(@ng-click,'${features[${index}].featureOf}') and @data-id='actAdd']]]//button[@ng-bind='transl.addCriterion']
+	\    Click Button						xpath=//section[div[button[contains(@ng-click,'${features[${index}].featureOf}') and @data-id='actAdd']]]//button[@ng-bind='transl.addCriterion']
+	\    Wait Until Element Is Visible		xpath=//section[div[button[contains(@ng-click,'${features[${index}].featureOf}') and @data-id='actAdd']]]//input[@ng-model='feature.title']
+	\    Input Text							xpath=//section[div[button[contains(@ng-click,'${features[${index}].featureOf}') and @data-id='actAdd']]]//input[@ng-model='feature.title']				${features[${index}].title}
+	\    Input Text							xpath=//section[div[button[contains(@ng-click,'${features[${index}].featureOf}') and @data-id='actAdd']]]//textarea[@ng-model='feature.description']	${features[${index}].description}
+	\    Додати criterion	${features[${index}]}
 
 
 Додати criterion
 	[Arguments]  ${feature}
-	@{criterion_value_list} = 		Get Webelements			css=input[ng-model='criterion.value']
-	@{criterion_title_list} = 		Get Webelements			css=input[ng-model='criterion.title']
+	@{criterion_value_list} = 		Get Webelements			xpath=//section[div[button[contains(@ng-click,'${feature.featureOf}') and @data-id='actAdd']]]//input[@ng-model='criterion.value']
+	@{criterion_title_list} = 		Get Webelements			xpath=//section[div[button[contains(@ng-click,'${feature.featureOf}') and @data-id='actAdd']]]//input[@ng-model='criterion.title']
 	@{criterions_data} = 			Get From Dictionary		${feature}	enum
 	${criterions_data_length} = 	Get Length	${criterions_data}
 	: FOR    ${index}    IN RANGE    0    ${criterions_data_length}
-	\    Mark Step		creterion_num_${index}
-	\    ${local_index} = 									Evaluate								${criterions_data_length}-1
-	\    ${value} = 										Evaluate								${criterions_data[${index}].value}*100
-	\    ${value} = 										Convert To String						${value}
-	\    debug       in criterion
+	\    Mark Step			creterion_num_${index}
+	\    ${local_index} = 	Evaluate	${criterions_data_length}-1
+	\    ${value} = 		Evaluate	${criterions_data[${index}].value}*100
+	\    ${value} = 		Convert To String	${value}
 	\    Input Text			${criterion_title_list[${index}]}	${criterions_data[${index}].title}
 	\    Run Keyword Unless	${value} == 0	Input Text	${criterion_value_list[${index}]}	${value}
 
-	Click button		css=div[ng-show='feature.expanded'] button[data-id='actCollapse']
+	debug     before fail
+	Click button		xpath=//section[div[button[contains(@ng-click,'${feature.featureOf}') and @data-id='actAdd']]]//button[@data-id='actCollapse']
 
 
 Додати items
@@ -284,6 +301,12 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	\    ${deliveryDate} =	Convert To String	${deliveryDate}
 	\    Execute Javascript	$("input[ng-model='item.deliveryDate.sd.d']").datepicker('setDate', '${deliveryDate}');
 	\    Execute Javascript	$("input[ng-model='item.deliveryDate.ed.d']").datepicker('setDate', '${deliveryDate}');
+
+
+Заповнити date+amount
+	[Arguments]  ${items}
+	${items_count} = 			Get Length	${items}
+
 
 
 Пошук тендера по ідентифікатору
