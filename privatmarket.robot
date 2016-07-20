@@ -149,7 +149,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 	Wait Until Element Is Enabled			id=tenders	timeout=${COMMONWAIT}
 	Switch To Frame							id=tenders
-	Sleep									2s
+	Sleep									1s
 	Wait Until Element Is Visible			css=button[ng-click='template.newTender()']
 	Click Button							css=button[ng-click='template.newTender()']
 
@@ -168,7 +168,6 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Mark Step									CPV
 	Wait For Ajax
 	Click Button								xpath=(//button[@data-id='actChoose'])[1]
-	debug    34564132
 	Wait Until Element Is Visible				css=section[data-id='classificationTreeModal']		${COMMONWAIT}
 	Wait Until Element Is Visible				css=input[data-id='query']							${COMMONWAIT}
 	Search By Query								css=input[data-id='query']	${items[0].classification.id}
@@ -185,6 +184,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Click Button								css=button[data-id='actConfirm']
 	Wait For Ajax
 
+	Scroll Page To Element						css=button[data-id='actSave']
 	Click Button								css=button[data-id='actSave']
 	Close Confirmation							Данные успешно сохранены
 
@@ -206,17 +206,22 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Run Keyword If		${features_count} > 0	Додати features	${features}
 	Click Button								css=button[data-id='actSave']
 	Close Confirmation							Данные успешно сохранены
-	debug     the end
 
 #step docs
 	Mark Step									step 4
-	${this_section_necessity} = 				Run keyword and return status	Dictionary Should Contain Key     ${tender_data.data}	documents
-	Run Keyword If	${this_section_necessity}	Click Element					css=#tab_3
+	${this_section_necessity} = 				Run keyword and return status	Dictionary Should Contain Key	${tender_data.data}	documents
+	Click Element								css=#tab_3
+	Wait Until Element Is Visible				css=button[data-id='actNextStep']	timeout=10
+	Run Keyword If	${this_section_necessity}	Добавить document				${tender_data.data}
+		...	ELSE								Click Button					css=button[data-id='actNextStep']
 
 #step budget
 	Mark Step									step 5
 	Click Element								css=#tab_4
-	Заповнити date+amount
+	Заповнити date+amount						${tender_data.data}
+	Click Button								css=button[data-id='actSave']
+	debug    in budget finish
+	Close Confirmation							Данные успешно сохранены
 
 #step puclication
 	Mark Step									step 6
@@ -244,6 +249,22 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	\    Input Text		css=input[data-id='guaranteeAmount']	1
 
 
+Додати items
+	[Arguments]  ${items}
+	${items_count} = 			Get Length	${items}
+
+	: FOR    ${index}    IN RANGE    0    ${items_count}
+	\    Mark Step													item_num_${index}
+	\    Click button												css=button[ng-click='model.addItem(lot)']
+	\    Wait Until Element Is Enabled								css=input[ng-model='item.description']	10s
+	\    Input Text			css=input[ng-model='item.description']	${items[${index}].description}
+	\    Input Text			css=input[data-id='quantity']			${items[${index}].quantity}
+	\    ${unit} = 			get_unit_ru_name						${items[${index}].unit.name}
+	\    Mark Step			choose_unit_${unit}
+	\    Click Element		xpath=//select[@data-id='unit']/option[text()='${unit}']
+	\    Set Date		css=input[ng-model='item.deliveryDate.ed.d']	${items[${index}].deliveryDate.endDate}
+
+
 Додати features
 	[Arguments]  ${features}
 	${features_count} = 		Get Length	${features}
@@ -257,6 +278,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	: FOR    ${index}    IN RANGE    0    ${features_count}
 	\    Mark Step							feature_of_${features[${index}].featureOf}
 	\    Click Button						xpath=//button[contains(@ng-click,'${features[${index}].featureOf}') and @data-id='actAdd']
+	\    Wait For Ajax
 	\    Wait Until Element Is Visible		xpath=//section[div[button[contains(@ng-click,'${features[${index}].featureOf}') and @data-id='actAdd']]]//button[@ng-bind='transl.addCriterion']
 	\    Click Button						xpath=//section[div[button[contains(@ng-click,'${features[${index}].featureOf}') and @data-id='actAdd']]]//button[@ng-bind='transl.addCriterion']
 	\    Wait Until Element Is Visible		xpath=//section[div[button[contains(@ng-click,'${features[${index}].featureOf}') and @data-id='actAdd']]]//input[@ng-model='feature.title']
@@ -278,34 +300,25 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	\    ${value} = 		Convert To String	${value}
 	\    Input Text			${criterion_title_list[${index}]}	${criterions_data[${index}].title}
 	\    Run Keyword Unless	${value} == 0	Input Text	${criterion_value_list[${index}]}	${value}
-
-	debug     before fail
 	Click button		xpath=//section[div[button[contains(@ng-click,'${feature.featureOf}') and @data-id='actAdd']]]//button[@data-id='actCollapse']
 
 
-Додати items
-	[Arguments]  ${items}
-	${items_count} = 			Get Length	${items}
-
-	: FOR    ${index}    IN RANGE    0    ${items_count}
-	\    Mark Step		item_num_${index}
-	\    Click button											css=button[ng-click='model.addItem(lot)']
-	\    Wait Until Element Is Enabled							css=input[ng-model='item.description']	10s
-	\    Input Text		css=input[ng-model='item.description']	${items[${index}].description}
-	\    Input Text		css=input[data-id='quantity']			${items[${index}].quantity}
-	\    ${unit} = 		get_unit_ru_name						${items[${index}].unit.name}
-	\    Mark Step			choose_unit_${unit}
-	\    Click Element		xpath=//select[@data-id='unit']/option[text()='${unit}']
-	\    ${deliveryDate} =	Get Regexp Matches	${items[${index}].deliveryDate.endDate}	(\\d{4}-\\d{2}-\\d{2})	1
-	\    ${deliveryDate} =	Convert Date		${deliveryDate[0]}	result_format=%d-%m-%Y
-	\    ${deliveryDate} =	Convert To String	${deliveryDate}
-	\    Execute Javascript	$("input[ng-model='item.deliveryDate.sd.d']").datepicker('setDate', '${deliveryDate}');
-	\    Execute Javascript	$("input[ng-model='item.deliveryDate.ed.d']").datepicker('setDate', '${deliveryDate}');
+Добавить document
+	[Arguments]  ${tender_data}
+	debug     in documents
 
 
 Заповнити date+amount
-	[Arguments]  ${items}
-	${items_count} = 			Get Length	${items}
+	[Arguments]  ${tender_data}
+	debug    in amount
+	Run Keyword If     ${tender_data.value.valueAddedTaxIncluded}	Select From List By Value	css=select[data-id='ptrValueAddedTaxIncluded']	0
+		...	ELSE	Select From List By Value	css=select[data-id='ptrValueAddedTaxIncluded']	1
+
+	Set Date And Time		css=input[ng-model='model.ptr.enquiryPeriod.sd.d']	css=timepicker-pop[input-time='model.ptr.enquiryPeriod.sd.t'] input[ng-model='inputTime']	${tender_data.enquiryPeriod.startDate}
+	Set Date And Time		css=input[ng-model='model.ptr.enquiryPeriod.ed.d']	css=timepicker-pop[input-time='model.ptr.enquiryPeriod.ed.t'] input[ng-model='inputTime']	${tender_data.enquiryPeriod.endDate}
+	Set Date And Time		css=input[ng-model='model.ptr.tenderPeriod.sd.d']	css=timepicker-pop[input-time='model.ptr.tenderPeriod.sd.t'] input[ng-model='inputTime']	${tender_data.tenderPeriod.startDate}
+	Set Date And Time		css=input[ng-model='model.ptr.tenderPeriod.ed.d']	css=timepicker-pop[input-time='model.ptr.tenderPeriod.ed.t'] input[ng-model='inputTime']	${tender_data.tenderPeriod.endDate}
+	Set Date And Time		css=input[ng-model='model.ptr.awardPeriod.ed.d']	css=timepicker-pop[input-time='model.ptr.awardPeriod.ed.t'] input[ng-model='inputTime']		${tender_data.tenderPeriod.endDate}
 
 
 
@@ -1248,11 +1261,6 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	[return]	${fieldname}
 
 
-Змінити parameters.0.value
-	[Arguments]  ${fieldvalue}
-	Select From List	xpath=(//select[@ng-model='feature.userValue'])[1]	${fieldvalue}
-
-
 Змінити lotValues[0].value.amount
 	[Arguments]  ${fieldvalue}
 	${fieldvalue} = 	Convert To String			${fieldvalue}
@@ -1506,12 +1514,25 @@ Wait For Element Value
 
 
 Scroll Page To Element
-	[Arguments]	${locator}
-	${cssLocator} =		Run Keyword If	'css' in '${TEST_NAME}'	Get Substring	${locator}	4
-		...  ELSE	Get Substring	${locator}	6
-	${js_expresion} =	Run Keyword If	'css' in '${TEST_NAME}'	Convert To String	return window.$("${cssLocator}")[0].scrollIntoView()
-		...  ELSE	Convert To String	return window.$x("${cssLocator}")[0].scrollIntoView()
+	[Arguments]	${element_locator}
+	${locator}  ${type} = 	Get Locator And Type	${element_locator}
+	${js_expresion} =	Run Keyword If	'css' == '${type}'	Convert To String	return window.$("${locator}")[0].scrollIntoView()
+		...  ELSE IF	'xpath' == '${element_locator}'		Convert To String	return window.$x("${locator}")[0].scrollIntoView()
+	Execute Javascript	${js_expresion}
 	Sleep	2s
+
+
+Get Locator And Type
+	[Arguments]	${full_locator}
+	${temp_locator} = 	Replace String	${full_locator}	'	${EMPTY}
+	${locator} = 	Run Keyword If	'css' in '${temp_locator}'	Get Substring	${full_locator}	4
+		...   ELSE IF	'xpath' in '${temp_locator}'	Get Substring	${full_locator}	6
+		...   ELSE		${full_locator}
+
+	${type} =	Set Variable If	'css' in '${temp_locator}'	css
+		...  	'xpath' in '${temp_locator}'	xpath
+		...  	None
+	[return]  ${locator}  ${type}
 
 
 Wait For Tender
@@ -1615,3 +1636,27 @@ Search By Query
 	Wait Until Element Is Enabled		css=input[id='found_${query}']	${COMMONWAIT}
 	Wait Until Element Not Stale		xpath=//div[input[@id='found_${query}']]	5
 	Click Element						xpath=//div[input[@id='found_${query}']]
+
+
+Set Date
+	[Arguments]  ${element}  ${date}
+	${locator}  ${type} = 	Get Locator And Type	${element}
+	${correctDate} =	Get Regexp Matches	${date}	(\\d{4}-\\d{2}-\\d{2})	1
+	${correctDate} =	Convert Date		${correctDate[0]}	result_format=%d-%m-%Y
+	${correctDate} =	Convert To String	${correctDate}
+	${js_expresion} =	Run Keyword If	'css' == '${type}'	Convert To String	$("${locator}").datepicker('setDate', '${correctDate}')
+		...  ELSE IF	'xpath' == '${type}'		Convert To String	$x("${locator}").datepicker('setDate', '${correctDate}');
+	Execute Javascript	${js_expresion}
+
+
+Set Time
+	[Arguments]  ${element}  ${date}
+	${deliveryDate} =	Get Regexp Matches	${date}	T(\\d{2}:\\d{2})	1
+	Input Text	${element}	${deliveryDate[0]}
+
+
+Set Date And Time
+	[Arguments]  ${date_element}  ${time_element}  ${date}
+	Set Date	${date_element}	${date}
+	Set Time	${time_element}	${date}
+
