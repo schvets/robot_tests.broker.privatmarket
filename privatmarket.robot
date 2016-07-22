@@ -5,7 +5,9 @@ Library  DateTime
 Library  Selenium2Library
 Library  Collections
 Library  DebugLibrary
+Library  OperatingSystem
 Library  privatmarket_service.py
+
 
 *** Variables ***
 ${COMMONWAIT}	40
@@ -129,15 +131,19 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	[Documentation]  Відкрити брaвзер, створити обєкт api wrapper, тощо
 	${service args}=	Create List	--ignore-ssl-errors=true	--ssl-protocol=tlsv1
 	${browser} =		Convert To Lowercase	${USERS.users['${username}'].browser}
+	${extention_dir} = 	Set variable	C:\\Users\\Oks\\AppData\\Local\\Google\\Chrome\\User Data\\Profile 5\\Extensions\\ggmdpepbjljkkkdaklfihhngmmgmpggp\\2.0_0
+	${if_dir_exist} = 	Run Keyword And Return Status	Directory Should Exist	${extention_dir}
 
-	${desired_capabilities} =    Create Dictionary    nativeEvents=${False}
+	${options}= 	Evaluate	sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
+	Call Method	${options}	add_argument	--allow-running-insecure-content
+	Call Method	${options}	add_argument	--disable-web-security
+	Call Method	${options}	add_argument	--start-maximized
+	Call Method	${options}	add_argument	--nativeEvents\=false
+	Run Keyword If	${if_dir_exist} == ${TRUE}	Call Method	${options}	add_argument	--load-extension\=${extention_dir}
 
 	Run Keyword If	'phantomjs' in '${browser}'	Run Keywords	Create Webdriver	PhantomJS	${username}	service_args=${service args}
-	...   AND   Go To			${USERS.users['${username}'].homepage}
-	...   ELSE	Open Browser	${USERS.users['${username}'].homepage}   ${USERS.users['${username}'].browser}   alias=${username}   desired_capabilities=${desired_capabilities}
-
-	Set Window Position		@{USERS.users['${username}'].position}
-	Maximize Browser Window
+	...   ELSE	Create WebDriver	Chrome	chrome_options=${options}	alias=${username}
+	Go To	${USERS.users['${username}'].homepage}
 	Run Keyword Unless	'Viewer' in '${username}'	Login	${username}
 
 
@@ -150,6 +156,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Wait Until Element Is Enabled			id=tenders	timeout=${COMMONWAIT}
 	Switch To Frame							id=tenders
 	Sleep									1s
+	Switch To Education Mode
 	Wait Until Element Is Visible			css=button[ng-click='template.newTender()']
 	Click Button							css=button[ng-click='template.newTender()']
 
@@ -211,6 +218,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Mark Step									step 4
 	${this_section_necessity} = 				Run keyword and return status	Dictionary Should Contain Key	${tender_data.data}	documents
 	Click Element								css=#tab_3
+	Wait For Ajax
 	Wait Until Element Is Visible				css=button[data-id='actNextStep']	timeout=10
 	Run Keyword If	${this_section_necessity}	Добавить document				${tender_data.data}
 		...	ELSE								Click Button					css=button[data-id='actNextStep']
@@ -310,7 +318,6 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 Заповнити date+amount
 	[Arguments]  ${tender_data}
-	debug    in amount
 	Run Keyword If     ${tender_data.value.valueAddedTaxIncluded}	Select From List By Value	css=select[data-id='ptrValueAddedTaxIncluded']	0
 		...	ELSE	Select From List By Value	css=select[data-id='ptrValueAddedTaxIncluded']	1
 
@@ -1427,6 +1434,8 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 #Custom Keywords
 Login
 	[Arguments]  ${username}
+	${if_logged_in} = 					Run Keyword And Return Status		Element Should Be Visible	id=user-profile
+	Return From Keyword If				${if_logged_in}
 	Click Element						xpath=//span[.='Вход']
 	Wait Until Element Is Visible		id=p24__login__field	${COMMONWAIT}
 	Execute Javascript					$('#p24__login__field').val(${USERS.users['${username}'].login})
@@ -1446,6 +1455,7 @@ Wait For Ajax
 Wait Until Element Not Stale
 	[Arguments]  ${locator}  ${time}
 	sleep 			2s
+	${time} = 	Convert To Integer	${time}
 	${left_time} =	Evaluate  ${time}-2
 	${element_state} =	Check If Element Stale	${locator}
 	run keyword if  ${element_state} and ${left_time} > 0	Wait Until Element Not Stale	${locator}	${left_time}
@@ -1516,8 +1526,8 @@ Wait For Element Value
 Scroll Page To Element
 	[Arguments]	${element_locator}
 	${locator}  ${type} = 	Get Locator And Type	${element_locator}
-	${js_expresion} =	Run Keyword If	'css' == '${type}'	Convert To String	return window.$("${locator}")[0].scrollIntoView()
-		...  ELSE IF	'xpath' == '${element_locator}'		Convert To String	return window.$x("${locator}")[0].scrollIntoView()
+	${js_expresion} =	Set Variable If	'css' == '${type}'	window.$("${locator}")[0].scrollIntoView()
+		...  						'xpath' == '${type}'	document.evaluate("${locator}", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue
 	Execute Javascript	${js_expresion}
 	Sleep	2s
 
@@ -1568,7 +1578,7 @@ Switch To Education Mode
 	Wait Until Element Is Visible		css=a#test-mode-off	${COMMONWAIT}
 	Wait For Ajax Overflow Vanish
 	Sleep								2s
-	Wait Until Element Not Stale		xpath=//tr[@ng-repeat='t in model.tenderList']	timeout=${COMMONWAIT}
+	Wait Until Element Not Stale		xpath=//tr[@ng-repeat='t in model.tenderList']	${COMMONWAIT}
 	Wait Until Element Is Enabled		xpath=//tr[@ng-repeat='t in model.tenderList']	timeout=${COMMONWAIT}
 
 
