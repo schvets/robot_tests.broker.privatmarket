@@ -123,6 +123,12 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 *** Keywords ***
 Підготувати дані для оголошення тендера
 	[Arguments]  ${username}  ${tender_data}  ${role_name}
+	Run keyword if	'${role_name}' != 'tender_owner'	Return From Keyword	${tender_data}
+	${start_date} = 									Set variable	${tender_data.data.enquiryPeriod.startDate}
+	${tender_data.data.enquiryPeriod.startDate} = 		add_time		${start_date}	5
+	${tender_data.data.value.amount} = 					format_amount	${tender_data.data.value.amount}
+	${tender_data.data.lots[0].value.amount} = 			format_amount	${tender_data.data.lots[0].value.amount}
+	${tender_data.data.lots[0].minimalStep.amount} = 	format_amount	${tender_data.data.lots[0].minimalStep.amount}
 	[return]	${tender_data}
 
 
@@ -144,6 +150,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Run Keyword If	'phantomjs' in '${browser}'	Run Keywords	Create Webdriver	PhantomJS	${username}	service_args=${service args}
 	...   ELSE	Create WebDriver	Chrome	chrome_options=${options}	alias=${username}
 	Go To	${USERS.users['${username}'].homepage}
+
 	Run Keyword Unless	'Viewer' in '${username}'	Login	${username}
 
 
@@ -228,13 +235,19 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Click Element								css=#tab_4
 	Заповнити date+amount						${tender_data.data}
 	Click Button								css=button[data-id='actSave']
-	debug    in budget finish
 	Close Confirmation							Данные успешно сохранены
 
 #step puclication
 	Mark Step									step 6
 	Click Element								css=#tab_5
-	debug     step 6
+	Click Button								css=button[data-id='actSend']
+	Close Confirmation							Закупка поставлена в очередь на отправку в ProZorro. Статус закупки Вы можете отслеживать в личном кабинете.
+	Wait For Ajax
+	Wait Until Element Is Visible				css=div#tenderStatus
+	${temp_id} = 								Отримати інформацію з tenderID	inner
+	debug     135146
+	Пошук тендера по ідентифікатору				${username}	${temp_id}
+	debug     135146
 
 
 Додати lots
@@ -939,6 +952,19 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	[return]	${text}
 
 
+Отримати інформацію з tenderID
+	[Arguments]  ${id_type}
+	${element_text} = 					Get Text	${tender_data_tenderID}
+	${reg_expresion} =	Set Variable If
+		...  'ua' in '${id_type}'		${None}
+		...  'inner' in '${id_type}'	([\\d]{6}) от
+
+	Run Keyword If		'${reg_expresion}' == '${None}'	${element_text}
+	${result} =			Get Regexp Matches	${element_text}	${reg_expresion}	1
+	debug    getting tender info
+	[return]	${text}
+
+
 Отримати інформацію з awards[0].documents[0].title
 	[Arguments]  ${element}
 	Click Element						${tender_data_awards[0].suppliers[0].name}
@@ -1434,8 +1460,6 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 #Custom Keywords
 Login
 	[Arguments]  ${username}
-	${if_logged_in} = 					Run Keyword And Return Status		Element Should Be Visible	id=user-profile
-	Return From Keyword If				${if_logged_in}
 	Click Element						xpath=//span[.='Вход']
 	Wait Until Element Is Visible		id=p24__login__field	${COMMONWAIT}
 	Execute Javascript					$('#p24__login__field').val(${USERS.users['${username}'].login})

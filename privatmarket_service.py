@@ -2,8 +2,9 @@
 
 from munch import munchify as privatmarket_munchify
 from selenium.common.exceptions import StaleElementReferenceException
-from datetime import datetime
+from datetime import datetime, timedelta
 from pytz import timezone
+import dateutil.parser
 
 
 def get_month_number(month_name):
@@ -75,6 +76,12 @@ def get_time_with_offset(date):
     time_zone = timezone('Europe/Kiev')
     localized_date = time_zone.localize(date_obj)
     return localized_date.strftime('%Y-%m-%d %H:%M:%S.%f%z')
+
+
+def add_time(date, minutes_to_add):
+    optimized_date = dateutil.parser.parse(date)
+    optimized_date = optimized_date + timedelta(minutes=int(minutes_to_add))
+    return optimized_date.strftime('%Y-%m-%dT%H:%M:%S.%f%z')
 
 
 def get_procurement_method_type(method_name):
@@ -189,8 +196,6 @@ def get_status_type(status_name):
     else:
         return status_name
 
-    return type_name
-
 
 def get_lot_num_by_item(tender_data, item_index):
     items = tender_data['items']
@@ -281,3 +286,8 @@ def get_unit_ru_name(current_name):
         return expected_name
     else:
         return current_name
+
+
+def format_amount(amount):
+    amount = round(amount/100, 2)
+    return format(float(amount), '.2f')
