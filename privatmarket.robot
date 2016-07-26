@@ -126,15 +126,14 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Run keyword if	'${role_name}' != 'tender_owner'	Return From Keyword	${tender_data}
 	${start_date} = 									Set variable	${tender_data.data.enquiryPeriod.startDate}
 	${tender_data.data.enquiryPeriod.startDate} = 		add_time		${start_date}	5
-	${tender_data.data.value.amount} = 					format_amount	${tender_data.data.value.amount}
-	${tender_data.data.lots[0].value.amount} = 			format_amount	${tender_data.data.lots[0].value.amount}
-	${tender_data.data.lots[0].minimalStep.amount} = 	format_amount	${tender_data.data.lots[0].minimalStep.amount}
+	Mark Step											${tender_data.data.value.amount} - ${tender_data.data.lots[0].value.amount} - ${tender_data.data.lots[0].minimalStep.amount}
 	[return]	${tender_data}
 
 
 Підготувати клієнт для користувача
 	[Arguments]  ${username}
 	[Documentation]  Відкрити брaвзер, створити обєкт api wrapper, тощо
+
 	${service args}=	Create List	--ignore-ssl-errors=true	--ssl-protocol=tlsv1
 	${browser} =		Convert To Lowercase	${USERS.users['${username}'].browser}
 	${extention_dir} = 	Set variable	C:\\Users\\Oks\\AppData\\Local\\Google\\Chrome\\User Data\\Profile 5\\Extensions\\ggmdpepbjljkkkdaklfihhngmmgmpggp\\2.0_0
@@ -150,7 +149,6 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Run Keyword If	'phantomjs' in '${browser}'	Run Keywords	Create Webdriver	PhantomJS	${username}	service_args=${service args}
 	...   ELSE	Create WebDriver	Chrome	chrome_options=${options}	alias=${username}
 	Go To	${USERS.users['${username}'].homepage}
-
 	Run Keyword Unless	'Viewer' in '${username}'	Login	${username}
 
 
@@ -245,9 +243,12 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Wait For Ajax
 	Wait Until Element Is Visible				css=div#tenderStatus
 	${temp_id} = 								Отримати інформацію з tenderID	inner
-	debug     135146
-	Пошук тендера по ідентифікатору				${username}	${temp_id}
-	debug     135146
+	Mark Step									Tender_inner_id: ${temp_id}
+	Go To										${USERS.users['${username}'].homepage}?utm_source=direct#/${temp_id}
+	Wait For Element With Reload				xpath=//div[@id='tenderId' and contains(.,'UA')]	1	4
+	${temp_id} = 								Отримати інформацію з tenderID	ua
+	Mark Step									Tender_ua_id: ${temp_id}
+	[return]	${temp_id}
 
 
 Додати lots
@@ -959,10 +960,9 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 		...  'ua' in '${id_type}'		${None}
 		...  'inner' in '${id_type}'	([\\d]{6}) от
 
-	Run Keyword If		'${reg_expresion}' == '${None}'	${element_text}
+	Return from Keyword If		'${reg_expresion}' == '${None}'	${element_text}
 	${result} =			Get Regexp Matches	${element_text}	${reg_expresion}	1
-	debug    getting tender info
-	[return]	${text}
+	[return]	${result[0]}
 
 
 Отримати інформацію з awards[0].documents[0].title
@@ -1572,7 +1572,7 @@ Get Locator And Type
 Wait For Tender
 	[Arguments]	${tender_id}  ${education_type}
 	Mark Step  in_Wait For Tender
-	Wait Until Keyword Succeeds	10min	10s	Try Search Tender	${tender_id}	${education_type}
+	Wait Until Keyword Succeeds	6min	10s	Try Search Tender	${tender_id}	${education_type}
 
 
 Try Search Tender
@@ -1610,6 +1610,7 @@ Reload And Switch To Tab
 	[Arguments]  ${tab_number}
 	Mark Step					in_reload
 	Reload Page
+	Wait For Ajax
 	Switch To Frame		id=tenders
 	Switch To Tab		${tab_number}
 	Wait For Ajax
@@ -1617,20 +1618,22 @@ Reload And Switch To Tab
 
 Switch To Tab
 	[Arguments]  ${tab_number}
+	Wait For Ajax
+	Wait Until Element Is Visible		xpath=(//ul[@class='widget-header-block']//a)[${tab_number}]	timeout=${COMMONWAIT}
 	${class} =	Get Element Attribute	xpath=(//ul[@class='widget-header-block']//a)[${tab_number}]@class
 	Run Keyword Unless	'white-icon' in '${class}'	Wait Visibulity And Click Element	xpath=(//ul[@class='widget-header-block']//a)[${tab_number}]
 
 
 Wait For Element With Reload
-	[Arguments]  ${locator}  ${tab_number}
+	[Arguments]  ${locator}  ${tab_number}  ${time_to_wait}=3
 	Mark Step					in_wait
-	Wait Until Keyword Succeeds			3min	10s	Try Search Element	${locator}	${tab_number}
+	Wait Until Keyword Succeeds			${time_to_wait}min	10s	Try Search Element	${locator}	${tab_number}
 
 
 Try Search Element
 	[Arguments]	${locator}  ${tab_number}
 	Mark Step						in_search
-	Reload And Switch To Tab		${tab_number}
+	Run Keyword If	'${tab_number}' != '0'	Reload And Switch To Tab	${tab_number}
 	Wait For Ajax
 	Sleep							2s
 	Wait Until Element Is Enabled	${locator}	3
