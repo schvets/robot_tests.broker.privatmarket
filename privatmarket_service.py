@@ -84,6 +84,15 @@ def add_time(date, minutes_to_add):
     return optimized_date.strftime('%Y-%m-%dT%H:%M:%S.%f%z')
 
 
+def modify_test_data(initial_data):
+    initial_data['procuringEntity']['name'] = u"Ат Тестюршадрову2"
+    # initial_data['procuringEntity']['address']['region'] = u"ДНЕПРОПЕТРОВСКАЯ ОБЛ"
+    # initial_data['procuringEntity']['address']['locality'] = u"ДНЕПРОПЕТРОВСК"
+    # initial_data['procuringEntity']['address']['streetAddress'] = u"УЛ 8-ГО МАРТА Д. 1 КОРП. 1 КВ. 1"
+    initial_data['enquiryPeriod']['startDate'] = add_time(initial_data['enquiryPeriod']['startDate'], 5)
+    return initial_data
+
+
 def get_procurement_method_type(method_name):
     type_dictionary = {
         u'Допорогові закупівлі': 'belowThreshold',

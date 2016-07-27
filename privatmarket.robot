@@ -124,9 +124,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 Підготувати дані для оголошення тендера
 	[Arguments]  ${username}  ${tender_data}  ${role_name}
 	Run keyword if	'${role_name}' != 'tender_owner'	Return From Keyword	${tender_data}
-	${start_date} = 									Set variable	${tender_data.data.enquiryPeriod.startDate}
-	${tender_data.data.enquiryPeriod.startDate} = 		add_time		${start_date}	5
-	Mark Step											${tender_data.data.value.amount} - ${tender_data.data.lots[0].value.amount} - ${tender_data.data.lots[0].minimalStep.amount}
+	${tender_data.data} = 	modify_test_data	${tender_data.data}
 	[return]	${tender_data}
 
 
@@ -195,6 +193,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Wait For Ajax
 	Click Button								css=button[data-id='actConfirm']
 	Wait For Ajax
+	debug     add info by user
 
 	Scroll Page To Element						css=button[data-id='actSave']
 	Click Button								css=button[data-id='actSave']
@@ -284,6 +283,11 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	\    ${unit} = 			get_unit_ru_name						${items[${index}].unit.name}
 	\    Mark Step			choose_unit_${unit}
 	\    Click Element		xpath=//select[@data-id='unit']/option[text()='${unit}']
+	\    Input Text			css=input[data-id='postalCode']			${items[${index}].deliveryAddress.postalCode}
+	\    Input Text			css=input[data-id='countryName']			${items[${index}].deliveryAddress.countryName}
+	\    Input Text			css=input[data-id='region']			${items[${index}].deliveryAddress.region}
+	\    Input Text			css=input[data-id='locality']			${items[${index}].deliveryAddress.locality}
+	\    Input Text			css=input[data-id='streetAddress']			${items[${index}].deliveryAddress.streetAddress}
 	\    Set Date		css=input[ng-model='item.deliveryDate.ed.d']	${items[${index}].deliveryDate.endDate}
 
 
@@ -341,6 +345,48 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Set Date And Time		css=input[ng-model='model.ptr.tenderPeriod.ed.d']	css=timepicker-pop[input-time='model.ptr.tenderPeriod.ed.t'] input[ng-model='inputTime']	${tender_data.tenderPeriod.endDate}
 	Set Date And Time		css=input[ng-model='model.ptr.awardPeriod.ed.d']	css=timepicker-pop[input-time='model.ptr.awardPeriod.ed.t'] input[ng-model='inputTime']		${tender_data.tenderPeriod.endDate}
 
+
+Внести зміни в тендер
+	[Arguments]  ${username}  ${tender_id}  ${field_name}  ${field_value}
+	Wait Until Element Is Visible	css=button[ng-click='act.createAfp()']	timeout=${COMMONWAIT}
+	Click Button					css=button[ng-click='act.createAfp()']
+
+	Run Keyword		Змінити ${field_name}		${field_value}
+
+#TODO till we have a problem with saving of expired but old data
+#	Click Button								css=button[data-id='actSave']
+#	Close Confirmation							Данные успешно сохранены
+
+
+Змінити tenderPeriod.endDate
+	[Arguments]  ${field_value}
+	Wait For Ajax
+	Wait Until Element Is Visible	id=tab_4	timeout=${COMMONWAIT}
+	Click Element					id=tab_4
+	Set Date And Time		css=input[ng-model='model.ptr.tenderPeriod.ed.d']	css=timepicker-pop[input-time='model.ptr.tenderPeriod.ed.t'] input[ng-model='inputTime']	${field_value}
+
+
+Завантажити документ
+	[Arguments]  ${user}  ${document}  ${tenderUaId}
+	Wait Until Element Is Visible	id=tab_3	timeout=${COMMONWAIT}
+	Click Element					id=tab_3
+	Wait For Ajax
+	Wait Until Element Is Visible	xpath=//select[@data-id='vfv']	timeout=${COMMONWAIT}
+	#doc type is for tender
+	Click Element					xpath=//select[@data-id='vfv']/option[@value=0]
+	Execute Javascript				$("input[type='file']").css('display', '')
+	Choose File						css=input[type='file']	${document}
+	sleep							5s
+	debug   add doc to the tender
+
+	Click Button								css=button[data-id='actSave']
+	Close Confirmation							Данные успешно сохранены
+	[return]  ${document}
+
+
+Завантажити документ в лот
+	[Arguments]  @{ARGUMENTS}
+	debug    add doc
 
 
 Пошук тендера по ідентифікатору
@@ -1034,11 +1080,6 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	[return]	${result}
 
 
-Внести зміни в тендер
-	[Arguments]  @{ARGUMENTS}
-	Fail  Функція не підтримується майданчиком
-
-
 Створити вимогу про виправлення умов закупівлі
 	[Arguments]  ${user}  ${tender_id}  ${complaints}  ${document}
 	Відкрити потрібну інформацію по тендеру	complaint
@@ -1467,7 +1508,8 @@ Login
 	Input Text							xpath=//div[@id="login_modal" and @style='display: block;']//input[@type='password']	${USERS.users['${username}'].password}
 	Click Element						xpath=//div[@id="login_modal" and @style='display: block;']//button[@type='submit']
 	Wait Until Element Is Visible		css=ul.user-menu  timeout=30
-	Sleep								1s
+	Sleep								2s
+	Wait For Ajax
 	Wait Until Element Is Visible		css=a[data-target='#select_cabinet']  timeout=${COMMONWAIT}
 
 
@@ -1694,6 +1736,7 @@ Set Time
 
 Set Date And Time
 	[Arguments]  ${date_element}  ${time_element}  ${date}
+	Wait Until Element Is Visible	${time_element}	timeout=${COMMONWAIT}
 	Set Date	${date_element}	${date}
 	Set Time	${time_element}	${date}
 
