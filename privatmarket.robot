@@ -193,7 +193,16 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Wait For Ajax
 	Click Button								css=button[data-id='actConfirm']
 	Wait For Ajax
-	debug     add info by user
+	Input Text									css=input[data-id='postalCode']		${tender_data.data.procuringEntity.address.postalCode}
+	Input Text									css=input[data-id='countryName']	${tender_data.data.procuringEntity.address.countryName}
+	Input Text									css=input[data-id='region']			${tender_data.data.procuringEntity.address.region}
+	Input Text									css=input[data-id='locality']		${tender_data.data.procuringEntity.address.locality}
+	Input Text									css=input[data-id='streetAddress']	${tender_data.data.procuringEntity.address.streetAddress}
+	Input Text									css=input[data-id='name']			${tender_data.data.procuringEntity.contactPoint.name}
+#	Input Text									css=input[data-id='telephone']		${tender_data.data.procuringEntity.contactPoint.telephone}
+	Input Text									css=input[data-id='email']			${tender_data.data.procuringEntity.contactPoint.email}
+	Input Text									css=input[data-id='faxNumber']		${tender_data.data.procuringEntity.contactPoint.faxNumber}
+	Input Text									css=input[data-id='url']			${tender_data.data.procuringEntity.contactPoint.url}
 
 	Scroll Page To Element						css=button[data-id='actSave']
 	Click Button								css=button[data-id='actSave']
@@ -244,7 +253,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	${temp_id} = 								Отримати інформацію з tenderID	inner
 	Mark Step									Tender_inner_id: ${temp_id}
 	Go To										${USERS.users['${username}'].homepage}?utm_source=direct#/${temp_id}
-	Wait For Element With Reload				xpath=//div[@id='tenderId' and contains(.,'UA')]	1	4
+	Wait For Element With Reload				xpath=//div[@id='tenderId' and contains(.,'UA')]	1	5
 	${temp_id} = 								Отримати інформацію з tenderID	ua
 	Mark Step									Tender_ua_id: ${temp_id}
 	[return]	${temp_id}
@@ -329,11 +338,6 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Click button		xpath=//section[div[button[contains(@ng-click,'${feature.featureOf}') and @data-id='actAdd']]]//button[@data-id='actCollapse']
 
 
-Добавить document
-	[Arguments]  ${tender_data}
-	debug     in documents
-
-
 Заповнити date+amount
 	[Arguments]  ${tender_data}
 	Run Keyword If     ${tender_data.value.valueAddedTaxIncluded}	Select From List By Value	css=select[data-id='ptrValueAddedTaxIncluded']	0
@@ -350,12 +354,37 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	[Arguments]  ${username}  ${tender_id}  ${field_name}  ${field_value}
 	Wait Until Element Is Visible	css=button[ng-click='act.createAfp()']	timeout=${COMMONWAIT}
 	Click Button					css=button[ng-click='act.createAfp()']
-
+	#TODO till we have a problem with saving of expired but old data
 	Run Keyword		Змінити ${field_name}		${field_value}
+	Click Button								css=button[data-id='actSave']
+	Close Confirmation							Данные успешно сохранены
 
-#TODO till we have a problem with saving of expired but old data
-#	Click Button								css=button[data-id='actSave']
-#	Close Confirmation							Данные успешно сохранены
+
+Змінити лот
+	[Arguments]  ${username}  ${tender_id}  ${lot_id}  ${field_name}  ${field_value}
+	Wait Until Element Is Visible	css=button[ng-click='act.createAfp()']	timeout=${COMMONWAIT}
+	Click Button					css=button[ng-click='act.createAfp()']
+	Wait For Ajax
+	Wait Until Element Is Visible	css=span[ng-bind='model.ptr.value.amount | accounting:2']	timeout=${COMMONWAIT}
+	Wait Until Element Is Visible	id=tab_1	timeout=${COMMONWAIT}
+	Click Element					id=tab_1
+	debug			edit lot
+	Click button					xpath=//div[contains(., '${lot_id}')]//button[@ng-click='lot.expanded = true']
+	Wait Until Element Is Visible	css=input[data-id='valueAmount']	timeout=${COMMONWAIT}
+	Clear Element Text				css=input[data-id='valueAmount']
+	Input Text						css=input[data-id='valueAmount']		${field_value}
+	Click Button					css=button[data-id='actSave']
+	Close Confirmation				Данные успешно сохранены
+
+
+Створити лот із предметом закупівлі
+	[Arguments]  @{Args}
+	debug     add lot
+
+
+Додати предмет закупівлі в лот
+	[Arguments]  @{Args}
+	debug     add item
 
 
 Змінити tenderPeriod.endDate
@@ -368,7 +397,14 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 Завантажити документ
 	[Arguments]  ${user}  ${document}  ${tenderUaId}
+	Wait For Ajax
+	Wait Until Element Is Visible	css=button[ng-click='act.createAfp()']	timeout=${COMMONWAIT}
+	Wait Until Element Is Enabled	css=button[ng-click='act.createAfp()']	timeout=${COMMONWAIT}
+	Click Button					css=button[ng-click='act.createAfp()']
+	Wait For Ajax
+	Sleep							1s
 	Wait Until Element Is Visible	id=tab_3	timeout=${COMMONWAIT}
+	Wait Until Element Is Enabled	id=tab_3	timeout=${COMMONWAIT}
 	Click Element					id=tab_3
 	Wait For Ajax
 	Wait Until Element Is Visible	xpath=//select[@data-id='vfv']	timeout=${COMMONWAIT}
@@ -376,8 +412,8 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Click Element					xpath=//select[@data-id='vfv']/option[@value=0]
 	Execute Javascript				$("input[type='file']").css('display', '')
 	Choose File						css=input[type='file']	${document}
-	sleep							5s
-	debug   add doc to the tender
+	sleep							3s
+	Wait Until Element Is Visible	css=a[data-id='actGetDocument']			timeout=${COMMONWAIT}
 
 	Click Button								css=button[data-id='actSave']
 	Close Confirmation							Данные успешно сохранены
@@ -385,8 +421,19 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 
 Завантажити документ в лот
-	[Arguments]  @{ARGUMENTS}
-	debug    add doc
+	[Arguments]  ${user}  ${document}  ${tender_id}  ${lot_id}
+	#start work with lot
+	Click button					css=div[ng-show='!lot.expanded'] button[data-id='actExpand']
+	#doc type is for tender
+	Click Element					xpath=//div[@ng-show='lot.expanded']//select[@ng-model='lot.currentVfv']/option[@value=0]
+	Execute Javascript				$("div[ng-show='lot.expanded'] input[type='file']").css('display', '')
+	Choose File						css=div[ng-show='lot.expanded'] input[type='file']	${document}
+	sleep							3s
+	Wait Until Element Is Visible	css=div[ng-show='lot.expanded'] a[data-id='actGetDocument']	timeout=${COMMONWAIT}
+
+	Click Button								css=button[data-id='actSave']
+	Close Confirmation							Данные успешно сохранены
+	[return]  ${document}
 
 
 Пошук тендера по ідентифікатору

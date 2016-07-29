@@ -86,9 +86,6 @@ def add_time(date, minutes_to_add):
 
 def modify_test_data(initial_data):
     initial_data['procuringEntity']['name'] = u"Ат Тестюршадрову2"
-    # initial_data['procuringEntity']['address']['region'] = u"ДНЕПРОПЕТРОВСКАЯ ОБЛ"
-    # initial_data['procuringEntity']['address']['locality'] = u"ДНЕПРОПЕТРОВСК"
-    # initial_data['procuringEntity']['address']['streetAddress'] = u"УЛ 8-ГО МАРТА Д. 1 КОРП. 1 КВ. 1"
     initial_data['enquiryPeriod']['startDate'] = add_time(initial_data['enquiryPeriod']['startDate'], 5)
     return initial_data
 
