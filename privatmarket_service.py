@@ -242,6 +242,30 @@ def get_lot_num_by_item(tender_data, item_index):
     return item_num, lot_num, lots_count
 
 
+def get_lot_num(tender_data, lot_id):
+    lots = tender_data['lots']
+    lot_num = 0
+
+    for i, lot in enumerate(lots):
+        if lot_id in lot['title']:
+            lot_num = i
+            break
+
+    return lot_num+1
+
+
+def get_item_num(tender_data, item_id):
+    items = tender_data['items']
+    item_num = 0
+
+    for i, item in enumerate(items):
+        if item_id in item['description']:
+            item_num = i
+            break
+
+    return item_num + 1
+
+
 def is_object_present(tender_data, object_id):
     result = False
 

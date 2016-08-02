@@ -14,20 +14,21 @@ ${COMMONWAIT}	40
 
 ${tender_data_title}											xpath=//div[contains(@class,'title-div')]
 ${tender_data_description}										css=div.description
-${tender_data_procurementMethodType}							css=div#tenderType
+${tender_data_procurementMethodType}							xpath=//div[@class='status-label ng-binding'][2]
 ${tender_data_status}											css=div#tenderStatus
 ${tender_data_value.amount}										css=#tenderBudget
 ${tender_data_value.currency}									css=#tenderBudgetCcy
 ${tender_data_value.valueAddedTaxIncluded}						css=#tenderBudgetTax
 ${tender_data_tenderID}											css=div#tenderId
 ${tender_data_procuringEntity.name}								css=a[ng-click='act.openCard()']
-${tender_data_enquiryPeriod.startDate}							xpath=(//span[@ng-if='p.bd'])[1]
-${tender_data_enquiryPeriod.endDate}							xpath=(//span[@ng-if='p.ed'])[1]
-${tender_data_tenderPeriod.startDate}							xpath=(//span[@ng-if='p.bd'])[2]
-${tender_data_tenderPeriod.endDate}								xpath=(//span[@ng-if='p.ed'])[2]
-${tender_data_auctionPeriod.startDate}							xpath=(//span[@ng-if='p.bd'])[3]
+${tender_data_enquiryPeriod.startDate}							xpath=//span[@id='active.enquiries-bd']
+${tender_data_enquiryPeriod.endDate}							xpath=//span[@id='active.enquiries-ed']
+${tender_data_tenderPeriod.startDate}							xpath=//span[@id='active.tendering-bd']
+${tender_data_tenderPeriod.endDate}								xpath=//span[@id='active.tendering-ed']
+${tender_data_auctionPeriod.startDate}							xpath=//span[@id='active.auction-bd']
 ${tender_data_complaintPeriod.endDate}							css=span#cmplPeriodEnd
 ${tender_data_minimalStep.amount}								css=#lotAmount
+${tender_data_bids}												xpath=(//table[@class='bids']//tr)[2]
 ${tender_data_items.description}								css=a[ng-click='adb.showCl = !adb.showCl;']
 ${tender_data_items.deliveryDate.endDate}						xpath=//div[contains(@class,'delivery-info')]//div[.='Кінець:']/following-sibling::div
 ${tender_data_items.deliveryLocation.latitude}					css=span.latitude
@@ -48,16 +49,15 @@ ${tender_data_items.additionalClassifications[0].description}	xpath=//div[@ng-re
 ${tender_data_items.unit.name}									xpath=//div[.='Кількість:']/following-sibling::div
 ${tender_data_items.unit.code}									xpath=//div[.='Кількість:']/following-sibling::div
 ${tender_data_items.quantity}									xpath=//div[.='Кількість:']/following-sibling::div
-${tender_data_lots.title}										css=div.lot-head span.ng-binding
-${tender_data_lots.description}									css=section.lot-description section.description
-${tender_data_lots.value.amount}								css=#lotAmount
+${tender_data_lots.title}										xpath=//section[contains(@class, 'lot-description') and contains(., '_lot_id_')]//div[@id='lot-title']
+${tender_data_lots.description}									xpath=//section[contains(@class, 'lot-description') and contains(., '_lot_id_')]//section[@class='description marged ng-binding']
+${tender_data_lots.value.amount}								xpath=//section[contains(@class, 'lot-description') and contains(., '_lot_id_')]//*[@id='lotAmount']
+${tender_data_lots.value.currency}								xpath=//section[contains(@class, 'lot-description') and contains(., '_lot_id_')]//*[@id='lotCcy']
+${tender_data_lots.value.valueAddedTaxIncluded}					xpath=//section[contains(@class, 'lot-description') and contains(., '_lot_id_')]//*[@id='lotTax']
+${tender_data_lots.minimalStep.amount}							xpath=//section[contains(@class, 'lot-description') and contains(., '_lot_id_')]//*[@id='lotMinStepAmount']
+${tender_data_lots.minimalStep.currency}						xpath=//section[contains(@class, 'lot-description') and contains(., '_lot_id_')]//*[@id='lotMinStepCcy']
+${tender_data_lots.minimalStep.valueAddedTaxIncluded}			xpath=div[ng-if='model.checkedLot.minimalStep.amount']
 ${tender_data_lotValues[0].value.amount}						xpath=//table[@class='bids']//tr[1]/td[3]
-${tender_data_lots.value.currency}								css=#lotCcy
-${tender_data_lots.value.valueAddedTaxIncluded}					css=#lotTax
-${tender_data_lots.minimalStep.amount}							css=#lotMinStepAmount
-${tender_data_lots.minimalStep.currency}						css=#lotMinStepCcy
-${tender_data_lots.minimalStep.valueAddedTaxIncluded}			css=div[ng-if='model.checkedLot.minimalStep.amount']
-${tender_data_bids}												xpath=(//table[@class='bids']//tr)[2]
 
 ${locator_tenderCreation.buttonEdit}			xpath=//button[@ng-click='act.createAfp()']
 ${locator_tenderCreation.buttonSave}			css=button.btn.btn-success
@@ -72,7 +72,6 @@ ${locator_tenderClaim.buttonCancel}				css=button[ng-click='act.delAfp()']
 ${locator_tenderClaim.buttonGoBack}				css=a[ng-click='act.ret2Ad()']
 ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
-
 ${tender_data_cancellations[0].status}						xpath=//div[@class='info-div']/div[last()]/div/div[1]/div[1]
 ${tender_data_cancellations[0].reason}						xpath=//div[@class='info-div']/div[last()]/div/div[1]/div[2]
 ${tender_data_cancellations[0].documents[0].title}			css=.file-name.ng-binding
@@ -81,7 +80,6 @@ ${tender_data_title_en}										css=.title-div.ng-binding
 ${tender_data_title_ru}										css=.title-div.ng-binding
 ${tender_data_description_en}								css=#tenderDescription
 ${tender_data_description_ru}								css=#tenderDescription
-
 
 ${tender_data_procuringEntity.address.countryName}		css=#procurerAddr #countryName
 ${tender_data_procuringEntity.address.locality}			css=#procurerAddr #locality
@@ -262,7 +260,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 Додати lots
 	[Arguments]  ${lots}
 	${lots_count} = 			Get Length	${lots}
-
+	debug     add lot3
 	: FOR    ${index}    IN RANGE    0    ${lots_count}
 	\    Mark Step		lot_num_${index}
 	\    Wait For Ajax
@@ -281,6 +279,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 Додати items
 	[Arguments]  ${items}
+	debug     add lot2
 	${items_count} = 			Get Length	${items}
 
 	: FOR    ${index}    IN RANGE    0    ${items_count}
@@ -368,23 +367,31 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Wait Until Element Is Visible	css=span[ng-bind='model.ptr.value.amount | accounting:2']	timeout=${COMMONWAIT}
 	Wait Until Element Is Visible	id=tab_1	timeout=${COMMONWAIT}
 	Click Element					id=tab_1
-	debug			edit lot
 	Click button					xpath=//div[contains(., '${lot_id}')]//button[@ng-click='lot.expanded = true']
 	Wait Until Element Is Visible	css=input[data-id='valueAmount']	timeout=${COMMONWAIT}
 	Clear Element Text				css=input[data-id='valueAmount']
 	Input Text						css=input[data-id='valueAmount']		${field_value}
+	debug			edit lot
 	Click Button					css=button[data-id='actSave']
 	Close Confirmation				Данные успешно сохранены
 
 
 Створити лот із предметом закупівлі
-	[Arguments]  @{Args}
+	[Arguments]  ${username}  ${tender_id}  ${lot}  ${item}
 	debug     add lot
+	Додати lots	${lot}
+	Додати items	${item}
 
 
 Додати предмет закупівлі в лот
 	[Arguments]  @{Args}
-	debug     add item
+	Wait Until Element Is Visible	css=button[ng-click='act.createAfp()']	timeout=${COMMONWAIT}
+	Click Button					css=button[ng-click='act.createAfp()']
+	Wait For Ajax
+	Wait Until Element Is Visible	css=span[ng-bind='model.ptr.value.amount | accounting:2']	timeout=${COMMONWAIT}
+	Wait Until Element Is Visible	id=tab_1	timeout=${COMMONWAIT}
+	Click Element					id=tab_1
+	debug							add item
 
 
 Змінити tenderPeriod.endDate
@@ -470,37 +477,33 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Wait Until Element Is Visible			css=div#tenderStatus	timeout=${COMMONWAIT}
 	Wait Until Element Not Stale			${tender_data_title}	40
 
+	Choose UA language
+	Відкрити інформацію по лотах
+	Відкрити детальну інформацію по позиціям
 
-Відкрити детальну інформацію про позицію
-	[Arguments]  ${item}
-	#check if extra information is already opened
-	Mark Step							step1
-	Wait Until Page Contains Element	xpath=//div[@ng-show='adb.showCl']	5s
-	${element_class} =					Get Element Attribute	xpath=(//div[@ng-show='adb.showCl'])[${item}]@class
-	Run Keyword Unless	'ng-hide' in '${element_class}'	Return From Keyword	False
-	Mark Step							step2
 
-	Wait Until Element Is Visible		css=div.info-item-val a	timeout=${COMMONWAIT}
-	Wait Until Element Not Stale		css=div.info-item-val a	10
-	Mark Step							step3
-
-	${locator} = 						Set Variable	xpath=(//a[@ng-click='adb.showCl = !adb.showCl;'])[${item}]
-	Wait Until Element Is Visible		${locator}	timeout=${COMMONWAIT}
-	Scroll Page To Element				${locator}
-	Wait Until Element Not Stale		${locator}	10
-	Mark Step							step4
-	Click Element	${locator}
-	Wait Until Element Is Visible		xpath=(//div[@ng-if='adb.classification'])[${item}]	timeout=10
-	Mark Step     step5
+Відкрити детальну інформацію по позиціям
+	Wait For Ajax
+	Wait Until Element Is Visible	xpath=//a[contains(@ng-click, 'description')]	${COMMONWAIT}
+	@{description_btn_list} = 	Get Webelements			xpath=//a[@ng-click='adb.showCl = !adb.showCl;']
+	${items_count} = 			Get Length				${description_btn_list}
+	${items_count} = 			Evaluate				${items_count}+1
+	: FOR    ${index}    IN RANGE    1    ${items_count}
+	\    ${element_class} =					Get Element Attribute	xpath=(//div[@ng-show='adb.showCl'])[${index}]@class
+	\    Run Keyword Unless	'ng-hide' in '${element_class}'	Return From Keyword	False
+	\    Sleep								2s
+	\    Wait Until Element Is Visible		css=div.info-item-val a	timeout=${COMMONWAIT}
+	\    Mark Step							step3
+	\    ${locator} = 						Set Variable	xpath=(//a[@ng-click='adb.showCl = !adb.showCl;'])[${index}]
+	\    Scroll Page To Element				${locator}
+	\    Wait Until Element Not Stale		${locator}	10
+	\    Click Element	${locator}
+	\    Wait Until Element Is Visible		xpath=(//div[@ng-if='adb.classification'])[${index}]	timeout=10
 
 
 Відкрити потрібну інформацію по тендеру
 	[Arguments]  ${field}
 	Wait Until Element Is Visible	${tender_data_title}	timeout=${COMMONWAIT}
-
-	#choose UK language
-	${status} =	Run Keyword And Return Status	Element Should Be Visible	css=a#lang_uk
-	Run Keyword If	${status}	Click Element	css=a#lang_uk
 
 	#switch to correct tab
 	${tab_num} =	Set Variable If
@@ -511,46 +514,28 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Sleep			2s
 
 
-Обрати потрібний лот за id
-	[Arguments]  ${lot_id}
-	#if lot is just one we don't have to switch
-	Sleep								2s
-	${is_multilot} =					Run Keyword And Return Status	Element Should Be Visible	css=div.lot-chooser
-	Run Keyword Unless					${is_multilot}	Return From Keyword	${False}
-
-	Mark Step							obraty lot ${lot_id}
-	Sleep								2s
-	Wait Until Element Is Visible		css=div.lot-chooser	1
-	Wait Until Element Is Enabled		css=div.lot-chooser	1
-	Click Element						css=div.lot-chooser>div.toggle-div
-	Sleep								1s
-	${status} =	Run Keyword And Return Status	Element Should Be Visible	xpath=//div[@ng-repeat='lot in model.lotPortion' and contains(., '${lot_id}')]
-	Mark Step							our status: ${status}
-
-	Wait Until Element Is Visible		xpath=//div[@ng-repeat='lot in model.lotPortion' and contains(., '${lot_id}')]	timeout=${COMMONWAIT}
-	Wait Enable And Click Element		xpath=//div[@ng-repeat='lot in model.lotPortion' and contains(., '${lot_id}')]
-	Wait Until Element Is Not Visible	xpath=//div[@ng-repeat='lot in model.lotPortion' and contains(., '${lot_id}')]	timeout=${COMMONWAIT}
-	Sleep								1s
-	Mark Step							lot obrano
+Choose UA language
+	${status} =	Run Keyword And Return Status	Element Should Be Visible	css=a#lang_uk
+	Run Keyword If	${status}	Click Element	css=a#lang_uk
 
 
-Обрати потрібний лот за порядковим номером
-	[Arguments]  ${number}
-	#if lot is just one we don't have to switch
-	Sleep								2s
-	${is_multilot} =					Run Keyword And Return Status	Element Should Be Visible	css=div.lot-chooser
-	Run Keyword Unless					${is_multilot}	Return From Keyword	${False}
-
-	Mark Step							obraty lot ${number}
-	Sleep								2s
-	Wait Until Element Is Visible		css=div.lot-chooser	1
-	Wait Until Element Is Enabled		css=div.lot-chooser	1
-	Click Element						css=div.lot-chooser>div.toggle-div
-
-	Wait Enable And Click Element		xpath=(//div[@ng-repeat='lot in model.lotPortion'])[${number}]
-	Wait Until Element Is Not Visible	xpath=(//div[@ng-repeat='lot in model.lotPortion'])[${number}]	timeout=${COMMONWAIT}
-	Sleep								1s
-	Mark Step							lot obrano
+Відкрити інформацію по лотах
+	Wait For Ajax
+	Wait Until Element Is Visible	xpath=//a[contains(@ng-click, 'description')]	${COMMONWAIT}
+	@{description_btn_list} = 	Get Webelements			xpath=//a[contains(@ng-click, 'description')]
+	${items_count} = 			Get Length				${description_btn_list}
+	${items_count} = 			Evaluate				${items_count}+1
+	: FOR    ${index}    IN RANGE    1    ${items_count}
+	\    Scroll Page To Element							xpath=(//a[contains(@ng-click, 'description')])[${index}]
+	\    ${attribute} =	Get Element Attribute			xpath=(//a[contains(@ng-click, 'description')])[${index}]/..@class
+	\    log to console    checked-nav_${index}
+	\    Return From Keyword If	'checked-nav' in '${attribute}'
+	\    log to console    after checked-nav_${index}
+	\    Click Element	xpath=(//a[contains(@ng-click, 'description')])[${index}]
+	\    Wait For Ajax
+	\    Wait Until Element Is Visible					xpath=(//a[@ng-click='lot.shwFull = !lot.shwFull'])[${index}]	timeout=${COMMONWAIT}
+	\    ${attribute} =	Get Element Attribute			xpath=(//a[@ng-click='lot.shwFull = !lot.shwFull'])[${index}]@id
+	\    Run Keyword If	'showMore' in '${attribute}'	Click Element	xpath=(//a[@ng-click='lot.shwFull = !lot.shwFull'])[${index}]
 
 
 Отримати положення предмету
@@ -563,6 +548,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	${tender_data} = 							Execute Javascript	return angular.element("#tenderId").scope().model.ad;
 
 	${item_num}	${lot_num}	${lots_count} = 	get_lot_num_by_item	${tender_data}	${item_id}
+	${item_num}							 = 		get_item_num		${tender_data}	${item_id}
 	Mark Step									${item_id} - ${item_num} - ${lot_num}
 	[return]  ${item_num}  ${lot_num}
 
@@ -571,13 +557,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	[Arguments]  ${username}  ${tender_uaid}  ${item_id}  ${element}
 	Mark Step	${username} - ${tender_uaid} - ${item_id} - ${element}
 	Відкрити потрібну інформацію по тендеру	${element}
-
 	${item}	${lot} =	Отримати положення предмету		${item_id}
-	Обрати потрібний лот за порядковим номером			${lot}
-
-	#show extra information if it is needed
-	Відкрити детальну інформацію про позицію	${item}
-
 	${element} = 	Set Variable	items.${element}
 
 	Run Keyword And Return If	'${element}' == 'items.classification.id'				Отримати строку			${element}	3	${item}
@@ -609,8 +589,6 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	[Arguments]  ${username}  ${tender_uaid}  ${feature_id}  ${field_name}
 	Відкрити потрібну інформацію по тендеру	${field_name}
 	Wait For Element With Reload			xpath=//div[contains(@class,'info-item-label') and contains(., '${feature_id}')]  1
-
-	Обрати потрібний лот за порядковим номером	1
 
 	${result} = 	Run Keyword If	'${field_name}' == 'title'	Get Text	xpath=//div[contains(@class,'info-item-label') and contains(., '${feature_id}')]
 		...	ELSE IF		'${field_name}' == 'description'		Get Text	xpath=//div[contains(., '${feature_id}')]/following-sibling::div[@ng-click='feature.showCl = !feature.showCl;']
@@ -668,26 +646,20 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 Отримати інформацію із лоту
 	[Arguments]  ${username}  ${tender_uaid}  ${object_id}  ${element}
-	Відкрити потрібну інформацію по тендеру		${element}
+	Відкрити потрібну інформацію по тендеру	${element}
 	${element_for_work} = 	Convert To String	lots.${element}
+	${tender_data} = 		Execute Javascript	return angular.element("#tenderId").scope().model.ad;
+	${lot} = 				get_lot_num			${tender_data}	${object_id}
 
 	Run Keyword If	'add_lot' in ${TEST_TAGS}		Wait Until Keyword Succeeds	2min	10s		Check Condition With Reload	1	${object_id}
 		...	ELSE IF		'delete_lot' in ${TEST_TAGS}	Wait Until Keyword Succeeds	2min	10s	Check Condition With Reload	1	${object_id}
 
-	#show more info of lot
-	Wait Until Element Is Visible					css=a[ng-click='model.shwFull = !model.shwFull']	timeout=${COMMONWAIT}
-	${attribute} =	Get Element Attribute			css=a[ng-click='model.shwFull = !model.shwFull'] span@id
-	Mark Step  ${attribute}
-	Run Keyword If	'showMore' in '${attribute}'	Click Element	css=a[ng-click='model.shwFull = !model.shwFull']
-
-	Обрати потрібний лот за id						${object_id}
-
-	Run Keyword And Return If	'${element}' == 'value.amount'						Отримати сумму								${element_for_work}
-	Run Keyword And Return If	'${element}' == 'value.valueAddedTaxIncluded'		Отримати інформацію про включення ПДВ		${element_for_work}
-	Run Keyword And Return If	'${element}' == 'value.currency'					Отримати інформацію з ${element}			${element_for_work}
-	Run Keyword And Return If	'${element}' == 'minimalStep.amount'				Отримати сумму								${element_for_work}
-	Run Keyword And Return If	'${element}' == 'minimalStep.currency'				Отримати інформацію з value.currency		${element_for_work}
-	Run Keyword And Return If	'${element}' == 'minimalStep.valueAddedTaxIncluded'	Отримати інформацію про включення ПДВ		${element_for_work}
+	Run Keyword And Return If	'${element}' == 'value.amount'						Отримати сумму								${element_for_work}	${lot}
+	Run Keyword And Return If	'${element}' == 'value.valueAddedTaxIncluded'		Отримати інформацію про включення ПДВ		${element_for_work}	${lot}
+	Run Keyword And Return If	'${element}' == 'value.currency'					Отримати інформацію з value.currency		${element_for_work}	${lot}
+	Run Keyword And Return If	'${element}' == 'minimalStep.amount'				Отримати сумму								${element_for_work}	${lot}
+	Run Keyword And Return If	'${element}' == 'minimalStep.currency'				Отримати інформацію з value.currency		${element_for_work}	${lot}
+	Run Keyword And Return If	'${element}' == 'minimalStep.valueAddedTaxIncluded'	Отримати інформацію про включення ПДВ		${element_for_work}	${lot}
 
 	Wait Until Element Is Visible	${tender_data_${element_for_work}}	timeout=${COMMONWAIT}
 	${result_full} =				Get Text	${tender_data_${element_for_work}}
@@ -750,7 +722,6 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 Отримати інформацію із пропозиції
 	[Arguments]  ${username}  ${tenderUA_id}  ${element}
-
 	Run Keyword And Return If	'${element}' == 'lotValues[0].value.amount'		Отримати сумму	${element}
 
 
@@ -854,8 +825,8 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 
 Отримати сумму
-	[Arguments]  ${element_name}
-	${value}=	Get text			${tender_data_${element_name}}
+	[Arguments]  ${element_name}  ${item}=${1}
+	${value}=	Отримати текст елемента	${element_name}	${item}
 	${value}=	Replace String		${value}	${SPACE}	${EMPTY}
 	${value}=	Replace String		${value}	грн			${EMPTY}
 	${result}=	Convert To Number	${value}
@@ -931,15 +902,15 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 
 Отримати інформацію з value.currency
-	[Arguments]    ${element_name}
-	${currency} =	Отримати текст елемента	${element_name}
+	[Arguments]    ${element_name}  ${item}
+	${currency} =	Отримати текст елемента	${element_name}	${item}
 	${currency_type} =	get_currency_type	${currency}
 	[return]  ${currency_type}
 
 
 Отримати інформацію про включення ПДВ
-	[Arguments]  ${element_name}
-	${value_added_tax_included} =	Get text	${tender_data_${element_name}}
+	[Arguments]  ${element_name} ${item}
+	${value_added_tax_included} =	Отримати текст елемента	${element_name}	${item}
 	${result} =	Set Variable If	'з ПДВ' in '${value_added_tax_included}'	True
 	${result} =	Convert To Boolean	${result}
 	[return]  ${result}
@@ -1142,7 +1113,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 Створити вимогу про виправлення умов лоту
 	[Arguments]    ${user}  ${tender_id}  ${claim}  ${lot_id}  ${document}
-	Обрати потрібний лот за id			${lot_id}
+#	Обрати потрібний лот за id			${lot_id}
 
 	Click Element	css=a[ng-click='act.showComplaintLot()']
 	Заповнити форму вимоги	${user}  ${claim}  ${document}
@@ -1256,7 +1227,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 Задати запитання на лот
 	[Arguments]  ${provider}  ${tender_id}  ${lot_id}  ${question}
-	Обрати потрібний лот за id	${lot_id}
+#	Обрати потрібний лот за id	${lot_id}
 	Wait Enable And Click Element	css=a[ng-click='act.sendLotEnquiry()']
 	Заповнити форму питання			${question.data.title}	${question.data.description}	${USERS.users['${provider}'].email}
 	[return]  True
@@ -1267,10 +1238,8 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Mark Step	${provider} - ${tender_id} - ${item_id} - ${question}
 
 	${item}	${lot} =	Отримати положення предмету		${item_id}
-	Обрати потрібний лот за порядковим номером			${lot}
-	Відкрити детальну інформацію про позицію	${item}
 
-	Wait Enable And Click Element	xpath=//a[@ng-click='act.sendItemEnquiry(adb.id)']
+	Wait Enable And Click Element	xpath=(//a[@ng-click='act.sendItemEnquiry(adb.id)'])[${item}]
 	Заповнити форму питання			${question.data.title}	${question.data.description}	${USERS.users['${provider}'].email}
 	[return]  True
 
@@ -1555,7 +1524,7 @@ Login
 	Input Text							xpath=//div[@id="login_modal" and @style='display: block;']//input[@type='password']	${USERS.users['${username}'].password}
 	Click Element						xpath=//div[@id="login_modal" and @style='display: block;']//button[@type='submit']
 	Wait Until Element Is Visible		css=ul.user-menu  timeout=30
-	Sleep								2s
+	Sleep								3s
 	Wait For Ajax
 	Wait Until Element Is Visible		css=a[data-target='#select_cabinet']  timeout=${COMMONWAIT}
 
@@ -1640,7 +1609,7 @@ Scroll Page To Element
 	[Arguments]	${element_locator}
 	${locator}  ${type} = 	Get Locator And Type	${element_locator}
 	${js_expresion} =	Set Variable If	'css' == '${type}'	window.$("${locator}")[0].scrollIntoView()
-		...  						'xpath' == '${type}'	document.evaluate("${locator}", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue
+		...  						'xpath' == '${type}'	document.evaluate("${locator}", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.scrollIntoView()
 	Execute Javascript	${js_expresion}
 	Sleep	2s
 
