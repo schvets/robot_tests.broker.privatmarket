@@ -49,14 +49,14 @@ ${tender_data_items.additionalClassifications[0].description}	xpath=//div[@ng-re
 ${tender_data_items.unit.name}									xpath=//div[.='Кількість:']/following-sibling::div
 ${tender_data_items.unit.code}									xpath=//div[.='Кількість:']/following-sibling::div
 ${tender_data_items.quantity}									xpath=//div[.='Кількість:']/following-sibling::div
-${tender_data_lots.title}										xpath=//section[contains(@class, 'lot-description') and contains(., '_lot_id_')]//div[@id='lot-title']
-${tender_data_lots.description}									xpath=//section[contains(@class, 'lot-description') and contains(., '_lot_id_')]//section[@class='description marged ng-binding']
-${tender_data_lots.value.amount}								xpath=//section[contains(@class, 'lot-description') and contains(., '_lot_id_')]//*[@id='lotAmount']
-${tender_data_lots.value.currency}								xpath=//section[contains(@class, 'lot-description') and contains(., '_lot_id_')]//*[@id='lotCcy']
-${tender_data_lots.value.valueAddedTaxIncluded}					xpath=//section[contains(@class, 'lot-description') and contains(., '_lot_id_')]//*[@id='lotTax']
-${tender_data_lots.minimalStep.amount}							xpath=//section[contains(@class, 'lot-description') and contains(., '_lot_id_')]//*[@id='lotMinStepAmount']
-${tender_data_lots.minimalStep.currency}						xpath=//section[contains(@class, 'lot-description') and contains(., '_lot_id_')]//*[@id='lotMinStepCcy']
-${tender_data_lots.minimalStep.valueAddedTaxIncluded}			xpath=div[ng-if='model.checkedLot.minimalStep.amount']
+${tender_data_lots.title}										div[@id='lot-title']
+${tender_data_lots.description}									section[@class='description marged ng-binding']
+${tender_data_lots.value.amount}								*[@id='lotAmount']
+${tender_data_lots.value.currency}								*[@id='lotCcy']
+${tender_data_lots.value.valueAddedTaxIncluded}					*[@id='lotTax']
+${tender_data_lots.minimalStep.amount}							*[@id='lotMinStepAmount']
+${tender_data_lots.minimalStep.currency}						*[@id='lotMinStepCcy']
+${tender_data_lots.minimalStep.valueAddedTaxIncluded}			div[ng-if='model.checkedLot.minimalStep.amount']
 ${tender_data_lotValues[0].value.amount}						xpath=//table[@class='bids']//tr[1]/td[3]
 
 ${locator_tenderCreation.buttonEdit}			xpath=//button[@ng-click='act.createAfp()']
@@ -241,7 +241,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Click Button								css=button[data-id='actSave']
 	Close Confirmation							Данные успешно сохранены
 
-#step puclication
+#step publication
 	Mark Step									step 6
 	Click Element								css=#tab_5
 	Click Button								css=button[data-id='actSend']
@@ -493,7 +493,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	\    Run Keyword Unless	'ng-hide' in '${element_class}'	Return From Keyword	False
 	\    Sleep								2s
 	\    Wait Until Element Is Visible		css=div.info-item-val a	timeout=${COMMONWAIT}
-	\    Mark Step							step3
+	\    Mark Step							show extra info
 	\    ${locator} = 						Set Variable	xpath=(//a[@ng-click='adb.showCl = !adb.showCl;'])[${index}]
 	\    Scroll Page To Element				${locator}
 	\    Wait Until Element Not Stale		${locator}	10
@@ -503,6 +503,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 Відкрити потрібну інформацію по тендеру
 	[Arguments]  ${field}
+	Sleep			2s
 	Wait Until Element Is Visible	${tender_data_title}	timeout=${COMMONWAIT}
 
 	#switch to correct tab
@@ -542,13 +543,13 @@ Choose UA language
 	[Arguments]  ${item_id}
 	${with_lot} = 	Run Keyword And Return Status		Wait Until Element Is Visible		css=#lotSection	timeout=${COMMONWAIT}
 
-	Run Keyword If		'add_item' in ${TEST_TAGS}		Wait Until Keyword Succeeds	2min	10s	Check Condition With Reload	1	${item_id}
-		...	ELSE IF		'add_lot' in ${TEST_TAGS}		Wait Until Keyword Succeeds	2min	10s	Check Condition With Reload	1	${item_id}
+	Run Keyword If		'add_item' in ${TEST_TAGS} and 'Можливість додати' in '${PREV TEST NAME}'		Wait Until Keyword Succeeds	2min	10s	Check Condition With Reload	1	${item_id}
+		...	ELSE IF		'add_lot' in ${TEST_TAGS} and 'Можливість додати' in '${PREV TEST NAME}'		Wait Until Keyword Succeeds	2min	10s	Check Condition With Reload	1	${item_id}
 
 	${tender_data} = 							Execute Javascript	return angular.element("#tenderId").scope().model.ad;
 
 	${item_num}	${lot_num}	${lots_count} = 	get_lot_num_by_item	${tender_data}	${item_id}
-	${item_num}							 = 		get_item_num		${tender_data}	${item_id}
+	${item_num} = 								get_item_num		${tender_data}	${item_id}
 	Mark Step									${item_id} - ${item_num} - ${lot_num}
 	[return]  ${item_num}  ${lot_num}
 
@@ -557,7 +558,7 @@ Choose UA language
 	[Arguments]  ${username}  ${tender_uaid}  ${item_id}  ${element}
 	Mark Step	${username} - ${tender_uaid} - ${item_id} - ${element}
 	Відкрити потрібну інформацію по тендеру	${element}
-	${item}	${lot} =	Отримати положення предмету		${item_id}
+	${item}	${lot} =	Отримати положення предмету		${item_id}  ${element}
 	${element} = 	Set Variable	items.${element}
 
 	Run Keyword And Return If	'${element}' == 'items.classification.id'				Отримати строку			${element}	3	${item}
@@ -592,7 +593,7 @@ Choose UA language
 
 	${result} = 	Run Keyword If	'${field_name}' == 'title'	Get Text	xpath=//div[contains(@class,'info-item-label') and contains(., '${feature_id}')]
 		...	ELSE IF		'${field_name}' == 'description'		Get Text	xpath=//div[contains(., '${feature_id}')]/following-sibling::div[@ng-click='feature.showCl = !feature.showCl;']
-		...	ELSE IF		'${field_name}' == 'featureOf'			Отримати інформацію з featureOf	${feature_id}	${field_name}
+		...	ELSE IF		'${field_name}' == 'featureOf'			Отримати інформацію з featureOf	${feature_id}
 		...	ELSE		There is no such feature parameter.
 
 	${result} =		Convert To String	${result}
@@ -648,21 +649,21 @@ Choose UA language
 	[Arguments]  ${username}  ${tender_uaid}  ${object_id}  ${element}
 	Відкрити потрібну інформацію по тендеру	${element}
 	${element_for_work} = 	Convert To String	lots.${element}
+	${element_for_work} = 	Set variable		xpath=//section[contains(@class, 'lot-description') and contains(., '${object_id}')]//${tender_data_${element_for_work}}
 	${tender_data} = 		Execute Javascript	return angular.element("#tenderId").scope().model.ad;
-	${lot} = 				get_lot_num			${tender_data}	${object_id}
 
 	Run Keyword If	'add_lot' in ${TEST_TAGS}		Wait Until Keyword Succeeds	2min	10s		Check Condition With Reload	1	${object_id}
 		...	ELSE IF		'delete_lot' in ${TEST_TAGS}	Wait Until Keyword Succeeds	2min	10s	Check Condition With Reload	1	${object_id}
 
-	Run Keyword And Return If	'${element}' == 'value.amount'						Отримати сумму								${element_for_work}	${lot}
-	Run Keyword And Return If	'${element}' == 'value.valueAddedTaxIncluded'		Отримати інформацію про включення ПДВ		${element_for_work}	${lot}
-	Run Keyword And Return If	'${element}' == 'value.currency'					Отримати інформацію з value.currency		${element_for_work}	${lot}
-	Run Keyword And Return If	'${element}' == 'minimalStep.amount'				Отримати сумму								${element_for_work}	${lot}
-	Run Keyword And Return If	'${element}' == 'minimalStep.currency'				Отримати інформацію з value.currency		${element_for_work}	${lot}
-	Run Keyword And Return If	'${element}' == 'minimalStep.valueAddedTaxIncluded'	Отримати інформацію про включення ПДВ		${element_for_work}	${lot}
+	Run Keyword And Return If	'${element}' == 'value.amount'						Отримати сумму								${element_for_work}
+	Run Keyword And Return If	'${element}' == 'value.valueAddedTaxIncluded'		Отримати інформацію про включення ПДВ		${element_for_work}
+	Run Keyword And Return If	'${element}' == 'value.currency'					Отримати інформацію з value.currency		${element_for_work}
+	Run Keyword And Return If	'${element}' == 'minimalStep.amount'				Отримати сумму								${element_for_work}
+	Run Keyword And Return If	'${element}' == 'minimalStep.currency'				Отримати інформацію з value.currency		${element_for_work}
+	Run Keyword And Return If	'${element}' == 'minimalStep.valueAddedTaxIncluded'	Отримати інформацію про включення ПДВ		${element_for_work}
 
-	Wait Until Element Is Visible	${tender_data_${element_for_work}}	timeout=${COMMONWAIT}
-	${result_full} =				Get Text	${tender_data_${element_for_work}}
+	Wait Until Element Is Visible	${element_for_work}	timeout=${COMMONWAIT}
+	${result_full} =				Get Text	${element_for_work}
 	${result} =						Strip String	${result_full}
 
 	[return]	${result}
@@ -800,9 +801,14 @@ Choose UA language
 
 Отримати текст елемента
 	[Arguments]  ${element_name}  ${item}=${1}
-	${index} =  					Evaluate	${item}-1
-	Wait Until Element Is Visible	${tender_data_${element_name}}
-	@{itemsList}=					Get Webelements	${tender_data_${element_name}}
+	${index} = 					Evaluate	${item}-1
+	${temp_name} = 					Remove String	${element_name}	'
+	${selector} = 	Set Variable If
+		...  'css=' in '${temp_name}' or 'xpath=' in '${temp_name}'	${element_name}
+		...  ${tender_data_${element_name}}
+
+	Wait Until Element Is Visible	${selector}
+	@{itemsList}=					Get Webelements	${selector}
 	${result_full} =				Get Text		${itemsList[${index}]}
 	[return]	${result_full}
 
@@ -825,8 +831,8 @@ Choose UA language
 
 
 Отримати сумму
-	[Arguments]  ${element_name}  ${item}=${1}
-	${value}=	Отримати текст елемента	${element_name}	${item}
+	[Arguments]  ${element_name}
+	${value}=	Отримати текст елемента	${element_name}
 	${value}=	Replace String		${value}	${SPACE}	${EMPTY}
 	${value}=	Replace String		${value}	грн			${EMPTY}
 	${result}=	Convert To Number	${value}
@@ -902,14 +908,14 @@ Choose UA language
 
 
 Отримати інформацію з value.currency
-	[Arguments]    ${element_name}  ${item}
+	[Arguments]    ${element_name}
 	${currency} =	Отримати текст елемента	${element_name}	${item}
 	${currency_type} =	get_currency_type	${currency}
 	[return]  ${currency_type}
 
 
 Отримати інформацію про включення ПДВ
-	[Arguments]  ${element_name} ${item}
+	[Arguments]  ${element_name}
 	${value_added_tax_included} =	Отримати текст елемента	${element_name}	${item}
 	${result} =	Set Variable If	'з ПДВ' in '${value_added_tax_included}'	True
 	${result} =	Convert To Boolean	${result}
@@ -966,7 +972,7 @@ Choose UA language
 
 Отримати інформацію з items.addClassifications.[0].id
 	[Arguments]  ${element}  ${item}
-	${text} =		Отримати текст елемента  ${element}  ${item}
+	${text} =		Отримати текст елемента	${element}	${item}
 	${newText} =	Get Regexp Matches		${text}	: (\\d.*\\d)	1
 	${result} = 	Convert To String  ${newText[0]}
 	[return]	${result}
@@ -974,9 +980,9 @@ Choose UA language
 
 Отримати інформацію з items.addClassifications.[0].scheme
 	[Arguments]  ${element}  ${item}
-	${text} =			Отримати текст елемента  ${element}  ${item}
-	${newText} =		Get Regexp Matches		${text}	Классификатор (.*):	1
-	${convertText} = 	Convert To String  ${newText[0]}
+	${text} =			Отримати текст елемента	${element}	${item}
+	${newText} =		Get Regexp Matches		${text}		Классификатор (.*):	1
+	${convertText} = 	Convert To String		${newText[0]}
 	${result} =			get_classification_type	${convertText}
 	[return]	${result}
 
@@ -984,8 +990,8 @@ Choose UA language
 Отримати інформацію з causeDescription
 	[Arguments]  ${element}  ${item}=${0}
 	Wait Enable And Click Element			css=#tenderType>span
-	${text} =	Отримати текст елемента		${element}	${item}
-	${text} =	Replace String				${text}	Опис:	${EMPTY}
+	${text} =	Отримати текст елемента		${element}					${item}
+	${text} =	Replace String				${text}				Опис:	${EMPTY}
 	${text} =	Strip String				${text}
 	[return]	${text}
 
@@ -994,13 +1000,13 @@ Choose UA language
 	[Arguments]  ${element}  ${item}=${0}
 	${text} =	Отримати текст елемента		${element}	${item}
 	${cause_type} =	Set Variable If
-		...  'Закупівля творів' in '${text}'	artContestIP
-		...  'Відсутність конкуренції' in '${text}'	noCompetition
-		...  'Нагальна потреба' in '${text}'	quick
-		...  'двічі відмінено тендер' in '${text}'	twiceUnsuccessful
-		...  'додаткову закупівлю' in '${text}'	additionalPurchase
+		...  'Закупівля творів' in '${text}'				artContestIP
+		...  'Відсутність конкуренції' in '${text}'			noCompetition
+		...  'Нагальна потреба' in '${text}'				quick
+		...  'двічі відмінено тендер' in '${text}'			twiceUnsuccessful
+		...  'додаткову закупівлю' in '${text}'				additionalPurchase
 		...  'додаткових будівельних робіт' in '${text}'	additionalConstruction
-		...  'Закупівля юридичних послуг' in '${text}'	stateLegalServices
+		...  'Закупівля юридичних послуг' in '${text}'		stateLegalServices
 	[return]	${cause_type}
 
 
@@ -1063,7 +1069,7 @@ Choose UA language
 
 
 Отримати інформацію з featureOf
-	[Arguments]  ${feature_id}  ${element}
+	[Arguments]  ${feature_id}
 	${result} = 	Get Text	xpath=//div[contains(@class, 'info-item ng-scope') and contains(., '${feature_id}')]/parent::div//section[contains(@class, 'description')]
 
 	#get featureOf identifier
@@ -1249,8 +1255,10 @@ Choose UA language
 	[Documentation]
 	...	${ARGUMENTS[0]} ==  username
 	...	${ARGUMENTS[1]} ==  tenderId
-
-	privatmarket.Пошук тендера по ідентифікатору		@{ARGUMENTS}[0]	@{ARGUMENTS}[1]
+	Reload Page
+	Wait For Ajax
+	Sleep				2s
+	Switch To Frame		id=tenders
 
 
 Подати цінову пропозицію
@@ -1669,8 +1677,11 @@ Reload And Switch To Tab
 	Mark Step					in_reload
 	Reload Page
 	Wait For Ajax
+	Sleep				2s
 	Switch To Frame		id=tenders
-	Switch To Tab		${tab_number}
+	Відкрити інформацію по лотах
+	Відкрити детальну інформацію по позиціям
+	Run Keyword If	'${tab_number}' != '0'	Switch To Tab		${tab_number}
 	Wait For Ajax
 
 
@@ -1685,13 +1696,13 @@ Switch To Tab
 Wait For Element With Reload
 	[Arguments]  ${locator}  ${tab_number}  ${time_to_wait}=3
 	Mark Step					in_wait
-	Wait Until Keyword Succeeds			${time_to_wait}min	10s	Try Search Element	${locator}	${tab_number}
+	Wait Until Keyword Succeeds			${time_to_wait}min	1s	Try Search Element	${locator}	${tab_number}
 
 
 Try Search Element
 	[Arguments]	${locator}  ${tab_number}
 	Mark Step						in_search
-	Run Keyword If	'${tab_number}' != '0'	Reload And Switch To Tab	${tab_number}
+	Reload And Switch To Tab		${tab_number}
 	Wait For Ajax
 	Sleep							2s
 	Wait Until Element Is Enabled	${locator}	3
