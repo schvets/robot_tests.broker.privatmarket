@@ -18,7 +18,7 @@ ${tender_data_value.amount}										css=#tenderBudget
 ${tender_data_value.currency}									css=#tenderBudgetCcy
 ${tender_data_value.valueAddedTaxIncluded}						css=#tenderBudgetTax
 ${tender_data_tenderID}											css=div#tenderId
-${tender_data_procuringEntity.name}								css=a[ng-click='act.openCard()']
+${tender_data_procuringEntity.name}								css=a[ng-click='commonActions.openCard()']
 ${tender_data_enquiryPeriod.startDate}							xpath=(//span[@ng-if='p.bd'])[1]
 ${tender_data_enquiryPeriod.endDate}							xpath=(//span[@ng-if='p.ed'])[1]
 ${tender_data_tenderPeriod.startDate}							xpath=(//span[@ng-if='p.bd'])[2]
@@ -27,12 +27,12 @@ ${tender_data_auctionPeriod.startDate}							xpath=(//span[@ng-if='p.bd'])[3]
 ${tender_data_complaintPeriod.endDate}							css=span#cmplPeriodEnd
 ${tender_data_minimalStep.amount}								css=#lotMinStepAmount
 ${tender_data_items.description}								css=a[ng-click='adb.showCl = !adb.showCl;']
-${tender_data_items.deliveryDate.endDate}						xpath=//div[contains(@class,'delivery-info')]//div[.='Кінець:']/following-sibling::div
+${tender_data_items.deliveryDate.endDate}						xpath=//div[@ng-if='adb.deliveryDate.endDate']/div[2]
 ${tender_data_items.deliveryLocation.latitude}					css=span.latitude
 ${tender_data_items.deliveryLocation.longitude}					css=span.longitude
 ${tender_data_items.deliveryAddress.countryName}				css=prz-address[addr='adb.deliveryAddress'] span#countryName
-${tender_data_items.deliveryAddress.countryName_ru}				css=prz-address[addr='adb.deliveryAddress'] span#countryName
-${tender_data_items.deliveryAddress.countryName_en}				css=prz-address[addr='adb.deliveryAddress'] span#countryName
+${tender_data_items.deliveryAddress.countryName_ru}				xpath=//div[@class='info-item ng-scope']//span[@id='countryName']
+${tender_data_items.deliveryAddress.countryName_en}				xpath=//div[@class='info-item ng-scope']//span[@id='countryName']
 ${tender_data_items.deliveryAddress.postalCode}					css=prz-address[addr='adb.deliveryAddress'] span#postalCode
 ${tender_data_items.deliveryAddress.region}						css=prz-address[addr='adb.deliveryAddress'] span#region
 ${tender_data_items.deliveryAddress.locality}					css=prz-address[addr='adb.deliveryAddress'] span#locality
@@ -96,8 +96,8 @@ ${tender_data_procuringEntity.identifier.id}			xpath=//div[@id='procurerId']/div
 
 ${tender_data_documents[0].title}						xpath=//prozorro-doc[contains(@ng-repeat, \"documentOf:'tender'\")]//*[@class='file-name ng-binding']
 ${tender_data_documents[1].title}						xpath=//prozorro-doc[contains(@ng-repeat, \"documentOf:'lot'\")]//*[@class='file-name ng-binding']
-${tender_data_causeDescription}							css=#tenderType>div>div:nth-of-type(2)
-${tender_data_cause}									css=#tenderType>div>div:nth-of-type(1)
+${tender_data_causeDescription}							css=#tenderType>div:nth-of-type(2)
+${tender_data_cause}									css=#tenderType>div:nth-of-type(1)
 
 ${tender_data_awards[0].status}									xpath=//div[@class='modal-body info-div ng-scope']/div[4]/div[2]
 ${tender_data_awards[0].suppliers[0].address.countryName}		xpath=(//prz-address[@id='procurerAddr'])[2]//*[@id='countryName']
@@ -727,10 +727,10 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	${work_string} =	Replace String			${result_full}	${SPACE},${SPACE}	${SPACE}
 	${work_string} =	Replace String			${result_full}	,${SPACE}	${SPACE}
 	${values_list} =	Split String			${work_string}
-	${day} =			Convert To String		${values_list[0]}
-	${month} =			get_month_number		${values_list[1]}
-	${year} =			Convert To String		${values_list[2]}
-	${time} =			Convert To String		${values_list[3]}
+	${day} =			Convert To String		${values_list[1]}
+	${month} =			get_month_number		${values_list[2]}
+	${year} =			Convert To String		${values_list[3]}
+	${time} =			Convert To String		${values_list[4]}
 	${result}=			Convert To String		${year}-${month}-${day} ${time}
 	${result} = 		get_time_with_offset	${result}
 	[return]	${result}
@@ -863,7 +863,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 Отримати інформацію з causeDescription
 	[Arguments]  ${element}  ${item}=${0}
-	Wait Enable And Click Element			css=#tenderType>span
+	Wait Enable And Click Element			css=#tenderType
 	${text} =	Отримати текст елемента		${element}	${item}
 	${text} =	Replace String				${text}	Опис:	${EMPTY}
 	${text} =	Strip String				${text}
@@ -889,12 +889,13 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Click Element						css=a#lang_${localization}
 	Wait For Ajax
 	Wait Until Element Is Visible		css=span#lang_${localization}	timeout=${COMMONWAIT}
-	Wait Until Element Is Visible		css=#nolotSection div[class='info-item'] a	timeout=${COMMONWAIT}
-	Wait Until Element Is Enabled		css=#nolotSection div[class='info-item'] a	timeout=${COMMONWAIT}
-	Click Element						css=#nolotSection div[class='info-item'] a
+	Wait Until Element Is Visible		css=#tenderType	timeout=${COMMONWAIT}
+	Wait Until Element Is Enabled		css=#tenderType	timeout=${COMMONWAIT}
+	Click Element						css=#tenderType
 	Run Keyword If	${item} > 0			Відкрити детальну інформацію про позицію	${item}
-	${text} =							Отримати текст елемента  ${element}  ${item}
-	[return]	${text}
+	${text} =							Отримати текст елемента  ${element}
+	${result} =			Strip String	${text}
+	[return]	${result}
 
 
 Отримати інформацію з awards[0].documents[0].title
