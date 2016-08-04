@@ -20,22 +20,22 @@ ${tender_data_value.amount}										css=#tenderBudget
 ${tender_data_value.currency}									css=#tenderBudgetCcy
 ${tender_data_value.valueAddedTaxIncluded}						css=#tenderBudgetTax
 ${tender_data_tenderID}											css=div#tenderId
-${tender_data_procuringEntity.name}								css=a[ng-click='act.openCard()']
+${tender_data_procuringEntity.name}								css=a[ng-click='commonActions.openCard()']
 ${tender_data_enquiryPeriod.startDate}							xpath=//span[@id='active.enquiries-bd']
 ${tender_data_enquiryPeriod.endDate}							xpath=//span[@id='active.enquiries-ed']
 ${tender_data_tenderPeriod.startDate}							xpath=//span[@id='active.tendering-bd']
 ${tender_data_tenderPeriod.endDate}								xpath=//span[@id='active.tendering-ed']
 ${tender_data_auctionPeriod.startDate}							xpath=//span[@id='active.auction-bd']
 ${tender_data_complaintPeriod.endDate}							css=span#cmplPeriodEnd
-${tender_data_minimalStep.amount}								css=#lotAmount
 ${tender_data_bids}												xpath=(//table[@class='bids']//tr)[2]
+${tender_data_minimalStep.amount}								css=#lotMinStepAmount
 ${tender_data_items.description}								css=a[ng-click='adb.showCl = !adb.showCl;']
-${tender_data_items.deliveryDate.endDate}						xpath=//div[contains(@class,'delivery-info')]//div[.='Кінець:']/following-sibling::div
+${tender_data_items.deliveryDate.endDate}						xpath=//div[@ng-if='adb.deliveryDate.endDate']/div[2]
 ${tender_data_items.deliveryLocation.latitude}					css=span.latitude
 ${tender_data_items.deliveryLocation.longitude}					css=span.longitude
 ${tender_data_items.deliveryAddress.countryName}				css=prz-address[addr='adb.deliveryAddress'] span#countryName
-${tender_data_items.deliveryAddress.countryName_ru}				css=prz-address[addr='adb.deliveryAddress'] span#countryName
-${tender_data_items.deliveryAddress.countryName_en}				css=prz-address[addr='adb.deliveryAddress'] span#countryName
+${tender_data_items.deliveryAddress.countryName_ru}				css=div.info-item.ng-scope span#countryName
+${tender_data_items.deliveryAddress.countryName_en}				css=div.info-item.ng-scope span#countryName
 ${tender_data_items.deliveryAddress.postalCode}					css=prz-address[addr='adb.deliveryAddress'] span#postalCode
 ${tender_data_items.deliveryAddress.region}						css=prz-address[addr='adb.deliveryAddress'] span#region
 ${tender_data_items.deliveryAddress.locality}					css=prz-address[addr='adb.deliveryAddress'] span#locality
@@ -96,8 +96,8 @@ ${tender_data_procuringEntity.identifier.id}			xpath=//div[@id='procurerId']/div
 
 ${tender_data_documents[0].title}						xpath=//prozorro-doc[contains(@ng-repeat, \"documentOf:'tender'\")]//*[@class='file-name ng-binding']
 ${tender_data_documents[1].title}						xpath=//prozorro-doc[contains(@ng-repeat, \"documentOf:'lot'\")]//*[@class='file-name ng-binding']
-${tender_data_causeDescription}							css=#tenderType>div>div:nth-of-type(2)
-${tender_data_cause}									css=#tenderType>div>div:nth-of-type(1)
+${tender_data_causeDescription}							css=#tenderType>div:nth-of-type(2)
+${tender_data_cause}									css=#tenderType>div:nth-of-type(1)
 
 ${tender_data_awards[0].status}									xpath=//div[@class='modal-body info-div ng-scope']/div[4]/div[2]
 ${tender_data_awards[0].suppliers[0].address.countryName}		xpath=(//prz-address[@id='procurerAddr'])[2]//*[@id='countryName']
@@ -731,11 +731,14 @@ Choose UA language
 	${test_name} =	Replace String	${test_name}	\'	${EMPTY}
 
 	${status} = 	Set Variable If
+		...  'незадоволення вимоги' in '${test_name}'	Не вирiшена, обробляється
+		...  'задоволення вимоги' in '${test_name}'	Вирiшена
+		...  'cancelled' in '${test_name}'	Скасована
+		...  'pending' in '${test_name}'	Не вирiшена, обробляється
 		...  'поданого статусу' in '${test_name}'	Вiдправлено
 		...  'resolved' in '${test_name}'			Вирiшена
 		...  'answered' in '${test_name}'			Отримано вiдповiдь
 		...  'was called' in '${test_name}'			Вiдмiнено
-		...  'задоволення вимоги' in '${test_name}'	Вирiшена
 		...  ${None}
 
 	Return From Keyword If	'${status}' == '${None}'	${True}
@@ -748,10 +751,12 @@ Choose UA language
 	[Arguments]  ${element}
 	${result_full} = 	Get Text	${element}
 	${result} = 	Set Variable If
-		...  '${result_full}' == 'Вiдправлено'			claim
-		...  '${result_full}' == 'Вирiшена'				resolved
-		...  '${result_full}' == 'Отримано вiдповiдь'	answered
-		...  '${result_full}' == 'Вiдмiнено'			was called
+		...  '${result_full}' == 'Вiдправлено'					claim
+		...  '${result_full}' == 'Вирiшена'						resolved
+		...  '${result_full}' == 'Отримано вiдповiдь'			answered
+		...  '${result_full}' == 'Вiдмiнено'					was called
+		...  '${result_full}' == 'Скасована'					cancelled
+		...  '${result_full}' == 'Не вирiшена, обробляється'	pending
 		...  ${result_full}
 
 	[return]	${result}
@@ -771,6 +776,7 @@ Choose UA language
 	[Arguments]  ${element}
 	${result_full} = 	Get Text	${element}
 	${result} = 	Set Variable If
+		...  '${result_full}' == 'Не вирiшена, обробляється'	${false}
 		...  '${result_full}' == 'Вирiшена'	${true}
 		...  ${result_full}
 
@@ -990,8 +996,8 @@ Choose UA language
 Отримати інформацію з causeDescription
 	[Arguments]  ${element}  ${item}=${0}
 	Wait Enable And Click Element			css=#tenderType>span
-	${text} =	Отримати текст елемента		${element}					${item}
-	${text} =	Replace String				${text}				Опис:	${EMPTY}
+	${text} =	Отримати текст елемента		${element}				${item}
+	${text} =	Replace String				${text}					Опис:	${EMPTY}
 	${text} =	Strip String				${text}
 	[return]	${text}
 
@@ -1015,12 +1021,13 @@ Choose UA language
 	Click Element						css=a#lang_${localization}
 	Wait For Ajax
 	Wait Until Element Is Visible		css=span#lang_${localization}	timeout=${COMMONWAIT}
-	Wait Until Element Is Visible		css=#nolotSection div[class='info-item'] a	timeout=${COMMONWAIT}
-	Wait Until Element Is Enabled		css=#nolotSection div[class='info-item'] a	timeout=${COMMONWAIT}
-	Click Element						css=#nolotSection div[class='info-item'] a
+	Wait Until Element Is Visible		css=#tenderType	timeout=${COMMONWAIT}
+	Wait Until Element Is Enabled		css=#tenderType	timeout=${COMMONWAIT}
+	Click Element						css=#tenderType
 	Run Keyword If	${item} > 0			Відкрити детальну інформацію про позицію	${item}
-	${text} =							Отримати текст елемента  ${element}  ${item}
-	[return]	${text}
+	${text} =							Отримати текст елемента  ${element}
+	${result} =			Strip String	${text}
+	[return]	${result}
 
 
 Отримати інформацію з tenderID
