@@ -727,10 +727,10 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	${work_string} =	Replace String			${result_full}	${SPACE},${SPACE}	${SPACE}
 	${work_string} =	Replace String			${result_full}	,${SPACE}	${SPACE}
 	${values_list} =	Split String			${work_string}
-	${day} =			Convert To String		${values_list[1]}
-	${month} =			get_month_number		${values_list[2]}
-	${year} =			Convert To String		${values_list[3]}
-	${time} =			Convert To String		${values_list[4]}
+	${day} =			Convert To String		${values_list[0]}
+	${month} =			get_month_number		${values_list[1]}
+	${year} =			Convert To String		${values_list[2]}
+	${time} =			Convert To String		${values_list[3]}
 	${result}=			Convert To String		${year}-${month}-${day} ${time}
 	${result} = 		get_time_with_offset	${result}
 	[return]	${result}
