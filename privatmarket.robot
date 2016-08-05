@@ -56,7 +56,7 @@ ${tender_data_lots.value.currency}								*[@id='lotCcy']
 ${tender_data_lots.value.valueAddedTaxIncluded}					*[@id='lotTax']
 ${tender_data_lots.minimalStep.amount}							*[@id='lotMinStepAmount']
 ${tender_data_lots.minimalStep.currency}						*[@id='lotMinStepCcy']
-${tender_data_lots.minimalStep.valueAddedTaxIncluded}			div[ng-if='model.checkedLot.minimalStep.amount']
+${tender_data_lots.minimalStep.valueAddedTaxIncluded}			*[@id='lotMinStepTax']
 ${tender_data_lotValues[0].value.amount}						xpath=//table[@class='bids']//tr[1]/td[3]
 
 ${locator_tenderCreation.buttonEdit}			xpath=//button[@ng-click='act.createAfp()']
@@ -260,7 +260,6 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 Додати lots
 	[Arguments]  ${lots}
 	${lots_count} = 			Get Length	${lots}
-	debug     add lot3
 	: FOR    ${index}    IN RANGE    0    ${lots_count}
 	\    Mark Step		lot_num_${index}
 	\    Wait For Ajax
@@ -279,7 +278,6 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 Додати items
 	[Arguments]  ${items}
-	debug     add lot2
 	${items_count} = 			Get Length	${items}
 
 	: FOR    ${index}    IN RANGE    0    ${items_count}
@@ -409,7 +407,6 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Wait Until Element Is Enabled	css=button[ng-click='act.createAfp()']	timeout=${COMMONWAIT}
 	Click Button					css=button[ng-click='act.createAfp()']
 	Wait For Ajax
-	Sleep							1s
 	Wait Until Element Is Visible	id=tab_3	timeout=${COMMONWAIT}
 	Wait Until Element Is Enabled	id=tab_3	timeout=${COMMONWAIT}
 	Click Element					id=tab_3
@@ -441,6 +438,22 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Click Button								css=button[data-id='actSave']
 	Close Confirmation							Данные успешно сохранены
 	[return]  ${document}
+
+
+Оновити сторінку з тендером
+	[Arguments]  @{ARGUMENTS}
+	[Documentation]
+	...	${ARGUMENTS[0]} ==  username
+	...	${ARGUMENTS[1]} ==  tenderId
+	Reload Page
+	Wait For Ajax
+	Switch To Frame		id=tenders
+
+	${is_in_tender_data} = 	Run Keyword And Return Status	Wait Until Element Is Visible	css=div#tenderStatus	5s
+	Run Keyword Unless	${is_in_tender_data}	Return From Keyword
+
+	Відкрити інформацію по лотах
+	Відкрити детальну інформацію по позиціям
 
 
 Пошук тендера по ідентифікатору
@@ -477,33 +490,36 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Wait Until Element Is Visible			css=div#tenderStatus	timeout=${COMMONWAIT}
 	Wait Until Element Not Stale			${tender_data_title}	40
 
-	Choose UA language
+	Chose interface language				uk
 	Відкрити інформацію по лотах
 	Відкрити детальну інформацію по позиціям
 
 
 Відкрити детальну інформацію по позиціям
 	Wait For Ajax
-	Wait Until Element Is Visible	xpath=//a[contains(@ng-click, 'description')]	${COMMONWAIT}
+	Wait Until Element Is Visible						xpath=//a[@ng-click='adb.showCl = !adb.showCl;']	${COMMONWAIT}
 	@{description_btn_list} = 	Get Webelements			xpath=//a[@ng-click='adb.showCl = !adb.showCl;']
 	${items_count} = 			Get Length				${description_btn_list}
 	${items_count} = 			Evaluate				${items_count}+1
 	: FOR    ${index}    IN RANGE    1    ${items_count}
-	\    ${element_class} =					Get Element Attribute	xpath=(//div[@ng-show='adb.showCl'])[${index}]@class
-	\    Run Keyword Unless	'ng-hide' in '${element_class}'	Return From Keyword	False
-	\    Sleep								2s
-	\    Wait Until Element Is Visible		css=div.info-item-val a	timeout=${COMMONWAIT}
-	\    Mark Step							show extra info
-	\    ${locator} = 						Set Variable	xpath=(//a[@ng-click='adb.showCl = !adb.showCl;'])[${index}]
-	\    Scroll Page To Element				${locator}
-	\    Wait Until Element Not Stale		${locator}	10
-	\    Click Element	${locator}
-	\    Wait Until Element Is Visible		xpath=(//div[@ng-if='adb.classification'])[${index}]	timeout=10
+	\    Відкрити детальну інформацію про позицію	${index}
+
+
+Відкрити детальну інформацію про позицію
+	[Arguments]  ${index}
+	${locator} = 						Set Variable	xpath=(//a[@ng-click='adb.showCl = !adb.showCl;'])[${index}]
+	${element_class} =					Get Element Attribute	${locator}@class
+	Run Keyword If	'ng-hide' in '${element_class}'	Return From Keyword
+	Sleep								1s
+	Mark Step							show extra info
+	Scroll Page To Element				${locator}
+	Wait Until Element Not Stale		${locator}	10
+	Click Element	${locator}
+	Wait Until Element Is Visible		xpath=(//div[@ng-if='adb.classification'])[${index}]	timeout=10
 
 
 Відкрити потрібну інформацію по тендеру
 	[Arguments]  ${field}
-	Sleep			2s
 	Wait Until Element Is Visible	${tender_data_title}	timeout=${COMMONWAIT}
 
 	#switch to correct tab
@@ -512,16 +528,21 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 		...  'complaint' in '${field}'	3
 		...  1
 	Switch To Tab	${tab_num}
-	Sleep			2s
+	Sleep			1s
 
 
-Choose UA language
-	${status} =	Run Keyword And Return Status	Element Should Be Visible	css=a#lang_uk
-	Run Keyword If	${status}	Click Element	css=a#lang_uk
+Chose interface language
+	[Arguments]  ${language}
+	${status} =	Run Keyword And Return Status	Element Should Be Visible	css=a#lang_${language}
+	Run Keyword If	${status}					Click Element	css=a#lang_${language}
+	Wait Until Element Is Visible				css=span#lang_${language}	${COMMONWAIT}
 
 
 Відкрити інформацію по лотах
 	Wait For Ajax
+	${is_multilot} =									Run Keyword And Return Status	Element Should Be Visible	xpath=//a[contains(@ng-click, 'description')]
+	Run Keyword Unless									${is_multilot}	Return From Keyword	${False}
+
 	Wait Until Element Is Visible	xpath=//a[contains(@ng-click, 'description')]	${COMMONWAIT}
 	@{description_btn_list} = 	Get Webelements			xpath=//a[contains(@ng-click, 'description')]
 	${items_count} = 			Get Length				${description_btn_list}
@@ -529,10 +550,10 @@ Choose UA language
 	: FOR    ${index}    IN RANGE    1    ${items_count}
 	\    Scroll Page To Element							xpath=(//a[contains(@ng-click, 'description')])[${index}]
 	\    ${attribute} =	Get Element Attribute			xpath=(//a[contains(@ng-click, 'description')])[${index}]/..@class
-	\    log to console    checked-nav_${index}
-	\    Return From Keyword If	'checked-nav' in '${attribute}'
-	\    log to console    after checked-nav_${index}
-	\    Click Element	xpath=(//a[contains(@ng-click, 'description')])[${index}]
+	\    Mark Step										checked-nav_${index}
+	\    Return From Keyword If							'checked-nav' in '${attribute}'
+	\    Mark Step										after checked-nav_${index}
+	\    Click Element									xpath=(//a[contains(@ng-click, 'description')])[${index}]
 	\    Wait For Ajax
 	\    Wait Until Element Is Visible					xpath=(//a[@ng-click='lot.shwFull = !lot.shwFull'])[${index}]	timeout=${COMMONWAIT}
 	\    ${attribute} =	Get Element Attribute			xpath=(//a[@ng-click='lot.shwFull = !lot.shwFull'])[${index}]@id
@@ -541,8 +562,6 @@ Choose UA language
 
 Отримати положення предмету
 	[Arguments]  ${item_id}
-	${with_lot} = 	Run Keyword And Return Status		Wait Until Element Is Visible		css=#lotSection	timeout=${COMMONWAIT}
-
 	Run Keyword If		'add_item' in ${TEST_TAGS} and 'Можливість додати' in '${PREV TEST NAME}'		Wait Until Keyword Succeeds	2min	10s	Check Condition With Reload	1	${item_id}
 		...	ELSE IF		'add_lot' in ${TEST_TAGS} and 'Можливість додати' in '${PREV TEST NAME}'		Wait Until Keyword Succeeds	2min	10s	Check Condition With Reload	1	${item_id}
 
@@ -558,8 +577,9 @@ Choose UA language
 	[Arguments]  ${username}  ${tender_uaid}  ${item_id}  ${element}
 	Mark Step	${username} - ${tender_uaid} - ${item_id} - ${element}
 	Відкрити потрібну інформацію по тендеру	${element}
-	${item}	${lot} =	Отримати положення предмету		${item_id}  ${element}
+	${item}	${lot} =	Отримати положення предмету		${item_id}
 	${element} = 	Set Variable	items.${element}
+	run keyword if     'items.deliveryAddress.countryName' in '${element}'				debug     items.additionalClassifications[0].description
 
 	Run Keyword And Return If	'${element}' == 'items.classification.id'				Отримати строку			${element}	3	${item}
 	Run Keyword And Return If	'${element}' == 'items.description'						Отримати текст елемента	${element}		${item}
@@ -915,14 +935,14 @@ Choose UA language
 
 Отримати інформацію з value.currency
 	[Arguments]    ${element_name}
-	${currency} =	Отримати текст елемента	${element_name}	${item}
+	${currency} =	Отримати текст елемента	${element_name}
 	${currency_type} =	get_currency_type	${currency}
 	[return]  ${currency_type}
 
 
 Отримати інформацію про включення ПДВ
 	[Arguments]  ${element_name}
-	${value_added_tax_included} =	Отримати текст елемента	${element_name}	${item}
+	${value_added_tax_included} =	Отримати текст елемента	${element_name}
 	${result} =	Set Variable If	'з ПДВ' in '${value_added_tax_included}'	True
 	${result} =	Convert To Boolean	${result}
 	[return]  ${result}
@@ -995,7 +1015,7 @@ Choose UA language
 
 Отримати інформацію з causeDescription
 	[Arguments]  ${element}  ${item}=${0}
-	Wait Enable And Click Element			css=#tenderType>span
+	Wait Enable And Click Element			css=#tenderType>div
 	${text} =	Отримати текст елемента		${element}				${item}
 	${text} =	Replace String				${text}					Опис:	${EMPTY}
 	${text} =	Strip String				${text}
@@ -1018,15 +1038,17 @@ Choose UA language
 
 Отримати інформацію з елемента зі зміною локалізації
 	[Arguments]  ${element}  ${item}  ${localization}
-	Click Element						css=a#lang_${localization}
-	Wait For Ajax
-	Wait Until Element Is Visible		css=span#lang_${localization}	timeout=${COMMONWAIT}
-	Wait Until Element Is Visible		css=#tenderType	timeout=${COMMONWAIT}
-	Wait Until Element Is Enabled		css=#tenderType	timeout=${COMMONWAIT}
+	Chose interface language			${localization}
+	Wait Until Element Is Visible		css=#tenderType								timeout=${COMMONWAIT}
+	Wait Until Element Is Enabled		css=#tenderType								timeout=${COMMONWAIT}
 	Click Element						css=#tenderType
 	Run Keyword If	${item} > 0			Відкрити детальну інформацію про позицію	${item}
 	${text} =							Отримати текст елемента  ${element}
 	${result} =			Strip String	${text}
+
+	Chose interface language			uk
+	Відкрити інформацію по лотах
+	Відкрити детальну інформацію по позиціям
 	[return]	${result}
 
 
@@ -1221,7 +1243,6 @@ Choose UA language
 Заповнити форму питання
 	[Arguments]  ${title}  ${description}  ${email}
 	Wait For Ajax
-	sleep								4s
 	Wait For Element Value				css=input[ng-model='model.person.phone']
 	Wait Until Element Not Stale		xpath=//input[@ng-model="model.question.title"]	40
 	Wait Until Element Is Visible		xpath=//input[@ng-model="model.question.title"]				timeout=10
@@ -1251,21 +1272,11 @@ Choose UA language
 	Mark Step	${provider} - ${tender_id} - ${item_id} - ${question}
 
 	${item}	${lot} =	Отримати положення предмету		${item_id}
+	Відкрити детальну інформацію про позицію	${item}
 
 	Wait Enable And Click Element	xpath=(//a[@ng-click='act.sendItemEnquiry(adb.id)'])[${item}]
 	Заповнити форму питання			${question.data.title}	${question.data.description}	${USERS.users['${provider}'].email}
 	[return]  True
-
-
-Оновити сторінку з тендером
-	[Arguments]  @{ARGUMENTS}
-	[Documentation]
-	...	${ARGUMENTS[0]} ==  username
-	...	${ARGUMENTS[1]} ==  tenderId
-	Reload Page
-	Wait For Ajax
-	Sleep				2s
-	Switch To Frame		id=tenders
 
 
 Подати цінову пропозицію
@@ -1626,7 +1637,7 @@ Scroll Page To Element
 	${js_expresion} =	Set Variable If	'css' == '${type}'	window.$("${locator}")[0].scrollIntoView()
 		...  						'xpath' == '${type}'	document.evaluate("${locator}", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.scrollIntoView()
 	Execute Javascript	${js_expresion}
-	Sleep	2s
+	Wait For Ajax
 
 
 Get Locator And Type
@@ -1684,7 +1695,6 @@ Reload And Switch To Tab
 	Mark Step					in_reload
 	Reload Page
 	Wait For Ajax
-	Sleep				2s
 	Switch To Frame		id=tenders
 	Відкрити інформацію по лотах
 	Відкрити детальну інформацію по позиціям
@@ -1698,6 +1708,7 @@ Switch To Tab
 	Wait Until Element Is Visible		xpath=(//ul[@class='widget-header-block']//a)[${tab_number}]	timeout=${COMMONWAIT}
 	${class} =	Get Element Attribute	xpath=(//ul[@class='widget-header-block']//a)[${tab_number}]@class
 	Run Keyword Unless	'white-icon' in '${class}'	Wait Visibulity And Click Element	xpath=(//ul[@class='widget-header-block']//a)[${tab_number}]
+	Wait For Ajax
 
 
 Wait For Element With Reload
@@ -1711,7 +1722,6 @@ Try Search Element
 	Mark Step						in_search
 	Reload And Switch To Tab		${tab_number}
 	Wait For Ajax
-	Sleep							2s
 	Wait Until Element Is Enabled	${locator}	3
 	[return]	True
 
@@ -1722,7 +1732,6 @@ Check Condition With Reload
 	Mark Step	in_check_condition_with_reload
 	Reload And Switch To Tab	${tab_number}
 	Wait For Ajax
-	sleep       2s
 
 	${tender_data} = 	Execute Javascript	return angular.element("#tenderId").scope().model.ad;
 	${result} = 		is_object_present	${tender_data}	${item_id}
