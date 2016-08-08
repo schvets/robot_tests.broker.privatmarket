@@ -540,9 +540,6 @@ Chose interface language
 
 Відкрити інформацію по лотах
 	Wait For Ajax
-	${is_multilot} =									Run Keyword And Return Status	Element Should Be Visible	xpath=//a[contains(@ng-click, 'description')]
-	Run Keyword Unless									${is_multilot}	Return From Keyword	${False}
-
 	Wait Until Element Is Visible	xpath=//a[contains(@ng-click, 'description')]	${COMMONWAIT}
 	@{description_btn_list} = 	Get Webelements			xpath=//a[contains(@ng-click, 'description')]
 	${items_count} = 			Get Length				${description_btn_list}
@@ -555,6 +552,8 @@ Chose interface language
 	\    Mark Step										after checked-nav_${index}
 	\    Click Element									xpath=(//a[contains(@ng-click, 'description')])[${index}]
 	\    Wait For Ajax
+	\    ${is_multilot} =								Run Keyword And Return Status	Element Should Be Visible	xpath=//a[@ng-click='lot.shwFull = !lot.shwFull']
+	\    Run Keyword Unless								${is_multilot}	Return From Keyword
 	\    Wait Until Element Is Visible					xpath=(//a[@ng-click='lot.shwFull = !lot.shwFull'])[${index}]	timeout=${COMMONWAIT}
 	\    ${attribute} =	Get Element Attribute			xpath=(//a[@ng-click='lot.shwFull = !lot.shwFull'])[${index}]@id
 	\    Run Keyword If	'showMore' in '${attribute}'	Click Element	xpath=(//a[@ng-click='lot.shwFull = !lot.shwFull'])[${index}]
@@ -579,7 +578,6 @@ Chose interface language
 	Відкрити потрібну інформацію по тендеру	${element}
 	${item}	${lot} =	Отримати положення предмету		${item_id}
 	${element} = 	Set Variable	items.${element}
-	run keyword if     'items.deliveryAddress.countryName' in '${element}'				debug     items.additionalClassifications[0].description
 
 	Run Keyword And Return If	'${element}' == 'items.classification.id'				Отримати строку			${element}	3	${item}
 	Run Keyword And Return If	'${element}' == 'items.description'						Отримати текст елемента	${element}		${item}
