@@ -11,7 +11,9 @@ def get_month_number(month_name):
     monthes = [u"янв.", u"февр.", u"марта", u"апр.", u"мая", u"июня",
                u"июля", u"авг.", u"сент.", u"окт.", u"нояб.", u"дек.",
                u"січ.", u"лют.", u"бер.", u"квіт.", u"трав.", u"черв.",
-               u"лип.", u"серп.", u"вер.", u"жовт.", u"лист.", u"груд."]
+               u"лип.", u"серп.", u"вер.", u"жовт.", u"лист.", u"груд.",
+               u"січеня", u"лютого", u"березня", u"квітня", u"травня", u"червня",
+               u"липня", u"серпня", u"вересня", u"жовтня", u"листопада", u"грудня", ]
     return monthes.index(month_name) % 12 + 1
 
 
@@ -87,6 +89,10 @@ def add_time(date, minutes_to_add):
 def modify_test_data(initial_data):
     initial_data['procuringEntity']['name'] = u"Ат Тестюршадрову2"
     initial_data['enquiryPeriod']['startDate'] = add_time(initial_data['enquiryPeriod']['startDate'], 5)
+    items = initial_data['items']
+    for item in items:
+        date = dateutil.parser.parse(item['deliveryDate']['endDate'])
+        item['deliveryDate']['endDate'] = date.strftime('%Y-%m-%dT00:00:00+03:00')
     return initial_data
 
 

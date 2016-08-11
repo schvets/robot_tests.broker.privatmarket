@@ -244,6 +244,8 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 #step publication
 	Mark Step									step 6
 	Click Element								css=#tab_5
+	Wait For Ajax
+	Wait Until Element Is Visible				css=button[data-id='actSend']
 	Click Button								css=button[data-id='actSend']
 	Close Confirmation							Закупка поставлена в очередь на отправку в ProZorro. Статус закупки Вы можете отслеживать в личном кабинете.
 	Wait For Ajax
@@ -251,7 +253,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	${temp_id} = 								Отримати інформацію з tenderID	inner
 	Mark Step									Tender_inner_id: ${temp_id}
 	Go To										${USERS.users['${username}'].homepage}?utm_source=direct#/${temp_id}
-	Wait For Element With Reload				xpath=//div[@id='tenderId' and contains(.,'UA')]	1	5
+	Wait For Element With Reload				xpath=//div[@id='tenderId' and contains(.,'UA')]	1	7
 	${temp_id} = 								Отримати інформацію з tenderID	ua
 	Mark Step									Tender_ua_id: ${temp_id}
 	[return]	${temp_id}
@@ -281,18 +283,18 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	${items_count} = 			Get Length	${items}
 
 	: FOR    ${index}    IN RANGE    0    ${items_count}
-	\    Mark Step													item_num_${index}
-	\    Click button												css=button[ng-click='model.addItem(lot)']
-	\    Wait Until Element Is Enabled								css=input[ng-model='item.description']	10s
-	\    Input Text			css=input[ng-model='item.description']	${items[${index}].description}
-	\    Input Text			css=input[data-id='quantity']			${items[${index}].quantity}
-	\    ${unit} = 			get_unit_ru_name						${items[${index}].unit.name}
+	\    Mark Step														item_num_${index}
+	\    Click button													css=button[ng-click='model.addItem(lot)']
+	\    Wait Until Element Is Enabled									css=input[ng-model='item.description']	10s
+	\    Input Text			css=input[ng-model='item.description']		${items[${index}].description}
+	\    Input Text			css=input[data-id='quantity']				${items[${index}].quantity}
+	\    ${unit} = 			get_unit_ru_name							${items[${index}].unit.name}
 	\    Mark Step			choose_unit_${unit}
 	\    Click Element		xpath=//select[@data-id='unit']/option[text()='${unit}']
-	\    Input Text			css=input[data-id='postalCode']			${items[${index}].deliveryAddress.postalCode}
+	\    Input Text			css=input[data-id='postalCode']				${items[${index}].deliveryAddress.postalCode}
 	\    Input Text			css=input[data-id='countryName']			${items[${index}].deliveryAddress.countryName}
-	\    Input Text			css=input[data-id='region']			${items[${index}].deliveryAddress.region}
-	\    Input Text			css=input[data-id='locality']			${items[${index}].deliveryAddress.locality}
+	\    Input Text			css=input[data-id='region']					${items[${index}].deliveryAddress.region}
+	\    Input Text			css=input[data-id='locality']				${items[${index}].deliveryAddress.locality}
 	\    Input Text			css=input[data-id='streetAddress']			${items[${index}].deliveryAddress.streetAddress}
 	\    Set Date		css=input[ng-model='item.deliveryDate.ed.d']	${items[${index}].deliveryDate.endDate}
 
@@ -349,12 +351,13 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 Внести зміни в тендер
 	[Arguments]  ${username}  ${tender_id}  ${field_name}  ${field_value}
+	debug    edit tender
 	Wait Until Element Is Visible	css=button[ng-click='act.createAfp()']	timeout=${COMMONWAIT}
 	Click Button					css=button[ng-click='act.createAfp()']
 	#TODO till we have a problem with saving of expired but old data
-	Run Keyword		Змінити ${field_name}		${field_value}
-	Click Button								css=button[data-id='actSave']
-	Close Confirmation							Данные успешно сохранены
+	Run Keyword						Змінити ${field_name}					${field_value}
+	Click Button					css=button[data-id='actSave']
+	Close Confirmation				Данные успешно сохранены
 
 
 Змінити лот
@@ -507,9 +510,9 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 Відкрити детальну інформацію про позицію
 	[Arguments]  ${index}
-	${locator} = 						Set Variable	xpath=(//a[@ng-click='adb.showCl = !adb.showCl;'])[${index}]
+	${locator} = 						Set Variable			xpath=(//a[@ng-click='adb.showCl = !adb.showCl;'])[${index}]
 	${element_class} =					Get Element Attribute	${locator}@class
-	Run Keyword If	'ng-hide' in '${element_class}'	Return From Keyword
+	Run Keyword If	'checked-item' in '${element_class}'		Return From Keyword
 	Sleep								1s
 	Mark Step							show extra info
 	Scroll Page To Element				${locator}
@@ -607,11 +610,13 @@ Chose interface language
 Отримати інформацію із нецінового показника
 	[Arguments]  ${username}  ${tender_uaid}  ${feature_id}  ${field_name}
 	Відкрити потрібну інформацію по тендеру	${field_name}
-	Wait For Element With Reload			xpath=//div[contains(@class,'info-item-label') and contains(., '${feature_id}')]  1
+	${is_feature_withible} = 	Run Keyword And Return Status	Element Should Be Visible	xpath=//div[@name='featureName' and contains(., '${feature_id}')]
+	Run Keyword If	${is_feature_withible} == ${FALSE}	Wait For Element With Reload		xpath=//div[@name='featureName' and contains(., '${feature_id}')]  1
 
-	${result} = 	Run Keyword If	'${field_name}' == 'title'	Get Text	xpath=//div[contains(@class,'info-item-label') and contains(., '${feature_id}')]
-		...	ELSE IF		'${field_name}' == 'description'		Get Text	xpath=//div[contains(., '${feature_id}')]/following-sibling::div[@ng-click='feature.showCl = !feature.showCl;']
-		...	ELSE IF		'${field_name}' == 'featureOf'			Отримати інформацію з featureOf	${feature_id}
+	debug    features
+	${result} = 	Run Keyword If	'${field_name}' == 'title'	Get Text									xpath=//div[@name='featureName' and contains(., '${feature_id}')]
+		...	ELSE IF		'${field_name}' == 'description'		Отримати інформацію з feature.description	${feature_id}
+		...	ELSE IF		'${field_name}' == 'featureOf'			Отримати інформацію з featureOf				${feature_id}
 		...	ELSE		There is no such feature parameter.
 
 	${result} =		Convert To String	${result}
@@ -1097,14 +1102,25 @@ Chose interface language
 
 Отримати інформацію з featureOf
 	[Arguments]  ${feature_id}
-	${result} = 	Get Text	xpath=//div[contains(@class, 'info-item ng-scope') and contains(., '${feature_id}')]/parent::div//section[contains(@class, 'description')]
+	${result} = 	Get Text	xpath=//div[@ng-include='page.feature' and contains(., '${feature_id}')]/ancestor::div[contains(@ng-if, 'featureOf')]
 
 	#get featureOf identifier
 	${result} =	Set Variable If
-		...  'По закупівлі' in '${result}'	tenderer
-		...  'По лоту' in '${result}'		lot
-		...  'По позиціям' in '${result}'	item
+		...  'по закупке' in '${result}'	tenderer
+		...  'по лоту' in '${result}'		lot
+		...  'по позиции' in '${result}'	item
 		...  ${result}
+
+	[return]	${result}
+
+
+Отримати інформацію з feature.description
+	[Arguments]  ${feature_id}
+	Click Element						xpath=//div[@ng-include='page.feature' and contains(., '${feature_id}')]//img[@id='status-tip']
+	Wait Until Element Is Visible		xpath=//div[@ng-include='page.feature' and contains(., '${feature_id}')]//div[@name='featureDescription']
+	${result} = 						Get Text	xpath=//div[@ng-include='page.feature' and contains(., '${feature_id}')]//div[@name='featureDescription']
+	Click Element						xpath=//div[@ng-include='page.feature' and contains(., '${feature_id}')]//img[@id='status-tip']
+	Wait Until Element Is Not Visible	xpath=//div[@ng-include='page.feature' and contains(., '${feature_id}')]//div[@name='featureDescription']
 
 	[return]	${result}
 
