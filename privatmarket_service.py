@@ -89,6 +89,10 @@ def add_time(date, minutes_to_add):
 def modify_test_data(initial_data):
     initial_data['procuringEntity']['name'] = u"Ат Тестюршадрову2"
     initial_data['enquiryPeriod']['startDate'] = add_time(initial_data['enquiryPeriod']['startDate'], 5)
+    items = initial_data['items']
+    for item in items:
+        date = dateutil.parser.parse(item['deliveryDate']['endDate'])
+        item['deliveryDate']['endDate'] = date.strftime('%Y-%m-%dT00:00:00+03:00')
     return initial_data
 
 
@@ -122,7 +126,7 @@ def get_doc_identifier(doc_type_name):
 
 def get_unit_name(current_name):
     dictionary = {
-        u'кілограм': {u'килограмм', u'килограмма', u'килограммов'},
+        u'кілограми': {u'килограмм', u'килограмма', u'килограммов'},
         u'пара': {u'пара', u'пары', u'пар'},
         u'літр': {u'литр', u'литра', u'литров'},
         u'набір': {u'комплект', u'комплекта', u'комплектов'},
@@ -145,7 +149,6 @@ def get_unit_name(current_name):
     }
 
     expected_name = None
-    dictionary.get(current_name)
     for name, variants in dictionary.iteritems():
         if current_name in variants:
             expected_name = name
@@ -158,7 +161,7 @@ def get_unit_name(current_name):
 
 def get_unit_code(name):
     dictionary = {
-        u'кілограм': u'KGM',
+        u'кілограми': u'KGM',
         u'пара': u'PR',
         u'літр': u'LTR',
         u'набір': u'SET',
