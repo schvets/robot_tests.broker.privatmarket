@@ -34,8 +34,8 @@ ${tender_data_items.deliveryDate.endDate}						xpath=//div[@ng-if='adb.deliveryD
 ${tender_data_items.deliveryLocation.latitude}					css=span.latitude
 ${tender_data_items.deliveryLocation.longitude}					css=span.longitude
 ${tender_data_items.deliveryAddress.countryName}				css=prz-address[addr='adb.deliveryAddress'] span#countryName
-${tender_data_items.deliveryAddress.countryName_ru}				css=div.info-item.ng-scope span#countryName
-${tender_data_items.deliveryAddress.countryName_en}				css=div.info-item.ng-scope span#countryName
+${tender_data_items.deliveryAddress.countryName_ru}				xpath=//div[@class='info-item ng-scope']//span[@id='countryName']
+${tender_data_items.deliveryAddress.countryName_en}				xpath=//div[@class='info-item ng-scope']//span[@id='countryName']
 ${tender_data_items.deliveryAddress.postalCode}					css=prz-address[addr='adb.deliveryAddress'] span#postalCode
 ${tender_data_items.deliveryAddress.region}						css=prz-address[addr='adb.deliveryAddress'] span#region
 ${tender_data_items.deliveryAddress.locality}					css=prz-address[addr='adb.deliveryAddress'] span#locality
@@ -510,6 +510,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	${locator} = 						Set Variable	xpath=(//a[@ng-click='adb.showCl = !adb.showCl;'])[${index}]
 	${element_class} =					Get Element Attribute	${locator}@class
 	Run Keyword If	'ng-hide' in '${element_class}'	Return From Keyword
+	Run Keyword If	'checked-item' in '${element_class}'	Return From Keyword
 	Sleep								1s
 	Mark Step							show extra info
 	Scroll Page To Element				${locator}
@@ -524,8 +525,8 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 	#switch to correct tab
 	${tab_num} =	Set Variable If
-		...  'questions' in '${field}'	2
-		...  'complaint' in '${field}'	3
+		...  'questions' in '${field}'		2
+		...  'complaint' in '${field}'		3
 		...  1
 	Switch To Tab	${tab_num}
 	Sleep			1s
@@ -562,6 +563,7 @@ Chose interface language
 
 Отримати положення предмету
 	[Arguments]  ${item_id}
+
 	Run Keyword If		'add_item' in ${TEST_TAGS} and 'Можливість додати' in '${PREV TEST NAME}'		Wait Until Keyword Succeeds	2min	10s	Check Condition With Reload	1	${item_id}
 		...	ELSE IF		'add_lot' in ${TEST_TAGS} and 'Можливість додати' in '${PREV TEST NAME}'		Wait Until Keyword Succeeds	2min	10s	Check Condition With Reload	1	${item_id}
 
@@ -576,10 +578,17 @@ Chose interface language
 Отримати інформацію із предмету
 	[Arguments]  ${username}  ${tender_uaid}  ${item_id}  ${element}
 	Mark Step	${username} - ${tender_uaid} - ${item_id} - ${element}
-	Відкрити потрібну інформацію по тендеру	${element}
+
+	${status} =	Run Keyword And Return Status
+	...      Wait Until Element Is Visible
+	...      xpath=//a[@ng-click='adb.showCl = !adb.showCl;' and contains(., '${item_id}')]
+	...      3
+
+	Run Keyword If	'${status}' == 'False'		Wait For Element With Reload	xpath=//a[@ng-click='adb.showCl = !adb.showCl;' and contains(., '${item_id}')]	1
+
 	${item}	${lot} =	Отримати положення предмету		${item_id}
 	${element} = 	Set Variable	items.${element}
-	run keyword if     'items.deliveryAddress.countryName' in '${element}'				debug     items.additionalClassifications[0].description
+#	run keyword if     'items.deliveryAddress.countryName' in '${element}'				debug     items.additionalClassifications[0].description
 
 	Run Keyword And Return If	'${element}' == 'items.classification.id'				Отримати строку			${element}	3	${item}
 	Run Keyword And Return If	'${element}' == 'items.description'						Отримати текст елемента	${element}		${item}
@@ -609,9 +618,10 @@ Chose interface language
 Отримати інформацію із нецінового показника
 	[Arguments]  ${username}  ${tender_uaid}  ${feature_id}  ${field_name}
 	Відкрити потрібну інформацію по тендеру	${field_name}
-	Wait For Element With Reload			xpath=//div[contains(@class,'info-item-label') and contains(., '${feature_id}')]  1
 
-	${result} = 	Run Keyword If	'${field_name}' == 'title'	Get Text	xpath=//div[contains(@class,'info-item-label') and contains(., '${feature_id}')]
+	Wait For Element With Reload			xpath=//div[contains(@class,'info-item') and contains(., '${feature_id}')]  1
+
+	${result} = 	Run Keyword If	'${field_name}' == 'title'	Get Text	xpath=//div[@name='featureName' and contains(., '${feature_id}')]
 		...	ELSE IF		'${field_name}' == 'description'		Get Text	xpath=//div[contains(., '${feature_id}')]/following-sibling::div[@ng-click='feature.showCl = !feature.showCl;']
 		...	ELSE IF		'${field_name}' == 'featureOf'			Отримати інформацію з featureOf	${feature_id}
 		...	ELSE		There is no such feature parameter.
@@ -691,7 +701,13 @@ Chose interface language
 
 Отримати інформацію із запитання
 	[Arguments]  ${username}  ${tender_uaid}  ${object_id}  ${field_name}
-	Відкрити потрібну інформацію по тендеру		questions
+	${questions_type} = 	Set Variable If
+		...  'лот' in '${TEST_NAME}'			lot_or_item
+		...  'предмет' in '${TEST_NAME}'		lot_or_item
+		...  questions
+	Відкрити потрібну інформацію по тендеру		${questions_type}
+
+	Run Keyword And Return If	'${questions_type}' == 'lot_or_item'		Отримати інформацію із запитання на лот або предмет	${field_name}
 
 	${element_for_work} = 	Set Variable If
 		...  '${field_name}' == 'title'			xpath=//div[@class='question-head title' and contains(.,'${object_id}')]/span
@@ -703,6 +719,26 @@ Chose interface language
 	Run Keyword And Return If	'${field_name}' == 'date'	Отримати дату та час	${element_for_work}
 
 	Wait For Element With Reload	${element_for_work}	2
+	Wait Until Element Is Visible	${element_for_work}	timeout=${COMMONWAIT}
+	${result_full} =				Get Text			${element_for_work}
+	${result} =						Strip String		${result_full}
+	[return]	${result}
+
+
+Отримати інформацію із запитання на лот або предмет
+	[Arguments]  ${field_name}
+	Wait Until Element Is Visible		css=a[ng-click="act.checkThis(lot, 'lot-faq')"]	timeout=10
+	Wait Until Element Is Enabled		css=a[ng-click="act.checkThis(lot, 'lot-faq')"]	timeout=10
+
+	${locator} = 						Set Variable	css=li[ng-class="{'checked-nav':lot.showTab == 'lot-faq'}"]
+	${element_class} =					Get Element Attribute	${locator}@class
+
+	Run Keyword If	'simple-nav_item active ng-scope checked-nav' != '${element_class}'	Click Element	css=a[ng-click="act.checkThis(lot, 'lot-faq')"]
+
+	${element_for_work} = 	Set Variable If
+		...  '${field_name}' == 'title'			css=.lot-info .question-title
+		...  ${field_name}
+
 	Wait Until Element Is Visible	${element_for_work}	timeout=${COMMONWAIT}
 	${result_full} =				Get Text			${element_for_work}
 	${result} =						Strip String		${result_full}
@@ -836,6 +872,7 @@ Chose interface language
 	Wait Until Element Is Visible	${selector}
 	@{itemsList}=					Get Webelements	${selector}
 	${result_full} =				Get Text		${itemsList[${index}]}
+	${result_full} =				Strip String	${result_full}
 	[return]	${result_full}
 
 
@@ -1099,13 +1136,13 @@ Chose interface language
 
 Отримати інформацію з featureOf
 	[Arguments]  ${feature_id}
-	${result} = 	Get Text	xpath=//div[contains(@class, 'info-item ng-scope') and contains(., '${feature_id}')]/parent::div//section[contains(@class, 'description')]
+	${result} = 	Get Text	xpath=//*[contains(@ng-if,"(model.ad.features") and contains(., '${feature_id}')]//*[contains(., 'Неценовые показатели по')]
 
 	#get featureOf identifier
 	${result} =	Set Variable If
-		...  'По закупівлі' in '${result}'	tenderer
-		...  'По лоту' in '${result}'		lot
-		...  'По позиціям' in '${result}'	item
+		...  'по закупке' in '${result}'	tenderer
+		...  'по лоту' in '${result}'		lot
+		...  'по позиции' in '${result}'	item
 		...  ${result}
 
 	[return]	${result}
@@ -1149,8 +1186,9 @@ Chose interface language
 Створити вимогу про виправлення умов лоту
 	[Arguments]    ${user}  ${tender_id}  ${claim}  ${lot_id}  ${document}
 #	Обрати потрібний лот за id			${lot_id}
-
-	Click Element	css=a[ng-click='act.showComplaintLot()']
+	Wait Until Element Is Visible		css=a[ng-click='act.showComplaintLot(lot.id)']	timeout=${COMMONWAIT}
+	Wait Until Element Is Enabled		css=a[ng-click='act.showComplaintLot(lot.id)']	timeout=${COMMONWAIT}
+	Click Element	css=a[ng-click='act.showComplaintLot(lot.id)']
 	Заповнити форму вимоги	${user}  ${claim}  ${document}
 	Відкрити потрібну інформацію по тендеру	complaint
 	${claim_id} = 						Get Text		css=span#cmpl0
@@ -1204,7 +1242,7 @@ Chose interface language
 	Click Button						css=button[ng-click='act.cancelComplaint()']
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=button[ng-click='act.cancelComplaint()']	timeout=${COMMONWAIT}
-	Wait Until Element Contains			css=span#cmplStatus0	Отменено	timeout=${COMMONWAIT}
+	Wait Until Element Contains			css=span#cmplStatus0	Скасована	timeout=${COMMONWAIT}
 
 
 Підтвердити вирішення вимоги про виправлення умов лоту
@@ -1261,8 +1299,13 @@ Chose interface language
 
 Задати запитання на лот
 	[Arguments]  ${provider}  ${tender_id}  ${lot_id}  ${question}
-#	Обрати потрібний лот за id	${lot_id}
-	Wait Enable And Click Element	css=a[ng-click='act.sendLotEnquiry()']
+	#Обрати потрібний лот за id	${lot_id}
+	privatmarket.Пошук тендера по ідентифікатору	${provider}	${tender_id}
+	${lot_num} =		get_lot_num_by_lot_id	${lot_id}
+	Wait Until Element Is Visible		css=a[ng-click="act.checkThis(lot, 'lot-faq')"]:nth-of-type(${lot_num})	timeout=10
+	Wait Until Element Is Enabled		css=a[ng-click="act.checkThis(lot, 'lot-faq')"]:nth-of-type(${lot_num})	timeout=10
+	Click Element						css=a[ng-click="act.checkThis(lot, 'lot-faq')"]:nth-of-type(${lot_num})
+	Wait Enable And Click Element	css=button[ng-click='act.sendLotEnquiry(lot.id)']
 	Заповнити форму питання			${question.data.title}	${question.data.description}	${USERS.users['${provider}'].email}
 	[return]  True
 
@@ -1270,13 +1313,50 @@ Chose interface language
 Задати запитання на предмет
 	[Arguments]  ${provider}  ${tender_id}  ${item_id}  ${question}
 	Mark Step	${provider} - ${tender_id} - ${item_id} - ${question}
-
+	privatmarket.Пошук тендера по ідентифікатору	${provider}	${tender_id}
 	${item}	${lot} =	Отримати положення предмету		${item_id}
 	Відкрити детальну інформацію про позицію	${item}
-
 	Wait Enable And Click Element	xpath=(//a[@ng-click='act.sendItemEnquiry(adb.id)'])[${item}]
 	Заповнити форму питання			${question.data.title}	${question.data.description}	${USERS.users['${provider}'].email}
 	[return]  True
+
+
+Перетворити вимогу про виправлення умов закупівлі в скаргу
+	[Arguments]  ${provider}  ${tender_id}  ${complaint_id}  ${escalation_data}
+	privatmarket.Перетворити вимогу в скаргу	${provider}	${tender_id}
+
+
+Перетворити вимогу про виправлення умов лоту в скаргу
+	[Arguments]  ${provider}  ${tender_id}  ${complaint_id}  ${escalation_data}
+	privatmarket.Перетворити вимогу в скаргу	${provider}	${tender_id}
+
+
+Перетворити вимогу в скаргу
+	[Arguments]  ${provider}  ${tender_id}
+	privatmarket.Пошук тендера по ідентифікатору	${provider}	${tender_id}
+	Wait For Ajax
+	Switch To Tab						3
+	Wait Until Element Is Visible		css=button[ng-click='act.setComplaintResolved(q, false)']
+	Wait Enable And Click Element		css=button[ng-click='act.setComplaintResolved(q, false)']
+	Wait Until Element Is Visible		css=.modal.fade.in h4
+	Wait Until Element Contains			css=.modal.fade.in h4	Ваша вимога була успішно переведена в звернення. Чекайте наступного рішення!
+	Wait Enable And Click Element		css=#btnClose
+
+
+Скасувати вимогу про виправлення умов закупівлі
+	[Arguments]  ${provider}  ${tender_id}  ${complaint_id}  ${cancellation_data}
+	privatmarket.Пошук тендера по ідентифікатору	${provider}	${tender_id}
+	Wait For Ajax
+	Switch To Tab						3
+	privatmarket.Скасувати вимогу  ${provider}  ${tender_id}  ${complaint_id}  ${cancellation_data}
+
+
+Скасувати вимогу про виправлення умов лоту
+	[Arguments]  ${provider}  ${tender_id}  ${complaint_id}  ${cancellation_data}
+	privatmarket.Пошук тендера по ідентифікатору	${provider}	${tender_id}
+	Wait For Ajax
+	Switch To Tab						3
+	privatmarket.Скасувати вимогу  ${provider}  ${tender_id}  ${complaint_id}  ${cancellation_data}
 
 
 Подати цінову пропозицію
@@ -1783,3 +1863,18 @@ Set Date And Time
 	Set Date	${date_element}	${date}
 	Set Time	${time_element}	${date}
 
+
+get_lot_num_by_lot_id
+	[Arguments]  ${lot_id}
+	${elements_list} =		Get Webelements		css=#lot-title
+	${length} =				Get Length			${elements_list}
+	${list} =				Create List			${EMPTY}
+
+	: FOR    ${index}    IN RANGE    0    ${length}
+	\    ${text} =			Get Text		${elements_list[${index}]}
+	\    ${values_list} =	Split String	${text}	:
+	\    Insert Into List	${list}	${index}	${values_list[0]}
+
+	${result} =				Get Index From List	${list}	${lot_id}
+	${lot_num} =			Evaluate			${result}+1
+	[return]  ${lot_num}
