@@ -10,7 +10,7 @@ Library  privatmarket_service.py
 
 
 *** Variables ***
-${COMMONWAIT}	40
+${COMMONWAIT}	10
 
 
 *** Keywords ***
@@ -25,23 +25,35 @@ ${COMMONWAIT}	40
 	[Arguments]  ${username}
 	[Documentation]  Відкрити брaвзер, створити обєкт api wrapper, тощо
 
-	${service args}=	Create List	--ignore-ssl-errors=true	--ssl-protocol=tlsv1
+	${service_args} =	Create List	--ignore-ssl-errors=true	--ssl-protocol=tlsv1
 	${browser} =		Convert To Lowercase	${USERS.users['${username}'].browser}
-	${extention_dir} = 	Set variable	C:\\Users\\Oks\\AppData\\Local\\Google\\Chrome\\User Data\\Profile 5\\Extensions\\ggmdpepbjljkkkdaklfihhngmmgmpggp\\2.0_0
-	${if_dir_exist} = 	Run Keyword And Return Status	Directory Should Exist	${extention_dir}
 
 	${options}= 	Evaluate	sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
 	Call Method	${options}	add_argument	--allow-running-insecure-content
 	Call Method	${options}	add_argument	--disable-web-security
 	Call Method	${options}	add_argument	--start-maximized
 	Call Method	${options}	add_argument	--nativeEvents\=false
-	Run Keyword If	${if_dir_exist} == ${TRUE}	Call Method	${options}	add_argument	--load-extension\=${extention_dir}
 
-	Run Keyword If	'phantomjs' in '${browser}'	Run Keywords	Create Webdriver	PhantomJS	${username}	service_args=${service args}
+	Run Keyword If	'phantomjs' in '${browser}'	Run Keywords	Create Webdriver	PhantomJS	${username}	service_args=${service_args}
 	...   ELSE	Create WebDriver	Chrome	chrome_options=${options}	alias=${username}
 	Go To	${USERS.users['${username}'].homepage}
 	Run Keyword Unless	'Viewer' in '${username}'	Login	${username}
 
+
+Оновити сторінку з тендером
+	[Arguments]  @{ARGUMENTS}
+	Reload Page
+
+Пошук тендера по ідентифікатору
+	[Arguments]  ${user_name}  ${tender_id}
+	Wait Until element Is Enabled			css=input#businessSearch		${COMMONWAIT}
+	Input Text	css=input#businessSearch	${tender_id}
+	Press Key	css=input#businessSearch	\\13
+	Wait Until Element Is Not Visible		css=div.progress.progress-bar	${COMMONWAIT}
+	Wait Until Element Is Not Visible		css=div[role='dialog']	${COMMONWAIT}
+	Wait Until Element Not Stale			css=a[tid='${tender_id}']	${COMMONWAIT}
+	Wait Enable And Click Element			css=a[tid='${tender_id}']
+	Wait Until element Is Visible			css=span[tid='data.title']		${COMMONWAIT}
 
 
 #Custom Keywords
@@ -52,7 +64,7 @@ Login
 
 Wait For Ajax
 	sleep				2s
-	Wait For Condition	return window.jQuery!=undefined && jQuery.active==0	60s
+#	Wait For Condition	return window.jQuery!=undefined && jQuery.active==0	60s
 
 
 Wait Until Element Not Stale
@@ -99,15 +111,6 @@ Wait For Element Value
 	Wait For Condition				return window.$($("${cssLocator}")).val()!='' && window.$($("${cssLocator}")).val()!='None'	${COMMONWAIT}
 	${value}=	get value			${locator}
 	Mark Step						_value_when_we_wait_it_${value}
-
-
-Scroll Page To Element
-	[Arguments]	${element_locator}
-	${locator}  ${type} = 	Get Locator And Type	${element_locator}
-	${js_expresion} =	Set Variable If	'css' == '${type}'	window.$("${locator}")[0].scrollIntoView()
-		...  						'xpath' == '${type}'	document.evaluate("${locator}", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.scrollIntoView()
-	Execute Javascript	${js_expresion}
-	Wait For Ajax
 
 
 Get Locator And Type
