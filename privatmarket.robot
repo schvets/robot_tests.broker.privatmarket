@@ -6,6 +6,7 @@ Library  Selenium2Library
 Library  Collections
 Library  DebugLibrary
 Library  OperatingSystem
+Library  AngularJSLibrary
 Library  privatmarket_service.py
 
 
@@ -64,8 +65,8 @@ ${locator_tenderCreation.buttonSave}			css=button.btn.btn-success
 ${locator_tenderCreation.buttonBack}			xpath=//a[@ng-click='act.goBack()']
 ${locator_tenderCreation.description}			css=textarea[ng-model='model.filterData.adbName']
 
-${locator_tenderClaim.buttonCreate}				css=button[ng-click='act.createAfp()']
-${locator_tenderClaim.fieldPrice}				css=input#userPrice
+${locator_tenderClaim.buttonCreate}				css=button[ng-click='commonActions.createAfp()']
+${locator_tenderClaim.fieldPrice}				css=input#price0
 ${locator_tenderClaim.fieldEmail}				css=input[ng-model='model.person.email']
 ${locator_tenderClaim.buttonSend}				css=button[ng-click='act.sendAfp()']
 ${locator_tenderClaim.buttonCancel}				css=button[ng-click='act.delAfp()']
@@ -178,7 +179,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Click Button								xpath=(//button[@data-id='actChoose'])[1]
 	Wait Until Element Is Visible				css=section[data-id='classificationTreeModal']		${COMMONWAIT}
 	Wait Until Element Is Visible				css=input[data-id='query']							${COMMONWAIT}
-	Search By Query								css=input[data-id='query']	${items[0].classification.id}
+	Search By Query								css=input[data-id='query']							${items[0].classification.id}
 	Wait For Ajax
 	Click Button								css=button[data-id='actConfirm']
 
@@ -262,15 +263,15 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 Додати lots
 	[Arguments]  ${lots}
 	${lots_count} = 			Get Length	${lots}
-	: FOR    ${index}    IN RANGE    0    ${lots_count}
-	\    Mark Step		lot_num_${index}
+	Return From Keyword If		${lots_count} == 0
+	:FOR    ${lot}    IN    @{lots}
 	\    Wait For Ajax
 	\    Click button											css=button[ng-click='model.addLot()']
 	\    Wait Until Element Is Enabled							css=input[data-id='title']	10s
-	\    Input Text		css=input[data-id='title']				${lots[${index}].title}
-	\    Input Text		css=textarea[data-id='description']		${lots[${index}].description}
-	\    ${value_amount} = 			Convert to String			${lots[${index}].value.amount}
-	\    ${minimalStep_amount} = 	Convert to String			${lots[${index}].minimalStep.amount}
+	\    Input Text		css=input[data-id='title']				${lot.title}
+	\    Input Text		css=textarea[data-id='description']		${lot.description}
+	\    ${value_amount} = 			Convert to String			${lot.value.amount}
+	\    ${minimalStep_amount} = 	Convert to String			${lot.minimalStep.amount}
 	\    Input Text		css=input[data-id='valueAmount']		${value_amount}
 	\    Sleep			1s
 	\    Input Text		css=input[data-id='minimalStepAmount']	${minimalStep_amount}
@@ -282,21 +283,20 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	[Arguments]  ${items}
 	${items_count} = 			Get Length	${items}
 
-	: FOR    ${index}    IN RANGE    0    ${items_count}
-	\    Mark Step														item_num_${index}
+	:FOR    ${item}    IN    @{items}
 	\    Click button													css=button[ng-click='model.addItem(lot)']
 	\    Wait Until Element Is Enabled									css=input[ng-model='item.description']	10s
-	\    Input Text			css=input[ng-model='item.description']		${items[${index}].description}
-	\    Input Text			css=input[data-id='quantity']				${items[${index}].quantity}
-	\    ${unit} = 			get_unit_ru_name							${items[${index}].unit.name}
+	\    Input Text			css=input[ng-model='item.description']		${item.description}
+	\    Input Text			css=input[data-id='quantity']				${item.quantity}
+	\    ${unit} = 			get_unit_ru_name							${item.unit.name}
 	\    Mark Step			choose_unit_${unit}
 	\    Click Element		xpath=//select[@data-id='unit']/option[text()='${unit}']
-	\    Input Text			css=input[data-id='postalCode']				${items[${index}].deliveryAddress.postalCode}
-	\    Input Text			css=input[data-id='countryName']			${items[${index}].deliveryAddress.countryName}
-	\    Input Text			css=input[data-id='region']					${items[${index}].deliveryAddress.region}
-	\    Input Text			css=input[data-id='locality']				${items[${index}].deliveryAddress.locality}
-	\    Input Text			css=input[data-id='streetAddress']			${items[${index}].deliveryAddress.streetAddress}
-	\    Set Date		css=input[ng-model='item.deliveryDate.ed.d']	${items[${index}].deliveryDate.endDate}
+	\    Input Text			css=input[data-id='postalCode']				${item.deliveryAddress.postalCode}
+	\    Input Text			css=input[data-id='countryName']			${item.deliveryAddress.countryName}
+	\    Input Text			css=input[data-id='region']					${item.deliveryAddress.region}
+	\    Input Text			css=input[data-id='locality']				${item.deliveryAddress.locality}
+	\    Input Text			css=input[data-id='streetAddress']			${item.deliveryAddress.streetAddress}
+	\    Set Date		css=input[ng-model='item.deliveryDate.ed.d']	${item.deliveryDate.endDate}
 
 
 Додати features
@@ -309,16 +309,15 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	\    Click button	${ELEMENT}
 	\    @{actExpand_btn_list} = 	Get Webelements	css=button[data-id='actExpand']
 
-	: FOR    ${index}    IN RANGE    0    ${features_count}
-	\    Mark Step							feature_of_${features[${index}].featureOf}
-	\    Click Button						xpath=//button[contains(@ng-click,'${features[${index}].featureOf}') and @data-id='actAdd']
+	:FOR    ${feature}    IN    @{features}
+	\    Click Button						xpath=//button[contains(@ng-click,'${feature.featureOf}') and @data-id='actAdd']
 	\    Wait For Ajax
-	\    Wait Until Element Is Visible		xpath=//section[div[button[contains(@ng-click,'${features[${index}].featureOf}') and @data-id='actAdd']]]//button[@ng-bind='transl.addCriterion']
-	\    Click Button						xpath=//section[div[button[contains(@ng-click,'${features[${index}].featureOf}') and @data-id='actAdd']]]//button[@ng-bind='transl.addCriterion']
-	\    Wait Until Element Is Visible		xpath=//section[div[button[contains(@ng-click,'${features[${index}].featureOf}') and @data-id='actAdd']]]//input[@ng-model='feature.title']
-	\    Input Text							xpath=//section[div[button[contains(@ng-click,'${features[${index}].featureOf}') and @data-id='actAdd']]]//input[@ng-model='feature.title']				${features[${index}].title}
-	\    Input Text							xpath=//section[div[button[contains(@ng-click,'${features[${index}].featureOf}') and @data-id='actAdd']]]//textarea[@ng-model='feature.description']	${features[${index}].description}
-	\    Додати criterion	${features[${index}]}
+	\    Wait Until Element Is Visible		xpath=//section[div[button[contains(@ng-click,'${feature.featureOf}') and @data-id='actAdd']]]//button[@ng-bind='transl.addCriterion']
+	\    Click Button						xpath=//section[div[button[contains(@ng-click,'${feature.featureOf}') and @data-id='actAdd']]]//button[@ng-bind='transl.addCriterion']
+	\    Wait Until Element Is Visible		xpath=//section[div[button[contains(@ng-click,'${feature.featureOf}') and @data-id='actAdd']]]//input[@ng-model='feature.title']
+	\    Input Text							xpath=//section[div[button[contains(@ng-click,'${feature.featureOf}') and @data-id='actAdd']]]//input[@ng-model='feature.title']				${feature.title}
+	\    Input Text							xpath=//section[div[button[contains(@ng-click,'${feature.featureOf}') and @data-id='actAdd']]]//textarea[@ng-model='feature.description']	${feature.description}
+	\    Додати criterion	${feature}
 
 
 Додати criterion
@@ -328,8 +327,6 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	@{criterions_data} = 			Get From Dictionary		${feature}	enum
 	${criterions_data_length} = 	Get Length	${criterions_data}
 	: FOR    ${index}    IN RANGE    0    ${criterions_data_length}
-	\    Mark Step			creterion_num_${index}
-	\    ${local_index} = 	Evaluate	${criterions_data_length}-1
 	\    ${value} = 		Evaluate	${criterions_data[${index}].value}*100
 	\    ${value} = 		Convert To String	${value}
 	\    Input Text			${criterion_title_list[${index}]}	${criterions_data[${index}].title}
@@ -352,10 +349,10 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 Внести зміни в тендер
 	[Arguments]  ${username}  ${tender_id}  ${field_name}  ${field_value}
 	debug    edit tender
-	Wait Until Element Is Visible	css=button[ng-click='act.createAfp()']	timeout=${COMMONWAIT}
-	Click Button					css=button[ng-click='act.createAfp()']
+	Wait Until Element Is Visible	css=button[ng-click='commonActions.createAfp()']	timeout=${COMMONWAIT}
+	Click Button					css=button[ng-click='commonActions.createAfp()']
 	#TODO till we have a problem with saving of expired but old data
-	Run Keyword						Змінити ${field_name}					${field_value}
+	Run Keyword						Змінити ${field_name}	${field_value}
 	Click Button					css=button[data-id='actSave']
 	Close Confirmation				Данные успешно сохранены
 
@@ -398,9 +395,9 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 Змінити tenderPeriod.endDate
 	[Arguments]  ${field_value}
 	Wait For Ajax
-	Wait Until Element Is Visible	id=tab_4	timeout=${COMMONWAIT}
-	Click Element					id=tab_4
+	Wait Visibulity And Click Element	id=tab_4
 	Set Date And Time		css=input[ng-model='model.ptr.tenderPeriod.ed.d']	css=timepicker-pop[input-time='model.ptr.tenderPeriod.ed.t'] input[ng-model='inputTime']	${field_value}
+	debug    edit date
 
 
 Завантажити документ
@@ -610,17 +607,17 @@ Chose interface language
 Отримати інформацію із нецінового показника
 	[Arguments]  ${username}  ${tender_uaid}  ${feature_id}  ${field_name}
 	Відкрити потрібну інформацію по тендеру	${field_name}
-	${is_feature_withible} = 	Run Keyword And Return Status	Element Should Be Visible	xpath=//div[@name='featureName' and contains(., '${feature_id}')]
-	Run Keyword If	${is_feature_withible} == ${FALSE}	Wait For Element With Reload		xpath=//div[@name='featureName' and contains(., '${feature_id}')]  1
+	${is_feature_visible} = 	Run Keyword And Return Status	Element Should Be Visible	xpath=//div[@name='featureName' and contains(., '${feature_id}')]
+	Run Keyword If	${is_feature_visible} == ${FALSE}	Wait For Element With Reload		xpath=//div[@name='featureName' and contains(., '${feature_id}')]  1
 
-	debug    features
+
 	${result} = 	Run Keyword If	'${field_name}' == 'title'	Get Text									xpath=//div[@name='featureName' and contains(., '${feature_id}')]
 		...	ELSE IF		'${field_name}' == 'description'		Отримати інформацію з feature.description	${feature_id}
 		...	ELSE IF		'${field_name}' == 'featureOf'			Отримати інформацію з featureOf				${feature_id}
 		...	ELSE		There is no such feature parameter.
 
 	${result} =		Convert To String	${result}
-	${result} =		Replace String	    ${result}	.:	.
+	${result} =		Replace String		${result}	.:	.
 	${result} =		Strip String		${result}
 	[Return]  ${result}
 
@@ -764,9 +761,7 @@ Chose interface language
 		...  'was called' in '${test_name}'			Вiдмiнено
 		...  ${None}
 
-	Return From Keyword If	'${status}' == '${None}'	${True}
-
-	Wait For Element With Reload	xpath=//div[@class='faq ng-scope' and contains(., '${complaintID}')]//span[contains(., '${status}')]	3
+	Return From Keyword If	'${status}' != '${None}'	Wait For Element With Reload	xpath=//div[@class='faq ng-scope' and contains(., '${complaintID}')]//span[contains(., '${status}')]	3
 	[return]	${True}
 
 
@@ -946,8 +941,7 @@ Chose interface language
 Отримати інформацію про включення ПДВ
 	[Arguments]  ${element_name}
 	${value_added_tax_included} =	Отримати текст елемента	${element_name}
-	${result} =	Set Variable If	'з ПДВ' in '${value_added_tax_included}'	True
-	${result} =	Convert To Boolean	${result}
+	${result} =	Set Variable If	'з ПДВ' in '${value_added_tax_included}'	${True}	${False}
 	[return]  ${result}
 
 
@@ -978,7 +972,7 @@ Chose interface language
 Отримати інформацію з cancellations[0].status
 	[Arguments]  ${element}
 	${text} =	Отримати текст елемента  ${element}
-	${result} =	Set Variable If	'Відмінено' in '${text}'	active
+	${result} =	Set Variable If	'Відмінено' in '${text}'	active	${text}
 	[return]  ${result}
 
 
@@ -1079,7 +1073,7 @@ Chose interface language
 Отримати інформацію з awards[0].status
 	[Arguments]  ${element}
 	${text} =							Отримати текст елемента  ${element}
-	${newText} =						Set Variable If	'Переможець' in '${text}'	active
+	${newText} =						Set Variable If	'Переможець' in '${text}'	active	${text}
 	[return]	${newText}
 
 
@@ -1294,50 +1288,50 @@ Chose interface language
 
 
 Подати цінову пропозицію
-	[Arguments]  @{ARGUMENTS}
-	[Documentation]
-	...	${ARGUMENTS[0]} ==  username
-	...	${ARGUMENTS[1]} ==  tenderId
-	...	${ARGUMENTS[2]} ==  bid
-	...	${ARGUMENTS[2]} ==  lots_ids
-	...	${ARGUMENTS[2]} ==  features_ids
+	[Arguments]  ${username}  ${tender_id}  ${bid}  ${lots_ids}=${None}  ${features_ids}=${None}
 
-	Run Keyword If	'без прив’язки до лоту' in '${TEST_NAME}'	Fail  Така ситуація не може виникнути
-	Run Keyword If	'без нецінового показника' in '${TEST_NAME}'	Fail  Така ситуація не може виникнути
-
-	privatmarket.Пошук тендера по ідентифікатору	${ARGUMENTS[0]}   ${ARGUMENTS[1]}
+	Run Keyword If	'без нецінових показників' in '${TEST_NAME}'	Fail  Така ситуація не може виникнути
+	Run Keyword If	'без прив’язки до лоту' in '${TEST_NAME}'		Fail  Така ситуація не може виникнути
 
 	Відкрити заявку
-	Wait Until Element Not Stale		${locator_tenderClaim.fieldEmail}	20
-	${amount} =	Set Variable If
-		...  ${number_of_lots} > 0	${Arguments[2].data.lotValues[0].value.amount}
-		...  ${Arguments[2].data.value.amount}
-	${amount} = 	Convert To String	${amount}
+	Run Keyword If	${lots_ids} != ${None}	Заповнити форму заявки по лотах	${bid}	${lots_ids}
+		...  ELSE	Заповнити форму заявки по предмету	${bid}
 
-	Input Text	${locator_tenderClaim.fieldPrice}	${amount}
-
-	Click Element						${locator_tenderClaim.fieldEmail}
-	Input Text							${locator_tenderClaim.fieldEmail}	${USERS.users['${ARGUMENTS[0]}'].email}
+	Wait Enable And Click Element	css=button[ng-click='commonActions.goNext(1)']
+	Wait Until Element Contains	css=div#afpPanel	Крок 2/3
+	Click Button				css=button[ng-click='commonActions.goNext(1)']
 
 	#Just for aboveThreshold tests
-	Run Keyword If	'open' in '${SUITE_NAME}'	Run Keywords	Click element	css=input[ng-disabled='model.selfQualifiedDisabled']
-	...   AND   Click element	css=input[ng-disabled='model.selfEligibleDisabled']
+	Wait Until Element Contains	css=div#afpPanel	Крок 3/3
+	Run Keyword If	'open' in '${SUITE_NAME}'	Run Keywords	Click element	css=input#chkSelfQualified
+	...   AND   Click element	css=input#chkSelfEligible
+
+	Wait Until Element Is Visible		css=div[ng-if='model.afp.tsdId===0&&model.afp.id']						3s
+	${claim_id} = 						Get text			css=div[ng-if='model.afp.tsdId===0&&model.afp.id']
+	${result} = 						Get Regexp Matches	${claim_id}	(\\d*), створена	1
+	Set to dictionary					${bid.data}		id=${result}
 
 	sleep								1s
-	Scroll Page To Element				${locator_tenderClaim.buttonSend}
 	Click Button						${locator_tenderClaim.buttonSend}
 	Wait For Ajax Overflow Vanish
-	Close confirmation					Ваша заявка була успішно включена до черги на відправку!
-	Wait Until Element Is Visible		css=div.afp-info.ng-scope.ng-binding
-	wait until element contains			css=div.afp-info.ng-scope.ng-binding	Номер заявки
-	Wait For Ajax
-	${claim_id}=						Get text			css=div.afp-info.ng-scope.ng-binding
-	${result}=							Get Regexp Matches	${claim_id}	Номер заявки: (\\d*),	1
+	Close Formatted Confirmation		Ваша заявка була успішно включена до черги на відправку!
 
-	Click Element					css=a[ng-click='act.ret2Ad()']
-	Wait For Element With Reload	xpath=//table[@class='bids']//tr[1]/td[4 and contains(., 'Відправлена')]	1
+	Wait For Element With Reload	xpath=//table[@class='bids']//tr[1]/td[4 and contains(., 'Відправлена')]	1	3	3
+	[return]	${bid}
 
-	[return]	${Arguments[2]}
+
+Заповнити форму заявки по лотах
+	[Arguments]  ${bid}  ${lots_ids}
+	${lots_ids_length} = 	Get Length	${lots_ids}
+	: FOR    ${index}    IN RANGE    0    ${lots_ids_length}
+	\    ${amount} = 	Convert To String		${bid.data.lotValues[${index}].value.amount}
+	\    Input Text		xpath=//div[contains(@class, 'lot-info') and contains(.,'${lots_ids[${index}]}')]//input[contains(@class,'inputUserPrice')]	${amount}
+
+
+Заповнити форму заявки по предмету
+	[Arguments]  ${bid}
+	${amount} = 	Convert To String		${bid.data.value.amount}
+	Input Text	${locator_tenderClaim.fieldPrice}	${amount}
 
 
 Дочекатися статусу заявки
@@ -1358,44 +1352,44 @@ Chose interface language
 	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}
 	sleep								3s
 	Wait Until Element Is Not Visible	${locator_tenderClaim.buttonCreate}	50s
-	Wait For Element Value				css=input[ng-model='model.person.lastName']
-	Wait Until Element Is Enabled		${locator_tenderClaim.fieldEmail}	20
+	Wait For Ajax
+	Wait Until Element Contains			css=div#afpPanel	Крок 1/3
 
 
 Змінити цінову пропозицію
 	[Arguments]  ${username}  ${tender_uaid}  ${fieldname}  ${fieldvalue}
-	privatmarket.Пошук тендера по ідентифікатору	${username}   ${tender_uaid}
-	Wait For Ajax
-
-	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}
-	Wait For Ajax
-	Wait For Element Value				css=input[ng-model='model.person.lastName']
-	Wait Until Element Is Enabled		${locator_tenderClaim.fieldEmail}	${COMMONWAIT}
-	sleep								5s
-
+	Відкрити заявку
+	debug     change bid
 	Run Keyword 						Змінити ${fieldname}	${fieldvalue}
-	Run Keyword Unless	'open' in '${SUITE_NAME}'	Run Keywords	Click Element	${locator_tenderClaim.fieldEmail}
-	...   AND   Input Text	${locator_tenderClaim.fieldEmail}	${USERS.users['${username}'].email}
 
-	Scroll Page To Element				${locator_tenderClaim.buttonSend}
+	#send request to update the bid
 	Click Button						${locator_tenderClaim.buttonSend}
+	Wait For Ajax Overflow Vanish
+	Close Formatted Confirmation		Ваша заявка була успішно включена до черги на відправку!
+
+	#check whether task was send
+	Wait For Element With Reload	xpath=//table[@class='bids']//tr[1]/td[4 and contains(., 'Відправлена')]	1	3	3
 
 	${test_name} =	Convert To Lowercase	${TEST_NAME}
-	Run Keyword If	'оновити статус цінової пропозиції' in '${test_name}'	Close confirmation	Ваша заявка була успішно включена до черги на відправку!
-		...  ELSE	Close confirmation	Ваша заявка була успішно збережена!
-
-	Wait Until Element Is Visible		css=div.afp-info.ng-scope.ng-binding
-	Wait For Ajax
-	${claim_id}=						Get text			css=div.afp-info.ng-scope.ng-binding
-	${result}=							Get Regexp Matches	${claim_id}	Номер заявки: (\\d*),	1
+	Run Keyword If	'оновити статус цінової пропозиції' in '${test_name}'	Close Formatted Confirmation	Ваша заявка була успішно включена до черги на відправку!
+		...  ELSE	Close Formatted Confirmation	Ваша заявка була успішно збережена!
 	[return]	${fieldname}
 
 
 Змінити lotValues[0].value.amount
 	[Arguments]  ${fieldvalue}
+	#choose corret bid.tab
+	Wait Enable And Click Element	css=button[ng-click='commonActions.goNext(1)']
+	Wait Until Element Contains		css=div#afpPanel	Крок 2/3
+
 	${fieldvalue} = 	Convert To String			${fieldvalue}
-	Clear Element Text								${locator_tenderClaim.fieldPrice}
-	Input Text	${locator_tenderClaim.fieldPrice}	${fieldvalue}
+	Wait Until Element Is Enabled					xpath=//div[contains(@class, 'lot-info') and contains(.,'0')]//input[contains(@class,'inputUserPrice')]	${COMMONWAIT}
+	Clear Element Text								xpath=//div[contains(@class, 'lot-info') and contains(.,'0')]//input[contains(@class,'inputUserPrice')]
+	Input Text										xpath=//div[contains(@class, 'lot-info') and contains(.,'0')]//input[contains(@class,'inputUserPrice')]	${fieldvalue}
+
+	#move to the very last step
+	Click Button				css=button[ng-click='commonActions.goNext(1)']
+	Wait Until Element Contains	css=div#afpPanel	Крок 3/3
 
 
 Змінити value.amount
@@ -1420,7 +1414,7 @@ Chose interface language
 	Wait For Element Value				css=input[ng-model='model.person.lastName']
 	Scroll Page To Element				${locator_tenderClaim.buttonCancel}
 	Wait Enable And Click Element		${locator_tenderClaim.buttonCancel}
-	Close Confirmation					Ваша заявка успешно отменена!
+	Close Formatted Confirmation		Ваша заявка успешно отменена!
 	Wait Until Element Is Enabled		${locator_tenderClaim.buttonCreate}	${COMMONWAIT}
 	[return]	${ARGUMENTS[1]}
 
@@ -1441,35 +1435,30 @@ Chose interface language
 
 Завантажити документ в ставку
 	[Arguments]  ${user}  ${filePath}  ${tenderId}  ${doc_type}=documents
-	privatmarket.Пошук тендера по ідентифікатору	${user}   ${tenderId}
 	Відкрити заявку
-	Input Text							${locator_tenderClaim.fieldEmail}	${USERS.users['${user}'].email}
 
-	Wait Until Element Is Enabled		css=button[ng-click='act.chooseFile()']	${COMMONWAIT}
-	Scroll Page To Element				css=button[ng-click='act.chooseFile()']
-	sleep  3s
+	Wait Until Element Is Enabled		css=div[ng-if='model.canAddFiles']	${COMMONWAIT}
 
 	${list_item} =	get_doc_identifier	${doc_type}
 	Select From List By Value			css=select[ng-model='model.currFileVfv']	${list_item}
-	${correctFilePath} = 				Replace String		${filePath}	\\	\/
 
-	Execute Javascript					$("#fileToUpload").removeClass();
-	Choose File							css=input#fileToUpload	${correctFilePath}
+	Execute Javascript					$("#afpFile").removeClass();
+	Choose File							css=#afpFile	${filePath}
 
 	${upload_response} =	Зберегти доданий файл	${filePath}
-	#before step for Change File
-	privatmarket.Пошук тендера по ідентифікатору	${user}	${tenderId}
 	[return]	${upload_response}
 
 
 Зберегти доданий файл
 	[Arguments]  ${filePath}
+	debug     save the file
+
 	Wait Until Element Is Not Visible	css=div[ng-show='progressVisible'] div.progress-bar	timeout=30
 	Sleep								5s
 	Wait Until Element Is Visible		xpath=(//div[contains(@class, 'file-item')])[1]	timeout=30
 
 	Click Button						${locator_tenderClaim.buttonSend}
-	Close confirmation					Ваша заявка була успішно збережена!
+	Close Formatted Confirmation		Ваша заявка була успішно збережена!
 	${dateModified}						Get text	css=span.file-tlm
 	Click Element						${locator_tenderClaim.buttonGoBack}
 	wait until element is visible		css=table.bids tr
@@ -1559,7 +1548,7 @@ Login
 	[Arguments]  ${username}
 	Click Element						xpath=//span[.='Вход']
 	Wait Until Element Is Visible		id=p24__login__field	${COMMONWAIT}
-	Execute Javascript					$('#p24__login__field').val(${USERS.users['${username}'].login})
+	input text							css=#p24__login__field		+${USERS.users['${username}'].login}
 	Check If Element Stale				xpath=//div[@id="login_modal" and @style='display: block;']//input[@type='password']
 	Input Text							xpath=//div[@id="login_modal" and @style='display: block;']//input[@type='password']	${USERS.users['${username}'].password}
 	Click Element						xpath=//div[@id="login_modal" and @style='display: block;']//button[@type='submit']
@@ -1572,6 +1561,7 @@ Login
 Wait For Ajax
 	sleep				2s
 	Wait For Condition	return window.jQuery!=undefined && jQuery.active==0	60s
+#	Wait for Angular
 
 
 Wait Until Element Not Stale
@@ -1620,11 +1610,18 @@ Mark Step
 Close Confirmation
 	[Arguments]	${confirmation_text}
 	Wait For Ajax
-	Wait Until Element Is Visible		css=p.ng-binding	${COMMONWAIT}
 	Wait Until Element Contains			css=p.ng-binding	${confirmation_text}	${COMMONWAIT}
-	Scroll Page To Element				css=p.ng-binding
 	Wait Visibulity And Click Element	xpath=//button[@ng-click='close()']
 	Wait Until Element Is Not Visible	xpath=//button[@ng-controller='inFrameModalCtrl']	${COMMONWAIT}
+	Wait For Ajax
+
+
+Close Formatted Confirmation
+	[Arguments]	${confirmation_text}
+	Wait For Ajax
+	Wait Until Element Contains			css=.modal.fade.in h4	${confirmation_text}
+	Wait Enable And Click Element		css=#btnClose
+	Wait Until Element Is Not Visible	css=#btnClose
 	Wait For Ajax
 
 
@@ -1705,7 +1702,7 @@ Switch To Education Mode
 
 
 Reload And Switch To Tab
-	[Arguments]  ${tab_number}
+	[Arguments]  ${tab_number}  ${lot_tab_num}
 	Mark Step					in_reload
 	Reload Page
 	Wait For Ajax
@@ -1713,28 +1710,37 @@ Reload And Switch To Tab
 	Відкрити інформацію по лотах
 	Відкрити детальну інформацію по позиціям
 	Run Keyword If	'${tab_number}' != '0'	Switch To Tab		${tab_number}
+	Run Keyword If	'${lot_tab_num}' != '0'	Switch To Lot Tab	${lot_tab_num}
 	Wait For Ajax
 
 
 Switch To Tab
 	[Arguments]  ${tab_number}
 	Wait For Ajax
-	Wait Until Element Is Visible		xpath=(//ul[@class='widget-header-block']//a)[${tab_number}]	timeout=${COMMONWAIT}
-	${class} =	Get Element Attribute	xpath=(//ul[@class='widget-header-block']//a)[${tab_number}]@class
-	Run Keyword Unless	'white-icon' in '${class}'	Wait Visibulity And Click Element	xpath=(//ul[@class='widget-header-block']//a)[${tab_number}]
+	Wait Until Element Is Visible		xpath=(//ul[@class='widget-header-block']//a[contains(@ng-click,'act.setActive')])[${tab_number}]	timeout=${COMMONWAIT}
+	${class} =	Get Element Attribute	xpath=(//ul[@class='widget-header-block']//a[contains(@ng-click,'act.setActive')])[${tab_number}]@class
+	Run Keyword Unless	'white-icon' in '${class}'	Wait Visibulity And Click Element	xpath=(//ul[@class='widget-header-block']//a[contains(@ng-click,'act.setActive')])[${tab_number}]
 	Wait For Ajax
 
 
+Switch To Lot Tab
+	[Arguments]  ${lot_tab_num}
+	#for now there is no way to chose lot, so '${lot_tab_num}' shows the number just of the first lot
+	Wait Until Element Is Visible					xpath=(//section[@id='lotSection']//ul[@class='widget-header-block']//li)[${lot_tab_num}]	timeout=${COMMONWAIT}
+	${class} =	Get Element Attribute				xpath=(//section[@id='lotSection']//ul[@class='widget-header-block']//li)[${lot_tab_num}]@class
+	Run Keyword Unless	'checked-nav' in '${class}'	Wait Visibulity And Click Element	xpath=(//section[@id='lotSection']//ul[@class='widget-header-block']//li)[${lot_tab_num}]
+
+
 Wait For Element With Reload
-	[Arguments]  ${locator}  ${tab_number}  ${time_to_wait}=3
+	[Arguments]  ${locator}  ${tab_number}  ${time_to_wait}=3	${lot_tab_num}=0
 	Mark Step					in_wait
-	Wait Until Keyword Succeeds			${time_to_wait}min	1s	Try Search Element	${locator}	${tab_number}
+	Wait Until Keyword Succeeds			${time_to_wait}min	1s	Try Search Element	${locator}	${tab_number}	${lot_tab_num}
 
 
 Try Search Element
-	[Arguments]	${locator}  ${tab_number}
+	[Arguments]	${locator}  ${tab_number}  ${lot_tab_num}
 	Mark Step						in_search
-	Reload And Switch To Tab		${tab_number}
+	Reload And Switch To Tab		${tab_number}	${lot_tab_num}
 	Wait For Ajax
 	Wait Until Element Is Enabled	${locator}	3
 	[return]	True
