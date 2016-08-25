@@ -314,3 +314,5 @@ def get_unit_ru_name(current_name):
 def format_amount(amount):
     amount = round(amount/100, 2)
     return format(float(amount), '.2f')
+
+
