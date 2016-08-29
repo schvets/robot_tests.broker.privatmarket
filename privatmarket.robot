@@ -34,8 +34,8 @@ ${tender_data_items.deliveryDate.endDate}						xpath=//div[@ng-if='adb.deliveryD
 ${tender_data_items.deliveryLocation.latitude}					css=span.latitude
 ${tender_data_items.deliveryLocation.longitude}					css=span.longitude
 ${tender_data_items.deliveryAddress.countryName}				css=prz-address[addr='adb.deliveryAddress'] span#countryName
-${tender_data_items.deliveryAddress.countryName_ru}				css=div.info-item.ng-scope span#countryName
-${tender_data_items.deliveryAddress.countryName_en}				css=div.info-item.ng-scope span#countryName
+${tender_data_items.deliveryAddress.countryName_ru}				xpath=//div[@class='info-item ng-scope']//span[@id='countryName']
+${tender_data_items.deliveryAddress.countryName_en}				xpath=//div[@class='info-item ng-scope']//span[@id='countryName']
 ${tender_data_items.deliveryAddress.postalCode}					css=prz-address[addr='adb.deliveryAddress'] span#postalCode
 ${tender_data_items.deliveryAddress.region}						css=prz-address[addr='adb.deliveryAddress'] span#region
 ${tender_data_items.deliveryAddress.locality}					css=prz-address[addr='adb.deliveryAddress'] span#locality
@@ -76,8 +76,8 @@ ${tender_data_cancellations[0].status}						xpath=//div[@class='info-div']/div[l
 ${tender_data_cancellations[0].reason}						xpath=//div[@class='info-div']/div[last()]/div/div[1]/div[2]
 ${tender_data_cancellations[0].documents[0].title}			css=.file-name.ng-binding
 ${tender_data_cancellations[0].documents[0].description}	xpath=//div[@class='file-descriptor']/span[2]
-${tender_data_title_en}										css=.title-div.ng-binding
-${tender_data_title_ru}										css=.title-div.ng-binding
+${tender_data_title_en}										css=.title-div>span
+${tender_data_title_ru}										css=.title-div>span
 ${tender_data_description_en}								css=#tenderDescription
 ${tender_data_description_ru}								css=#tenderDescription
 
@@ -578,7 +578,10 @@ Chose interface language
 Отримати інформацію із предмету
 	[Arguments]  ${username}  ${tender_uaid}  ${item_id}  ${element}
 	Mark Step	${username} - ${tender_uaid} - ${item_id} - ${element}
-	Відкрити потрібну інформацію по тендеру	${element}
+
+	${status} =	Run Keyword And Return Status   Wait Until Element Is Visible   xpath=//a[@ng-click='adb.showCl = !adb.showCl;' and contains(., '${item_id}')]  3
+	Run Keyword If	'${status}' == 'False'		Wait For Element With Reload	xpath=//a[@ng-click='adb.showCl = !adb.showCl;' and contains(., '${item_id}')]	1
+
 	${item}	${lot} =	Отримати положення предмету		${item_id}
 	${element} = 	Set Variable	items.${element}
 
@@ -613,7 +616,6 @@ Chose interface language
 	${is_feature_withible} = 	Run Keyword And Return Status	Element Should Be Visible	xpath=//div[@name='featureName' and contains(., '${feature_id}')]
 	Run Keyword If	${is_feature_withible} == ${FALSE}	Wait For Element With Reload		xpath=//div[@name='featureName' and contains(., '${feature_id}')]  1
 
-	debug    features
 	${result} = 	Run Keyword If	'${field_name}' == 'title'	Get Text									xpath=//div[@name='featureName' and contains(., '${feature_id}')]
 		...	ELSE IF		'${field_name}' == 'description'		Отримати інформацію з feature.description	${feature_id}
 		...	ELSE IF		'${field_name}' == 'featureOf'			Отримати інформацію з featureOf				${feature_id}
@@ -694,7 +696,13 @@ Chose interface language
 
 Отримати інформацію із запитання
 	[Arguments]  ${username}  ${tender_uaid}  ${object_id}  ${field_name}
-	Відкрити потрібну інформацію по тендеру		questions
+	${questions_type} = 	Set Variable If
+		...  'лот' in '${TEST_NAME}'			lot_or_item
+		...  'предмет' in '${TEST_NAME}'		lot_or_item
+		...  questions
+	Відкрити потрібну інформацію по тендеру		${questions_type}
+
+	Run Keyword And Return If	'${questions_type}' == 'lot_or_item'		Отримати інформацію із запитання на лот або предмет	${field_name}
 
 	${element_for_work} = 	Set Variable If
 		...  '${field_name}' == 'title'			xpath=//div[@class='question-head title' and contains(.,'${object_id}')]/span
@@ -706,6 +714,26 @@ Chose interface language
 	Run Keyword And Return If	'${field_name}' == 'date'	Отримати дату та час	${element_for_work}
 
 	Wait For Element With Reload	${element_for_work}	2
+	Wait Until Element Is Visible	${element_for_work}	timeout=${COMMONWAIT}
+	${result_full} =				Get Text			${element_for_work}
+	${result} =						Strip String		${result_full}
+	[return]	${result}
+
+
+Отримати інформацію із запитання на лот або предмет
+	[Arguments]  ${field_name}
+	Wait Until Element Is Visible		css=a[ng-click="act.checkThis(lot, 'lot-faq')"]	timeout=10
+	Wait Until Element Is Enabled		css=a[ng-click="act.checkThis(lot, 'lot-faq')"]	timeout=10
+
+	${locator} = 						Set Variable	css=li[ng-class="{'checked-nav':lot.showTab == 'lot-faq'}"]
+	${element_class} =					Get Element Attribute	${locator}@class
+
+	Run Keyword If	'simple-nav_item active ng-scope checked-nav' != '${element_class}'	Click Element	css=a[ng-click="act.checkThis(lot, 'lot-faq')"]
+
+	${element_for_work} = 	Set Variable If
+		...  '${field_name}' == 'title'			css=.lot-info .question-title
+		...  ${field_name}
+
 	Wait Until Element Is Visible	${element_for_work}	timeout=${COMMONWAIT}
 	${result_full} =				Get Text			${element_for_work}
 	${result} =						Strip String		${result_full}
@@ -839,6 +867,7 @@ Chose interface language
 	Wait Until Element Is Visible	${selector}
 	@{itemsList}=					Get Webelements	${selector}
 	${result_full} =				Get Text		${itemsList[${index}]}
+	${result_full} =				Strip String	${result_full}
 	[return]	${result_full}
 
 
@@ -1042,9 +1071,9 @@ Chose interface language
 Отримати інформацію з елемента зі зміною локалізації
 	[Arguments]  ${element}  ${item}  ${localization}
 	Chose interface language			${localization}
-	Wait Until Element Is Visible		css=#tenderType								timeout=${COMMONWAIT}
 	Wait Until Element Is Enabled		css=#tenderType								timeout=${COMMONWAIT}
 	Click Element						css=#tenderType
+	Run Keyword If	${item} > 0			Click Element	xpath=//div[@class='nav-tab']//li[1]/a
 	Run Keyword If	${item} > 0			Відкрити детальну інформацію про позицію	${item}
 	${text} =							Отримати текст елемента  ${element}
 	${result} =			Strip String	${text}
@@ -1069,6 +1098,7 @@ Chose interface language
 
 Отримати інформацію з awards[0].documents[0].title
 	[Arguments]  ${element}
+	Wait Enable And Click Element		css=.nav-tab li:nth-of-type(3)>a
 	Click Element						${tender_data_awards[0].suppliers[0].name}
 	Wait Until Element Is Visible		${tender_data_contracts[0].status}	timeout=${COMMONWAIT}
 	Wait For Ajax
@@ -1138,6 +1168,7 @@ Chose interface language
 
 Отримати інформацію з contracts[0].status
 	[Arguments]  ${element}
+	Wait Enable And Click Element		css=.nav-tab li:nth-of-type(3)>a
 	Click Element						${tender_data_awards[0].suppliers[0].name}
 	Wait Until Element Is Visible		${tender_data_contracts[0].status}	timeout=${COMMONWAIT}
 	${text} =		Отримати текст елемента  ${element}
@@ -1163,8 +1194,7 @@ Chose interface language
 Створити вимогу про виправлення умов лоту
 	[Arguments]    ${user}  ${tender_id}  ${claim}  ${lot_id}  ${document}
 #	Обрати потрібний лот за id			${lot_id}
-
-	Click Element	css=a[ng-click='act.showComplaintLot()']
+	Wait Enable And Click Element		css=a[ng-click='act.showComplaintLot(lot.id)']
 	Заповнити форму вимоги	${user}  ${claim}  ${document}
 	Відкрити потрібну інформацію по тендеру	complaint
 	${claim_id} = 						Get Text		css=span#cmpl0
@@ -1218,7 +1248,7 @@ Chose interface language
 	Click Button						css=button[ng-click='act.cancelComplaint()']
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=button[ng-click='act.cancelComplaint()']	timeout=${COMMONWAIT}
-	Wait Until Element Contains			css=span#cmplStatus0	Отменено	timeout=${COMMONWAIT}
+	Wait Until Element Contains			css=span#cmplStatus0	Скасована	timeout=${COMMONWAIT}
 
 
 Підтвердити вирішення вимоги про виправлення умов лоту
@@ -1275,8 +1305,10 @@ Chose interface language
 
 Задати запитання на лот
 	[Arguments]  ${provider}  ${tender_id}  ${lot_id}  ${question}
-#	Обрати потрібний лот за id	${lot_id}
-	Wait Enable And Click Element	css=a[ng-click='act.sendLotEnquiry()']
+	#Обрати потрібний лот за id	${lot_id}
+	privatmarket.Пошук тендера по ідентифікатору	${provider}	${tender_id}
+	Wait Enable And Click Element	xpath=//section[contains(@class, 'lot-description') and contains(., '${lot_id}')]//li[2]/a
+	Wait Enable And Click Element	css=button[ng-click='act.sendLotEnquiry(lot.id)']
 	Заповнити форму питання			${question.data.title}	${question.data.description}	${USERS.users['${provider}'].email}
 	[return]  True
 
@@ -1284,13 +1316,49 @@ Chose interface language
 Задати запитання на предмет
 	[Arguments]  ${provider}  ${tender_id}  ${item_id}  ${question}
 	Mark Step	${provider} - ${tender_id} - ${item_id} - ${question}
-
+	privatmarket.Пошук тендера по ідентифікатору	${provider}	${tender_id}
 	${item}	${lot} =	Отримати положення предмету		${item_id}
 	Відкрити детальну інформацію про позицію	${item}
-
 	Wait Enable And Click Element	xpath=(//a[@ng-click='act.sendItemEnquiry(adb.id)'])[${item}]
 	Заповнити форму питання			${question.data.title}	${question.data.description}	${USERS.users['${provider}'].email}
 	[return]  True
+
+
+Перетворити вимогу про виправлення умов закупівлі в скаргу
+	[Arguments]  ${provider}  ${tender_id}  ${complaint_id}  ${escalation_data}
+	privatmarket.Перетворити вимогу в скаргу	${provider}	${tender_id}
+
+
+Перетворити вимогу про виправлення умов лоту в скаргу
+	[Arguments]  ${provider}  ${tender_id}  ${complaint_id}  ${escalation_data}
+	privatmarket.Перетворити вимогу в скаргу	${provider}	${tender_id}
+
+
+Перетворити вимогу в скаргу
+	[Arguments]  ${provider}  ${tender_id}
+	privatmarket.Пошук тендера по ідентифікатору	${provider}	${tender_id}
+	Wait For Ajax
+	Switch To Tab						3
+	Wait Enable And Click Element		css=button[ng-click='act.setComplaintResolved(q, false)']
+	Wait Until Element Contains			css=.modal.fade.in h4	Ваша вимога була успішно переведена в звернення. Чекайте наступного рішення!
+	Wait Enable And Click Element		css=#btnClose
+	Wait Until Element Is Not Visible	css=#btnClose
+
+
+Скасувати вимогу про виправлення умов закупівлі
+	[Arguments]  ${provider}  ${tender_id}  ${complaint_id}  ${cancellation_data}
+	privatmarket.Пошук тендера по ідентифікатору	${provider}	${tender_id}
+	Wait For Ajax
+	Switch To Tab						3
+	privatmarket.Скасувати вимогу  ${provider}  ${tender_id}  ${complaint_id}  ${cancellation_data}
+
+
+Скасувати вимогу про виправлення умов лоту
+	[Arguments]  ${provider}  ${tender_id}  ${complaint_id}  ${cancellation_data}
+	privatmarket.Пошук тендера по ідентифікатору	${provider}	${tender_id}
+	Wait For Ajax
+	Switch To Tab						3
+	privatmarket.Скасувати вимогу  ${provider}  ${tender_id}  ${complaint_id}  ${cancellation_data}
 
 
 Подати цінову пропозицію
