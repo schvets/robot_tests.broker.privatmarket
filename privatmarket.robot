@@ -841,11 +841,6 @@ Chose interface language
 	[return]  ${result}
 
 
-Отримати документ
-	[Arguments]  ${username}  ${tender_uaid}  ${doc_url}
-	[return]  Doc Title   Doc text
-
-
 Отримати текст елемента
 	[Arguments]  ${element_name}  ${item}=${1}
 	${index} = 					Evaluate	${item}-1
@@ -1520,7 +1515,9 @@ Chose interface language
 	Click Button						css=button[ng-click='file.addFile();']
 	Wait Until Element Is Visible		css=i[ng-if="model.canAddFiles"]
 
-	${upload_response} =	Зберегти доданий файл	${filePath}
+	${upload_response} =				Зберегти доданий файл	${filePath}
+	Click Element						css=span[ng-click='act.hideModal()']
+	Wait Until Element Is Not Visible	css=div[ng-if='model.canAddFiles']	${COMMONWAIT}
 	[return]	${upload_response}
 
 
@@ -1550,7 +1547,7 @@ Chose interface language
 
 
 Змінити документ в ставці
-	[Arguments]  ${user}  ${filePath}  ${docid}
+	[Arguments]  ${user}  ${filePath}  ${docid}  ${what}
 	Відкрити заявку
 	Scroll Page To Element				css=button[ng-click='act.chooseFile()']
 	sleep  2s
