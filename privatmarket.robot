@@ -6,7 +6,6 @@ Library  Selenium2Library
 Library  Collections
 Library  DebugLibrary
 Library  OperatingSystem
-Library  AngularJSLibrary
 Library  privatmarket_service.py
 
 
@@ -348,7 +347,6 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 Внести зміни в тендер
 	[Arguments]  ${username}  ${tender_id}  ${field_name}  ${field_value}
-	debug    edit tender
 	Wait Until Element Is Visible	css=button[ng-click='commonActions.createAfp()']	timeout=${COMMONWAIT}
 	Click Button					css=button[ng-click='commonActions.createAfp()']
 	#TODO till we have a problem with saving of expired but old data
@@ -369,14 +367,12 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Wait Until Element Is Visible	css=input[data-id='valueAmount']	timeout=${COMMONWAIT}
 	Clear Element Text				css=input[data-id='valueAmount']
 	Input Text						css=input[data-id='valueAmount']		${field_value}
-	debug			edit lot
 	Click Button					css=button[data-id='actSave']
 	Close Confirmation				Данные успешно сохранены
 
 
 Створити лот із предметом закупівлі
 	[Arguments]  ${username}  ${tender_id}  ${lot}  ${item}
-	debug     add lot
 	Додати lots	${lot}
 	Додати items	${item}
 
@@ -389,7 +385,6 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Wait Until Element Is Visible	css=span[ng-bind='model.ptr.value.amount | accounting:2']	timeout=${COMMONWAIT}
 	Wait Until Element Is Visible	id=tab_1	timeout=${COMMONWAIT}
 	Click Element					id=tab_1
-	debug							add item
 
 
 Змінити tenderPeriod.endDate
@@ -397,7 +392,6 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Wait For Ajax
 	Wait Visibulity And Click Element	id=tab_4
 	Set Date And Time		css=input[ng-model='model.ptr.tenderPeriod.ed.d']	css=timepicker-pop[input-time='model.ptr.tenderPeriod.ed.t'] input[ng-model='inputTime']	${field_value}
-	debug    edit date
 
 
 Завантажити документ
@@ -1359,20 +1353,19 @@ Chose interface language
 Змінити цінову пропозицію
 	[Arguments]  ${username}  ${tender_uaid}  ${fieldname}  ${fieldvalue}
 	Відкрити заявку
-	debug     change bid
 	Run Keyword 						Змінити ${fieldname}	${fieldvalue}
 
 	#send request to update the bid
 	Click Button						${locator_tenderClaim.buttonSend}
 	Wait For Ajax Overflow Vanish
-	Close Formatted Confirmation		Ваша заявка була успішно включена до черги на відправку!
-
-	#check whether task was send
-	Wait For Element With Reload	xpath=//table[@class='bids']//tr[1]/td[4 and contains(., 'Відправлена')]	1	3	3
 
 	${test_name} =	Convert To Lowercase	${TEST_NAME}
 	Run Keyword If	'оновити статус цінової пропозиції' in '${test_name}'	Close Formatted Confirmation	Ваша заявка була успішно включена до черги на відправку!
 		...  ELSE	Close Formatted Confirmation	Ваша заявка була успішно збережена!
+
+	#check whether task was send
+	Wait For Element With Reload	xpath=//table[@class='bids']//tr[1]/td[4 and contains(., 'Відправлена')]	1	3	3
+
 	[return]	${fieldname}
 
 
@@ -1438,12 +1431,25 @@ Chose interface language
 	Відкрити заявку
 
 	Wait Until Element Is Enabled		css=div[ng-if='model.canAddFiles']	${COMMONWAIT}
+	Click Element						xpath=(//div[@ng-if='model.canAddFiles']//a)[1]
 
-	${list_item} =	get_doc_identifier	${doc_type}
-	Select From List By Value			css=select[ng-model='model.currFileVfv']	${list_item}
-
+	#choose file
 	Execute Javascript					$("#afpFile").removeClass();
 	Choose File							css=#afpFile	${filePath}
+	Wait For Ajax
+
+	${doc_name} =	get_doc_identifier	${doc_type}
+	#choose file type
+	Click Element						css=div.btn-group a[data-toggle="dropdown"]
+	Wait Enable And Click Element		xpath=//li[contains(., '${doc_name}')]
+
+	#choose file language
+	Click Element						css=a.lang
+	Wait Enable And Click Element		xpath=(//li[@ng-click='act.setFileLang(lang)'])[2]
+
+	#add file
+	Click Button						css=button[ng-click='file.addFile();']
+	Wait Until Element Is Visible		css=i[ng-if="model.canAddFiles"]
 
 	${upload_response} =	Зберегти доданий файл	${filePath}
 	[return]	${upload_response}
@@ -1451,23 +1457,21 @@ Chose interface language
 
 Зберегти доданий файл
 	[Arguments]  ${filePath}
-	debug     save the file
-
-	Wait Until Element Is Not Visible	css=div[ng-show='progressVisible'] div.progress-bar	timeout=30
-	Sleep								5s
-	Wait Until Element Is Visible		xpath=(//div[contains(@class, 'file-item')])[1]	timeout=30
-
+	Wait Enable And Click Element		css=button[ng-click='commonActions.goNext(1)']
+	Wait Until Element Contains			css=div#afpPanel	Крок 2/3
+	Click Button						css=button[ng-click='commonActions.goNext(1)']
+	Wait Until Element Contains			css=div#afpPanel	Крок 3/3
 	Click Button						${locator_tenderClaim.buttonSend}
+	Wait For Ajax Overflow Vanish
 	Close Formatted Confirmation		Ваша заявка була успішно збережена!
+
+	Wait For Element With Reload		xpath=//table[@class='bids']//tr[1]/td//img[contains(@src,'clip_icon.png')]	1	3	3
+	Click Element						xpath=//table[@class='bids']//tr[1]/td//img[contains(@src,'clip_icon.png')]
+	Wait For Ajax
+	Wait Until Element Is Visible		css=div.modal.fade.in	${COMMONWAIT}
 	${dateModified}						Get text	css=span.file-tlm
-	Click Element						${locator_tenderClaim.buttonGoBack}
-	wait until element is visible		css=table.bids tr
-	Wait For Element With Reload		xpath=//table[@class='bids']//tr[1]/td//img[contains(@src,'clip_icon.png')]	1
 
 	#получим ссылку на файл и его id
-	Scroll Page To Element				css=a[ng-click='act.showDocWin(b)']
-	Click Element						css=a[ng-click='act.showDocWin(b)']
-	Wait For Ajax
 	Wait Until Element Is Enabled		xpath=(//div[@ng-click='openUrl(file.url)'])[last()]	5s
 	${url} = 							Execute Javascript	var scope = angular.element($("div[ng-click='openUrl(file.url)']")).last().scope(); return scope.file.url
 	${uploaded_file_data} =				fill_file_data  ${url}  ${filePath}  ${dateModified}  ${dateModified}
@@ -1548,7 +1552,7 @@ Login
 	[Arguments]  ${username}
 	Click Element						xpath=//span[.='Вход']
 	Wait Until Element Is Visible		id=p24__login__field	${COMMONWAIT}
-	input text							css=#p24__login__field		+${USERS.users['${username}'].login}
+	Input Text							css=#p24__login__field		+${USERS.users['${username}'].login}
 	Check If Element Stale				xpath=//div[@id="login_modal" and @style='display: block;']//input[@type='password']
 	Input Text							xpath=//div[@id="login_modal" and @style='display: block;']//input[@type='password']	${USERS.users['${username}'].password}
 	Click Element						xpath=//div[@id="login_modal" and @style='display: block;']//button[@type='submit']
@@ -1619,7 +1623,7 @@ Close Confirmation
 Close Formatted Confirmation
 	[Arguments]	${confirmation_text}
 	Wait For Ajax
-	Wait Until Element Contains			css=.modal.fade.in h4	${confirmation_text}
+	Wait Until Element Contains			css=.modal.fade.in h4	${confirmation_text}	${COMMONWAIT}
 	Wait Enable And Click Element		css=#btnClose
 	Wait Until Element Is Not Visible	css=#btnClose
 	Wait For Ajax
