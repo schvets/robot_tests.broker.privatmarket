@@ -70,7 +70,7 @@ ${locator_tenderClaim.fieldEmail}				css=input[ng-model='model.person.email']
 ${locator_tenderClaim.buttonSend}				css=button[ng-click='act.sendAfp()']
 ${locator_tenderClaim.buttonCancel}				css=button[ng-click='act.delAfp()']
 ${locator_tenderClaim.buttonGoBack}				css=a[ng-click='act.ret2Ad()']
-${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
+${locator_tender.ajax_overflow}					css=div.ajax_overflow
 
 ${tender_data_cancellations[0].status}						xpath=//div[@class='info-div']/div[last()]/div/div[1]/div[1]
 ${tender_data_cancellations[0].reason}						xpath=//div[@class='info-div']/div[last()]/div/div[1]/div[2]
@@ -1324,9 +1324,7 @@ Chose interface language
 	Wait For Ajax
 	Switch To Tab						3
 	Wait Enable And Click Element		css=button[ng-click='act.setComplaintResolved(q, false)']
-	Wait Until Element Contains			css=.modal.fade.in h4	Ваша вимога була успішно переведена в звернення. Чекайте наступного рішення!
-	Wait Enable And Click Element		css=#btnClose
-	Wait Until Element Is Not Visible	css=#btnClose
+	Close Formatted Confirmation	Ваша вимога була успішно переведена в звернення. Чекайте наступного рішення!
 
 
 Скасувати вимогу про виправлення умов закупівлі
@@ -1463,10 +1461,7 @@ Chose interface language
 
 Скасувати цінову пропозицію
 	[Arguments]  ${username}  ${tender_uaid}
-	[Documentation]
-
-	privatmarket.Пошук тендера по ідентифікатору	${username}	${tender_uaid}
-	Wait For Ajax
+	debug     Cancel
 	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}
 	Wait For Element Value				css=input[ng-model='model.person.lastName']
 	Scroll Page To Element				${locator_tenderClaim.buttonCancel}
@@ -1485,11 +1480,6 @@ Chose interface language
 	[return]	${bid}
 
 
-Відповісти на питання
-	[Arguments]  @{ARGUMENTS}
-	Fail  Функція не підтримується майданчиком
-
-
 Завантажити документ в ставку
 	[Arguments]  ${user}  ${filePath}  ${tenderId}  ${doc_type}=documents
 	Відкрити заявку
@@ -1502,6 +1492,14 @@ Chose interface language
 	Choose File							css=#afpFile	${filePath}
 	Wait For Ajax
 
+	Заповнити інформацію про файл	${doc_type}
+
+	${upload_response} =				Зберегти доданий файл	${filePath}
+	[return]	${upload_response}
+
+
+Заповнити інформацію про файл
+	[Arguments]  ${doc_type}
 	${doc_name} =	get_doc_identifier	${doc_type}
 	#choose file type
 	Click Element						css=div.btn-group a[data-toggle="dropdown"]
@@ -1513,12 +1511,8 @@ Chose interface language
 
 	#add file
 	Click Button						css=button[ng-click='file.addFile();']
+	Wait For Ajax
 	Wait Until Element Is Visible		css=i[ng-if="model.canAddFiles"]
-
-	${upload_response} =				Зберегти доданий файл	${filePath}
-	Click Element						css=span[ng-click='act.hideModal()']
-	Wait Until Element Is Not Visible	css=div[ng-if='model.canAddFiles']	${COMMONWAIT}
-	[return]	${upload_response}
 
 
 Зберегти доданий файл
@@ -1527,6 +1521,7 @@ Chose interface language
 	Wait Until Element Contains			css=div#afpPanel	Крок 2/3
 	Click Button						css=button[ng-click='commonActions.goNext(1)']
 	Wait Until Element Contains			css=div#afpPanel	Крок 3/3
+
 	Click Button						${locator_tenderClaim.buttonSend}
 	Wait For Ajax Overflow Vanish
 	Close Formatted Confirmation		Ваша заявка була успішно збережена!
@@ -1537,54 +1532,50 @@ Chose interface language
 	Wait Until Element Is Visible		css=div.modal.fade.in	${COMMONWAIT}
 	${dateModified}						Get text	css=span.file-tlm
 
-	#получим ссылку на файл и его id
+	#get file link and it's id
 	Wait Until Element Is Enabled		xpath=(//div[@ng-click='openUrl(file.url)'])[last()]	5s
 	${url} = 							Execute Javascript	var scope = angular.element($("div[ng-click='openUrl(file.url)']")).last().scope(); return scope.file.url
 	${uploaded_file_data} =				fill_file_data  ${url}  ${filePath}  ${dateModified}  ${dateModified}
 	${upload_response} = 				Create Dictionary
+
+	#close window of bid info
 	Set To Dictionary					${upload_response}	upload_response	${uploaded_file_data}
+	Click Element						css=span[ng-click='act.hideModal()']
+	Wait Until Element Is Not Visible	css=div[ng-if='model.canAddFiles']	${COMMONWAIT}
 	[return]	${upload_response}
 
 
 Змінити документ в ставці
-	[Arguments]  ${user}  ${filePath}  ${docid}  ${what}
+	[Arguments]  ${user}  ${tenderId}  ${filePath}  ${docid}  ${doc_type}=documents
 	Відкрити заявку
-	Scroll Page To Element				css=button[ng-click='act.chooseFile()']
-	sleep  2s
+	debug     edit file
+	#choose file
+	Execute Javascript					$("#changeFile").removeClass();
+	Choose File							css=#changeFile	${filePath}
+	Wait For Ajax
 
-	${correctFilePath} = 				Replace String		${filePath}	\\	\/
-	Execute Javascript					$("#fileToUpload").removeClass();
-	Execute Javascript					angular.element($("input[ng-model='model.fileName']")).scope().$parent.act.changeFile(angular.element("div.file-item").scope().file);
-	Choose File							css=input#fileToUpload    ${correctFilePath}
-
+	Заповнити інформацію про файл	${doc_type}
 	${uploaded_file_data} =				Зберегти доданий файл	${filePath}
 	[return]  ${uploaded_file_data}
 
 
 Змінити документацію в ставці
-	[Arguments]  ${privat_doc}  ${bidid}  ${docid}
+	[Arguments]  ${username}  ${tender_id}  ${privat_doc}  ${doc_id}
 	Відкрити заявку
-	Scroll Page To Element		css=button[ng-click='act.chooseFile()']
 
-	Run Keyword					Змінити ${bidid.data.confidentiality} для файлу	${bidid}
-	${file_name} =				Get text	xpath=(//span[@class='file-name ng-binding'])[last()]
-	${uploaded_file_data} =		Зберегти доданий файл	${file_name}
-	[return]  ${uploaded_file_data}
+	Run Keyword					Змінити ${privat_doc.data.confidentiality} для файлу	${privat_doc}
+	${uploaded_file_data} =		Зберегти доданий файл	${doc_id}
+	[return]  ${True}
 
 
 Змінити buyerOnly для файлу
-	[Arguments]  ${bidid}
-	Click Element					xpath=(//div[@ng-if='model.canSecretFiles'])[last()]
+	[Arguments]  ${privat_doc}
+	Click Element					xpath=(//i[@ng-if='model.canSecretFiles'])[last()]
 	Wait For Ajax
 	Wait Until Element Is Enabled	css=textarea[ng-model='model.fvHideReason']
-	Input Text						css=textarea[ng-model='model.fvHideReason']		${bidid.data.confidentialityRationale}
+	Input Text						css=textarea[ng-model='model.fvHideReason']		${privat_doc.data.confidentialityRationale}
 	Click Button					xpath=//button[contains(@ng-click,'act.setFvHidden')]
-	Wait For Notification			Файл был успешно скрыт!
-
-
-Обробити скаргу
-	[Arguments]  @{ARGUMENTS}
-	Fail  Функція не підтримується майданчиком
+	Wait For Notification			Файл був успішно прихований!
 
 
 Отримати посилання на аукціон для глядача
@@ -1625,13 +1616,13 @@ Login
 	Wait Until Element Is Visible		css=ul.user-menu  timeout=30
 	Sleep								3s
 	Wait For Ajax
+	Wait Until Element Not Stale		css=a[data-target='#select_cabinet']  10
 	Wait Until Element Is Visible		css=a[data-target='#select_cabinet']  timeout=${COMMONWAIT}
 
 
 Wait For Ajax
 	sleep				2s
 	Wait For Condition	return window.jQuery!=undefined && jQuery.active==0	60s
-#	Wait for Angular
 
 
 Wait Until Element Not Stale
@@ -1689,6 +1680,7 @@ Close Confirmation
 Close Formatted Confirmation
 	[Arguments]	${confirmation_text}
 	Wait For Ajax
+	Wait For Ajax Overflow Vanish
 	Wait Until Element Contains			css=.modal.fade.in h4	${confirmation_text}	${COMMONWAIT}
 	Wait Enable And Click Element		css=#btnClose
 	Wait Until Element Is Not Visible	css=#btnClose
@@ -1772,7 +1764,7 @@ Switch To Education Mode
 
 
 Reload And Switch To Tab
-	[Arguments]  ${tab_number}  ${lot_tab_num}
+	[Arguments]  ${tab_number}  ${lot_tab_num}=1
 	Mark Step					in_reload
 	Reload Page
 	Wait For Ajax
