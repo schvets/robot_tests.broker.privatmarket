@@ -767,6 +767,14 @@ Chose interface language
 Отримати інформацію із пропозиції
 	[Arguments]  ${username}  ${tenderUA_id}  ${element}
 	Run Keyword And Return If	'${element}' == 'lotValues[0].value.amount'		Отримати сумму	${element}
+	Run Keyword And Return If	'${element}' == 'status'						Отримати bid.status
+
+
+Отримати bid.status
+	Wait For Element With Reload	xpath=//table[@class='bids']//tr[1]/td[4 and contains(., 'Недійсна')]	1	3	3
+	${status} = 	Get Text		xpath=//table[@class='bids']//tr[1]/td[4]
+	${status} = 	Set Variable If	'Недійсна' in ${status}	invalid	wrong status
+	[return]	${status}
 
 
 Дочекатися статусу вимоги
@@ -775,13 +783,13 @@ Chose interface language
 
 	${status} = 	Set Variable If
 		...  'незадоволення вимоги' in '${test_name}'	Не вирiшена, обробляється
-		...  'задоволення вимоги' in '${test_name}'	Вирiшена
-		...  'cancelled' in '${test_name}'	Скасована
-		...  'pending' in '${test_name}'	Не вирiшена, обробляється
-		...  'поданого статусу' in '${test_name}'	Вiдправлено
-		...  'resolved' in '${test_name}'			Вирiшена
-		...  'answered' in '${test_name}'			Отримано вiдповiдь
-		...  'was called' in '${test_name}'			Вiдмiнено
+		...  'задоволення вимоги' in '${test_name}'		Вирiшена
+		...  'cancelled' in '${test_name}'				Скасована
+		...  'pending' in '${test_name}'				Не вирiшена, обробляється
+		...  'поданого статусу' in '${test_name}'		Вiдправлено
+		...  'resolved' in '${test_name}'				Вирiшена
+		...  'answered' in '${test_name}'				Отримано вiдповiдь
+		...  'was called' in '${test_name}'				Вiдмiнено
 		...  ${None}
 
 	Return From Keyword If	'${status}' != '${None}'	Wait For Element With Reload	xpath=//div[@class='faq ng-scope' and contains(., '${complaintID}')]//span[contains(., '${status}')]	3
@@ -1455,19 +1463,20 @@ Chose interface language
 
 Змінити status
 	[Arguments]  ${fieldvalue}
-	[return]  True
-#	лише клікаємо зберегти, нічого не змінюючи
+	#лише клікаємо зберегти, нічого не змінюючи
+	Wait Enable And Click Element	css=button[ng-click='commonActions.goNext(1)']
+	Wait Until Element Contains		css=div#afpPanel	Крок 2/3
+	#move to the very last step
+	Click Button					css=button[ng-click='commonActions.goNext(1)']
+	Wait Until Element Contains		css=div#afpPanel	Крок 3/3
 
 
 Скасувати цінову пропозицію
 	[Arguments]  ${username}  ${tender_uaid}
-	debug     Cancel
-	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}
-	Wait For Element Value				css=input[ng-model='model.person.lastName']
-	Scroll Page To Element				${locator_tenderClaim.buttonCancel}
-	Wait Enable And Click Element		${locator_tenderClaim.buttonCancel}
-	Close Formatted Confirmation		Ваша заявка успешно отменена!
-	Wait Until Element Is Enabled		${locator_tenderClaim.buttonCreate}	${COMMONWAIT}
+	Відкрити заявку
+
+	Wait Enable And Click Element		css=a[ng-click='act.delAfp()']
+	Close Formatted Confirmation		Вашау заявку успішно скасовано!
 	[return]	${ARGUMENTS[1]}
 
 
@@ -1548,7 +1557,6 @@ Chose interface language
 Змінити документ в ставці
 	[Arguments]  ${user}  ${tenderId}  ${filePath}  ${docid}  ${doc_type}=documents
 	Відкрити заявку
-	debug     edit file
 	#choose file
 	Execute Javascript					$("#changeFile").removeClass();
 	Choose File							css=#changeFile	${filePath}
