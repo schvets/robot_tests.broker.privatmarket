@@ -42,6 +42,7 @@ ${tender_data.items[0].classification.description}		css=span[tid='item.classific
 ${tender_data.items[0].unit.name}						css=span[tid='item.unit.name']
 ${tender_data.items[0].unit.code}						css=span[tid='item.unit.code']
 ${tender_data.items[0].quantity}						css=span[tid='item.quantity']
+${tender_data.items[0].description}						css=span[tid='item.description']
 
 ${tender_data.questions[0].title}						css=span[tid='data.question.title']
 ${tender_data.questions[0].description}					css=span[tid='data.question.description']
@@ -73,6 +74,7 @@ ${tender_data.questions[0].answer}						css=span[tid='data.question.answer']
 	Run Keyword If	'phantomjs' in '${browser}'	Run Keywords	Create Webdriver	PhantomJS	${username}	service_args=${service_args}
 	...   ELSE	Create WebDriver	Chrome	chrome_options=${options}	alias=${username}
 
+	Set Selenium Implicit Wait						10s
 	Go To	${USERS.users['${username}'].homepage}
 	Run Keyword Unless	'Viewer' in '${username}'	Login	${username}
 
@@ -93,9 +95,8 @@ ${tender_data.questions[0].answer}						css=span[tid='data.question.answer']
 #	if it is test of checking info by question, we have to wait for it's info comes to us (so, reload page)
 	Run Keyword If	'${element}' == 'questions[0].title'								Wait For Element With Reload			${tender_data.${element}}
 	Run Keyword If	'${element}' == 'questions[0].answer'								Wait For Element With Reload			${tender_data.${element}}
-	Wait Until Element Is Visible	${tender_data.${element}}	timeout=${COMMONWAIT}
-	${result} =						Отримати текст	${element}
 
+	Run Keyword And Return If	'${element}' == 'status'								Отримати status
 	Run Keyword And Return If	'${element}' == 'value.amount'							Отримати число							${element}
 	Run Keyword And Return If	'${element}' == 'value.valueAddedTaxIncluded'			Отримати інформацію про включення ПДВ	${element}
 	Run Keyword And Return If	'${element}' == 'minimalStep.amount'					Отримати число							${element}
@@ -109,6 +110,8 @@ ${tender_data.questions[0].answer}						css=span[tid='data.question.answer']
 	Run Keyword And Return If	'${element}' == 'items[0].deliveryLocation.longitude'	Отримати число							${element}
 	Run Keyword And Return If	'${element}' == 'items[0].quantity'						Отримати число							${element}
 
+	Wait Until Element Is Visible	${tender_data.${element}}	timeout=${COMMONWAIT}
+	${result} =						Отримати текст	${element}
 	[return]	${result}
 
 
@@ -143,14 +146,113 @@ ${tender_data.questions[0].answer}						css=span[tid='data.question.answer']
 	[return]  ${result}
 
 
+Отримати status
+	${status_line} = 	Get Text			css=div.arrow-present
+	@{list} = 			Split String	${status_line}
+	${status} = 		Set Variable If	'Уточнення' == '${list[0]}'	active.enquiries
+		...  	'Пропозиції' == '${list[0]}'	active.tendering
+		...  	'Аукціон' == '${list[0]}'		active.auction
+		...  	'Визначення' == '${list[0]}'	active.qualification
+		...  	Anknown: ${status_line}
+	[return]  ${status}
+
+
+Задати питання
+	[Arguments]  ${user_name}  ${tender_id}  ${question_data}
+	Wait Until Element Is Visible	css=input[ng-model='lot.newQuestionTitle']	${COMMONWAIT}
+	Input Text						css=input[ng-model='lot.newQuestionTitle']	${question_data.data.title}
+	Input Text						css=textarea[ng-model='lot.newQuestion']	${question_data.data.description}
+	Click Button					css=button[tid='sendQuestion']
+	Sleep							3s
+	Dismiss Alert
+	Wait Until Element Is Not Visible		css=div.progress.progress-bar	${COMMONWAIT}
+	Wait For Element With Reload			css=span[tid='data.quesion.date']
+
+
+Подати цінову пропозицію
+	[Arguments]  ${user_name}  ${tender_id}  ${bid}
+	Wait For Element With Reload							css=input[ng-model='newbid.amount']	5
+	Input Text		css=input[ng-model='newbid.amount']		${bid.data.value.amount}
+	Click Button	css=button[ng-click='createBid(newbid)']
+	Wait Until Element Is Visible	css=div.progress.progress-bar			${COMMONWAIT}
+	Wait For Ajax
+	Wait Until Element Is Not Visible	css=div.progress.progress-bar			${COMMONWAIT}
+
+
+Скасувати цінову пропозицію
+	[Arguments]  ${user_name}  ${tender_id}  ${bid}
+	Wait Until Element Is Visible		css=button[ng-click='deleteBid(bid)']	${COMMONWAIT}
+	Click Button						css=button[ng-click='deleteBid(bid)']
+	Wait Until Element Is Visible	css=div.progress.progress-bar				${COMMONWAIT}
+	Wait For Ajax
+	Wait Until Element Is Not Visible	css=div.progress.progress-bar			${COMMONWAIT}
+	Wait Until Element Is Not Visible	css=button[ng-click='deleteBid(bid)']	${COMMONWAIT}
+
+
+Змінити цінову пропозицію
+	[Arguments]  ${user_name}  ${tender_id}  ${name}  ${value}
+	Clear Element Text	css=input[ng-model='newbid.amount']
+	Input Text			css=input[ng-model='newbid.amount']		${value}
+	Click Button		css=button[ng-click='createBid(newbid)']
+	Wait Until Element Is Visible	css=div.progress.progress-bar			${COMMONWAIT}
+	Wait For Ajax
+	Wait Until Element Is Not Visible	css=div.progress.progress-bar		${COMMONWAIT}
+
+
+Завантажити документ в ставку
+	[Arguments]  @{args}
+	Fail	Is not implemented
+	Choose File								css=input#addProposalDocs	{args}
+	sleep									5s
+	Wait Until Element Does Not Contain		css=div.file-item			Файл не выбран
+
+
+Змінити документ в ставці
+	[Arguments]  @{args}
+	Fail	Is not implemented
+
+
+Отримати посилання на аукціон для учасника
+	[Arguments]  ${user_name}  ${tender_id}
+	Wait For Element With Reload			css=div[ng-if='data.auctionUrl']	5
+	${url} = 	Get Element Attribute		xpath=//div[@ng-if='data.auctionUrl']/a@href
+	[return]  ${url}
+
+
+Отримати посилання на аукціон для глядача
+	[Arguments]  ${user_name}  ${tender_id}
+	Отримати посилання на аукціон для учасника	${user_name}	${tender_id}
+
+
 #Custom Keywords
 Login
 	[Arguments]  ${username}
-	debug   login
+	Wait Until Element Is Not Visible	css=div.progress.progress-bar			${COMMONWAIT}
+	Sleep				5s
+	Wait Until Element Is enabled	css=a[ng-show='bankIdUrl']	${COMMONWAIT}
+	Click Element					css=a[ng-show='bankIdUrl']
+	Wait Until Element Is Visible		css=div[id='privatBank']				5s
+	Click Element						css=div[id='privatBank']
+	Wait Until Element Is Visible		css=input[id='loginLikePhone']			5s
+	Input Text							css=input[id='loginLikePhone']			+${USERS.users['${username}'].login}
+	Input Text							css=input[id='passwordLikePassword']	${USERS.users['${username}'].password}
+	Click Element						css=div[id='signInButton']
+	#TODO   these test data must be removed
+	Wait Until Element Is Visible		css=input[id='first-section']	5s
+	Input Text							css=input[id='first-section']	12
+	Input Text							css=input[id='second-section']	34
+	Input Text							css=input[id='third-section']	56
+	Click Element						css=a[id='confirmButton']
+	Sleep								3s
+	Wait Until Element Is Not Visible	css=div.progress.progress-bar			${COMMONWAIT}
+	Wait Until Element Is Not visible	css=a[id='confirmButton']
+	Wait Until Element Is Visible		css=input#businessSearch
 
 
 Wait For Ajax
-	Wait For Angular
+	Get Remote Url
+	Sleep     3s
+#	Wait For Angular
 
 
 Wait Until Element Not Stale
@@ -207,7 +309,7 @@ Get Locator And Type
 
 Wait For Auction
 	[Arguments]	${tender_id}
-	Wait Until Keyword Succeeds	1min	10s	Try Search Auction	${tender_id}
+	Wait Until Keyword Succeeds	2min	10s	Try Search Auction	${tender_id}
 
 
 Try Search Auction
@@ -233,12 +335,13 @@ Try Search Element
 	[Arguments]	${locator}
 	Reload Page
 	Wait For Ajax
+	Wait Until Element Is Visible	${locator}	3
 	Wait Until Element Is Enabled	${locator}	3
 	[return]	True
 
 
 Wait For Element With Reload
-	[Arguments]  ${locator}  ${time_to_wait}=1
+	[Arguments]  ${locator}  ${time_to_wait}=2
 	Wait Until Keyword Succeeds			${time_to_wait}min	3s	Try Search Element	${locator}
 
 

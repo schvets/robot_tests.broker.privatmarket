@@ -119,25 +119,6 @@ def get_unit_code(name):
         return name
 
 
-def get_status_type(status_name):
-    type_dictionary = {
-        u'Період уточнень': 'active.enquiries',
-        u'Період уточнень завершено': 'active.enquiries.ended',
-        u'Подача пропозицій': 'active.tendering',
-        u'Очікування пропозицій': 'active.auction',
-        u'Кваліфікація переможця': 'active.qualification',
-        u'Пропозиції розглянуто': 'active.awarded',
-        u'Закупівля не відбулась': 'unsuccessful',
-        u'Pавершена закупівля': 'complete',
-        u'Відмінена закупівля': 'cancelled'
-    }
-    type_name = type_dictionary.get(status_name)
-    if type_name:
-        return type_name
-    else:
-        return status_name
-
-
 def format_amount(amount):
     amount = round(amount/100, 2)
     return format(float(amount), '.2f')
@@ -172,6 +153,6 @@ def wait_for_angular():
         WebDriverWait(browser, timeout, 0.2) \
             .until_not(lambda x: browser.execute_script(js_waiting_var))
     except TimeoutException:
-        browser._exec_js('return window.NG_PENDING_TIMEOUTS')
-        browser._exec_js(js_get_pending_http_requests)
+        browser.execute_script('return window.NG_PENDING_TIMEOUTS')
+        browser.execute_script(js_get_pending_http_requests)
         raise TimeoutException("Problem with angular")
