@@ -82,10 +82,11 @@ ${tender_data.questions[0].answer}						css=span[tid='data.question.answer']
 Оновити сторінку з тендером
 	[Arguments]  @{ARGUMENTS}
 	Reload Page
+	Sleep	2s
 
 Пошук тендера по ідентифікатору
 	[Arguments]  ${user_name}  ${tender_id}
-	Wait For Auction							${tender_id}
+	Wait For Auction						${tender_id}
 	Wait Enable And Click Element			css=a[tid='${tender_id}']
 	Wait Until element Is Visible			css=span[tid='data.title']		${COMMONWAIT}
 
@@ -147,8 +148,10 @@ ${tender_data.questions[0].answer}						css=span[tid='data.question.answer']
 
 
 Отримати status
-	${status_line} = 	Get Text			css=div.arrow-present
-	@{list} = 			Split String	${status_line}
+	privatmarket.Оновити сторінку з тендером	status
+	Wait Until Element Is Visible				css=div.arrow-present	5s
+	${status_line} = 	Get Text				css=div.arrow-present
+	@{list} = 			Split String			${status_line}
 	${status} = 		Set Variable If	'Уточнення' == '${list[0]}'	active.enquiries
 		...  	'Пропозиції' == '${list[0]}'	active.tendering
 		...  	'Аукціон' == '${list[0]}'		active.auction
@@ -163,18 +166,17 @@ ${tender_data.questions[0].answer}						css=span[tid='data.question.answer']
 	Input Text						css=input[ng-model='lot.newQuestionTitle']	${question_data.data.title}
 	Input Text						css=textarea[ng-model='lot.newQuestion']	${question_data.data.description}
 	Click Button					css=button[tid='sendQuestion']
-	Sleep							3s
-	Dismiss Alert
+	Sleep							5s
 	Wait Until Element Is Not Visible		css=div.progress.progress-bar	${COMMONWAIT}
 	Wait For Element With Reload			css=span[tid='data.quesion.date']
 
 
 Подати цінову пропозицію
 	[Arguments]  ${user_name}  ${tender_id}  ${bid}
-	Wait For Element With Reload							css=input[ng-model='newbid.amount']	5
-	Input Text		css=input[ng-model='newbid.amount']		${bid.data.value.amount}
-	Click Button	css=button[ng-click='createBid(newbid)']
-	Wait Until Element Is Visible	css=div.progress.progress-bar			${COMMONWAIT}
+	Run Keyword Unless	'Неможливість подати цінову' in '${TEST NAME}'	Wait For Element With Reload	css=input[ng-model='newbid.amount']	5
+	Input Text			css=input[ng-model='newbid.amount']		${bid.data.value.amount}
+	Click Button		css=button[ng-click='createBid(newbid)']
+	Wait Until Element Is Visible		css=div.progress.progress-bar			${COMMONWAIT}
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar			${COMMONWAIT}
 
@@ -214,7 +216,7 @@ ${tender_data.questions[0].answer}						css=span[tid='data.question.answer']
 
 Отримати посилання на аукціон для учасника
 	[Arguments]  ${user_name}  ${tender_id}
-	Wait For Element With Reload			css=div[ng-if='data.auctionUrl']	5
+	Wait For Element With Reload			xpath=//div[@ng-if='data.auctionUrl']/a	5
 	${url} = 	Get Element Attribute		xpath=//div[@ng-if='data.auctionUrl']/a@href
 	[return]  ${url}
 
@@ -309,7 +311,7 @@ Get Locator And Type
 
 Wait For Auction
 	[Arguments]	${tender_id}
-	Wait Until Keyword Succeeds	2min	10s	Try Search Auction	${tender_id}
+	Wait Until Keyword Succeeds	5min	10s	Try Search Auction	${tender_id}
 
 
 Try Search Auction
