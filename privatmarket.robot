@@ -152,7 +152,7 @@ ${tender_data.questions[0].answer}						css=span[tid='data.question.answer']
 	${active_active_period} = 	Run Keyword And Return Status	Wait Until Element Is Visible	css=div.arrow-present	5s
 
 	${locator} = 	Set Variable If	${active_active_period}	css=div.arrow-present	css=div.arrow-future
-	${status_line} = 	Get Text				css=div.arrow-present
+	${status_line} = 	Get Text				${locator}
 	@{list} = 			Split String			${status_line}
 	${status} = 		Set Variable If	'Уточнення' == '${list[0]}'	active.enquiries
 		...  	'Пропозиції' == '${list[0]}'	active.tendering
@@ -204,16 +204,22 @@ ${tender_data.questions[0].answer}						css=span[tid='data.question.answer']
 
 
 Завантажити документ в ставку
-	[Arguments]  @{args}
-	Fail	Is not implemented
-	Choose File								css=input#addProposalDocs	{args}
+	[Arguments]  ${user_name}  ${filepath}  ${tender_id}
+	debug     add file
+	Choose File								css=input#addProposalDocs					${filepath}
 	sleep									5s
 	Wait Until Element Does Not Contain		css=div.file-item			Файл не выбран
+	Click Button							css=button[ng-click='createBid(newbid)']
+	Wait Until Element Is Visible			css=div.progress.progress-bar				${COMMONWAIT}
+	Wait For Ajax
+	Wait Until Element Is Not Visible		css=div.progress.progress-bar				${COMMONWAIT}
 
 
 Змінити документ в ставці
-	[Arguments]  @{args}
-	Fail	Is not implemented
+	[Arguments]  ${user_name}  ${filepath}  ${bidid}  ${docid}
+	debug     edit file
+#	Choose File								css=input#modifyDocs	${filepath}
+#	sleep									5s
 
 
 Отримати посилання на аукціон для учасника
