@@ -14,7 +14,7 @@ ${COMMONWAIT}	10
 
 ${tender_data.title}									css=span[tid='data.title']
 ${tender_data.description}								css=span[tid='data.description']
-${tender_data.procuringEntity.name}						css=span[tid='data.procuringEntity.name']
+${tender_data.procuringEntity.name}						css=span[tid='procuringEntity.name']
 ${tender_data.value.amount}								css=span[tid='data.value.amount']
 ${tender_data.value.currency}							css=span[tid='data.value.currency']
 ${tender_data.value.valueAddedTaxIncluded}				css=span[tid='data.value.valueAddedTaxIncluded']
@@ -149,7 +149,9 @@ ${tender_data.questions[0].answer}						css=span[tid='data.question.answer']
 
 Отримати status
 	privatmarket.Оновити сторінку з тендером	status
-	Wait Until Element Is Visible				css=div.arrow-present	5s
+	${active_active_period} = 	Run Keyword And Return Status	Wait Until Element Is Visible	css=div.arrow-present	5s
+
+	${locator} = 	Set Variable If	${active_active_period}	css=div.arrow-present	css=div.arrow-future
 	${status_line} = 	Get Text				css=div.arrow-present
 	@{list} = 			Split String			${status_line}
 	${status} = 		Set Variable If	'Уточнення' == '${list[0]}'	active.enquiries
