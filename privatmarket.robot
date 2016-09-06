@@ -120,7 +120,6 @@ ${tender_data.questions[0].answer}						css=span[tid='data.question.answer']
 	[Arguments]  ${element_name}
 	${result_full} =				Get Text		${tender_data.${element_name}}
 	${result} =						Strip String	${result_full}
-	${result} =						Replace String	${result}	,	${EMPTY}
 	[return]	${result}
 
 
@@ -195,6 +194,7 @@ ${tender_data.questions[0].answer}						css=span[tid='data.question.answer']
 
 Змінити цінову пропозицію
 	[Arguments]  ${user_name}  ${tender_id}  ${name}  ${value}
+	Fail	Is not ready yet
 	Clear Element Text	css=input[ng-model='newbid.amount']
 	Input Text			css=input[ng-model='newbid.amount']		${value}
 	Click Button		css=button[ng-click='createBid(newbid)']
@@ -205,7 +205,7 @@ ${tender_data.questions[0].answer}						css=span[tid='data.question.answer']
 
 Завантажити документ в ставку
 	[Arguments]  ${user_name}  ${filepath}  ${tender_id}
-	debug     add file
+	Fail	Is not ready yet
 	Choose File								css=input#addProposalDocs					${filepath}
 	sleep									5s
 	Wait Until Element Does Not Contain		css=div.file-item			Файл не выбран
@@ -217,21 +217,22 @@ ${tender_data.questions[0].answer}						css=span[tid='data.question.answer']
 
 Змінити документ в ставці
 	[Arguments]  ${user_name}  ${filepath}  ${bidid}  ${docid}
-	debug     edit file
+	Fail	Is not ready yet
 #	Choose File								css=input#modifyDocs	${filepath}
 #	sleep									5s
 
 
 Отримати посилання на аукціон для учасника
 	[Arguments]  ${user_name}  ${tender_id}
-	Wait For Element With Reload			xpath=//div[@ng-if='data.auctionUrl']/a	5
-	${url} = 	Get Element Attribute		xpath=//div[@ng-if='data.auctionUrl']/a@href
+	Wait For Element With Reload			xpath=//div[@ng-if='data.auctionUrl']/a[contains(@href, 'https://auction-sandbox.ea.openprocurement.org')]	5
+	${url} = 	Get Element Attribute		xpath=//div[@ng-if='data.auctionUrl']/a[contains(@href, 'https://auction-sandbox.ea.openprocurement.org')]@href
 	[return]  ${url}
 
 
 Отримати посилання на аукціон для глядача
 	[Arguments]  ${user_name}  ${tender_id}
-	Отримати посилання на аукціон для учасника	${user_name}	${tender_id}
+	${url} = 	privatmarket.Отримати посилання на аукціон для учасника	${user_name}	${tender_id}
+	[return]  ${url}
 
 
 #Custom Keywords
