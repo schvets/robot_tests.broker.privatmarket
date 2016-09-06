@@ -511,6 +511,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 Відкрити детальну інформацію про позицію
 	[Arguments]  ${index}
 	${locator} = 						Set Variable			xpath=(//a[@ng-click='adb.showCl = !adb.showCl;'])[${index}]
+	Wait Until Element Is Visible		${locator}
 	${element_class} =					Get Element Attribute	${locator}@class
 	Run Keyword If	'checked-item' in '${element_class}'		Return From Keyword
 	Sleep								1s
@@ -1168,8 +1169,12 @@ Chose interface language
 
 Отримати інформацію з contracts[0].status
 	[Arguments]  ${element}
-	Wait Enable And Click Element		css=.nav-tab li:nth-of-type(3)>a
-	Click Element						${tender_data_awards[0].suppliers[0].name}
+	Run Keyword If	'статусу підписаної' in '${TEST_NAME}'			sleep	120s
+	Reload And Switch To Tab		1
+	${locator} = 						Set Variable			css=.nav-tab li:nth-of-type(3)
+	${element_class} =					Get Element Attribute	${locator}@class
+	Run Keyword Unless	'checked-nav' in '${element_class}'		Wait Enable And Click Element		css=.nav-tab li:nth-of-type(3)>a
+	Wait Enable And Click Element		${tender_data_awards[0].suppliers[0].name}
 	Wait Until Element Is Visible		${tender_data_contracts[0].status}	timeout=${COMMONWAIT}
 	${text} =		Отримати текст елемента  ${element}
 	${result} =		Set Variable If
@@ -1207,7 +1212,7 @@ Chose interface language
 Заповнити форму вимоги
 	[Arguments]  ${user}  ${complaints}  ${document}
 	Wait For Ajax
-	Wait For Element Value				css=input[ng-model='model.person.phone']
+	Wait For Element Value				css=#personPhone
 	Wait Until Element Is Visible		xpath=//input[@ng-model='model.complaint.user.title']	timeout=${COMMONWAIT}
 	Wait Until Element Is Enabled		xpath=//input[@ng-model='model.complaint.user.title']	timeout=${COMMONWAIT}
 	Input Text							xpath=//input[@ng-model='model.complaint.user.title']	${complaints.data.title}
@@ -1338,7 +1343,7 @@ Chose interface language
 	[Arguments]  ${provider}  ${tender_id}
 	privatmarket.Пошук тендера по ідентифікатору	${provider}	${tender_id}
 	Wait For Ajax
-	Switch To Tab						3
+	Wait For Element With Reload		css=button[ng-click='act.setComplaintResolved(q, false)']	3
 	Wait Enable And Click Element		css=button[ng-click='act.setComplaintResolved(q, false)']
 	Wait Until Element Contains			css=.modal.fade.in h4	Ваша вимога була успішно переведена в звернення. Чекайте наступного рішення!
 	Wait Enable And Click Element		css=#btnClose
@@ -1627,7 +1632,7 @@ Login
 	[Arguments]  ${username}
 	Click Element						xpath=//span[.='Вход']
 	Wait Until Element Is Visible		id=p24__login__field	${COMMONWAIT}
-	Execute Javascript					$('#p24__login__field').val(${USERS.users['${username}'].login})
+	Execute Javascript					$('#p24__login__field').val('+' + ${USERS.users['${username}'].login})
 	Check If Element Stale				xpath=//div[@id="login_modal" and @style='display: block;']//input[@type='password']
 	Input Text							xpath=//div[@id="login_modal" and @style='display: block;']//input[@type='password']	${USERS.users['${username}'].password}
 	Click Element						xpath=//div[@id="login_modal" and @style='display: block;']//button[@type='submit']
@@ -1638,7 +1643,7 @@ Login
 
 
 Wait For Ajax
-	sleep				2s
+#	sleep				2s
 	Wait For Condition	return window.jQuery!=undefined && jQuery.active==0	60s
 
 
@@ -1789,8 +1794,10 @@ Switch To Tab
 	Wait For Ajax
 	Wait Until Element Is Visible		xpath=(//ul[@class='widget-header-block']//a)[${tab_number}]	timeout=${COMMONWAIT}
 	${class} =	Get Element Attribute	xpath=(//ul[@class='widget-header-block']//a)[${tab_number}]@class
-	Run Keyword Unless	'white-icon' in '${class}'	Wait Visibulity And Click Element	xpath=(//ul[@class='widget-header-block']//a)[${tab_number}]
-	Wait For Ajax
+	${status} =	Set Variable If		'white-icon' in '${class}'	true	false
+	Run Keyword If	'${status}' == 'false'	Wait Visibulity And Click Element	xpath=(//ul[@class='widget-header-block']//a)[${tab_number}]
+	Run Keyword If	'${status}' == 'false'	Wait For Ajax
+
 
 
 Wait For Element With Reload
