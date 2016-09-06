@@ -114,13 +114,12 @@ def get_procurement_method_type(method_name):
 
 
 def get_doc_identifier(doc_type_name):
-    type_dictionary = {
-        'eligibility_documents': 20,
-        'qualification_documents': 21,
-        'documents': 48,
-        'financial_documents': 49
-    }
-    type_name = type_dictionary.get(doc_type_name)
+    return {
+        'eligibility_documents': u'Лицензионные документы (лицензии, сертификаты, грамоты)',
+        'qualification_documents': u'Квалификационные документы',
+        'documents': u'Технические спецификации',
+        'financial_documents': u'Смета (расчет стоимости)'
+    }.get(doc_type_name)
     return str(type_name)
 
 
