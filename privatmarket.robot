@@ -93,7 +93,7 @@ ${tender_data.questions[0].answer}						css=span[tid='data.question.answer']
 
 Отримати інформацію із тендера
 	[Arguments]  ${user_name}  ${element}
-#	if it is test of checking info by question, we have to wait for it's info comes to us (so, reload page)
+	#дождаться получения информации по поданным вопросам/ответам
 	Run Keyword If	'${element}' == 'questions[0].title'								Wait For Element With Reload			${tender_data.${element}}
 	Run Keyword If	'${element}' == 'questions[0].answer'								Wait For Element With Reload			${tender_data.${element}}
 
@@ -163,20 +163,20 @@ ${tender_data.questions[0].answer}						css=span[tid='data.question.answer']
 
 Задати питання
 	[Arguments]  ${user_name}  ${tender_id}  ${question_data}
-	Wait Until Element Is Visible	css=input[ng-model='lot.newQuestionTitle']	${COMMONWAIT}
-	Input Text						css=input[ng-model='lot.newQuestionTitle']	${question_data.data.title}
-	Input Text						css=textarea[ng-model='lot.newQuestion']	${question_data.data.description}
-	Click Button					css=button[tid='sendQuestion']
-	Sleep							5s
+	Wait Until Element Is Visible			css=input[ng-model='newQuestion.title']	${COMMONWAIT}
+	Input Text								css=input[ng-model='newQuestion.title']	${question_data.data.title}
+	Input Text								css=textarea[ng-model='newQuestion.text']	${question_data.data.description}
+	Click Button							css=button[tid='sendQuestion']
+	Sleep									5s
 	Wait Until Element Is Not Visible		css=div.progress.progress-bar	${COMMONWAIT}
 	Wait For Element With Reload			css=span[tid='data.quesion.date']
 
 
 Подати цінову пропозицію
 	[Arguments]  ${user_name}  ${tender_id}  ${bid}
-	Run Keyword Unless	'Неможливість подати цінову' in '${TEST NAME}'	Wait For Element With Reload	css=input[ng-model='newbid.amount']	5
-	Input Text			css=input[ng-model='newbid.amount']		${bid.data.value.amount}
-	Click Button		css=button[ng-click='createBid(newbid)']
+	Run Keyword Unless					'Неможливість подати цінову' in '${TEST NAME}'	Wait For Element With Reload	css=input[ng-model='newbid.amount']	5
+	Input Text							css=input[ng-model='newbid.amount']		${bid.data.value.amount}
+	Click Button						css=button[ng-click='createBid(newbid)']
 	Wait Until Element Is Visible		css=div.progress.progress-bar			${COMMONWAIT}
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar			${COMMONWAIT}
@@ -186,7 +186,7 @@ ${tender_data.questions[0].answer}						css=span[tid='data.question.answer']
 	[Arguments]  ${user_name}  ${tender_id}  ${bid}
 	Wait Until Element Is Visible		css=button[ng-click='deleteBid(bid)']	${COMMONWAIT}
 	Click Button						css=button[ng-click='deleteBid(bid)']
-	Wait Until Element Is Visible	css=div.progress.progress-bar				${COMMONWAIT}
+	Wait Until Element Is Visible		css=div.progress.progress-bar				${COMMONWAIT}
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar			${COMMONWAIT}
 	Wait Until Element Is Not Visible	css=button[ng-click='deleteBid(bid)']	${COMMONWAIT}
@@ -194,11 +194,13 @@ ${tender_data.questions[0].answer}						css=span[tid='data.question.answer']
 
 Змінити цінову пропозицію
 	[Arguments]  ${user_name}  ${tender_id}  ${name}  ${value}
-	Fail	Is not ready yet
-	Clear Element Text	css=input[ng-model='newbid.amount']
-	Input Text			css=input[ng-model='newbid.amount']		${value}
-	Click Button		css=button[ng-click='createBid(newbid)']
-	Wait Until Element Is Visible	css=div.progress.progress-bar			${COMMONWAIT}
+	Wait Until Element Is Visible		css=label[ng-click='showModifyBid()']	${COMMONWAIT}
+	Click Element						css=label[ng-click='showModifyBid()']
+	Clear Element Text					css=input[tid='bid.value.newAmount']
+	Input Text							css=input[tid='bid.value.newAmount']		${value}
+	Fail								Is not ready yet
+	Click Button						css=button[ng-click='createBid(newbid)']
+	Wait Until Element Is Visible		css=div.progress.progress-bar			${COMMONWAIT}
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar		${COMMONWAIT}
 
@@ -218,8 +220,8 @@ ${tender_data.questions[0].answer}						css=span[tid='data.question.answer']
 Змінити документ в ставці
 	[Arguments]  ${user_name}  ${filepath}  ${bidid}  ${docid}
 	Fail	Is not ready yet
-#	Choose File								css=input#modifyDocs	${filepath}
-#	sleep									5s
+	Choose File								css=input#modifyDocs	${filepath}
+	sleep									5s
 
 
 Отримати посилання на аукціон для учасника
@@ -240,8 +242,8 @@ Login
 	[Arguments]  ${username}
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar			${COMMONWAIT}
 	Sleep				5s
-	Wait Until Element Is enabled	css=a[ng-show='bankIdUrl']	${COMMONWAIT}
-	Click Element					css=a[ng-show='bankIdUrl']
+	Wait Until Element Is enabled		css=a[ng-show='bankIdUrl']	${COMMONWAIT}
+	Click Element						css=a[ng-show='bankIdUrl']
 	Wait Until Element Is Visible		css=div[id='privatBank']				5s
 	Click Element						css=div[id='privatBank']
 	Wait Until Element Is Visible		css=input[id='loginLikePhone']			5s
@@ -263,7 +265,6 @@ Login
 Wait For Ajax
 	Get Remote Url
 	Sleep     3s
-#	Wait For Angular
 
 
 Wait Until Element Not Stale
@@ -302,7 +303,6 @@ Wait For Element Value
 	${cssLocator} =	Get Substring	${locator}	4
 	Wait For Condition				return window.$($("${cssLocator}")).val()!='' && window.$($("${cssLocator}")).val()!='None'	${COMMONWAIT}
 	${value}=	get value			${locator}
-	Mark Step						_value_when_we_wait_it_${value}
 
 
 Get Locator And Type
