@@ -19,7 +19,3 @@ def get_time_with_offset(date):
     localized_date = time_zone.localize(date_obj)
     return localized_date.strftime('%Y-%m-%d %H:%M:%S.%f%z')
 
-
-def format_amount(amount):
-    amount = round(amount/100, 2)
-    return format(float(amount), '.2f')

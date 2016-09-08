@@ -1,11 +1,7 @@
 *** Settings ***
-Library  Selenium2Screenshots
 Library  String
-Library  DateTime
 Library  Selenium2Library
-Library  Collections
 Library  DebugLibrary
-Library  OperatingSystem
 Library  privatmarket_service.py
 
 
@@ -53,8 +49,6 @@ ${tender_data.questions[0].answer}						css=span[tid='data.question.answer']
 *** Keywords ***
 Підготувати дані для оголошення тендера
 	[Arguments]  ${username}  ${tender_data}  ${role_name}
-	Run keyword if	'${role_name}' != 'tender_owner'	Return From Keyword	${tender_data}
-	${tender_data.data} = 	modify_test_data	${tender_data.data}
 	[return]	${tender_data}
 
 
@@ -66,10 +60,10 @@ ${tender_data.questions[0].answer}						css=span[tid='data.question.answer']
 	${browser} =		Convert To Lowercase	${USERS.users['${username}'].browser}
 
 	${options}= 	Evaluate	sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
-	Call Method	${options}	add_argument	--allow-running-insecure-content
-	Call Method	${options}	add_argument	--disable-web-security
-	Call Method	${options}	add_argument	--start-maximized
-	Call Method	${options}	add_argument	--nativeEvents\=false
+	Call Method	${options}		add_argument	--allow-running-insecure-content
+	Call Method	${options}		add_argument	--disable-web-security
+	Call Method	${options}		add_argument	--start-maximized
+	Call Method	${options}		add_argument	--nativeEvents\=false
 
 	Run Keyword If	'phantomjs' in '${browser}'	Run Keywords	Create Webdriver	PhantomJS	${username}	service_args=${service_args}
 	...   ELSE	Create WebDriver	Chrome	chrome_options=${options}	alias=${username}
@@ -174,6 +168,7 @@ ${tender_data.questions[0].answer}						css=span[tid='data.question.answer']
 
 Подати цінову пропозицію
 	[Arguments]  ${user_name}  ${tender_id}  ${bid}
+	#дождаться появления поля ввода ссуммы только в случае выполнения позитивного теста
 	Run Keyword Unless					'Неможливість подати цінову' in '${TEST NAME}'	Wait For Element With Reload	css=input[ng-model='newbid.amount']	5
 	Input Text							css=input[ng-model='newbid.amount']		${bid.data.value.amount}
 	Click Button						css=button[ng-click='createBid(newbid)']
@@ -250,7 +245,6 @@ Login
 	Input Text							css=input[id='loginLikePhone']			+${USERS.users['${username}'].login}
 	Input Text							css=input[id='passwordLikePassword']	${USERS.users['${username}'].password}
 	Click Element						css=div[id='signInButton']
-	#TODO   these test data must be removed
 	Wait Until Element Is Visible		css=input[id='first-section']	5s
 	Input Text							css=input[id='first-section']	12
 	Input Text							css=input[id='second-section']	34
@@ -263,8 +257,8 @@ Login
 
 
 Wait For Ajax
-	Get Remote Url
-	Sleep     3s
+	Get Location
+	Sleep			3s
 
 
 Wait Until Element Not Stale
