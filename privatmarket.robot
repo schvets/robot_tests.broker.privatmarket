@@ -203,22 +203,18 @@ ${tender_data.questions[0].answer}						css=span[tid='data.question.answer']
 
 
 Завантажити документ в ставку
-	[Arguments]  ${user_name}  ${filepath}  ${tender_id}
-	Fail	Is not ready yet
-	Choose File								css=input#addProposalDocs					${filepath}
-	sleep									5s
-	Wait Until Element Does Not Contain		css=div.file-item			Файл не выбран
-	Click Button							css=button[ng-click='createBid(newbid)']
+	[Arguments]  ${user_name}  ${filepath}  ${tender_id}=${None}
+	Wait Until Element Is Visible			css=label[tid='modifyDoc']				${COMMONWAIT}
+	Choose File								css=input[id='modifyDocs']				${filepath}
 	Wait Until Element Is Visible			css=div.progress.progress-bar				${COMMONWAIT}
+	sleep									5s
 	Wait For Ajax
 	Wait Until Element Is Not Visible		css=div.progress.progress-bar				${COMMONWAIT}
 
 
 Змінити документ в ставці
 	[Arguments]  ${user_name}  ${filepath}  ${bidid}  ${docid}
-	Fail	Is not ready yet
-	Choose File								css=input#modifyDocs	${filepath}
-	sleep									5s
+	privatmarket.Завантажити документ в ставку	${user_name}	${filepath}
 
 
 Отримати посилання на аукціон для учасника
