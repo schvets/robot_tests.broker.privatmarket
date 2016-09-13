@@ -76,7 +76,7 @@ ${tender_data.questions[0].answer}						css=span[tid='data.question.answer']
 Оновити сторінку з тендером
 	[Arguments]  @{ARGUMENTS}
 	Reload Page
-	Sleep	2s
+	Sleep	3s
 
 Пошук тендера по ідентифікатору
 	[Arguments]  ${user_name}  ${tender_id}
@@ -168,8 +168,9 @@ ${tender_data.questions[0].answer}						css=span[tid='data.question.answer']
 
 Подати цінову пропозицію
 	[Arguments]  ${user_name}  ${tender_id}  ${bid}
-	#дождаться появления поля ввода ссуммы только в случае выполнения позитивного теста
-	Run Keyword Unless					'Неможливість подати цінову' in '${TEST NAME}'	Wait For Element With Reload	css=input[ng-model='newbid.amount']	5
+	#дождаться появления поля ввода ссуммы только в случае выполнения первого позитивного теста
+	Run Keyword Unless	'Неможливість подати цінову' in '${TEST NAME}' or 'подати повторно цінову' in '${TEST NAME}'
+		...  Wait For Element With Reload	css=input[ng-model='newbid.amount']	5
 	Input Text							css=input[ng-model='newbid.amount']		${bid.data.value.amount}
 	Click Button						css=button[ng-click='createBid(newbid)']
 	Wait Until Element Is Visible		css=div.progress.progress-bar			${COMMONWAIT}
@@ -179,9 +180,10 @@ ${tender_data.questions[0].answer}						css=span[tid='data.question.answer']
 
 Скасувати цінову пропозицію
 	[Arguments]  ${user_name}  ${tender_id}  ${bid}
+	Wait For Element With Reload		css=button[ng-click='deleteBid(bid)']	5
 	Wait Until Element Is Visible		css=button[ng-click='deleteBid(bid)']	${COMMONWAIT}
 	Click Button						css=button[ng-click='deleteBid(bid)']
-	Wait Until Element Is Visible		css=div.progress.progress-bar				${COMMONWAIT}
+	Wait Until Element Is Visible		css=div.progress.progress-bar			${COMMONWAIT}
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar			${COMMONWAIT}
 	Wait Until Element Is Not Visible	css=button[ng-click='deleteBid(bid)']	${COMMONWAIT}
@@ -189,34 +191,30 @@ ${tender_data.questions[0].answer}						css=span[tid='data.question.answer']
 
 Змінити цінову пропозицію
 	[Arguments]  ${user_name}  ${tender_id}  ${name}  ${value}
-	Wait Until Element Is Visible		css=label[ng-click='showModifyBid()']	${COMMONWAIT}
-	Click Element						css=label[ng-click='showModifyBid()']
+	Wait For Element With Reload		css=label[ng-click='showModifyBidOrSave(bid)']	5
+	Wait Until Element Is Visible		css=label[ng-click='showModifyBidOrSave(bid)']	${COMMONWAIT}
+	Click Element						css=label[ng-click='showModifyBidOrSave(bid)']
 	Clear Element Text					css=input[tid='bid.value.newAmount']
-	Input Text							css=input[tid='bid.value.newAmount']		${value}
-	Fail								Is not ready yet
-	Click Button						css=button[ng-click='createBid(newbid)']
-	Wait Until Element Is Visible		css=div.progress.progress-bar			${COMMONWAIT}
+	Input Text							css=input[tid='bid.value.newAmount']			${value}
+	Click Element						css=label[ng-click='showModifyBidOrSave(bid)']
+	Wait Until Element Is Visible		css=div.progress.progress-bar					${COMMONWAIT}
 	Wait For Ajax
-	Wait Until Element Is Not Visible	css=div.progress.progress-bar		${COMMONWAIT}
+	Wait Until Element Is Not Visible	css=div.progress.progress-bar					${COMMONWAIT}
 
 
 Завантажити документ в ставку
-	[Arguments]  ${user_name}  ${filepath}  ${tender_id}
-	Fail	Is not ready yet
-	Choose File								css=input#addProposalDocs					${filepath}
-	sleep									5s
-	Wait Until Element Does Not Contain		css=div.file-item			Файл не выбран
-	Click Button							css=button[ng-click='createBid(newbid)']
+	[Arguments]  ${user_name}  ${filepath}  ${tender_id}=${None}
+	Wait Until Element Is Visible			css=label[tid='modifyDoc']				${COMMONWAIT}
+	Choose File								css=input[id='modifyDocs']				${filepath}
 	Wait Until Element Is Visible			css=div.progress.progress-bar				${COMMONWAIT}
+	sleep									5s
 	Wait For Ajax
 	Wait Until Element Is Not Visible		css=div.progress.progress-bar				${COMMONWAIT}
 
 
 Змінити документ в ставці
 	[Arguments]  ${user_name}  ${filepath}  ${bidid}  ${docid}
-	Fail	Is not ready yet
-	Choose File								css=input#modifyDocs	${filepath}
-	sleep									5s
+	privatmarket.Завантажити документ в ставку	${user_name}	${filepath}
 
 
 Отримати посилання на аукціон для учасника
@@ -236,7 +234,7 @@ ${tender_data.questions[0].answer}						css=span[tid='data.question.answer']
 Login
 	[Arguments]  ${username}
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar			${COMMONWAIT}
-	Sleep				5s
+	Sleep				7s
 	Wait Until Element Is enabled		css=a[ng-show='bankIdUrl']	${COMMONWAIT}
 	Click Element						css=a[ng-show='bankIdUrl']
 	Wait Until Element Is Visible		css=div[id='privatBank']				5s
@@ -258,7 +256,7 @@ Login
 
 Wait For Ajax
 	Get Location
-	Sleep			3s
+	Sleep			4s
 
 
 Wait Until Element Not Stale
