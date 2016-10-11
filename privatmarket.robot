@@ -181,7 +181,6 @@ ${tender_data.questions[0].answer}						css=span[tid='data.question.answer']
 
 Скасувати цінову пропозицію
 	[Arguments]  ${user_name}  ${tender_id}  ${bid}
-	debug
 	Wait For Element With Reload		css=button[ng-click='deleteBid(bid)']	5
 	Wait Until Element Is Visible		css=button[ng-click='deleteBid(bid)']	${COMMONWAIT}
 	Click Button						css=button[ng-click='deleteBid(bid)']
