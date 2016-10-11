@@ -160,6 +160,7 @@ ${tender_data.questions[0].answer}						css=span[tid='data.question.answer']
 	Wait Until Element Is Visible			css=input[ng-model='newQuestion.title']	${COMMONWAIT}
 	Input Text								css=input[ng-model='newQuestion.title']	${question_data.data.title}
 	Input Text								css=textarea[ng-model='newQuestion.text']	${question_data.data.description}
+	Wait Until Element Is Enabled			css=div.ng-isolate-scope.successMessage.ng-hide
 	Click Button							css=button[tid='sendQuestion']
 	Sleep									5s
 	Wait Until Element Is Not Visible		css=div.progress.progress-bar	${COMMONWAIT}
@@ -180,6 +181,7 @@ ${tender_data.questions[0].answer}						css=span[tid='data.question.answer']
 
 Скасувати цінову пропозицію
 	[Arguments]  ${user_name}  ${tender_id}  ${bid}
+	debug
 	Wait For Element With Reload		css=button[ng-click='deleteBid(bid)']	5
 	Wait Until Element Is Visible		css=button[ng-click='deleteBid(bid)']	${COMMONWAIT}
 	Click Button						css=button[ng-click='deleteBid(bid)']
