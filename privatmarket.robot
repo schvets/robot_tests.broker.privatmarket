@@ -24,27 +24,28 @@ ${tender_data.enquiryPeriod.endDate}					css=span[tid='data.enquiryPeriod.endDat
 ${tender_data.tenderPeriod.startDate}					css=span[tid='data.tenderPeriod.startDate']
 ${tender_data.tenderPeriod.endDate}						css=span[tid='data.tenderPeriod.endDate']
 
-${tender_data.items[0].deliveryDate.endDate}			css=span[tid='item.deliveryDate.endDate']
-${tender_data.items[0].deliveryLocation.latitude}		css=span[tid='item.deliveryLocation.latitude']
-${tender_data.items[0].deliveryLocation.longitude}		css=span[tid='item.deliveryLocation.longitude']
-${tender_data.items[0].deliveryAddress.countryName}		css=span[tid='item.deliveryAddress.countryName']
-${tender_data.items[0].deliveryAddress.postalCode}		css=span[tid='item.deliveryAddress.postalCode']
-${tender_data.items[0].deliveryAddress.region}			css=span[tid='item.deliveryAddress.region']
-${tender_data.items[0].deliveryAddress.locality}		css=span[tid='item.deliveryAddress.locality']
-${tender_data.items[0].deliveryAddress.streetAddress}	css=span[tid='item.deliveryAddress.streetAddress']
-${tender_data.items[0].classification.scheme}			css=span[tid='item.classification.scheme']
-${tender_data.items[0].classification.id}				css=span[tid='item.classification.id']
-${tender_data.items[0].classification.description}		css=span[tid='item.classification.description']
-${tender_data.items[0].unit.name}						css=span[tid='item.unit.name']
-${tender_data.items[0].unit.code}						css=span[tid='item.unit.code']
-${tender_data.items[0].quantity}						css=span[tid='item.quantity']
-${tender_data.items[0].description}						css=span[tid='item.description']
+${tender_data.items.deliveryDate.endDate}			span[@tid='item.deliveryDate.endDate']
+${tender_data.items.deliveryLocation.latitude}		span[@tid='item.deliveryLocation.latitude']
+${tender_data.items.deliveryLocation.longitude}		span[@tid='item.deliveryLocation.longitude']
+${tender_data.items.deliveryAddress.countryName}	span[@tid='item.deliveryAddress.countryName']
+${tender_data.items.deliveryAddress.postalCode}		span[@tid='item.deliveryAddress.postalCode']
+${tender_data.items.deliveryAddress.region}			span[@tid='item.deliveryAddress.region']
+${tender_data.items.deliveryAddress.locality}		span[@tid='item.deliveryAddress.locality']
+${tender_data.items.deliveryAddress.streetAddress}	span[@tid='item.deliveryAddress.streetAddress']
+${tender_data.items.classification.scheme}			span[@tid='item.classification.scheme']
+${tender_data.items.classification.id}				span[@tid='item.classification.id']
+${tender_data.items.classification.description}		span[@tid='item.classification.description']
+${tender_data.items.unit.name}						span[@tid='item.unit.name']
+${tender_data.items.unit.code}						span[@tid='item.unit.code']
+${tender_data.items.quantity}						span[@tid='item.quantity']
+${tender_data.items.description}					span[@tid='item.description']
 
 ${tender_data.questions[0].title}						css=span[tid='data.question.title']
 ${tender_data.questions[0].description}					css=span[tid='data.question.description']
 ${tender_data.questions[0].date}						css=span[tid='data.quesion.date']
 ${tender_data.questions[0].answer}						css=span[tid='data.question.answer']
 
+${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 
 *** Keywords ***
 Підготувати дані для оголошення тендера
@@ -86,10 +87,7 @@ ${tender_data.questions[0].answer}						css=span[tid='data.question.answer']
 
 
 Отримати інформацію із тендера
-	[Arguments]  ${user_name}  ${element}
-	#дождаться получения информации по поданным вопросам/ответам
-	Run Keyword If	'${element}' == 'questions[0].title'								Wait For Element With Reload			${tender_data.${element}}
-	Run Keyword If	'${element}' == 'questions[0].answer'								Wait For Element With Reload			${tender_data.${element}}
+	[Arguments]  ${user_name}  ${tender_id}  ${element}
 
 	Run Keyword And Return If	'${element}' == 'status'								Отримати status
 	Run Keyword And Return If	'${element}' == 'value.amount'							Отримати число							${element}
@@ -100,12 +98,53 @@ ${tender_data.questions[0].answer}						css=span[tid='data.question.answer']
 	Run Keyword And Return If	'${element}' == 'enquiryPeriod.endDate'					Отримати дату та час					${element}
 	Run Keyword And Return If	'${element}' == 'tenderPeriod.startDate'				Отримати дату та час					${element}
 	Run Keyword And Return If	'${element}' == 'tenderPeriod.endDate'					Отримати дату та час					${element}
-	Run Keyword And Return If	'${element}' == 'items[0].deliveryDate.endDate'			Отримати дату та час					${element}
-	Run Keyword And Return If	'${element}' == 'items[0].deliveryLocation.latitude'	Отримати число							${element}
-	Run Keyword And Return If	'${element}' == 'items[0].deliveryLocation.longitude'	Отримати число							${element}
-	Run Keyword And Return If	'${element}' == 'items[0].quantity'						Отримати число							${element}
 
 	Wait Until Element Is Visible	${tender_data.${element}}	timeout=${COMMONWAIT}
+	${result} =						Отримати текст	${element}
+	[return]	${result}
+
+
+
+Отримати інформацію із предмету
+	[Arguments]  ${username}  ${tender_uaid}  ${item_id}  ${element}
+	${element} = 	Convert To String	items.${element}
+	${element_for_work} = 	Set variable		xpath=//div[@ng-repeat='item in data.items' and contains(., '${item_id}')]//${tender_data.${element}}
+
+	Run Keyword And Return If	'${element}' == 'items.deliveryDate.endDate'			Отримати дату та час			${element_for_work}
+	Run Keyword And Return If	'${element}' == 'items.deliveryLocation.latitude'		Отримати число					${element_for_work}
+	Run Keyword And Return If	'${element}' == 'items.deliveryLocation.longitude'		Отримати число					${element_for_work}
+	Run Keyword And Return If	'${element}' == 'items.quantity'						Отримати число					${element_for_work}
+
+	Wait Until Element Is Visible	${element_for_work}	timeout=${COMMONWAIT}
+	${result} =						Отримати текст	${element_for_work}
+	[return]	${result}
+
+
+Отримати інформацію із запитання
+	[Arguments]  ${username}  ${tender_uaid}  ${questions_id}  ${element}
+	${element_for_work} = 	Convert To String	questions.${element}
+	${element_for_work} = 	Set variable		xpath=//section[contains(@class, 'lot-description') and contains(., '${object_id}')]//${tender_data_${element_for_work}}
+
+	#дождаться получения информации по поданным вопросам/ответам
+	Run Keyword If	'${element}' == 'questions.title'								Wait For Element With Reload			${tender_data.${element}}
+	Run Keyword If	'${element}' == 'questions[0].answer'								Wait For Element With Reload			${tender_data.${element}}
+
+	${element} = 	Set Variable	questions[0].${element}
+
+	Wait Until Element Is Visible	${tender_data.${element}}	timeout=${COMMONWAIT}
+	${result} =						Отримати текст	${element}
+	[return]	${result}
+
+
+Отримати інформацію із документа
+	[Arguments]  ${username}  ${tender_uaid}  ${doc_id}  ${element}
+	Wait For Element With Reload			css=div[ng-click='openLotDocsModal()']
+	Click Element							css=div[ng-click='openLotDocsModal()']
+
+	${element} = 	Set Variable	doc.${element}
+
+	Wait Until Element Is Visible	${tender_data.${element}}	timeout=${COMMONWAIT}
+
 	${result} =						Отримати текст	${element}
 	[return]	${result}
 
