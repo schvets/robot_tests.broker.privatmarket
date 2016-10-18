@@ -236,10 +236,9 @@ Login
 	[Arguments]  ${username}
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar			${COMMONWAIT}
 	Sleep				7s
-	Wait Until Element Is enabled		css=a[ng-show='bankIdUrl']	${COMMONWAIT}
-	Click Element						css=a[ng-show='bankIdUrl']
-	Wait Until Element Is Visible		css=div[id='privatBank']				5s
-	Click Element						css=div[id='privatBank']
+	Wait Enable And Click Element		css=a[ng-click="loginModal('login')"]
+	Wait Enable And Click Element		xpath=//a[contains(@href, 'https://bankid.privatbank.ua')]
+
 	Wait Until Element Is Visible		css=input[id='loginLikePhone']			5s
 	Input Text							css=input[id='loginLikePhone']			+${USERS.users['${username}'].login}
 	Input Text							css=input[id='passwordLikePassword']	${USERS.users['${username}'].password}
@@ -278,7 +277,7 @@ Check If Element Stale
 
 Wait Enable And Click Element
 	[Arguments]  ${elementLocator}
-	Wait Until Element Is enabled	${elementLocator}	${COMMONWAIT}
+	Wait Until Element Is Enabled	${elementLocator}	${COMMONWAIT}
 	Click Element					${elementLocator}
 	Wait For Ajax
 
