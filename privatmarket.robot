@@ -168,10 +168,8 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 	[Arguments]  ${element}  ${tender_id}  ${doc_id}
 	${file_name} = 	Get Element Attribute	xpath=//tr[@ng-repeat='doc in docs']//a[contains(@title, '${doc_id}')]@title
 	Click Element							xpath=//tr[@ng-repeat='doc in docs']//a[contains(@title, '${doc_id}')]
-	Sleep									3s
-	${file_path} = 	Set Variable			${OUTPUT_DIR}${/}${file_name}
-	${file_data} = 	get_file_content		${file_path}
-	[return]  ${file_data}
+	Sleep									8s
+	[return]  ${file_name}
 
 
 Отримати текст елемента
@@ -235,7 +233,6 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 Отримати інформацію із пропозиції
 	[Arguments]  ${user_name}  ${tender_id}  ${field}
 	fail  get info
-
 
 
 Задати запитання на предмет
@@ -305,7 +302,7 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 	Wait Until Element Is Visible			css=label[tid='modifyDoc']				${COMMONWAIT}
 	Choose File								css=input[id='modifyDocs']				${filepath}
 	Wait Until Element Is Visible			css=div.progress.progress-bar				${COMMONWAIT}
-	sleep									5s
+	sleep									10s
 	Wait For Ajax
 	Wait Until Element Is Not Visible		css=div.progress.progress-bar				${COMMONWAIT}
 
