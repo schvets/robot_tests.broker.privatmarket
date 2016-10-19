@@ -186,7 +186,7 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 	${locator} = 	Set Variable If	${active_active_period}	css=div.arrow-present	css=div.arrow-future
 	${status_line} = 	Get Text				${locator}
 	@{list} = 			Split String			${status_line}
-	${status} = 		Set Variable If	'Уточнення' == '${list[0]}'	active.enquiries
+	${status} = 		Set Variable If	'Уточнення' == '${list[0]}'	active.tendering
 		...  	'Пропозиції' == '${list[0]}'	active.tendering
 		...  	'Аукціон' == '${list[0]}'		active.auction
 		...  	'Визначення' == '${list[0]}'	active.qualification
@@ -194,7 +194,26 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 	[return]  ${status}
 
 
-Задати питання
+Отримати інформацію із пропозиції
+	[Arguments]  ${user_name}  ${tender_id}  ${field}
+	fail  get info
+
+
+
+Задати запитання на предмет
+	[Arguments]  ${user_name}  ${tender_id}  ${item_id}  ${question_data}
+	Fail									is not implemented
+	Wait Until Element Is Visible			css=input[ng-model='newQuestion.title']	${COMMONWAIT}
+	Input Text								css=input[ng-model='newQuestion.title']	${question_data.data.title}
+	Input Text								css=textarea[ng-model='newQuestion.text']	${question_data.data.description}
+	Wait Until Element Is Enabled			css=div.ng-isolate-scope.successMessage.ng-hide
+	Click Button							css=button[tid='sendQuestion']
+	Sleep									5s
+	Wait Until Element Is Not Visible		css=div.progress.progress-bar	${COMMONWAIT}
+	Wait For Element With Reload			css=span[tid='data.quesion.date']
+
+
+Задати запитання на тендер
 	[Arguments]  ${user_name}  ${tender_id}  ${question_data}
 	Wait Until Element Is Visible			css=input[ng-model='newQuestion.title']	${COMMONWAIT}
 	Input Text								css=input[ng-model='newQuestion.title']	${question_data.data.title}
@@ -211,7 +230,8 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 	#дождаться появления поля ввода ссуммы только в случае выполнения первого позитивного теста
 	Run Keyword Unless	'Неможливість подати цінову' in '${TEST NAME}' or 'подати повторно цінову' in '${TEST NAME}'
 		...  Wait For Element With Reload	css=input[ng-model='newbid.amount']	5
-	Input Text							css=input[ng-model='newbid.amount']		${bid.data.value.amount}
+	${amount} = 						Convert To String	${bid.data.value.amount}
+	Input Text							css=input[ng-model='newbid.amount']		${amount}
 	Click Button						css=button[ng-click='createBid(newbid)']
 	Wait Until Element Is Visible		css=div.progress.progress-bar			${COMMONWAIT}
 	Wait For Ajax
