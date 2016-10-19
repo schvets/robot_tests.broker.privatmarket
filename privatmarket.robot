@@ -57,16 +57,22 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 Підготувати клієнт для користувача
 	[Arguments]  ${username}
 	[Documentation]  Відкрити брaвзер, створити обєкт api wrapper, тощо
+	${extention_dir} = 	Set variable	C:\\Users\\Oks\\AppData\\Local\\Google\\Chrome\\User Data\\Profile 5\\Extensions\\ggmdpepbjljkkkdaklfihhngmmgmpggp\\2.0_0
+	${if_dir_exist} = 	Run Keyword And Return Status	Directory Should Exist	${extention_dir}
 
 	${service_args} =	Create List	--ignore-ssl-errors=true	--ssl-protocol=tlsv1
 	${browser} =		Convert To Lowercase	${USERS.users['${username}'].browser}
+	${disabled}			Create List				Chrome PDF Viewer
+	${prefs}			Create Dictionary		download.default_directory=${OUTPUT_DIR}	plugins.plugins_disabled=${disabled}
 
 	${options}= 	Evaluate	sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
 	Call Method	${options}		add_argument	--allow-running-insecure-content
 	Call Method	${options}		add_argument	--disable-web-security
 	Call Method	${options}		add_argument	--start-maximized
 	Call Method	${options}		add_argument	--nativeEvents\=false
+	Call Method	${options}		add_experimental_option	prefs	${prefs}
 
+	Run Keyword If	${if_dir_exist} == ${TRUE}	Call Method	${options}	add_argument	--load-extension\=${extention_dir}
 	Run Keyword If	'phantomjs' in '${browser}'	Create Webdriver	PhantomJS	${username}	service_args=${service_args}
 	...   ELSE	Create WebDriver	Chrome	chrome_options=${options}	alias=${username}
 
@@ -143,8 +149,8 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 
 	${element} = 	Set Variable	doc.${element}
 
-	Run Keyword And Return If	'${element}' == 'doc.title'			Отримати заголовок документа	${element}
-	Wait Until Element Is Visible	${tender_data.${element}}	timeout=${COMMONWAIT}
+	Run Keyword And Return If		'${element}' == 'doc.title'		Отримати заголовок документа	${element}
+	Wait Until Element Is Visible	${tender_data.${element}}		timeout=${COMMONWAIT}
 
 	${result} =						Отримати текст	${element}
 	[return]	${result}
@@ -156,6 +162,16 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 	${words} =						Split String	${text}	\\
 	${result} =						Get From List	${words}	-1
 	[return]	${result}
+
+
+Отримати документ
+	[Arguments]  ${element}  ${tender_id}  ${doc_id}
+	${file_name} = 	Get Element Attribute	xpath=//tr[@ng-repeat='doc in docs']//a[contains(@title, '${doc_id}')]@title
+	Click Element							xpath=//tr[@ng-repeat='doc in docs']//a[contains(@title, '${doc_id}')]
+	Sleep									3s
+	${file_path} = 	Set Variable			${OUTPUT_DIR}${/}${file_name}
+	${file_data} = 	get_file_content		${file_path}
+	[return]  ${file_data}
 
 
 Отримати текст елемента
@@ -208,7 +224,7 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 	${locator} = 	Set Variable If	${active_active_period}	css=div.arrow-present	css=div.arrow-future
 	${status_line} = 	Get Text				${locator}
 	@{list} = 			Split String			${status_line}
-	${status} = 		Set Variable If	'Уточнення' == '${list[0]}'	active.tendering
+	${status} = 		Set Variable If	'Уточнення' == '${list[0]}'	active.enquiries
 		...  	'Пропозиції' == '${list[0]}'	active.tendering
 		...  	'Аукціон' == '${list[0]}'		active.auction
 		...  	'Визначення' == '${list[0]}'	active.qualification

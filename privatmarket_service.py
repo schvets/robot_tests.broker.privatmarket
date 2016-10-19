@@ -19,3 +19,9 @@ def get_time_with_offset(date):
     localized_date = time_zone.localize(date_obj)
     return localized_date.strftime('%Y-%m-%d %H:%M:%S.%f%z')
 
+
+def get_file_content(path_to_save_file):
+    f = open(path_to_save_file, 'r')
+    file_data = f.read()
+    f.close()
+    return file_data
