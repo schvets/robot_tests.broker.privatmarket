@@ -3,6 +3,7 @@ Library  String
 Library  Selenium2Library
 Library  DebugLibrary
 Library  privatmarket_service.py
+Library  Collections
 
 
 *** Variables ***
@@ -24,26 +25,26 @@ ${tender_data.enquiryPeriod.endDate}					css=span[tid='data.enquiryPeriod.endDat
 ${tender_data.tenderPeriod.startDate}					css=span[tid='data.tenderPeriod.startDate']
 ${tender_data.tenderPeriod.endDate}						css=span[tid='data.tenderPeriod.endDate']
 
-${tender_data.items.deliveryDate.endDate}			span[@tid='item.deliveryDate.endDate']
-${tender_data.items.deliveryLocation.latitude}		span[@tid='item.deliveryLocation.latitude']
-${tender_data.items.deliveryLocation.longitude}		span[@tid='item.deliveryLocation.longitude']
-${tender_data.items.deliveryAddress.countryName}	span[@tid='item.deliveryAddress.countryName']
-${tender_data.items.deliveryAddress.postalCode}		span[@tid='item.deliveryAddress.postalCode']
-${tender_data.items.deliveryAddress.region}			span[@tid='item.deliveryAddress.region']
-${tender_data.items.deliveryAddress.locality}		span[@tid='item.deliveryAddress.locality']
-${tender_data.items.deliveryAddress.streetAddress}	span[@tid='item.deliveryAddress.streetAddress']
-${tender_data.items.classification.scheme}			span[@tid='item.classification.scheme']
-${tender_data.items.classification.id}				span[@tid='item.classification.id']
-${tender_data.items.classification.description}		span[@tid='item.classification.description']
-${tender_data.items.unit.name}						span[@tid='item.unit.name']
-${tender_data.items.unit.code}						span[@tid='item.unit.code']
-${tender_data.items.quantity}						span[@tid='item.quantity']
-${tender_data.items.description}					span[@tid='item.description']
+${tender_data.items.deliveryDate.endDate}				span[@tid='item.deliveryDate.endDate']
+${tender_data.items.deliveryLocation.latitude}			span[@tid='item.deliveryLocation.latitude']
+${tender_data.items.deliveryLocation.longitude}			span[@tid='item.deliveryLocation.longitude']
+${tender_data.items.deliveryAddress.countryName}		span[@tid='item.deliveryAddress.countryName']
+${tender_data.items.deliveryAddress.postalCode}			span[@tid='item.deliveryAddress.postalCode']
+${tender_data.items.deliveryAddress.region}				span[@tid='item.deliveryAddress.region']
+${tender_data.items.deliveryAddress.locality}			span[@tid='item.deliveryAddress.locality']
+${tender_data.items.deliveryAddress.streetAddress}		span[@tid='item.deliveryAddress.streetAddress']
+${tender_data.items.classification.scheme}				span[@tid='item.classification.scheme']
+${tender_data.items.classification.id}					span[@tid='item.classification.id']
+${tender_data.items.classification.description}			span[@tid='item.classification.description']
+${tender_data.items.unit.name}							span[@tid='item.unit.name']
+${tender_data.items.unit.code}							span[@tid='item.unit.code']
+${tender_data.items.quantity}							span[@tid='item.quantity']
+${tender_data.items.description}						span[@tid='item.description']
 
-${tender_data.questions[0].title}						css=span[tid='data.question.title']
-${tender_data.questions[0].description}					css=span[tid='data.question.description']
-${tender_data.questions[0].date}						css=span[tid='data.quesion.date']
-${tender_data.questions[0].answer}						css=span[tid='data.question.answer']
+${tender_data.questions.title}							span[@tid='data.question.title']
+${tender_data.questions.description}					span[@tid='data.question.description']
+${tender_data.questions.date}							span[@tid='data.quesion.date']
+${tender_data.questions.answer}							span[@tid='data.question.answer']
 
 ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 
@@ -116,23 +117,22 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 	Run Keyword And Return If	'${element}' == 'items.quantity'						Отримати число					${element_for_work}
 
 	Wait Until Element Is Visible	${element_for_work}	timeout=${COMMONWAIT}
-	${result} =						Отримати текст	${element_for_work}
+	${result} =				Отримати текст елемента		${element_for_work}
 	[return]	${result}
 
 
 Отримати інформацію із запитання
 	[Arguments]  ${username}  ${tender_uaid}  ${questions_id}  ${element}
-	${element_for_work} = 	Convert To String	questions.${element}
-	${element_for_work} = 	Set variable		xpath=//section[contains(@class, 'lot-description') and contains(., '${object_id}')]//${tender_data_${element_for_work}}
+	${element} = 	Convert To String	questions.${element}
+	${element_for_work} = 	Set variable		xpath=//div[@ng-repeat='question in data.questions' and contains(., '${questions_id}')]//${tender_data.${element}}
 
 	#дождаться получения информации по поданным вопросам/ответам
-	Run Keyword If	'${element}' == 'questions.title'								Wait For Element With Reload			${tender_data.${element}}
-	Run Keyword If	'${element}' == 'questions[0].answer'								Wait For Element With Reload			${tender_data.${element}}
+	Run Keyword If	'${element}' == 'questions.title'								Wait For Element With Reload			${element_for_work}
+	Run Keyword If	'${element}' == 'questions.answer'								Wait For Element With Reload			${element_for_work}
 
-	${element} = 	Set Variable	questions[0].${element}
+	Wait Until Element Is Visible	${element_for_work}	timeout=${COMMONWAIT}
+	${result} =				Отримати текст елемента		${element_for_work}
 
-	Wait Until Element Is Visible	${tender_data.${element}}	timeout=${COMMONWAIT}
-	${result} =						Отримати текст	${element}
 	[return]	${result}
 
 
@@ -143,10 +143,32 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 
 	${element} = 	Set Variable	doc.${element}
 
+	Run Keyword And Return If	'${element}' == 'doc.title'			Отримати заголовок документа	${element}
 	Wait Until Element Is Visible	${tender_data.${element}}	timeout=${COMMONWAIT}
 
 	${result} =						Отримати текст	${element}
 	[return]	${result}
+
+
+Отримати заголовок документа
+	[Arguments]  ${element}
+	${text} =						Get Element Attribute	${tender_data.${element}}@title
+	${words} =						Split String	${text}	\\
+	${result} =						Get From List	${words}	-1
+	[return]	${result}
+
+
+Отримати текст елемента
+	[Arguments]  ${element_name}
+	${temp_name} = 					Remove String	${element_name}	'
+	${selector} = 	Set Variable If
+		...  'css=' in '${temp_name}' or 'xpath=' in '${temp_name}'	${element_name}
+		...  ${tender_data.${element_name}}
+
+	Wait Until Element Is Visible	${selector}
+	${result_full} =				Get Text		${selector}
+	${result_full} =				Strip String	${result_full}
+	[return]	${result_full}
 
 
 Отримати текст
@@ -158,14 +180,14 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 
 Отримати число
 	[Arguments]  ${element_name}
-	${value}=	Отримати текст		${element_name}
+	${value}=	Отримати текст елемента		${element_name}
 	${result}=	Convert To Number	${value}
 	[return]	${result}
 
 
 Отримати дату та час
 	[Arguments]  ${element_name}
-	${result_full} =	Отримати текст	${element_name}
+	${result_full} =	Отримати текст елемента	${element_name}
 	${result_full} =	Replace String			${result_full}	з${SPACE}	${EMPTY}
 	${result_full} =	Replace String			${result_full}	до${SPACE}	${EMPTY}
 	${result} = 		get_time_with_offset	${result_full}
@@ -174,7 +196,7 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 
 Отримати інформацію про включення ПДВ
 	[Arguments]  ${element_name}
-	${value_added_tax_included} =	Отримати текст	${element_name}
+	${value_added_tax_included} =	Отримати текст елемента	${element_name}
 	${result} =	Set Variable If	'з ПДВ' in '${value_added_tax_included}'	${True}	${False}
 	[return]  ${result}
 
