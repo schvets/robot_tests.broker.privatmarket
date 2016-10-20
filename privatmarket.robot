@@ -189,7 +189,7 @@ Wait for question
 	${file_name} =	Replace String			${file_name}	~	-
 	${file_name} =	Replace String			${file_name}	\\	%5C
 	Click Element							${tender_data.doc.title}
-	Sleep									3s
+	Sleep									8s
 	[return]	${file_name}
 
 
