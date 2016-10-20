@@ -232,20 +232,35 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 
 Отримати інформацію із пропозиції
 	[Arguments]  ${user_name}  ${tender_id}  ${field}
-	fail  get info
+	${locator} = 	Set Variable If	'${field}' == 'value.amount'	css=span[tid='bid.value.amount']	null
+	${result} = 	Get Text		${locator}
+	${result} = 	Convert To Number	${result}
+	[return]  ${result}
 
 
 Задати запитання на предмет
 	[Arguments]  ${user_name}  ${tender_id}  ${item_id}  ${question_data}
-	Fail									is not implemented
 	Wait Until Element Is Visible			css=input[ng-model='newQuestion.title']	${COMMONWAIT}
 	Input Text								css=input[ng-model='newQuestion.title']	${question_data.data.title}
 	Input Text								css=textarea[ng-model='newQuestion.text']	${question_data.data.description}
 	Wait Until Element Is Enabled			css=div.ng-isolate-scope.successMessage.ng-hide
+
+	Click Element							css=div[ng-model='newQuestion.questionOf'] span
+	Wait Enable And Click Element			xpath=//span[@class='ui-select-choices-row-inner' and contains(., '${item_id}')]
+
 	Click Button							css=button[tid='sendQuestion']
 	Sleep									5s
 	Wait Until Element Is Not Visible		css=div.progress.progress-bar	${COMMONWAIT}
-	Wait For Element With Reload			css=span[tid='data.quesion.date']
+	Wait Until Keyword Succeeds				3min	3s	Check If Question Is Uploaded	${question_data.data.title}
+
+
+Check If Question Is Uploaded
+	[Arguments]  ${title}
+	Reload Page
+	Wait For Ajax
+	Wait Enable And Click Element	css=a[ng-click='hideAddFilters = !hideAddFilters']
+	Wait Until Element Is Enabled	xpath=//div[@ng-repeat='item in data.items']//div[@ng-if='data.questions' and contains(., '${title}')]	3
+	[return]	True
 
 
 Задати запитання на тендер
@@ -254,6 +269,10 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 	Input Text								css=input[ng-model='newQuestion.title']	${question_data.data.title}
 	Input Text								css=textarea[ng-model='newQuestion.text']	${question_data.data.description}
 	Wait Until Element Is Enabled			css=div.ng-isolate-scope.successMessage.ng-hide
+
+	Click Element							css=div[ng-model='newQuestion.questionOf'] span
+	Wait Enable And Click Element			xpath=//span[@class='ui-select-choices-row-inner' and contains(., 'Загальне питання по аукціону')]
+
 	Click Button							css=button[tid='sendQuestion']
 	Sleep									5s
 	Wait Until Element Is Not Visible		css=div.progress.progress-bar	${COMMONWAIT}
@@ -262,6 +281,7 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 
 Подати цінову пропозицію
 	[Arguments]  ${user_name}  ${tender_id}  ${bid}
+	Run Keyword If	'без кваліфікації' in '${TEST NAME}'	Fail	Is not implemented yet
 	#дождаться появления поля ввода ссуммы только в случае выполнения первого позитивного теста
 	Run Keyword Unless	'Неможливість подати цінову' in '${TEST NAME}' or 'подати повторно цінову' in '${TEST NAME}'
 		...  Wait For Element With Reload	css=input[ng-model='newbid.amount']	5
@@ -286,11 +306,13 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 
 Змінити цінову пропозицію
 	[Arguments]  ${user_name}  ${tender_id}  ${name}  ${value}
+	${amount} = 						Convert To String	${value}
+
 	Wait For Element With Reload		css=label[ng-click='showModifyBidOrSave(bid)']	5
 	Wait Until Element Is Visible		css=label[ng-click='showModifyBidOrSave(bid)']	${COMMONWAIT}
 	Click Element						css=label[ng-click='showModifyBidOrSave(bid)']
 	Clear Element Text					css=input[tid='bid.value.newAmount']
-	Input Text							css=input[tid='bid.value.newAmount']			${value}
+	Input Text							css=input[tid='bid.value.newAmount']			${amount}
 	Click Element						css=label[ng-click='showModifyBidOrSave(bid)']
 	Wait Until Element Is Visible		css=div.progress.progress-bar					${COMMONWAIT}
 	Wait For Ajax
@@ -299,16 +321,16 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 
 Завантажити документ в ставку
 	[Arguments]  ${user_name}  ${filepath}  ${tender_id}=${None}
-	Wait Until Element Is Visible			css=label[tid='modifyDoc']				${COMMONWAIT}
-	Choose File								css=input[id='modifyDocs']				${filepath}
-	Wait Until Element Is Visible			css=div.progress.progress-bar				${COMMONWAIT}
+	Wait Until Element Is Visible			css=label[tid='modifyDoc']		${COMMONWAIT}
+	Choose File								css=input[id='modifyDocs']		${filepath}
+	Wait Until Element Is Visible			css=div.progress.progress-bar	${COMMONWAIT}
 	sleep									10s
 	Wait For Ajax
-	Wait Until Element Is Not Visible		css=div.progress.progress-bar				${COMMONWAIT}
+	Wait Until Element Is Not Visible		css=div.progress.progress-bar	${COMMONWAIT}
 
 
 Змінити документ в ставці
-	[Arguments]  ${user_name}  ${filepath}  ${bidid}  ${docid}
+	[Arguments]  ${user_name}  ${tender_id}  ${filepath}  ${bidid}
 	privatmarket.Завантажити документ в ставку	${user_name}	${filepath}
 
 
