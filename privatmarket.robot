@@ -189,7 +189,6 @@ Wait for question
 	${file_name} =	Replace String			${file_name}	~	-
 	${file_name} =	Replace String			${file_name}	\\	%5C
 	Click Element							${tender_data.doc.title}
-	debug
 	Sleep									3s
 	[return]	${file_name}
 
