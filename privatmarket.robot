@@ -4,7 +4,7 @@ Library  Selenium2Library
 Library  DebugLibrary
 Library  privatmarket_service.py
 Library  Collections
-
+Library  OperatingSystem
 
 *** Variables ***
 ${COMMONWAIT}	10
@@ -48,6 +48,8 @@ ${tender_data.questions.answer}							span[@tid='data.question.answer']
 
 ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 
+${tender_data.cancellations[0].status}					css=.h3.item-key
+
 *** Keywords ***
 Підготувати дані для оголошення тендера
 	[Arguments]  ${username}  ${tender_data}  ${role_name}
@@ -62,10 +64,15 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 	${browser} =		Convert To Lowercase	${USERS.users['${username}'].browser}
 
 	${options}= 	Evaluate	sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
+	${disabled}	Create List	Chrome	PDF	Viewer
+	${prefs}	Create Dictionary	download.default_directory=${OUTPUT DIR}	plugins.plugins_disabled=${disabled}
+	Call Method	${options}		add_experimental_option	prefs	${prefs}
 	Call Method	${options}		add_argument	--allow-running-insecure-content
 	Call Method	${options}		add_argument	--disable-web-security
 	Call Method	${options}		add_argument	--start-maximized
 	Call Method	${options}		add_argument	--nativeEvents\=false
+	Call Method	${options}		add_argument	browser.download.dir
+
 
 	Run Keyword If	'phantomjs' in '${browser}'	Create Webdriver	PhantomJS	${username}	service_args=${service_args}
 	...   ELSE	Create WebDriver	Chrome	chrome_options=${options}	alias=${username}
@@ -108,8 +115,9 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 
 Отримати інформацію із предмету
 	[Arguments]  ${username}  ${tender_uaid}  ${item_id}  ${element}
-	${element} = 	Convert To String	items.${element}
+	${element} = 			Convert To String	items.${element}
 	${element_for_work} = 	Set variable		xpath=//div[@ng-repeat='item in data.items' and contains(., '${item_id}')]//${tender_data.${element}}
+	Wait For Element With Reload				${element_for_work}
 
 	Run Keyword And Return If	'${element}' == 'items.deliveryDate.endDate'			Отримати дату та час			${element_for_work}
 	Run Keyword And Return If	'${element}' == 'items.deliveryLocation.latitude'		Отримати число					${element_for_work}
@@ -123,29 +131,33 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 
 Отримати інформацію із запитання
 	[Arguments]  ${username}  ${tender_uaid}  ${questions_id}  ${element}
-	${element} = 	Convert To String	questions.${element}
-	${element_for_work} = 	Set variable		xpath=//div[@ng-repeat='question in data.questions' and contains(., '${questions_id}')]//${tender_data.${element}}
-
-	#дождаться получения информации по поданным вопросам/ответам
-	Run Keyword If	'${element}' == 'questions.title'								Wait For Element With Reload			${element_for_work}
-	Run Keyword If	'${element}' == 'questions.answer'								Wait For Element With Reload			${element_for_work}
-
-	Wait Until Element Is Visible	${element_for_work}	timeout=${COMMONWAIT}
+	${element} = 			Convert To String			questions.${element}
+	${element_for_work} = 	Set variable				xpath=//div[contains(@class, 'questionsBox') and contains(., '${questions_id}')]//${tender_data.${element}}
+	Wait Until Keyword Succeeds							1min	5s	Wait for question	${element_for_work}
 	${result} =				Отримати текст елемента		${element_for_work}
-
 	[return]	${result}
+
+
+Wait for question
+	[Arguments]  ${element}
+	Reload Page
+	@{open_questions}		Get Webelements	css=a.glyphicon
+
+	:FOR    ${open_question}    IN    @{open_questions}
+	\    Click Element  	${open_question}
+
+	Wait Until Element Is Visible	${element}	2
 
 
 Отримати інформацію із документа
 	[Arguments]  ${username}  ${tender_uaid}  ${doc_id}  ${element}
 	Wait For Element With Reload			css=div[ng-click='openLotDocsModal()']
 	Click Element							css=div[ng-click='openLotDocsModal()']
-
 	${element} = 	Set Variable	doc.${element}
 
 	Run Keyword And Return If	'${element}' == 'doc.title'			Отримати заголовок документа	${element}
-	Wait Until Element Is Visible	${tender_data.${element}}	timeout=${COMMONWAIT}
 
+	Wait Until Element Is Visible	${tender_data.${element}}	timeout=${COMMONWAIT}
 	${result} =						Отримати текст	${element}
 	[return]	${result}
 
@@ -169,6 +181,18 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 	${result_full} =				Get Text		${selector}
 	${result_full} =				Strip String	${result_full}
 	[return]	${result_full}
+
+
+Отримати документ
+	[Arguments]  ${username}  ${tender_uaid}  ${doc_id}
+	${file_name} =	Get Element Attribute	${tender_data.doc.title}@title
+	${file_name} =	Replace String			${file_name}	:	-
+	${file_name} =	Replace String			${file_name}	~	-
+	${file_name} =	Replace String			${file_name}	\\	%5C
+	Click Element							${tender_data.doc.title}
+	debug
+	Sleep									3s
+	[return]	${file_name}
 
 
 Отримати текст
