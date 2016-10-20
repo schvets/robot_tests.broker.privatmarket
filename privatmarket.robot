@@ -4,7 +4,7 @@ Library  Selenium2Library
 Library  DebugLibrary
 Library  privatmarket_service.py
 Library  Collections
-Library  OperatingSystem
+
 
 *** Variables ***
 ${COMMONWAIT}	10
@@ -48,8 +48,6 @@ ${tender_data.questions.answer}							span[@tid='data.question.answer']
 
 ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 
-${tender_data.cancellations[0].status}					css=.h3.item-key
-
 *** Keywords ***
 Підготувати дані для оголошення тендера
 	[Arguments]  ${username}  ${tender_data}  ${role_name}
@@ -59,21 +57,22 @@ ${tender_data.cancellations[0].status}					css=.h3.item-key
 Підготувати клієнт для користувача
 	[Arguments]  ${username}
 	[Documentation]  Відкрити брaвзер, створити обєкт api wrapper, тощо
+	${extention_dir} = 	Set variable	C:\\Users\\Oks\\AppData\\Local\\Google\\Chrome\\User Data\\Profile 5\\Extensions\\ggmdpepbjljkkkdaklfihhngmmgmpggp\\2.0_0
+	${if_dir_exist} = 	Run Keyword And Return Status	Directory Should Exist	${extention_dir}
 
 	${service_args} =	Create List	--ignore-ssl-errors=true	--ssl-protocol=tlsv1
 	${browser} =		Convert To Lowercase	${USERS.users['${username}'].browser}
+	${disabled}			Create List				Chrome PDF Viewer
+	${prefs}			Create Dictionary		download.default_directory=${OUTPUT_DIR}	plugins.plugins_disabled=${disabled}
 
 	${options}= 	Evaluate	sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
-	${disabled}	Create List	Chrome	PDF	Viewer
-	${prefs}	Create Dictionary	download.default_directory=${OUTPUT DIR}	plugins.plugins_disabled=${disabled}
-	Call Method	${options}		add_experimental_option	prefs	${prefs}
 	Call Method	${options}		add_argument	--allow-running-insecure-content
 	Call Method	${options}		add_argument	--disable-web-security
 	Call Method	${options}		add_argument	--start-maximized
 	Call Method	${options}		add_argument	--nativeEvents\=false
-	Call Method	${options}		add_argument	browser.download.dir
+	Call Method	${options}		add_experimental_option	prefs	${prefs}
 
-
+	Run Keyword If	${if_dir_exist} == ${TRUE}	Call Method	${options}	add_argument	--load-extension\=${extention_dir}
 	Run Keyword If	'phantomjs' in '${browser}'	Create Webdriver	PhantomJS	${username}	service_args=${service_args}
 	...   ELSE	Create WebDriver	Chrome	chrome_options=${options}	alias=${username}
 
@@ -240,12 +239,49 @@ Wait for question
 	[return]  ${status}
 
 
-Задати питання
+Отримати інформацію із пропозиції
+	[Arguments]  ${user_name}  ${tender_id}  ${field}
+	${locator} = 	Set Variable If	'${field}' == 'value.amount'	css=span[tid='bid.value.amount']	null
+	${result} = 	Get Text		${locator}
+	${result} = 	Convert To Number	${result}
+	[return]  ${result}
+
+
+Задати запитання на предмет
+	[Arguments]  ${user_name}  ${tender_id}  ${item_id}  ${question_data}
+	Wait Until Element Is Visible			css=input[ng-model='newQuestion.title']	${COMMONWAIT}
+	Input Text								css=input[ng-model='newQuestion.title']	${question_data.data.title}
+	Input Text								css=textarea[ng-model='newQuestion.text']	${question_data.data.description}
+	Wait Until Element Is Enabled			css=div.ng-isolate-scope.successMessage.ng-hide
+
+	Click Element							css=div[ng-model='newQuestion.questionOf'] span
+	Wait Enable And Click Element			xpath=//span[@class='ui-select-choices-row-inner' and contains(., '${item_id}')]
+
+	Click Button							css=button[tid='sendQuestion']
+	Sleep									5s
+	Wait Until Element Is Not Visible		css=div.progress.progress-bar	${COMMONWAIT}
+	Wait Until Keyword Succeeds				3min	3s	Check If Question Is Uploaded	${question_data.data.title}
+
+
+Check If Question Is Uploaded
+	[Arguments]  ${title}
+	Reload Page
+	Wait For Ajax
+	Wait Enable And Click Element	css=a[ng-click='hideAddFilters = !hideAddFilters']
+	Wait Until Element Is Enabled	xpath=//div[@ng-repeat='item in data.items']//div[@ng-if='data.questions' and contains(., '${title}')]	3
+	[return]	True
+
+
+Задати запитання на тендер
 	[Arguments]  ${user_name}  ${tender_id}  ${question_data}
 	Wait Until Element Is Visible			css=input[ng-model='newQuestion.title']	${COMMONWAIT}
 	Input Text								css=input[ng-model='newQuestion.title']	${question_data.data.title}
 	Input Text								css=textarea[ng-model='newQuestion.text']	${question_data.data.description}
 	Wait Until Element Is Enabled			css=div.ng-isolate-scope.successMessage.ng-hide
+
+	Click Element							css=div[ng-model='newQuestion.questionOf'] span
+	Wait Enable And Click Element			xpath=//span[@class='ui-select-choices-row-inner' and contains(., 'Загальне питання по аукціону')]
+
 	Click Button							css=button[tid='sendQuestion']
 	Sleep									5s
 	Wait Until Element Is Not Visible		css=div.progress.progress-bar	${COMMONWAIT}
@@ -254,10 +290,12 @@ Wait for question
 
 Подати цінову пропозицію
 	[Arguments]  ${user_name}  ${tender_id}  ${bid}
+	Run Keyword If	'без кваліфікації' in '${TEST NAME}'	Fail	Is not implemented yet
 	#дождаться появления поля ввода ссуммы только в случае выполнения первого позитивного теста
 	Run Keyword Unless	'Неможливість подати цінову' in '${TEST NAME}' or 'подати повторно цінову' in '${TEST NAME}'
 		...  Wait For Element With Reload	css=input[ng-model='newbid.amount']	5
-	Input Text							css=input[ng-model='newbid.amount']		${bid.data.value.amount}
+	${amount} = 						Convert To String	${bid.data.value.amount}
+	Input Text							css=input[ng-model='newbid.amount']		${amount}
 	Click Button						css=button[ng-click='createBid(newbid)']
 	Wait Until Element Is Visible		css=div.progress.progress-bar			${COMMONWAIT}
 	Wait For Ajax
@@ -277,11 +315,13 @@ Wait for question
 
 Змінити цінову пропозицію
 	[Arguments]  ${user_name}  ${tender_id}  ${name}  ${value}
+	${amount} = 						Convert To String	${value}
+
 	Wait For Element With Reload		css=label[ng-click='showModifyBidOrSave(bid)']	5
 	Wait Until Element Is Visible		css=label[ng-click='showModifyBidOrSave(bid)']	${COMMONWAIT}
 	Click Element						css=label[ng-click='showModifyBidOrSave(bid)']
 	Clear Element Text					css=input[tid='bid.value.newAmount']
-	Input Text							css=input[tid='bid.value.newAmount']			${value}
+	Input Text							css=input[tid='bid.value.newAmount']			${amount}
 	Click Element						css=label[ng-click='showModifyBidOrSave(bid)']
 	Wait Until Element Is Visible		css=div.progress.progress-bar					${COMMONWAIT}
 	Wait For Ajax
@@ -290,16 +330,16 @@ Wait for question
 
 Завантажити документ в ставку
 	[Arguments]  ${user_name}  ${filepath}  ${tender_id}=${None}
-	Wait Until Element Is Visible			css=label[tid='modifyDoc']				${COMMONWAIT}
-	Choose File								css=input[id='modifyDocs']				${filepath}
-	Wait Until Element Is Visible			css=div.progress.progress-bar				${COMMONWAIT}
-	sleep									5s
+	Wait Until Element Is Visible			css=label[tid='modifyDoc']		${COMMONWAIT}
+	Choose File								css=input[id='modifyDocs']		${filepath}
+	Wait Until Element Is Visible			css=div.progress.progress-bar	${COMMONWAIT}
+	sleep									10s
 	Wait For Ajax
-	Wait Until Element Is Not Visible		css=div.progress.progress-bar				${COMMONWAIT}
+	Wait Until Element Is Not Visible		css=div.progress.progress-bar	${COMMONWAIT}
 
 
 Змінити документ в ставці
-	[Arguments]  ${user_name}  ${filepath}  ${bidid}  ${docid}
+	[Arguments]  ${user_name}  ${tender_id}  ${filepath}  ${bidid}
 	privatmarket.Завантажити документ в ставку	${user_name}	${filepath}
 
 
@@ -321,10 +361,9 @@ Login
 	[Arguments]  ${username}
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar			${COMMONWAIT}
 	Sleep				7s
-	Wait Until Element Is enabled		css=a[ng-show='bankIdUrl']	${COMMONWAIT}
-	Click Element						css=a[ng-show='bankIdUrl']
-	Wait Until Element Is Visible		css=div[id='privatBank']				5s
-	Click Element						css=div[id='privatBank']
+	Wait Enable And Click Element		css=a[ng-click="loginModal('login')"]
+	Wait Enable And Click Element		xpath=//a[contains(@href, 'https://bankid.privatbank.ua')]
+
 	Wait Until Element Is Visible		css=input[id='loginLikePhone']			5s
 	Input Text							css=input[id='loginLikePhone']			+${USERS.users['${username}'].login}
 	Input Text							css=input[id='passwordLikePassword']	${USERS.users['${username}'].password}
@@ -363,7 +402,7 @@ Check If Element Stale
 
 Wait Enable And Click Element
 	[Arguments]  ${elementLocator}
-	Wait Until Element Is enabled	${elementLocator}	${COMMONWAIT}
+	Wait Until Element Is Enabled	${elementLocator}	${COMMONWAIT}
 	Click Element					${elementLocator}
 	Wait For Ajax
 
