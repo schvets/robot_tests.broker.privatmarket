@@ -342,7 +342,7 @@ Check If Question Is Uploaded
 
 
 Отримати посилання на аукціон для глядача
-	[Arguments]  ${user_name}  ${tender_id}
+	[Arguments]  ${user_name}  ${tender_id}  ${lot_id}
 	${url} = 	privatmarket.Отримати посилання на аукціон для учасника	${user_name}	${tender_id}
 	[return]  ${url}
 
