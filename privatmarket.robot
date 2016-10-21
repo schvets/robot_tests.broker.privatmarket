@@ -114,8 +114,9 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 
 Отримати інформацію із предмету
 	[Arguments]  ${username}  ${tender_uaid}  ${item_id}  ${element}
-	${element} = 	Convert To String	items.${element}
+	${element} = 			Convert To String	items.${element}
 	${element_for_work} = 	Set variable		xpath=//div[@ng-repeat='item in data.items' and contains(., '${item_id}')]//${tender_data.${element}}
+	Wait For Element With Reload				${element_for_work}
 
 	Run Keyword And Return If	'${element}' == 'items.deliveryDate.endDate'			Отримати дату та час			${element_for_work}
 	Run Keyword And Return If	'${element}' == 'items.deliveryLocation.latitude'		Отримати число					${element_for_work}
@@ -129,29 +130,33 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 
 Отримати інформацію із запитання
 	[Arguments]  ${username}  ${tender_uaid}  ${questions_id}  ${element}
-	${element} = 	Convert To String	questions.${element}
-	${element_for_work} = 	Set variable		xpath=//div[@ng-repeat='question in data.questions' and contains(., '${questions_id}')]//${tender_data.${element}}
-
-	#дождаться получения информации по поданным вопросам/ответам
-	Run Keyword If	'${element}' == 'questions.title'								Wait For Element With Reload			${element_for_work}
-	Run Keyword If	'${element}' == 'questions.answer'								Wait For Element With Reload			${element_for_work}
-
-	Wait Until Element Is Visible	${element_for_work}	timeout=${COMMONWAIT}
+	${element} = 			Convert To String			questions.${element}
+	${element_for_work} = 	Set variable				xpath=//div[contains(@class, 'questionsBox') and contains(., '${questions_id}')]//${tender_data.${element}}
+	Wait Until Keyword Succeeds							1min	5s	Wait for question	${element_for_work}
 	${result} =				Отримати текст елемента		${element_for_work}
-
 	[return]	${result}
+
+
+Wait for question
+	[Arguments]  ${element}
+	Reload Page
+	@{open_questions}		Get Webelements	css=a.glyphicon
+
+	:FOR    ${open_question}    IN    @{open_questions}
+	\    Click Element  	${open_question}
+
+	Wait Until Element Is Visible	${element}	2
 
 
 Отримати інформацію із документа
 	[Arguments]  ${username}  ${tender_uaid}  ${doc_id}  ${element}
 	Wait For Element With Reload			css=div[ng-click='openLotDocsModal()']
 	Click Element							css=div[ng-click='openLotDocsModal()']
-
 	${element} = 	Set Variable	doc.${element}
 
-	Run Keyword And Return If		'${element}' == 'doc.title'		Отримати заголовок документа	${element}
-	Wait Until Element Is Visible	${tender_data.${element}}		timeout=${COMMONWAIT}
+	Run Keyword And Return If	'${element}' == 'doc.title'			Отримати заголовок документа	${element}
 
+	Wait Until Element Is Visible	${tender_data.${element}}	timeout=${COMMONWAIT}
 	${result} =						Отримати текст	${element}
 	[return]	${result}
 
@@ -162,14 +167,6 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 	${words} =						Split String	${text}	\\
 	${result} =						Get From List	${words}	-1
 	[return]	${result}
-
-
-Отримати документ
-	[Arguments]  ${element}  ${tender_id}  ${doc_id}
-	${file_name} = 	Get Element Attribute	xpath=//tr[@ng-repeat='doc in docs']//a[contains(@title, '${doc_id}')]@title
-	Click Element							xpath=//tr[@ng-repeat='doc in docs']//a[contains(@title, '${doc_id}')]
-	Sleep									8s
-	[return]  ${file_name}
 
 
 Отримати текст елемента
@@ -183,6 +180,17 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 	${result_full} =				Get Text		${selector}
 	${result_full} =				Strip String	${result_full}
 	[return]	${result_full}
+
+
+Отримати документ
+	[Arguments]  ${username}  ${tender_uaid}  ${doc_id}
+	${file_name} =	Get Element Attribute	${tender_data.doc.title}@title
+	${file_name} =	Replace String			${file_name}	:	-
+	${file_name} =	Replace String			${file_name}	~	-
+	${file_name} =	Replace String			${file_name}	\\	%5C
+	Click Element							${tender_data.doc.title}
+	Sleep									8s
+	[return]	${file_name}
 
 
 Отримати текст
