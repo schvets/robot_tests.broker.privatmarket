@@ -112,6 +112,53 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 
 
 
+Створити тендер
+	[Arguments]  @{ARGUMENTS}
+	${items} = 	Get From Dictionary	${ARGUMENTS[1].data}	items
+	Wait Enable And Click Element			css=#simple-dropdown
+	Wait Enable And Click Element			css=a[href='#/add-lot']
+	Wait Until Element Is Enabled			css=input[tid='data.title']
+	Input text								css=input[tid='data.title']	${ARGUMENTS[1].data.title}
+	Select From List						css=select[tid='data.procurementMethodType']	string:${mode}
+	Input text								css=input[tid='data.value.amount']	'${ARGUMENTS[1].data.value.amount}'
+	Run Keyword If	'${ARGUMENTS[1].data.value.valueAddedTaxIncluded}' == 'True'	Click Element	css=input[tid='data.value.valueAddedTaxIncluded']
+		...  ELSE	Click Element	css=input[tid='data.value.valueAddedTaxNotIncluded']
+	Input text								css=input[tid='data.minimalStep.amount']	'${ARGUMENTS[1].data.minimalStep.amount}'
+	Click Button							css=button[tid='add.item']
+	Wait Until Element Is Enabled			css=input[tid='item.description']
+	Input text								css=input[tid='item.description']	${items[0].description}
+	Select From List						css=select[tid='item.classification.scheme']	string:${items[0].classification.scheme}
+	Click Element							css=div[tid='classification'] input
+	Input text								css=div[tid='classification'] input	 05040000-7
+
+#	Input text								css=div[tid='classification'] input	${items[0].classification.id}
+#	Wait Until Element Is Visible			xpath=//b/span[contains(., '${items[0].classification.id}')]04000000-8
+#	Click Element							xpath=//b/span[contains(., '${items[0].classification.id}')]
+
+	Wait Enable And Click Element			xpath=//b/span[contains(., ' 05040000-7')]
+
+#	Wait Until Element Is Visible			xpath=//b/span[contains(., '05093000-3')]
+#	Click Element							xpath=//b/span[contains(., '05093000-3')]
+
+	Input text								css=input[tid='item.classification.description']	${items[0].classification.description}
+
+	Input text								css=input[tid='item.address.countryName']	${items[0].deliveryAddress.countryName}
+	Input text								css=input[tid='item.address.postalCode']	${items[0].deliveryAddress.postalCode}
+	Input text								css=input[tid='item.address.region']	${items[0].deliveryAddress.region}
+	Input text								css=input[tid='item.address.streetAddress']	${items[0].deliveryAddress.streetAddress}
+	Input text								css=input[tid='item.address.locality']	${items[0].deliveryAddress.locality}
+
+	Input text								css=input[tid='item.unit.code']	${items[0].unit.code}
+	Input text								css=input[tid='item.unit.name']	${items[0].unit.name}
+
+	Input text								css=input[tid='item.quantity']	${number_of_items}
+
+	Set Date And Time						css=input[tid='auctionStartDate']	xpath=(//input[@ng-model='hours'])[1]	xpath=(//input[@ng-model='minutes'])[1]	${ARGUMENTS[1].data.auctionPeriod.startDate}
+	click button							css=button[tid='btn.createlot']
+	debug
+
+
+
 Отримати інформацію із предмету
 	[Arguments]  ${username}  ${tender_uaid}  ${item_id}  ${element}
 	${element} = 			Convert To String	items.${element}
@@ -471,5 +518,26 @@ Wait For Element With Reload
 	[Arguments]  ${locator}  ${time_to_wait}=2
 	Wait Until Keyword Succeeds			${time_to_wait}min	3s	Try Search Element	${locator}
 
+Set Date
+	[Arguments]  ${element}  ${date}
+	${locator}  ${type} = 	Get Locator And Type	${element}
+	${correctDate} =	Get Regexp Matches	${date}	(\\d{4}-\\d{2}-\\d{2})	1
+	${correctDate} =	Convert Date		${correctDate[0]}	result_format=%d-%m-%Y
+	${correctDate} =	Convert To String	${correctDate}
+	Input Text	${element}	${correctDate}
 
+
+Set Time
+	[Arguments]  ${element_hour}  ${element_min}  ${date}
+	${hour} =	Get Regexp Matches	${date}	T(\\d{2}):\\d{2}	1
+	${min} =	Get Regexp Matches	${date}	T\\d{2}:(\\d{2})	1
+	Input Text	${element_hour}	${hour}
+	Input Text	${element_min}	${min}
+
+
+Set Date And Time
+	[Arguments]  ${date_element}  ${element_hour}  ${element_min}  ${date}
+	Wait Until Element Is Visible	${element_min}	timeout=${COMMONWAIT}
+	Set Date	${date_element}	${date}
+	Set Time	${element_hour}	${element_min}	${date}
 
