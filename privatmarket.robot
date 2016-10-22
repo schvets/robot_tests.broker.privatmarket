@@ -4,6 +4,7 @@ Library  Selenium2Library
 Library  DebugLibrary
 Library  privatmarket_service.py
 Library  Collections
+Library  BuiltIn
 
 
 *** Variables ***
@@ -86,6 +87,7 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 	Reload Page
 	Sleep	3s
 
+
 Пошук тендера по ідентифікатору
 	[Arguments]  ${user_name}  ${tender_id}
 	Wait For Auction						${tender_id}
@@ -111,52 +113,54 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 	[return]	${result}
 
 
-
 Створити тендер
-	[Arguments]  @{ARGUMENTS}
-	${items} = 	Get From Dictionary	${ARGUMENTS[1].data}	items
+	[Arguments]  ${user_name}  ${tender_data}
+	${items} = 	Get From Dictionary	${tender_data.data}	items
 	Wait Enable And Click Element			css=#simple-dropdown
 	Wait Enable And Click Element			css=a[href='#/add-lot']
+
+	#main info
 	Wait Until Element Is Enabled			css=input[tid='data.title']
-	Input text								css=input[tid='data.title']	${ARGUMENTS[1].data.title}
+	Input text								css=input[tid='data.title']	${tender_data.data.title}
 	Select From List						css=select[tid='data.procurementMethodType']	string:${mode}
-	Input text								css=input[tid='data.value.amount']	'${ARGUMENTS[1].data.value.amount}'
-	Run Keyword If	'${ARGUMENTS[1].data.value.valueAddedTaxIncluded}' == 'True'	Click Element	css=input[tid='data.value.valueAddedTaxIncluded']
+	Input text								css=input[tid='data.value.amount']	'${tender_data.data.value.amount}'
+	Run Keyword If	'${tender_data.data.value.valueAddedTaxIncluded}' == 'True'	Click Element	css=input[tid='data.value.valueAddedTaxIncluded']
 		...  ELSE	Click Element	css=input[tid='data.value.valueAddedTaxNotIncluded']
-	Input text								css=input[tid='data.minimalStep.amount']	'${ARGUMENTS[1].data.minimalStep.amount}'
+	Input text								css=input[tid='data.minimalStep.amount']	'${tender_data.data.minimalStep.amount}'
+
+	#item
 	Click Button							css=button[tid='add.item']
 	Wait Until Element Is Enabled			css=input[tid='item.description']
 	Input text								css=input[tid='item.description']	${items[0].description}
 	Select From List						css=select[tid='item.classification.scheme']	string:${items[0].classification.scheme}
-	Click Element							css=div[tid='classification'] input
-	Input text								css=div[tid='classification'] input	 05040000-7
 
-#	Input text								css=div[tid='classification'] input	${items[0].classification.id}
-#	Wait Until Element Is Visible			xpath=//b/span[contains(., '${items[0].classification.id}')]04000000-8
-#	Click Element							xpath=//b/span[contains(., '${items[0].classification.id}')]
-
-	Wait Enable And Click Element			xpath=//b/span[contains(., ' 05040000-7')]
-
-#	Wait Until Element Is Visible			xpath=//b/span[contains(., '05093000-3')]
-#	Click Element							xpath=//b/span[contains(., '05093000-3')]
-
+	#classification
+	#TODO   delete sub+eval
+	${length} = 							Get Length		${items[0].classification.id}
+	${length} = 							Evaluate		${length} - 2
+	${sub_id} = 							Get Substring	${items[0].classification.id}	0	${length}
+	Input text								css=div[tid='classification'] input	${sub_id}
+	Wait Until Element Is Enabled			css=ul.ui-select-choices-content
+	Wait Enable And Click Element			xpath=//span[@class='ui-select-choices-row-inner' and contains(., '${items[0].classification.id}')]
 	Input text								css=input[tid='item.classification.description']	${items[0].classification.description}
 
+	#address
 	Input text								css=input[tid='item.address.countryName']	${items[0].deliveryAddress.countryName}
 	Input text								css=input[tid='item.address.postalCode']	${items[0].deliveryAddress.postalCode}
 	Input text								css=input[tid='item.address.region']	${items[0].deliveryAddress.region}
 	Input text								css=input[tid='item.address.streetAddress']	${items[0].deliveryAddress.streetAddress}
 	Input text								css=input[tid='item.address.locality']	${items[0].deliveryAddress.locality}
 
+	#quantity
 	Input text								css=input[tid='item.unit.code']	${items[0].unit.code}
 	Input text								css=input[tid='item.unit.name']	${items[0].unit.name}
+	Input text								css=input[tid='item.quantity']	${items[0].quantity}
 
-	Input text								css=input[tid='item.quantity']	${number_of_items}
-
-	Set Date And Time						css=input[tid='auctionStartDate']	xpath=(//input[@ng-model='hours'])[1]	xpath=(//input[@ng-model='minutes'])[1]	${ARGUMENTS[1].data.auctionPeriod.startDate}
+	#date/time
+	Set Date And Time						css=input[tid='auctionStartDate']	xpath=(//input[@ng-model='hours'])[1]	xpath=(//input[@ng-model='minutes'])[1]	${tender_data.data.auctionPeriod.startDate}
+	Set Date And Time						css=input[tid='auctionStartDate']	xpath=(//input[@ng-model='hours'])[1]	xpath=(//input[@ng-model='minutes'])[1]	${tender_data.data.auctionPeriod.startDate}
 	click button							css=button[tid='btn.createlot']
-	debug
-
+	# Todo   finish test
 
 
 Отримати інформацію із предмету
