@@ -138,6 +138,7 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 	Set Date And Time						css=input[tid='auctionStartDate']	xpath=(//input[@ng-model='hours'])[1]	xpath=(//input[@ng-model='minutes'])[1]	${tender_data.data.auctionPeriod.startDate}
 	click button							css=button[tid='btn.createlot']
 	# Todo   finish test
+	debug   finish test
 
 
 Пошук тендера по ідентифікатору
@@ -155,12 +156,7 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 	Run Keyword And Return If	'${element}' == 'value.valueAddedTaxIncluded'			Отримати інформацію про включення ПДВ	${element}
 	Run Keyword And Return If	'${element}' == 'minimalStep.amount'					Отримати число							${element}
 	Run Keyword And Return If	'${element}' == 'minimalStep.valueAddedTaxIncluded'		Отримати інформацію про включення ПДВ	${element}
-	Run Keyword And Return If	'${element}' == 'enquiryPeriod.startDate'				Отримати дату та час					${element}
-	Run Keyword And Return If	'${element}' == 'enquiryPeriod.endDate'					Отримати дату та час					${element}
-	Run Keyword And Return If	'${element}' == 'tenderPeriod.startDate'				Отримати дату та час					${element}
-	Run Keyword And Return If	'${element}' == 'tenderPeriod.endDate'					Отримати дату та час					${element}
-	Run Keyword And Return If	'${element}' == 'auctionPeriod.endDate'					Отримати дату та час					${element}
-	Run Keyword And Return If	'${element}' == 'auctionPeriod.startDate'				Отримати дату та час					${element}
+	Run Keyword And Return If	'Period.' in '${element}'								Отримати дату та час					${element}
 
 	Wait Until Element Is Visible	${tender_data.${element}}	timeout=${COMMONWAIT}
 	${result} =						Отримати текст	${element}
@@ -286,9 +282,9 @@ Wait for question
 	${status_line} = 	Get Text				${locator}
 	@{list} = 			Split String			${status_line}
 	${status} = 		Set Variable If	'Уточнення' == '${list[0]}'	active.enquiries
-		...  	'Пропозиції' == '${list[0]}'			active.tendering
-		...  	'Аукціон' == '${list[0]}'				active.auction
-		...  	'Визначення переможця' == '${list[0]}'	active.qualification
+		...  	'Пропозиції' in '${list[0]}'			active.tendering
+		...  	'Аукціон'in '${list[0]}'				active.auction
+		...  	'Визначення переможця' in '${list[0]}'	active.qualification
 		...  	Anknown: ${status_line}
 	[return]  ${status}
 
