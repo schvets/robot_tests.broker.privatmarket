@@ -115,8 +115,10 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 Створити тендер
 	[Arguments]  @{ARGUMENTS}
 	${items} = 	Get From Dictionary	${ARGUMENTS[1].data}	items
-	Wait Enable And Click Element			css=#simple-dropdown
-	Wait Enable And Click Element			css=a[href='#/add-lot']
+	Wait Until Element Is Visible			css=#simple-dropdown
+	Click Element							css=#simple-dropdown
+	Wait Until Element Is Visible			css=a[href='#/add-lot']
+	Click Element							css=a[href='#/add-lot']
 	Wait Until Element Is Enabled			css=input[tid='data.title']
 	Input text								css=input[tid='data.title']	${ARGUMENTS[1].data.title}
 	Select From List						css=select[tid='data.procurementMethodType']	string:${mode}
