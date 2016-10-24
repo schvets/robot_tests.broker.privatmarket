@@ -134,7 +134,6 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 	Set Date And Time						css=input[tid='auctionStartDate']	xpath=(//input[@ng-model='hours'])[1]	xpath=(//input[@ng-model='minutes'])[1]	${tender_data.data.auctionPeriod.startDate}
 	click button							css=button[tid='btn.createlot']
 	# Todo   finish test
-	debug   finish test
 
 
 Пошук тендера по ідентифікатору
@@ -152,6 +151,8 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 	Run Keyword And Return If	'${element}' == 'value.valueAddedTaxIncluded'			Отримати інформацію про включення ПДВ	${element}
 	Run Keyword And Return If	'${element}' == 'minimalStep.amount'					Отримати число							${element}
 	Run Keyword And Return If	'${element}' == 'minimalStep.valueAddedTaxIncluded'		Отримати інформацію про включення ПДВ	${element}
+
+	Run Keyword If				'auctionPeriod' in '${element}'	Wait Until Keyword Succeeds	5min	3s	Check For Auction Dates
 	Run Keyword And Return If	'Period.' in '${element}'								Отримати дату та час					${element}
 
 	Wait Until Element Is Visible	${tender_data.${element}}	timeout=${COMMONWAIT}
@@ -273,7 +274,6 @@ Wait for question
 Отримати status
 	privatmarket.Оновити сторінку з тендером	status
 	${active_active_period} = 	Run Keyword And Return Status	Wait Until Element Is Visible	css=div.arrow-present	5s
-	Wait Until Keyword Succeeds	3min	3s	Wait Until Element Does Not Contain	//div[span[@tid="data.auctionPeriod.startDate"]]	період не визначено	5s
 
 	${locator} = 	Set Variable If	${active_active_period}	css=div.arrow-present	css=div.arrow-future
 	${status_line} = 	Get Text				${locator}
@@ -518,6 +518,14 @@ Try Search Element
 Wait For Element With Reload
 	[Arguments]  ${locator}  ${time_to_wait}=2
 	Wait Until Keyword Succeeds			${time_to_wait}min	3s	Try Search Element	${locator}
+
+
+Check For Auction Dates
+	Reload Page
+	Wait For Ajax
+	Wait Until Element Does Not Contain	xpath=//div[span[@tid="data.auctionPeriod.startDate"]]	період не визначено	5s
+	[return]	True
+
 
 Set Date
 	[Arguments]  ${element}  ${date}
