@@ -112,12 +112,7 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 	Select From List						css=select[tid='item.classification.scheme']	string:${items[0].classification.scheme}
 
 	#classification
-	#TODO   delete sub+eval
-	${length} = 							Get Length		${items[0].classification.id}
-	${length} = 							Evaluate		${length} - 2
-	${sub_id} = 							Get Substring	${items[0].classification.id}	0	${length}
-	Input text								css=div[tid='classification'] input	${sub_id}
-	Wait Until Element Is Enabled			css=ul.ui-select-choices-content
+	Input text								css=div[tid='classification'] input	${items[0].classification.id}
 	Wait Enable And Click Element			xpath=//span[@class='ui-select-choices-row-inner' and contains(., '${items[0].classification.id}')]
 	Input text								css=input[tid='item.classification.description']	${items[0].classification.description}
 
