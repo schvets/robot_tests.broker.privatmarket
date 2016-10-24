@@ -60,9 +60,6 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 Підготувати клієнт для користувача
 	[Arguments]  ${username}
 	[Documentation]  Відкрити брaвзер, створити обєкт api wrapper, тощо
-	${extention_dir} = 	Set variable	C:\\Users\\Oks\\AppData\\Local\\Google\\Chrome\\User Data\\Profile 5\\Extensions\\ggmdpepbjljkkkdaklfihhngmmgmpggp\\2.0_0
-	${if_dir_exist} = 	Run Keyword And Return Status	Directory Should Exist	${extention_dir}
-
 	${service_args} =	Create List	--ignore-ssl-errors=true	--ssl-protocol=tlsv1
 	${browser} =		Convert To Lowercase	${USERS.users['${username}'].browser}
 	${disabled}			Create List				Chrome PDF Viewer
@@ -75,7 +72,6 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 	Call Method	${options}		add_argument	--nativeEvents\=false
 	Call Method	${options}		add_experimental_option	prefs	${prefs}
 
-	Run Keyword If	${if_dir_exist} == ${TRUE}	Call Method	${options}	add_argument	--load-extension\=${extention_dir}
 	Run Keyword If	'phantomjs' in '${browser}'	Create Webdriver	PhantomJS	${username}	service_args=${service_args}
 	...   ELSE	Create WebDriver	Chrome	chrome_options=${options}	alias=${username}
 
@@ -277,13 +273,14 @@ Wait for question
 Отримати status
 	privatmarket.Оновити сторінку з тендером	status
 	${active_active_period} = 	Run Keyword And Return Status	Wait Until Element Is Visible	css=div.arrow-present	5s
+	Wait Until Keyword Succeeds	3min	3s	Wait Until Element Does Not Contain	//div[span[@tid="data.auctionPeriod.startDate"]]	період не визначено	5s
 
 	${locator} = 	Set Variable If	${active_active_period}	css=div.arrow-present	css=div.arrow-future
 	${status_line} = 	Get Text				${locator}
 	@{list} = 			Split String			${status_line}
-	${status} = 		Set Variable If	'Уточнення' == '${list[0]}'	active.enquiries
+	${status} = 		Set Variable If	'Уточнення' in '${list[0]}'	active.enquiries
 		...  	'Пропозиції' in '${list[0]}'			active.tendering
-		...  	'Аукціон'in '${list[0]}'				active.auction
+		...  	'Аукціон' in '${list[0]}'				active.auction
 		...  	'Визначення переможця' in '${list[0]}'	active.qualification
 		...  	Anknown: ${status_line}
 	[return]  ${status}
