@@ -8,7 +8,7 @@ Library  BuiltIn
 
 
 *** Variables ***
-${COMMONWAIT}	10
+${COMMONWAIT}	15
 
 ${tender_data.title}									css=span[tid='data.title']
 ${tender_data.description}								css=span[tid='data.description']
@@ -51,17 +51,18 @@ ${tender_data.questions.answer}							span[@tid='data.question.answer']
 
 ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 
+
 *** Keywords ***
 Підготувати дані для оголошення тендера
 	[Arguments]  ${username}  ${tender_data}  ${role_name}
+	Run Keyword If	'${role_name}' != 'tender_owner'	Return From Keyword	${tender_data}
+	${tender_data.data} = 	modify_test_data	${tender_data.data}
 	[return]	${tender_data}
 
 
 Підготувати клієнт для користувача
 	[Arguments]  ${username}
 	[Documentation]  Відкрити брaвзер, створити обєкт api wrapper, тощо
-	${extention_dir} = 	Set variable	C:\\Users\\Oks\\AppData\\Local\\Google\\Chrome\\User Data\\Profile 5\\Extensions\\ggmdpepbjljkkkdaklfihhngmmgmpggp\\2.0_0
-	${if_dir_exist} = 	Run Keyword And Return Status	Directory Should Exist	${extention_dir}
 
 	${service_args} =	Create List	--ignore-ssl-errors=true	--ssl-protocol=tlsv1
 	${browser} =		Convert To Lowercase	${USERS.users['${username}'].browser}
@@ -75,7 +76,6 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 	Call Method	${options}		add_argument	--nativeEvents\=false
 	Call Method	${options}		add_experimental_option	prefs	${prefs}
 
-	Run Keyword If	${if_dir_exist} == ${TRUE}	Call Method	${options}	add_argument	--load-extension\=${extention_dir}
 	Run Keyword If	'phantomjs' in '${browser}'	Create Webdriver	PhantomJS	${username}	service_args=${service_args}
 	...   ELSE	Create WebDriver	Chrome	chrome_options=${options}	alias=${username}
 
@@ -97,8 +97,10 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 	Wait Enable And Click Element			css=a[href='#/add-lot']
 
 	#main info
+	Execute Javascript						angular.prozorroaccelerator=1440;
 	Wait Until Element Is Enabled			css=input[tid='data.title']
 	Input text								css=input[tid='data.title']	${tender_data.data.title}
+	Input text								css=textarea[tid='data.description']	${tender_data.data.description}
 	Select From List						css=select[tid='data.procurementMethodType']	string:${mode}
 	Input text								css=input[tid='data.value.amount']	'${tender_data.data.value.amount}'
 	Run Keyword If	'${tender_data.data.value.valueAddedTaxIncluded}' == 'True'	Click Element	css=input[tid='data.value.valueAddedTaxIncluded']
@@ -112,14 +114,9 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 	Select From List						css=select[tid='item.classification.scheme']	string:${items[0].classification.scheme}
 
 	#classification
-	#TODO   delete sub+eval
-	${length} = 							Get Length		${items[0].classification.id}
-	${length} = 							Evaluate		${length} - 2
-	${sub_id} = 							Get Substring	${items[0].classification.id}	0	${length}
-	Input text								css=div[tid='classification'] input	${sub_id}
+	Input text								css=div[tid='classification'] input	${items[0].classification.id}
 	Wait Until Element Is Enabled			css=ul.ui-select-choices-content
 	Wait Enable And Click Element			xpath=//span[@class='ui-select-choices-row-inner' and contains(., '${items[0].classification.id}')]
-	Input text								css=input[tid='item.classification.description']	${items[0].classification.description}
 
 	#address
 	Input text								css=input[tid='item.address.countryName']	${items[0].deliveryAddress.countryName}
@@ -134,10 +131,14 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 	Input text								css=input[tid='item.quantity']	${items[0].quantity}
 
 	#date/time
-	Set Date And Time						css=input[tid='auctionStartDate']	xpath=(//input[@ng-model='hours'])[1]	xpath=(//input[@ng-model='minutes'])[1]	${tender_data.data.auctionPeriod.startDate}
-	Set Date And Time						css=input[tid='auctionStartDate']	xpath=(//input[@ng-model='hours'])[1]	xpath=(//input[@ng-model='minutes'])[1]	${tender_data.data.auctionPeriod.startDate}
-	click button							css=button[tid='btn.createlot']
-	# Todo   finish test
+	Set Date And Time						css=input[tid='auctionStartDate']	css=div[tid='auctionStartTime'] input[ng-model='hours']	css=div[tid='auctionStartTime'] input[ng-model='minutes']	${tender_data.data.auctionPeriod.startDate}
+	Click Button							css=button[tid='btn.createlot']
+	Wait Until element Is Visible			css=span[tid='data.title']		${COMMONWAIT}
+	Wait For Element With Reload			css=p[tid='data.auctionID']
+	${tender_id} = 							Get Text	css=p[tid='data.auctionID']
+	Go To									${USERS.users['${username}'].homepage}
+	Wait For Ajax
+	[return]  ${tender_id}
 
 
 Пошук тендера по ідентифікатору
@@ -339,6 +340,11 @@ Check If Question Is Uploaded
 	Wait For Element With Reload			css=span[tid='data.quesion.date']
 
 
+Відповісти на запитання
+	[Arguments]  ${user_name}  ${tender_id}  ${answer}  ${question_id}
+	Fail    Is not implemented
+
+
 Подати цінову пропозицію
 	[Arguments]  ${user_name}  ${tender_id}  ${bid}
 	Run Keyword If	'без кваліфікації' in '${TEST NAME}'	Fail	Is not implemented yet
@@ -405,6 +411,19 @@ Check If Question Is Uploaded
 	[Arguments]  ${user_name}  ${tender_id}  ${lot_id}
 	${url} = 	privatmarket.Отримати посилання на аукціон для учасника	${user_name}	${tender_id}
 	[return]  ${url}
+
+
+Підтвердити постачальника
+	[Arguments]  ${user_name}  ${tender_id}  ${award_num}
+	${buttons_list} = 	Get Webelements	css=button[ng-click='confirmAward(award)']
+	Click Button	${buttons_list[${award_num}]}
+	Wait For Ajax
+	Wait Until Element Is Not Visible	css=button[ng-click='confirmAward(award)']	${COMMONWAIT}
+
+
+Підтвердити підписання контракту
+	[Arguments]  ${username}  ${tender_uaid}  ${contract_num}
+	Fail	Is Not Implemented Yet
 
 
 #Custom Keywords
