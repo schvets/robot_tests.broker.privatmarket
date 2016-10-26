@@ -85,7 +85,7 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 
 
 Оновити сторінку з тендером
-	[Arguments]  ${user_name}  ${tender_id}=${None}
+	[Arguments]  ${user_name}  ${tender_id}
 	Switch Browser	${user_name}
 	Reload Page
 	Sleep	3s
@@ -152,7 +152,7 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 Отримати інформацію із тендера
 	[Arguments]  ${user_name}  ${tender_id}  ${element}
 
-	Run Keyword And Return If	'${element}' == 'status'								Отримати status
+	Run Keyword And Return If	'${element}' == 'status'								Отримати status		${user_name}	${tender_id}
 	Run Keyword And Return If	'${element}' == 'value.amount'							Отримати число							${element}
 	Run Keyword And Return If	'${element}' == 'value.valueAddedTaxIncluded'			Отримати інформацію про включення ПДВ	${element}
 	Run Keyword And Return If	'${element}' == 'minimalStep.amount'					Отримати число							${element}
@@ -278,7 +278,8 @@ Wait for question
 
 
 Отримати status
-	privatmarket.Оновити сторінку з тендером	status
+	[Arguments]  ${user_name}  ${tender_id}
+	privatmarket.Оновити сторінку з тендером	${user_name}  ${tender_id}
 	${active_active_period} = 	Run Keyword And Return Status	Wait Until Element Is Visible	css=div.arrow-present	5s
 
 	${locator} = 	Set Variable If	${active_active_period}	css=div.arrow-present	css=div.arrow-future
