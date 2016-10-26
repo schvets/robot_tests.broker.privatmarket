@@ -85,7 +85,7 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 
 
 Оновити сторінку з тендером
-	[Arguments]  ${user_name}  ${tender_id}
+	[Arguments]  ${user_name}  ${tender_id}=${None}
 	Switch Browser	${user_name}
 	Reload Page
 	Sleep	3s
