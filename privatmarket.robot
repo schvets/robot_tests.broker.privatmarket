@@ -426,19 +426,9 @@ Check If Question Is Uploaded
 
 Підтвердити підписання контракту
 	[Arguments]  ${username}  ${tender_uaid}  ${contract_num}
-#	${file_path}  ${file_name}  ${file_content} = 	create_fake_doc
-#	Wait Until Element Is Visible			css=label[tid='docContract']	${COMMONWAIT}
-#	Choose File								css=input[id='docsContractI']	${file_path}
-#	Wait Until Element Is Visible			css=div.progress.progress-bar	${COMMONWAIT}
-#	sleep									10s
-#	Wait For Ajax
-#	Wait Until Element Is Not Visible		css=div.progress.progress-bar	${COMMONWAIT}
-
 	Wait For Element With Reload			css=button[tid='contractActivate']
 	Click Button							css=button[tid='contractActivate']
 	Wait Until Element Is Not Visible		css=button[tid='contractActivate']	${COMMONWAIT}
-
-#	Remove File  ${file_path}
 
 
 #Custom Keywords
