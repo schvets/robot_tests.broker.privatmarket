@@ -417,15 +417,28 @@ Check If Question Is Uploaded
 
 Підтвердити постачальника
 	[Arguments]  ${user_name}  ${tender_id}  ${award_num}
-	${buttons_list} = 	Get Webelements	css=button[ng-click='confirmAward(award)']
-	Click Button	${buttons_list[${award_num}]}
+	Wait For Element With Reload			css=button[ng-click='confirmAward(award)']
+	${buttons_list} = 	Get Webelements		css=button[ng-click='confirmAward(award)']
+	Click Button							${buttons_list[${award_num}]}
 	Wait For Ajax
-	Wait Until Element Is Not Visible	css=button[ng-click='confirmAward(award)']	${COMMONWAIT}
+	Wait Until Element Is Not Visible		css=button[ng-click='confirmAward(award)']	${COMMONWAIT}
 
 
 Підтвердити підписання контракту
 	[Arguments]  ${username}  ${tender_uaid}  ${contract_num}
-	Fail	Is Not Implemented Yet
+#	${file_path}  ${file_name}  ${file_content} = 	create_fake_doc
+#	Wait Until Element Is Visible			css=label[tid='docContract']	${COMMONWAIT}
+#	Choose File								css=input[id='docsContractI']	${file_path}
+#	Wait Until Element Is Visible			css=div.progress.progress-bar	${COMMONWAIT}
+#	sleep									10s
+#	Wait For Ajax
+#	Wait Until Element Is Not Visible		css=div.progress.progress-bar	${COMMONWAIT}
+
+	Wait For Element With Reload			css=button[tid='contractActivate']
+	Click Button							css=button[tid='contractActivate']
+	Wait Until Element Is Not Visible		css=button[tid='contractActivate']	${COMMONWAIT}
+
+#	Remove File  ${file_path}
 
 
 #Custom Keywords
