@@ -417,15 +417,18 @@ Check If Question Is Uploaded
 
 Підтвердити постачальника
 	[Arguments]  ${user_name}  ${tender_id}  ${award_num}
-	${buttons_list} = 	Get Webelements	css=button[ng-click='confirmAward(award)']
-	Click Button	${buttons_list[${award_num}]}
+	Wait For Element With Reload			css=button[ng-click='confirmAward(award)']
+	${buttons_list} = 	Get Webelements		css=button[ng-click='confirmAward(award)']
+	Click Button							${buttons_list[${award_num}]}
 	Wait For Ajax
-	Wait Until Element Is Not Visible	css=button[ng-click='confirmAward(award)']	${COMMONWAIT}
+	Wait Until Element Is Not Visible		css=button[ng-click='confirmAward(award)']	${COMMONWAIT}
 
 
 Підтвердити підписання контракту
 	[Arguments]  ${username}  ${tender_uaid}  ${contract_num}
-	Fail	Is Not Implemented Yet
+	Wait For Element With Reload			css=button[tid='contractActivate']
+	Click Button							css=button[tid='contractActivate']
+	Wait Until Element Is Not Visible		css=button[tid='contractActivate']	${COMMONWAIT}
 
 
 #Custom Keywords
