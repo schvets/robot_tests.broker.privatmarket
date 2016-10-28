@@ -21,6 +21,7 @@ ${tender_data.minimalStep.currency}						css=span[tid='data.minimalStep.currency
 ${tender_data.minimalStep.valueAddedTaxIncluded}		css=span[tid='data.minimalStep.valueAddedTaxIncluded']
 
 ${tender_data.auctionID}								css=p[tid='data.auctionID']
+${tender_data.dgfID}									css=span[tid='data.dgfID']
 ${tender_data.enquiryPeriod.startDate}					css=span[tid='data.enquiryPeriod.startDate']
 ${tender_data.enquiryPeriod.endDate}					css=span[tid='data.enquiryPeriod.endDate']
 ${tender_data.tenderPeriod.startDate}					css=span[tid='data.tenderPeriod.startDate']
@@ -100,36 +101,37 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 	#main info
 	Execute Javascript						angular.prozorroaccelerator=1440;
 	Wait Until Element Is Enabled			css=input[tid='data.title']
-	Input text								css=input[tid='data.title']	${tender_data.data.title}
-	Input text								css=textarea[tid='data.description']	${tender_data.data.description}
-	Select From List						css=select[tid='data.procurementMethodType']	string:${mode}
-	Input text								css=input[tid='data.value.amount']	'${tender_data.data.value.amount}'
+	Input text								css=input[tid='data.title']							${tender_data.data.title}
+	Input text								css=textarea[tid='data.description']				${tender_data.data.description}
+	Select From List						css=select[tid='data.procurementMethodType']		string:${mode}
+	Input text								css=input[tid='data.value.amount']					'${tender_data.data.value.amount}'
 	Run Keyword If	'${tender_data.data.value.valueAddedTaxIncluded}' == 'True'	Click Element	css=input[tid='data.value.valueAddedTaxIncluded']
 		...  ELSE	Click Element	css=input[tid='data.value.valueAddedTaxNotIncluded']
-	Input text								css=input[tid='data.minimalStep.amount']	'${tender_data.data.minimalStep.amount}'
+	Input text								css=input[tid='data.minimalStep.amount']			'${tender_data.data.minimalStep.amount}'
+	Input text								css=input[tid='data.dgfID']							${tender_data.data.dgfID}
 
 	#item
 	Click Button							css=button[tid='add.item']
 	Wait Until Element Is Enabled			css=input[tid='item.description']
-	Input text								css=input[tid='item.description']	${items[0].description}
-	Select From List						css=select[tid='item.classification.scheme']	string:${items[0].classification.scheme}
+	Input text								css=input[tid='item.description']					${items[0].description}
+	Select From List						css=select[tid='item.classification.scheme']		string:${items[0].classification.scheme}
 
 	#classification
-	Input text								css=div[tid='classification'] input	${items[0].classification.id}
+	Input text								css=div[tid='classification'] input					${items[0].classification.id}
 	Wait Until Element Is Enabled			css=ul.ui-select-choices-content
 	Wait Enable And Click Element			xpath=//span[@class='ui-select-choices-row-inner' and contains(., '${items[0].classification.id}')]
 
 	#address
-	Input text								css=input[tid='item.address.countryName']	${items[0].deliveryAddress.countryName}
-	Input text								css=input[tid='item.address.postalCode']	${items[0].deliveryAddress.postalCode}
-	Input text								css=input[tid='item.address.region']	${items[0].deliveryAddress.region}
-	Input text								css=input[tid='item.address.streetAddress']	${items[0].deliveryAddress.streetAddress}
-	Input text								css=input[tid='item.address.locality']	${items[0].deliveryAddress.locality}
+	Input text								css=input[tid='item.address.countryName']			${items[0].deliveryAddress.countryName}
+	Input text								css=input[tid='item.address.postalCode']			${items[0].deliveryAddress.postalCode}
+	Input text								css=input[tid='item.address.region']				${items[0].deliveryAddress.region}
+	Input text								css=input[tid='item.address.streetAddress']			${items[0].deliveryAddress.streetAddress}
+	Input text								css=input[tid='item.address.locality']				${items[0].deliveryAddress.locality}
 
 	#quantity
-	Input text								css=input[tid='item.unit.code']	${items[0].unit.code}
-	Input text								css=input[tid='item.unit.name']	${items[0].unit.name}
-	Input text								css=input[tid='item.quantity']	${items[0].quantity}
+	Input text								css=input[tid='item.unit.code']						${items[0].unit.code}
+	Input text								css=input[tid='item.unit.name']						${items[0].unit.name}
+	Input text								css=input[tid='item.quantity']						${items[0].quantity}
 
 	#date/time
 	Set Date And Time						css=input[tid='auctionStartDate']	css=div[tid='auctionStartTime'] input[ng-model='hours']	css=div[tid='auctionStartTime'] input[ng-model='minutes']	${tender_data.data.auctionPeriod.startDate}
@@ -427,8 +429,18 @@ Check If Question Is Uploaded
 Підтвердити підписання контракту
 	[Arguments]  ${username}  ${tender_uaid}  ${contract_num}
 	Wait For Element With Reload			css=button[tid='contractActivate']
+
+	Wait Until Element Is Visible			css=label[tid='docContract']	${COMMONWAIT}
+	${file_path}  ${file_name}  ${file_content} = 	create_fake_doc
+	Choose File								css=input[id='docsContractI']	${file_path}
+	Wait Until Element Is Visible			css=div.progress.progress-bar	${COMMONWAIT}
+	sleep									10s
+	Wait For Ajax
+	Wait Until Element Is Not Visible		css=div.progress.progress-bar	${COMMONWAIT}
+
 	Click Button							css=button[tid='contractActivate']
 	Wait Until Element Is Not Visible		css=button[tid='contractActivate']	${COMMONWAIT}
+	Remove File  ${file_path}
 
 
 #Custom Keywords
