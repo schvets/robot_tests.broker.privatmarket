@@ -437,6 +437,7 @@ Check If Question Is Uploaded
 	Wait For Ajax
 	Wait Until Element Is Not Visible		css=div.progress.progress-bar	${COMMONWAIT}
 
+	Wait Until Element Is Enables			css=button[tid='contractActivate']	${COMMONWAIT}
 	Click Button							css=button[tid='contractActivate']
 	Wait Until Element Is Not Visible		css=button[tid='contractActivate']	${COMMONWAIT}
 	Remove File  ${file_path}
