@@ -111,7 +111,6 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 	Input text								css=input[tid='data.dgfID']							${tender_data.data.dgfID}
 
 	#item
-	Click Button							css=button[tid='add.item']
 	Wait Until Element Is Enabled			css=input[tid='item.description']
 	Input text								css=input[tid='item.description']					${items[0].description}
 	Select From List						css=select[tid='item.classification.scheme']		string:${items[0].classification.scheme}
