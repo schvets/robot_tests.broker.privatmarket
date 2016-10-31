@@ -297,7 +297,9 @@ Wait for question
 Отримати інформацію із пропозиції
 	[Arguments]  ${user_name}  ${tender_id}  ${field}
 	${locator} = 	Set Variable If	'${field}' == 'value.amount'	css=span[tid='bid.value.amount']	null
-	${result} = 	Get Text		${locator}
+	Wait For Ajax
+	Wait For Element With Reload		${locator}
+	${result} = 	Get Text			${locator}
 	${result} = 	Convert To Number	${result}
 	[return]  ${result}
 
