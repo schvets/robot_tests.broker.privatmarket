@@ -462,6 +462,7 @@ Login
 	Input Text							css=input[id='third-section']	56
 	Click Element						css=a[id='confirmButton']
 	Sleep								3s
+	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar			${COMMONWAIT}
 	Wait Until Element Is Not visible	css=a[id='confirmButton']
 	Wait Until Element Is Visible		css=input#businessSearch
