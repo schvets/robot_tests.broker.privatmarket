@@ -73,13 +73,14 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 	${options}= 	Evaluate	sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
 	Call Method	${options}		add_argument	--allow-running-insecure-content
 	Call Method	${options}		add_argument	--disable-web-security
-	Call Method	${options}		add_argument	--start-maximized
 	Call Method	${options}		add_argument	--nativeEvents\=false
 	Call Method	${options}		add_experimental_option	prefs	${prefs}
 
 	Run Keyword If	'phantomjs' in '${browser}'	Create Webdriver	PhantomJS	${username}	service_args=${service_args}
 	...   ELSE	Create WebDriver	Chrome	chrome_options=${options}	alias=${username}
 
+	Set Window Size									@{USERS.users['${username}'].size}
+	Set Window Position								@{USERS.users['${username}'].position}
 	Set Selenium Implicit Wait						10s
 	Go To	${USERS.users['${username}'].homepage}
 	Run Keyword Unless	'Viewer' in '${username}'	Login	${username}
@@ -447,6 +448,7 @@ Check If Question Is Uploaded
 #Custom Keywords
 Login
 	[Arguments]  ${username}
+	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar			${COMMONWAIT}
 	Sleep				7s
 	Wait Enable And Click Element		css=a[ng-click="loginModal('login')"]
