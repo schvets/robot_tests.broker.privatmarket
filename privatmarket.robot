@@ -93,8 +93,12 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 Створити тендер
 	[Arguments]  ${user_name}  ${tender_data}
 	${items} = 	Get From Dictionary	${tender_data.data}	items
-	Wait Enable And Click Element			css=#simple-dropdown
-	Wait Enable And Click Element			css=a[href='#/add-lot']
+#	Wait Enable And Click Element			css=#simple-dropdown
+#	Wait Enable And Click Element			css=a[href='#/add-lot']
+	Wait Until element Is Visible			css=#simple-dropdown
+	Click Element							css=#simple-dropdown
+	Wait Until element Is Visible			css=a[href='#/add-lot']
+	Click Element			css=a[href='#/add-lot']
 
 	#main info
 	Wait Until Element Is Enabled			css=input[tid='data.title']
@@ -133,7 +137,7 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 	Set Date And Time						css=input[tid='auctionStartDate']	xpath=(//input[@ng-model='hours'])[1]	xpath=(//input[@ng-model='minutes'])[1]	${tender_data.data.auctionPeriod.startDate}
 	click button							css=button[tid='btn.createlot']
 	# Todo   finish test
-	debug   finish test
+	debug
 
 
 Пошук тендера по ідентифікатору
