@@ -51,11 +51,18 @@ ${tender_data.questions.date}							span[@tid='data.quesion.date']
 ${tender_data.questions.answer}							span[@tid='data.question.answer']
 
 ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
+${tender_data.auction.status}							css=span[tid='data.statusName']
+
+${tender_data.cancellations[0].status}					css=span[tid='cancellation.status']
+${tender_data.cancellations[0].reason}					css=span[tid='cancellation.reason']
+${tender_data.cancellation.doc.title}					css=a[tid='cancellation.doc.title']
+${tender_data.cancellation.doc.description}				css=span[tid='cancellation.doc.description']
 
 
 *** Keywords ***
 Підготувати дані для оголошення тендера
 	[Arguments]  ${username}  ${tender_data}  ${role_name}
+	debug
 	Run Keyword If	'${role_name}' != 'tender_owner'	Return From Keyword	${tender_data}
 	${tender_data.data} = 	modify_test_data	${tender_data.data}
 	[return]	${tender_data}
@@ -153,11 +160,16 @@ ${tender_data.doc.title}								xpath=//tr[@ng-repeat='doc in docs'][1]//a
 Отримати інформацію із тендера
 	[Arguments]  ${user_name}  ${tender_id}  ${element}
 
+	${element} = 	Set Variable If		'absence_bid' in ${TEST_TAGS} and '${element}' == 'status'		auction.${element}	${element}
+
 	Run Keyword And Return If	'${element}' == 'status'								Отримати status		${user_name}	${tender_id}
 	Run Keyword And Return If	'${element}' == 'value.amount'							Отримати число							${element}
 	Run Keyword And Return If	'${element}' == 'value.valueAddedTaxIncluded'			Отримати інформацію про включення ПДВ	${element}
 	Run Keyword And Return If	'${element}' == 'minimalStep.amount'					Отримати число							${element}
 	Run Keyword And Return If	'${element}' == 'minimalStep.valueAddedTaxIncluded'		Отримати інформацію про включення ПДВ	${element}
+	Run Keyword And Return If	'${element}' == 'auction.status'						Отримати status аукціону				${element}	Неуспішний лот (не відбувся аукціон)
+	Run Keyword And Return If	'${element}' == 'tender_cancellation_title'				Отримати заголовок документа	${element}
+
 
 	Run Keyword If				'auctionPeriod' in '${element}'	Wait Until Keyword Succeeds	5min	3s	Check For Auction Dates
 	Run Keyword And Return If	'Period.' in '${element}'								Отримати дату та час					${element}
@@ -205,11 +217,10 @@ Wait for question
 
 Отримати інформацію із документа
 	[Arguments]  ${username}  ${tender_uaid}  ${doc_id}  ${element}
-	Wait For Element With Reload			css=div[ng-click='openLotDocsModal()']
-	Click Element							css=div[ng-click='openLotDocsModal()']
-	${element} = 	Set Variable	doc.${element}
+	${element} = 	Set Variable If		'скасування лоту' in '${TEST_NAME}'		cancellation.doc.${element}	doc.${element}
 
-	Run Keyword And Return If	'${element}' == 'doc.title'			Отримати заголовок документа	${element}
+	Run Keyword And Return If	'${element}' == 'doc.title'					Отримати заголовок документації до лоту	${element}
+	Run Keyword And Return If	'${element}' == 'cancellation.doc.title'	Отримати заголовок документа	${element}
 
 	Wait Until Element Is Visible	${tender_data.${element}}	timeout=${COMMONWAIT}
 	${result} =						Отримати текст	${element}
@@ -221,6 +232,15 @@ Wait for question
 	${text} =						Get Element Attribute	${tender_data.${element}}@title
 	${words} =						Split String	${text}	\\
 	${result} =						Get From List	${words}	-1
+	[return]	${result}
+
+
+Отримати заголовок документації до лоту
+	[Arguments]  ${element}
+	Wait For Element With Reload			css=div[ng-click='openLotDocsModal()']
+	Click Element							css=div[ng-click='openLotDocsModal()']
+
+	${result} =								Отримати заголовок документа	${element}
 	[return]	${result}
 
 
@@ -294,6 +314,14 @@ Wait for question
 	[return]  ${status}
 
 
+Отримати status аукціону
+	[Arguments]  ${element}  ${status_name}
+	Wait Until Keyword Succeeds			3min	10s	Try Search Element With Text	${tender_data.${element}}	${status_name}
+	${text} =				Отримати текст елемента		${element}
+	${result} = 	Set Variable If	'${text}' == 'Неуспішний лот (не відбувся аукціон)'	unsuccessful
+	[return]  ${result}
+
+
 Отримати інформацію із пропозиції
 	[Arguments]  ${user_name}  ${tender_id}  ${field}
 	${locator} = 	Set Variable If	'${field}' == 'value.amount'	css=span[tid='bid.value.amount']	null
@@ -365,7 +393,7 @@ Check If Question Is Uploaded
 
 
 Скасувати цінову пропозицію
-	[Arguments]  ${user_name}  ${tender_id}  ${bid}
+	[Arguments]  ${user_name}  ${tender_id}
 	Wait For Element With Reload		css=button[ng-click='deleteBid(bid)']	5
 	Wait Until Element Is Visible		css=button[ng-click='deleteBid(bid)']	${COMMONWAIT}
 	Click Button						css=button[ng-click='deleteBid(bid)']
@@ -442,6 +470,36 @@ Check If Question Is Uploaded
 	Click Button							css=button[tid='contractActivate']
 	Wait Until Element Is Not Visible		css=button[tid='contractActivate']	${COMMONWAIT}
 	Remove File  ${file_path}
+
+
+Скасувати закупівлю
+	[Arguments]  ${username}  ${tender_uaid}  ${reason}  ${doc_path}  ${description}
+
+	privatmarket.Пошук тендера по ідентифікатору	${username}	${tender_uaid}
+	Wait Enable And Click Element			css=button[tid='cancelBtn']
+	Wait For Ajax
+
+	#add doc
+	Wait Until Element Is Visible			css=button[tid='docCancellation']		${COMMONWAIT}
+	Choose File								css=#docsCancellation		${doc_path}
+	Wait Until Element Is Visible			css=div.progress.progress-bar	${COMMONWAIT}
+	Wait For Ajax
+
+	#input description
+	Wait Until Element Is Enabled			css=input[tid='cancellation.description']
+	Input text								css=input[tid='cancellation.description']	${description}
+
+	#input reason
+	Input text								css=input[tid='cancellation.reason']	${reason}
+
+	#confirm
+	Click Button							css=button[tid='btn.cancellation']
+
+	Wait Until Element Is Visible			css=div.progress.progress-bar	${COMMONWAIT}
+	sleep									10s
+	Wait For Ajax
+	Wait Until Element Is Not Visible		css=div.progress.progress-bar	60
+	Wait Until Element Is Visible			${tender_data.cancellations[0].status}		${COMMONWAIT}
 
 
 #Custom Keywords
@@ -554,6 +612,14 @@ Try Search Element
 	Wait For Ajax
 	Wait Until Element Is Visible	${locator}	3
 	Wait Until Element Is Enabled	${locator}	3
+	[return]	True
+
+
+Try Search Element With Text
+	[Arguments]	${locator}  ${text}
+	Reload Page
+	Wait For Ajax
+	Wait Until Element Contains		${locator}	${text}	3s
 	[return]	True
 
 
