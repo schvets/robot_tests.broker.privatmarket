@@ -62,7 +62,6 @@ ${tender_data.cancellation.doc.description}				css=span[tid='cancellation.doc.de
 *** Keywords ***
 Підготувати дані для оголошення тендера
 	[Arguments]  ${username}  ${tender_data}  ${role_name}
-	debug
 	Run Keyword If	'${role_name}' != 'tender_owner'	Return From Keyword	${tender_data}
 	${tender_data.data} = 	modify_test_data	${tender_data.data}
 	[return]	${tender_data}
