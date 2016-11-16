@@ -158,16 +158,18 @@ ${tender_data.cancellation.doc.description}				css=span[tid='cancellation.doc.de
 
 Отримати інформацію із тендера
 	[Arguments]  ${user_name}  ${tender_id}  ${element}
-
-	${element} = 	Set Variable If		'absence_bid' in ${TEST_TAGS} and '${element}' == 'status'		auction.${element}	${element}
+	${element} =	Set Variable If
+		...  'absence_bid' in ${TEST_TAGS} and '${element}' == 'status'		auction.${element}
+		...  'tender_cancellation' in ${TEST_TAGS} and '${element}' == 'status'		auction.${element}
+		...  ${element}
 
 	Run Keyword And Return If	'${element}' == 'status'								Отримати status		${user_name}	${tender_id}
 	Run Keyword And Return If	'${element}' == 'value.amount'							Отримати число							${element}
 	Run Keyword And Return If	'${element}' == 'value.valueAddedTaxIncluded'			Отримати інформацію про включення ПДВ	${element}
 	Run Keyword And Return If	'${element}' == 'minimalStep.amount'					Отримати число							${element}
 	Run Keyword And Return If	'${element}' == 'minimalStep.valueAddedTaxIncluded'		Отримати інформацію про включення ПДВ	${element}
-	Run Keyword And Return If	'${element}' == 'auction.status'						Отримати status аукціону				${element}	Неуспішний лот (не відбувся аукціон)
-	Run Keyword And Return If	'${element}' == 'tender_cancellation_title'				Отримати заголовок документа	${element}
+	Run Keyword And Return If	'${element}' == 'auction.status'						Отримати status аукціону				${element}
+	Run Keyword And Return If	'${element}' == 'tender_cancellation_title'				Отримати заголовок документа			${element}
 
 
 	Run Keyword If				'auctionPeriod' in '${element}'	Wait Until Keyword Succeeds	5min	3s	Check For Auction Dates
@@ -216,30 +218,30 @@ Wait for question
 
 Отримати інформацію із документа
 	[Arguments]  ${username}  ${tender_uaid}  ${doc_id}  ${element}
-	${element} = 	Set Variable If		'скасування лоту' in '${TEST_NAME}'		cancellation.doc.${element}	doc.${element}
+	${element} =	Set Variable If		'скасування лоту' in '${TEST_NAME}'		cancellation.doc.${element}		doc.${element}
 
-	Run Keyword And Return If	'${element}' == 'doc.title'					Отримати заголовок документації до лоту	${element}
+	Run Keyword And Return If	'${element}' == 'doc.title'		Отримати заголовок документації до лоту		${element}
 	Run Keyword And Return If	'${element}' == 'cancellation.doc.title'	Отримати заголовок документа	${element}
 
 	Wait Until Element Is Visible	${tender_data.${element}}	timeout=${COMMONWAIT}
-	${result} =						Отримати текст	${element}
+	${result} =		Отримати текст	${element}
 	[return]	${result}
 
 
 Отримати заголовок документа
 	[Arguments]  ${element}
-	${text} =						Get Element Attribute	${tender_data.${element}}@title
-	${words} =						Split String	${text}	\\
-	${result} =						Get From List	${words}	-1
+	${text} =	Get Element Attribute	${tender_data.${element}}@title
+	${words} =	Split String	${text}	\\
+	${result} =	Get From List	${words}	-1
 	[return]	${result}
 
 
 Отримати заголовок документації до лоту
 	[Arguments]  ${element}
-	Wait For Element With Reload			css=div[ng-click='openLotDocsModal()']
-	Click Element							css=div[ng-click='openLotDocsModal()']
+	Wait For Element With Reload	css=div[ng-click='openLotDocsModal()']
+	Click Element	css=div[ng-click='openLotDocsModal()']
 
-	${result} =								Отримати заголовок документа	${element}
+	${result} =		Отримати заголовок документа	${element}
 	[return]	${result}
 
 
@@ -314,10 +316,17 @@ Wait for question
 
 
 Отримати status аукціону
-	[Arguments]  ${element}  ${status_name}
+	[Arguments]  ${element}
+	${status_name} =	Set Variable If
+		...  'absence_bid' in ${TEST_TAGS}	Неуспішний лот (не відбувся аукціон)
+		...  'tender_cancellation' in ${TEST_TAGS}	Скасований лот (скасовано аукціон)
+
 	Wait Until Keyword Succeeds			3min	10s	Try Search Element With Text	${tender_data.${element}}	${status_name}
 	${text} =				Отримати текст елемента		${element}
-	${result} = 	Set Variable If	'${text}' == 'Неуспішний лот (не відбувся аукціон)'	unsuccessful
+	${result} =	Set Variable If
+		...  '${text}' == 'Неуспішний лот (не відбувся аукціон)'	unsuccessful
+		...  '${text}' == 'Скасований лот (скасовано аукціон)'	cancelled
+		...  ${element}
 	[return]  ${result}
 
 
