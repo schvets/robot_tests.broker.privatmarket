@@ -713,10 +713,3 @@ Set Date And Time
 	Set Date	${date_element}	${date}
 	Set Time	${element_hour}	${element_min}	${date}
 
-Scroll Page To Element
-	[Arguments]	${element_locator}
-	${locator}  ${type} = 	Get Locator And Type	${element_locator}
-	${js_expresion} =	Set Variable If	'css' == '${type}'	window.$("${locator}")[0].scrollIntoView()
-		...  						'xpath' == '${type}'	document.evaluate("${locator}", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.scrollIntoView()
-	Execute Javascript	${js_expresion}
-	Wait For Ajax
