@@ -162,7 +162,7 @@ ${tender_data.cancellation.doc.description}				css=span[tid='cancellation.doc.de
 	${element} =	Set Variable If
 		...  'absence_bid' in ${TEST_TAGS} and '${element}' == 'status'		auction.${element}
 		...  'tender_cancellation' in ${TEST_TAGS} and '${element}' == 'status'		auction.${element}
-		...  'tender_view' in ${TEST_TAGS} and '${element}' == 'status'		auction.${element}
+		...  'Відображення статусу завершення лоту' in '${TEST_NAME}' and '${element}' == 'status'		auction.${element}
 		...  ${element}
 
 	Run Keyword And Return If	'${element}' == 'status'								Отримати status		${user_name}	${tender_id}
@@ -478,6 +478,30 @@ Check If Question Is Uploaded
 	Click Element	css=button[tid='btn.refreshlot']
 
 
+Завантажити фінансову ліцензію
+	[Arguments]  ${user_name}  ${tender_id}  ${financial_license_path}
+	Wait Until Element Is Visible	css=span[tid='editBtn']	${COMMONWAIT}
+
+
+Отримати кількість документів в ставці
+	[Arguments]  ${user_name}  ${tender_id}  ${bid_index}
+	${index} = 	Evaluate	${bid_index}+1
+	Wait Until Element Is Visible	xpath=(//div[@class='text-info questionsBox'])[${index}]//a[@tid='bid.document.title']
+	${result} = 	Get Matching Xpath Count	(//div[@class='text-info questionsBox'])[${index}]//a[@tid='bid.document.title']
+	[return]  ${result}
+
+
+Отримати дані із документу пропозиції
+	[Arguments]  ${user_name}  ${tender_id}  ${bid_index}  ${document_index}  ${field}
+	debug
+	${bid_index} = 	Evaluate	${bid_index}+1
+	${document_index} = 	Evaluate	${bid_index}+1
+	${text} =	Get Element Attribute	xpath=((//div[@class='text-info questionsBox'])[${bid_index}]//a[@tid='bid.document.title'])[${document_index}]@title
+	${words} =	Split String	${text}	\\
+	${result} =	Get From List	${words}	-1
+	[return]	${result}
+
+
 Додати Virtual Data Room
 	[Arguments]  ${user_name}  ${tender_id}  ${filepath}
 	Fail    Is not implemented
@@ -511,6 +535,7 @@ Check If Question Is Uploaded
 
 Підтвердити підписання контракту
 	[Arguments]  ${username}  ${tender_uaid}  ${contract_num}
+	debug
 	Wait For Element With Reload			css=button[tid='contractActivate']
 
 	Wait Until Element Is Visible			css=label[tid='docContract']	${COMMONWAIT}
@@ -556,6 +581,29 @@ Check If Question Is Uploaded
 	Wait Until Element Is Not Visible		css=div.progress.progress-bar	60
 	Wait Until Element Is Visible			${tender_data.cancellations[0].status}		${COMMONWAIT}
 
+
+Завантажити документ рішення кваліфікаційної комісії
+	[Arguments]  ${username}  ${file_path}  ${tender_id}  ${award_num}
+	debug
+	Wait For Ajax
+
+
+Дискваліфікувати постачальника
+	[Arguments]  ${username}  ${tender_id}  ${award_num}  ${description}
+	debug
+	Wait For Ajax
+
+
+Завантажити протокол аукціону
+	[Arguments]  ${username}  ${tender_id}  ${filepath}  ${award_index}
+	debug
+	Wait For Ajax
+
+
+Завантажити угоду до тендера
+  [Arguments]  ${username}  ${tender_id}  ${contract_num}  ${filepath}
+	debug
+	Wait For Ajax
 
 #Custom Keywords
 Login
