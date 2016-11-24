@@ -322,6 +322,7 @@ Wait for question
 	${status_name} =	Set Variable If
 		...  'absence_bid' in ${TEST_TAGS}	Неуспішний лот (не відбувся аукціон)
 		...  'tender_cancellation' in ${TEST_TAGS}	Скасований лот (скасовано аукціон)
+		...  'Відображення статусу завершення лоту' in '${TEST_NAME}'	Завершений аукціон (завершений)
 
 	Wait Until Keyword Succeeds			3min	10s	Try Search Element With Text	${tender_data.${element}}	${status_name}
 	${text} =				Отримати текст елемента		${element}
@@ -407,7 +408,7 @@ Check If Question Is Uploaded
 
 
 Скасувати цінову пропозицію
-	[Arguments]  ${user_name}  ${tender_id}  ${bid}
+	[Arguments]  ${user_name}  ${tender_id}
 	Wait For Element With Reload		css=button[ng-click='deleteBid(bid)']	5
 	Wait Until Element Is Visible		css=button[ng-click='deleteBid(bid)']	${COMMONWAIT}
 	Click Button						css=button[ng-click='deleteBid(bid)']
@@ -484,20 +485,19 @@ Check If Question Is Uploaded
 
 Отримати кількість документів в ставці
 	[Arguments]  ${user_name}  ${tender_id}  ${bid_index}
-	${index} = 	Evaluate	${bid_index}+2
-	Wait Until Element Is Visible	xpath=(//div[@class='text-info questionsBox'])[${index}]//a[@tid='bid.document.title']
+#	debug
+	Wait Until Element Is Visible	xpath=//div[@class='text-info questionsBox']
+	${index} = 	Get Index Number	xpath=//div[@class='text-info questionsBox']	${bid_index}
 	${result} = 	Get Matching Xpath Count	(//div[@class='text-info questionsBox'])[${index}]//a[@tid='bid.document.title']
 	[return]  ${result}
 
 
 Отримати дані із документу пропозиції
 	[Arguments]  ${user_name}  ${tender_id}  ${bid_index}  ${document_index}  ${field}
-
-	${bid_index} = 	Evaluate	${bid_index}+1
-	${document_index} = 	Evaluate	${bid_index}+1
-	${text} =	Get Element Attribute	xpath=((//div[@class='text-info questionsBox'])[${bid_index}]//a[@tid='bid.document.title'])[${document_index}]@title
-	${words} =	Split String	${text}	\\
-	${result} =	Get From List	${words}	-1
+#	debug
+	${bid_index} = 	Get Index Number	xpath=//div[@class='text-info questionsBox']	${bid_index}
+	${document_index} = 	modify_number	${document_index}	1
+	${result} =	Get Text	xpath=((//div[@class='text-info questionsBox'])[${bid_index}]////span[@tid='bid.document.type'])[${document_index}]
 	[return]	${result}
 
 
@@ -545,21 +545,10 @@ Check If Question Is Uploaded
 
 Підтвердити підписання контракту
 	[Arguments]  ${username}  ${tender_uaid}  ${contract_num}
-
 	Wait For Element With Reload			css=button[tid='contractActivate']
-
-	Wait Until Element Is Visible			css=label[tid='docContract']	${COMMONWAIT}
-	${file_path}  ${file_name}  ${file_content} = 	create_fake_doc
-	Choose File								css=input[id='docsContractI']	${file_path}
-	Wait Until Element Is Visible			css=div.progress.progress-bar	${COMMONWAIT}
-	sleep									10s
-	Wait For Ajax
-	Wait Until Element Is Not Visible		css=div.progress.progress-bar	${COMMONWAIT}
-
 	Wait Until Element Is Enabled			css=button[tid='contractActivate']	${COMMONWAIT}
 	Click Button							css=button[tid='contractActivate']
 	Wait Until Element Is Not Visible		css=button[tid='contractActivate']	${COMMONWAIT}
-	Remove File  ${file_path}
 
 
 Скасувати закупівлю
@@ -594,9 +583,12 @@ Check If Question Is Uploaded
 
 Завантажити документ рішення кваліфікаційної комісії
 	[Arguments]  ${username}  ${file_path}  ${tender_id}  ${award_num}
-
+	Wait Until Element Is Visible	css=button[tid='btn.award.cancelled']	${COMMONWAIT}
+	Click Button	css=button[tid='btn.award.cancelled']
 	Wait For Ajax
-
+	Wait Until Element Is Visible	css=button[tid='btn.award.unsuccessful']	${COMMONWAIT}
+	Click Button	css=button[tid='btn.award.unsuccessful']
+#	debug
 
 Дискваліфікувати постачальника
 	[Arguments]  ${username}  ${tender_id}  ${award_num}  ${description}
@@ -605,20 +597,23 @@ Check If Question Is Uploaded
 	Wait For Ajax
 	Wait Until Element Is Visible	css=button[tid='btn.award.unsuccessful']	${COMMONWAIT}
 	Click Button	css=button[tid='btn.award.unsuccessful']
-
-
+#	debug
 
 
 Завантажити протокол аукціону
 	[Arguments]  ${username}  ${tender_id}  ${filepath}  ${award_index}
-
+#	debug
 	Wait For Ajax
 
 
 Завантажити угоду до тендера
   [Arguments]  ${username}  ${tender_id}  ${contract_num}  ${filepath}
-
+	Wait Until Element Is Visible			css=label[tid='docContract']	${COMMONWAIT}
+	Choose File								css=input[id='docsContractI']	${file_path}
+	Wait Until Element Is Visible			css=div.progress.progress-bar	${COMMONWAIT}
+	sleep									10s
 	Wait For Ajax
+	Wait Until Element Is Not Visible		css=div.progress.progress-bar	${COMMONWAIT}
 
 
 Скасування рішення кваліфікаційної комісії
@@ -779,3 +774,10 @@ Set Date And Time
 	Set Date	${date_element}	${date}
 	Set Time	${element_hour}	${element_min}	${date}
 
+Get Index Number
+	[Arguments]  ${elements}  ${element_index}
+	${elementsList} = 	Get Webelements	${elements}
+	${elementByIndex} = 	Get From List	${elementsList}	${element_index}
+	${index} = 	Get Index From List	${elementsList}	${elementByIndex}
+	${index} = 	modify_number	${index}	1
+	[return]	${index}
