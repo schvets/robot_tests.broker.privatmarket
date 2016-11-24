@@ -453,7 +453,9 @@ Check If Question Is Uploaded
 	Choose File		css=input[id='fileInputPr']	${filepath}
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar	${COMMONWAIT}
-	Select From List	css=select[tid='doc.type']	string:technicalSpecifications
+	${elements} = 	Get Webelements	css=select[tid='doc.type']
+	${element} = 	Get From List	${elements}	-1
+	Select From List	${element}	string:technicalSpecifications
 	Wait For Ajax
 	Click Element	css=button[tid='btn.addDocs']
 	Wait Until Element Is Not Visible	css=button[tid='btn.addDocs']	${COMMONWAIT}
@@ -471,7 +473,9 @@ Check If Question Is Uploaded
 	Choose File		css=input[id='fileInputPr']	${filepath}
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar	${COMMONWAIT}
-	Select From List	xpath=(//select[@tid='doc.type'])[2]	string:illustration
+	${elements} = 	Get Webelements	css=select[tid='doc.type']
+	${element} = 	Get From List	${elements}	-1
+	Select From List	${element}	string:illustration
 	Wait For Ajax
 	Click Element	css=button[tid='btn.addDocs']
 	Wait Until Element Is Visible	css=button[tid='btn.refreshlot']	${COMMONWAIT}
@@ -496,7 +500,7 @@ Check If Question Is Uploaded
 	[Arguments]  ${user_name}  ${tender_id}  ${bid_index}  ${document_index}  ${field}
 #	debug
 	${bid_index} = 	Get Index Number	xpath=//div[@class='text-info questionsBox']	${bid_index}
-	${document_index} = 	modify_number	${document_index}	1
+	${document_index} = 	sum_of_numbers	${document_index}	1
 	${result} =	Get Text	xpath=((//div[@class='text-info questionsBox'])[${bid_index}]////span[@tid='bid.document.type'])[${document_index}]
 	[return]	${result}
 
@@ -617,6 +621,10 @@ Check If Question Is Uploaded
 
 
 Скасування рішення кваліфікаційної комісії
+  [Arguments]  ${username}  ${tender_uaid}  ${award_num}
+#	debug
+	Wait For Ajax
+
 
 #Custom Keywords
 Login
@@ -779,5 +787,6 @@ Get Index Number
 	${elementsList} = 	Get Webelements	${elements}
 	${elementByIndex} = 	Get From List	${elementsList}	${element_index}
 	${index} = 	Get Index From List	${elementsList}	${elementByIndex}
-	${index} = 	modify_number	${index}	1
+	${index} = 	sum_of_numbers	${index}	1
 	[return]	${index}
+

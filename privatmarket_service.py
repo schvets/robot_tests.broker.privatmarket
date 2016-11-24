@@ -30,6 +30,6 @@ def modify_test_data(initial_data):
     initial_data['procuringEntity']['name'] = u"ВОЛОДИМИР БІЛЯВЦЕВ"
     return initial_data
 
-def modify_number(number, value):
+def sum_of_numbers(number, value):
     number = int(number) + int(value)
     return number
