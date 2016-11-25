@@ -379,7 +379,7 @@ Check If Question Is Uploaded
 	Click Button							css=button[tid='sendQuestion']
 	Sleep									5s
 	Wait Until Element Is Not Visible		css=div.progress.progress-bar	${COMMONWAIT}
-	Wait For Element With Reload			css=span[tid='data.quesion.date']
+	Wait For Element With Reload			css=span[tid='data.question.date']
 
 
 Відповісти на запитання
@@ -483,7 +483,7 @@ Check If Question Is Uploaded
 
 Завантажити фінансову ліцензію
 	[Arguments]  ${user_name}  ${tender_id}  ${financial_license_path}
-	Wait Until Element Is Visible	css=span[tid='editBtn']	${COMMONWAIT}
+	fail	unrealized keyword
 
 
 Отримати кількість документів в ставці
