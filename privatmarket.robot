@@ -56,7 +56,7 @@ ${tender_data.auction.status}							css=span[tid='data.statusName']
 
 ${tender_data.cancellations[0].status}					css=span[tid='cancellation.status']
 ${tender_data.cancellations[0].reason}					css=span[tid='cancellation.reason']
-${tender_data.cancellation.doc.title}					css=a[tid='cancellation.doc.title']
+${tender_data.cancellation.doc.title}					xpath=//a[@tid='cancellation.doc.title']
 ${tender_data.cancellation.doc.description}				css=span[tid='cancellation.doc.description']
 
 
@@ -223,8 +223,8 @@ Wait for question
 	[Arguments]  ${username}  ${tender_uaid}  ${doc_id}  ${element}
 	${element} =	Set Variable If		'скасування лоту' in '${TEST_NAME}'		cancellation.doc.${element}		doc.${element}
 
-	Run Keyword And Return If	'${element}' == 'doc.title'		Отримати заголовок документації до лоту		${element}
-	Run Keyword And Return If	'${element}' == 'cancellation.doc.title'	Отримати заголовок документа	${element}
+	Run Keyword And Return If	'${element}' == 'doc.title'		Отримати заголовок документації до лоту		${element}	${doc_id}
+	Run Keyword And Return If	'${element}' == 'cancellation.doc.title'	Отримати заголовок документа	${element}	${doc_id}
 
 	Wait Until Element Is Visible	${tender_data.${element}}	timeout=${COMMONWAIT}
 	${result} =		Отримати текст	${element}
@@ -232,18 +232,24 @@ Wait for question
 
 
 Отримати заголовок документа
-	[Arguments]  ${element}
-	${text} =	Get Element Attribute	${tender_data.${element}}[2]@title
-	${words} =	Split String	${text}	\\
-	${result} =	Get From List	${words}	-1
-	[return]	${result}
+	[Arguments]  ${element_name}  ${doc_id}=${EMPTY}
+	${elements_list} =	Get Webelements	${tender_data.${element_name}}
+	${size} =	Get Length	${elements_list}
+	${size} =	Sum_Of_Numbers	${size}	1
+	${title} =	Set Variable	${EMPTY}
+	: FOR    ${index}    IN RANGE    1    ${size}
+	\    ${text} =	Get Element Attribute	${tender_data.${element_name}}[${index}]@title
+	\    ${words} =	Split String	${text}	\\
+	\    ${result} =	Get From List	${words}	-1
+	\    Run Keyword If	'${doc_id}' in '${result}'	Return From Keyword	${result}
+	[return]	${title}
 
 
 Отримати заголовок документації до лоту
-	[Arguments]  ${element}
+	[Arguments]  ${element}  ${doc_id}=${EMPTY}
 	Wait For Element With Reload	css=div[ng-click='openLotDocsModal()']
 	Click Element	css=div[ng-click='openLotDocsModal()']
-	${result} =		Отримати заголовок документа	${element}
+	${result} =		Отримати заголовок документа	${element}	${doc_id}
 	[return]	${result}
 
 
