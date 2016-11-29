@@ -490,11 +490,16 @@ Check If Question Is Uploaded
 
 Завантажити фінансову ліцензію
 	[Arguments]  ${user_name}  ${tender_id}  ${financial_license_path}
-	fail	unrealized keyword
+	Wait Until Element Is Visible	css=label[tid='modifyDoc']
+	Choose File		css=input[id='modifyDocs']	${financial_license_path}
+	Wait For Ajax
+	Wait Until Element Is Not Visible	css=div.progress.progress-bar	${COMMONWAIT}
 
 
 Отримати кількість документів в ставці
 	[Arguments]  ${user_name}  ${tender_id}  ${bid_index}
+	Wait For Ajax
+	Sleep	10s
 	Wait Until Element Is Visible	xpath=//div[@class='text-info questionsBox']
 	${index} = 	Get Index Number	xpath=//div[@class='text-info questionsBox']	${bid_index}
 	${result} = 	Get Matching Xpath Count	(//div[@class='text-info questionsBox'])[${index}]//a[@tid='bid.document.title']
@@ -545,8 +550,10 @@ Check If Question Is Uploaded
 
 Підтвердити постачальника
 	[Arguments]  ${user_name}  ${tender_id}  ${award_num}
-	Wait For Element With Reload			css=button[ng-click='confirmAward(award)']
-	${buttons_list} = 	Get Webelements		css=button[ng-click='confirmAward(award)']
+	Wait For Ajax
+#	debug
+	Wait For Element With Reload			css=button[tid='btn.award.active']
+	${buttons_list} = 	Get Webelements		css=button[tid='btn.award.active']
 	Click Button							${buttons_list[${award_num}]}
 	Wait For Ajax
 
@@ -591,11 +598,14 @@ Check If Question Is Uploaded
 
 Завантажити документ рішення кваліфікаційної комісії
 	[Arguments]  ${username}  ${file_path}  ${tender_id}  ${award_num}
-	Wait Until Element Is Visible	css=button[tid='btn.award.cancelled']	${COMMONWAIT}
-	Click Button	css=button[tid='btn.award.cancelled']
 	Wait For Ajax
-	Wait Until Element Is Visible	css=button[tid='btn.award.addDocForCancel']	${COMMONWAIT}
-	Choose File		css=input[id='rejectQualificationInput']	${filepath}
+	Wait Until Element Is Visible	css=button[tid='btn.award.cancelled']	${COMMONWAIT}
+	${buttons_list} = 	Get Webelements	css=button[tid='btn.award.cancelled']
+	Click Button	${buttons_list[${award_num}]}
+	Wait For Ajax
+#	debug
+	Wait Until Element Is Visible	xpath=(//div[@class='questionsBox ng-scope'])[${index}]//button[@tid='btn.award.addDocForCancel']	${COMMONWAIT}
+	Choose File		xpath=(//div[@class='questionsBox ng-scope'])[${index}]//input[@id='rejectQualificationInput']	${filepath}
 	Wait For Ajax
 
 
@@ -603,14 +613,20 @@ Check If Question Is Uploaded
 	[Arguments]  ${username}  ${tender_id}  ${award_num}  ${description}
 	Wait Until Element Is Visible	css=button[tid='btn.award.unsuccessful']	${COMMONWAIT}
 	Click Button	css=button[tid='btn.award.unsuccessful']
+	Wait For Ajax
+
 
 Завантажити протокол аукціону
 	[Arguments]  ${username}  ${tender_id}  ${filepath}  ${bid_index}
-	Wait Until Element Is Visible	css=button[tid='btn.award.active']	${COMMONWAIT}
-	Click Button	css=button[tid='btn.award.active']
-	Wait Until Element Is Visible	css=label[tid='docContract']	${COMMONWAIT}
-	Choose File		css=input[id='docsContractI']	${filepath}
+#	debug
+	privatmarket.Пошук тендера по ідентифікатору	${username}	${tender_id}
+#	debug
+	Wait Until Element Is Visible	css=label[tid='docProtocol']	${COMMONWAIT}
+	Choose File		css=input[id='docsProtocolI']	${filepath}
 	Wait For Ajax
+	Wait Until Element Is Not Visible		css=div.progress.progress-bar	${COMMONWAIT}
+	Wait Until Element Is Enabled	css=button[tid='confirmProtocol']	${COMMONWAIT}
+	Click Button	css=button[tid='confirmProtocol']
 
 
 Завантажити угоду до тендера
@@ -625,8 +641,9 @@ Check If Question Is Uploaded
 
 Скасування рішення кваліфікаційної комісії
   [Arguments]  ${username}  ${tender_uaid}  ${award_num}
+	Sleep	1s
 #	debug
-	fail	unrealized keyword
+#	fail	unrealized keyword
 
 
 #Custom Keywords
