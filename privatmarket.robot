@@ -8,7 +8,7 @@ Library  BuiltIn
 
 
 *** Variables ***
-${COMMONWAIT}	40
+${COMMONWAIT}	20
 
 ${tender_data.title}									css=span[tid='data.title']
 ${tender_data.description}								css=span[tid='data.description']
