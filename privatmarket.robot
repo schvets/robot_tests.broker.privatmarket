@@ -6,7 +6,7 @@ Library  privatmarket_service.py
 Library  Collections
 Library  BuiltIn
 
-
+mod
 *** Variables ***
 ${COMMONWAIT}	60
 
@@ -471,9 +471,9 @@ Check If Question Is Uploaded
 
 Завантажити ілюстрацію
 	[Arguments]  ${user_name}  ${tender_id}  ${filepath}
-	Wait Until Element Is Visible	css=span[tid='editBtn']	30
+	Wait Until Element Is Visible	css=span[tid='editBtn']	${COMMONWAIT}
 	Click Element	css=span[tid='editBtn']
-	Wait Until Element Is Visible	css=div[tid='btn.add.docs']
+	Wait Until Element Is Visible	css=div[tid='btn.add.docs']	${COMMONWAIT}
 	Click Element	css=div[tid='btn.add.docs']
 	Wait Until Element Is Enabled	css=div[tid='btn.addFiles']	${COMMONWAIT}
 	Choose File		css=input[id='fileInputPr']	${filepath}
@@ -490,8 +490,9 @@ Check If Question Is Uploaded
 
 Завантажити фінансову ліцензію
 	[Arguments]  ${user_name}  ${tender_id}  ${financial_license_path}
-	Wait Until Element Is Visible	css=label[tid='modifyDoc']
-	Choose File		css=input[id='modifyDocs']	${financial_license_path}
+	Wait For Element With Reload	css=label[tid='modifyDoc']
+	Wait Until Element Is Visible	css=label[tid='modifyDoc']	${COMMONWAIT}
+	Choose File		css=input[id='modifyDoc']	${financial_license_path}
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar	${COMMONWAIT}
 
@@ -500,7 +501,7 @@ Check If Question Is Uploaded
 	[Arguments]  ${user_name}  ${tender_id}  ${bid_index}
 	Wait For Ajax
 	Sleep	10s
-	Wait Until Element Is Visible	xpath=//div[@class='text-info questionsBox']
+	Wait Until Element Is Visible	xpath=//div[@class='text-info questionsBox']	${COMMONWAIT}
 	${index} = 	Get Index Number	xpath=//div[@class='text-info questionsBox']	${bid_index}
 	${result} = 	Get Matching Xpath Count	(//div[@class='text-info questionsBox'])[${index}]//a[@tid='bid.document.title']
 	[return]  ${result}
@@ -516,7 +517,7 @@ Check If Question Is Uploaded
 
 Додати Virtual Data Room
 	[Arguments]  ${user_name}  ${tender_id}  ${vdr_url}
-	Wait Until Element Is Visible	css=span[tid='editBtn']	30
+	Wait Until Element Is Visible	css=span[tid='editBtn']	${COMMONWAIT}
 	Click Element	css=span[tid='editBtn']
 	Wait Until Element Is Visible	css=div[tid='btn.add.docs']	${COMMONWAIT}
 	Click Element	css=div[tid='btn.add.docs']
@@ -619,6 +620,7 @@ Check If Question Is Uploaded
 	Wait Until Element Is Not Visible		css=div.progress.progress-bar	${COMMONWAIT}
 	Wait Until Element Is Enabled	css=button[tid='confirmProtocol']	${COMMONWAIT}
 	Click Button	css=button[tid='confirmProtocol']
+	Sleep	20s
 
 
 Завантажити угоду до тендера
