@@ -551,7 +551,6 @@ Check If Question Is Uploaded
 Підтвердити постачальника
 	[Arguments]  ${user_name}  ${tender_id}  ${award_num}
 	Wait For Ajax
-#	debug
 	Wait For Element With Reload			css=button[tid='btn.award.active']
 	${buttons_list} = 	Get Webelements		css=button[tid='btn.award.active']
 	Click Button							${buttons_list[${award_num}]}
@@ -616,12 +615,10 @@ Check If Question Is Uploaded
 	privatmarket.Пошук тендера по ідентифікатору	${username}	${tender_id}
 	Wait Until Element Is Visible	css=label[tid='docProtocol']	${COMMONWAIT}
 	Choose File		css=input[id='docsProtocolI']	${file_path}
-	debug
 	Wait For Ajax
 	Wait Until Element Is Not Visible		css=div.progress.progress-bar	${COMMONWAIT}
 	Wait Until Element Is Enabled	css=button[tid='confirmProtocol']	${COMMONWAIT}
 	Click Button	css=button[tid='confirmProtocol']
-	debug
 
 
 Завантажити угоду до тендера
