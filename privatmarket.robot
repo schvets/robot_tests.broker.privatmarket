@@ -80,13 +80,14 @@ ${tender_data.cancellation.doc.description}				css=span[tid='cancellation.doc.de
 	${options}= 	Evaluate	sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
 	Call Method	${options}		add_argument	--allow-running-insecure-content
 	Call Method	${options}		add_argument	--disable-web-security
-	Call Method	${options}		add_argument	--start-maximized
 	Call Method	${options}		add_argument	--nativeEvents\=false
 	Call Method	${options}		add_experimental_option	prefs	${prefs}
 
 	Run Keyword If	'phantomjs' in '${browser}'	Create Webdriver	PhantomJS	${username}	service_args=${service_args}
 	...   ELSE	Create WebDriver	Chrome	chrome_options=${options}	alias=${username}
 
+	Set Window Size									@{USERS.users['${username}'].size}
+	Set Window Position								@{USERS.users['${username}'].position}
 	Set Selenium Implicit Wait						10s
 	Go To	${USERS.users['${username}'].homepage}
 	Run Keyword Unless	'Viewer' in '${username}'	Login	${username}
@@ -615,10 +616,12 @@ Check If Question Is Uploaded
 	privatmarket.Пошук тендера по ідентифікатору	${username}	${tender_id}
 	Wait Until Element Is Visible	css=label[tid='docProtocol']	${COMMONWAIT}
 	Choose File		css=input[id='docsProtocolI']	${file_path}
+	debug
 	Wait For Ajax
 	Wait Until Element Is Not Visible		css=div.progress.progress-bar	${COMMONWAIT}
 	Wait Until Element Is Enabled	css=button[tid='confirmProtocol']	${COMMONWAIT}
 	Click Button	css=button[tid='confirmProtocol']
+	debug
 
 
 Завантажити угоду до тендера
