@@ -8,7 +8,7 @@ Library  BuiltIn
 
 
 *** Variables ***
-${COMMONWAIT}	40
+${COMMONWAIT}	60
 
 ${tender_data.title}									css=span[tid='data.title']
 ${tender_data.description}								css=span[tid='data.description']
@@ -550,6 +550,7 @@ Check If Question Is Uploaded
 Підтвердити постачальника
 	[Arguments]  ${user_name}  ${tender_id}  ${award_num}
 	Wait For Ajax
+#	debug
 	Wait For Element With Reload			css=button[tid='btn.award.active']
 	${buttons_list} = 	Get Webelements		css=button[tid='btn.award.active']
 	Click Button							${buttons_list[${award_num}]}
