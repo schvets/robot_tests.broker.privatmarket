@@ -6,7 +6,7 @@ Library  privatmarket_service.py
 Library  Collections
 Library  BuiltIn
 
-mod
+
 *** Variables ***
 ${COMMONWAIT}	60
 
