@@ -268,11 +268,11 @@ Wait for question
 
 Отримати документ
 	[Arguments]  ${username}  ${tender_uaid}  ${doc_id}
-	${file_name} =	Get Element Attribute	${tender_data.doc.title}@title
+	${file_name} =	Get Element Attribute	${tender_data.doc.title}[2]@title
 	${file_name} =	Replace String			${file_name}	:	-
 	${file_name} =	Replace String			${file_name}	~	-
 	${file_name} =	Replace String			${file_name}	\\	%5C
-	Click Element							${tender_data.doc.title}
+	Click Element							${tender_data.doc.title}[2]
 	Sleep									8s
 	[return]	${file_name}
 
@@ -408,7 +408,6 @@ Check If Question Is Uploaded
 	${amount} = 						Convert To String	${bid.data.value.amount}
 	Input Text							css=input[ng-model='newbid.amount']		${amount}
 	Click Button						css=button[ng-click='createBid(newbid)']
-	Wait Until Element Is Visible		css=div.progress.progress-bar			${COMMONWAIT}
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar			${COMMONWAIT}
 
@@ -418,7 +417,6 @@ Check If Question Is Uploaded
 	Wait For Element With Reload		css=button[ng-click='deleteBid(bid)']	5
 	Wait Until Element Is Visible		css=button[ng-click='deleteBid(bid)']	${COMMONWAIT}
 	Click Button						css=button[ng-click='deleteBid(bid)']
-	Wait Until Element Is Visible		css=div.progress.progress-bar			${COMMONWAIT}
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar			${COMMONWAIT}
 	Wait Until Element Is Not Visible	css=button[ng-click='deleteBid(bid)']	${COMMONWAIT}
@@ -434,7 +432,6 @@ Check If Question Is Uploaded
 	Clear Element Text					css=input[tid='bid.value.newAmount']
 	Input Text							css=input[tid='bid.value.newAmount']			${amount}
 	Click Element						css=label[ng-click='showModifyBidOrSave(bid)']
-	Wait Until Element Is Visible		css=div.progress.progress-bar					${COMMONWAIT}
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar					${COMMONWAIT}
 
@@ -443,7 +440,6 @@ Check If Question Is Uploaded
 	[Arguments]  ${user_name}  ${filepath}  ${tender_id}=${None}
 	Wait Until Element Is Visible			css=label[tid='modifyDoc']		${COMMONWAIT}
 	Choose File								css=input[id='modifyDocs']		${filepath}
-	Wait Until Element Is Visible			css=div.progress.progress-bar	${COMMONWAIT}
 	sleep									10s
 	Wait For Ajax
 	Wait Until Element Is Not Visible		css=div.progress.progress-bar	${COMMONWAIT}
@@ -576,7 +572,6 @@ Check If Question Is Uploaded
 	#add doc
 	Wait Until Element Is Visible			css=button[tid='docCancellation']		${COMMONWAIT}
 	Choose File								css=#docsCancellation		${doc_path}
-	Wait Until Element Is Visible			css=div.progress.progress-bar	${COMMONWAIT}
 	Wait For Ajax
 
 	#input description
@@ -589,7 +584,6 @@ Check If Question Is Uploaded
 	#confirm
 	Click Button							css=button[tid='btn.cancellation']
 
-	Wait Until Element Is Visible			css=div.progress.progress-bar	${COMMONWAIT}
 	sleep									10s
 	Wait For Ajax
 	Wait Until Element Is Not Visible		css=div.progress.progress-bar	60
@@ -627,7 +621,6 @@ Check If Question Is Uploaded
   [Arguments]  ${username}  ${tender_id}  ${contract_num}  ${file_path}
 	Wait Until Element Is Visible			css=label[tid='docContract']	${COMMONWAIT}
 	Choose File								css=input[id='docsContractI']	${file_path}
-	Wait Until Element Is Visible			css=div.progress.progress-bar	${COMMONWAIT}
 	sleep									10s
 	Wait For Ajax
 	Wait Until Element Is Not Visible		css=div.progress.progress-bar	${COMMONWAIT}
