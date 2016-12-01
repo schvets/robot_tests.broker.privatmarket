@@ -624,6 +624,9 @@ Check If Question Is Uploaded
 	sleep									10s
 	Wait For Ajax
 	Wait Until Element Is Not Visible		css=div.progress.progress-bar	${COMMONWAIT}
+	Wait Until Element Is Enabled	css=button[tid='contractConfirm']	${COMMONWAIT}
+	Click Button	css=button[tid='contractConfirm']
+	Wait For Ajax
 
 
 Скасування рішення кваліфікаційної комісії
