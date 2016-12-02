@@ -439,7 +439,7 @@ Check If Question Is Uploaded
 Завантажити документ в ставку
 	[Arguments]  ${user_name}  ${filepath}  ${tender_id}=${None}
 	Wait Until Element Is Visible			css=label[tid='modifyDoc']		${COMMONWAIT}
-	Choose File								css=input[id='modifyDocs']		${filepath}
+	Choose File								css=input[id='modifyDoc']		${filepath}
 	sleep									10s
 	Wait For Ajax
 	Wait Until Element Is Not Visible		css=div.progress.progress-bar	${COMMONWAIT}
