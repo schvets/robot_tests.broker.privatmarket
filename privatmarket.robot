@@ -592,9 +592,9 @@ Check If Question Is Uploaded
 
 Завантажити документ рішення кваліфікаційної комісії
 	[Arguments]  ${username}  ${file_path}  ${tender_id}  ${award_num}
+	Wait For Ajax
 	Wait Until Element Is Visible	css=button[tid='btn.award.addDocForCancel']	${COMMONWAIT}
-	${index} = 	Get Index Number	xpath=//div[@class='questionsBox ng-scope']	${award_num}
-	Choose File		xpath=(//div[@class='questionsBox ng-scope'])[${index}]//input[@id='rejectQualificationInput']	${file_path}
+	Choose File		xpath=//button[@tid='btn.award.addDocForCancel']/following-sibling::input	${file_path}
 	Wait For Ajax
 
 
