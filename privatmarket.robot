@@ -59,6 +59,7 @@ ${tender_data.cancellations[0].reason}					css=span[tid='cancellation.reason']
 ${tender_data.cancellation.doc.title}					xpath=//a[@tid='cancellation.doc.title']
 ${tender_data.cancellation.doc.description}				css=span[tid='cancellation.doc.description']
 
+${tender_data.procurementMethodType}					css=span[tid='data.procurementMethodTypeName']
 
 *** Keywords ***
 Підготувати дані для оголошення тендера
@@ -173,7 +174,7 @@ ${tender_data.cancellation.doc.description}				css=span[tid='cancellation.doc.de
 	Run Keyword And Return If	'${element}' == 'minimalStep.valueAddedTaxIncluded'		Отримати інформацію про включення ПДВ	${element}
 	Run Keyword And Return If	'${element}' == 'auction.status'						Отримати status аукціону				${element}
 	Run Keyword And Return If	'${element}' == 'tender_cancellation_title'				Отримати заголовок документа			${element}
-
+	Run Keyword And Return If	'${element}' == 'procurementMethodType'					Отримати тип оголошеного лоту			${element}
 
 	Run Keyword If				'auctionPeriod' in '${element}'	Wait Until Keyword Succeeds	5min	3s	Check For Auction Dates
 	Run Keyword And Return If	'Period.' in '${element}'								Отримати дату та час					${element}
@@ -637,6 +638,20 @@ Check If Question Is Uploaded
 	Wait For Ajax
 
 
+Отримати тип оголошеного лоту
+	[Arguments]  ${element}
+	Wait For Element With Any Text	${tender_data.${element}}
+#	Run Keyword If	'viewer' in ${TEST_TAGS}	Wait Until Element Is Visible	${tender_data.${element}}	${COMMONWAIT}
+#		...  ELSE IF	Wait Until Element Is Visible	css=span[tid='editBtn']	${COMMONWAIT}
+#	Wait For Ajax
+	${text} =	Отримати текст елемента		${element}
+	${result} =	Set Variable If
+		...  '${text}' == 'продаж майна'	dgfOtherAssets
+		...  '${text}' == 'продаж прав вимоги за кредитами'	dgfFinancialAssets
+		...  ${text}
+	[return]	${result}
+
+
 #Custom Keywords
 Login
 	[Arguments]  ${username}
@@ -800,4 +815,16 @@ Get Index Number
 	${index} = 	Get Index From List	${elementsList}	${elementByIndex}
 	${index} = 	sum_of_numbers	${index}	1
 	[return]	${index}
+
+
+Wait For Element With Any Text
+	[Arguments]	${element}
+	Wait Until Keyword Succeeds	1min	5s	Try Wait For Element With Any Text	${element}
+
+
+Try Wait For Element With Any Text
+	[Arguments]	${element}
+	Wait Until Element Is Visible	${element}	${COMMONWAIT}
+	${text} = 	Get Text	${element}
+	Should Not Be Equal As Strings  ${text}  ${EMPTY}
 
