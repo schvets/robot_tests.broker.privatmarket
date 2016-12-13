@@ -33,3 +33,13 @@ def modify_test_data(initial_data):
 def sum_of_numbers(number, value):
     number = int(number) + int(value)
     return number
+
+def get_current_year():
+    now = datetime.now()
+    return now.year
+
+def get_month_number(month_name):
+    monthes = [u"січня", u"лютого", u"березня", u"квітня", u"травня", u"червня",
+               u"липня", u"серпня", u"вересня", u"жовтня", u"листопада", u"грудня"]
+    return monthes.index(month_name) + 1
+
