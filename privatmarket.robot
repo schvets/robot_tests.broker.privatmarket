@@ -110,23 +110,25 @@ ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 	${items_number} =	Get Length  ${items}
 	Wait Enable And Click Element	css=#simple-dropdown
 	Wait Enable And Click Element	css=a[href='#/add-lot']
+	${correctDate} =	Convert Date	${tender_data.data.dgfDecisionDate}	result_format=%d/%m/%Y
+	${correctDate} =	Convert To String	${correctDate}
 
 	#main info
 	Execute Javascript	angular.prozorroaccelerator=1440;
 	Wait Until Element Is Enabled	css=input[tid='data.title']
 	Input text	css=input[tid='data.title']	${tender_data.data.title}
+	Input text	css=input[tid='data.dgfID']	${tender_data.data.dgfID}
+	Select From List	css=select[tid='data.procurementMethodType']	string:${tender_data.data.procurementMethodType}
+	Run Keyword If	'${tender_data.data.procurementMethodType}' == 'dgfFinancialAssets'		Run Keywords	Wait Until Element Is Visible	css=input[tid='dgfDecisionDate']
+	...   AND   	Input Text	css=input[tid='dgfDecisionDate']	${correctDate}
+	...   AND   	Input text	css=input[tid='data.dgfDecisionID']	${tender_data.data.dgfDecisionID}
+
+	Select From List	css=select[tid='data.tenderAttempts']	number:${tender_data.data.tenderAttempts}
 	Input text	css=textarea[tid='data.description']	${tender_data.data.description}
-	Select From List	css=select[tid='data.procurementMethodType']	string:${mode}
 	Input text	css=input[tid='data.value.amount']	'${tender_data.data.value.amount}'
 	Run Keyword If	'${tender_data.data.value.valueAddedTaxIncluded}' == 'True'	Click Element	css=input[tid='data.value.valueAddedTaxIncluded']
 		...  ELSE	Click Element	css=input[tid='data.value.valueAddedTaxNotIncluded']
 	Input text	css=input[tid='data.minimalStep.amount']	'${tender_data.data.minimalStep.amount}'
-	Input text	css=input[tid='data.dgfID']	${tender_data.data.dgfID}
-	Input text	css=input[tid='data.dgfDecisionID']	${tender_data.data.dgfDecisionID}
-	${correctDate} =	Convert Date	${tender_data.data.dgfDecisionDate}	result_format=%d/%m/%Y
-	${correctDate} =	Convert To String	${correctDate}
-	Input Text	css=input[tid='dgfDecisionDate']	${correctDate}
-	Select From List	css=select[tid='data.tenderAttempts']	number:${tender_data.data.tenderAttempts}
 
 	#items
 	: FOR  ${index}  IN RANGE  ${items_number}
@@ -685,7 +687,7 @@ Login
 	[Arguments]  ${username}
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar			${COMMONWAIT}
 	Sleep				7s
-	Wait Enable And Click Element		css=a[ng-click="loginModal('login')"]
+	Wait Enable And Click Element		css=a[ui-sref='modal.login']
 	Wait Enable And Click Element		xpath=//a[contains(@href, 'https://bankid.privatbank.ua')]
 
 	Wait Until Element Is Visible		css=input[id='loginLikePhone']			5s
@@ -701,6 +703,9 @@ Login
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar			${COMMONWAIT}
 	Wait Until Element Is Not visible	css=a[id='confirmButton']
+	#Close message notification
+	Wait Enable And Click Element	css=button[ng-click='later()']
+	Wait Until Element Is Not visible	css=button[ng-click='later()']
 	Wait Until Element Is Visible		css=input[tid='global.search']
 
 
