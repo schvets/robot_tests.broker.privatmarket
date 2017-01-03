@@ -5,7 +5,6 @@ Library  DebugLibrary
 Library  privatmarket_service.py
 Library  Collections
 Library  BuiltIn
-Library  DateTime
 
 *** Variables ***
 ${COMMONWAIT}	60
@@ -63,10 +62,6 @@ ${tender_data.procurementMethodType}					css=div[tid='data.procurementMethodType
 ${tender_data.tenderAttempts}							css=span[tid='data.tenderAttempts']
 ${tender_data.dgfDecisionDate}							css=span[tid='data.dgfDecisionDate']
 ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
-
-
-
-
 
 
 *** Keywords ***
@@ -131,6 +126,7 @@ ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 	${correctDate} =	Convert Date	${tender_data.data.dgfDecisionDate}	result_format=%d/%m/%Y
 	${correctDate} =	Convert To String	${correctDate}
 	Input Text	css=input[tid='dgfDecisionDate']	${correctDate}
+	Select From List	css=select[tid='data.tenderAttempts']	number:${tender_data.data.tenderAttempts}
 
 	#items
 	: FOR  ${index}  IN RANGE  ${items_number}
@@ -389,8 +385,8 @@ Check If Question Is Uploaded
 	[Arguments]  ${title}
 	Reload Page
 	Wait For Ajax
-	Wait Enable And Click Element	css=a[ng-click='hideAddFilters = !hideAddFilters']
-	Wait Until Element Is Enabled	xpath=//div[@ng-repeat='item in data.items']//div[@ng-if='data.questions' and contains(., '${title}')]	3
+#	Wait Enable And Click Element	css=a[ng-click='hideAddFilters = !hideAddFilters']
+	Wait Until Element Is Enabled	xpath=//div[@ng-repeat='question in data.questions']//span[@tid='data.question.title' and contains(., '${title}')]	3
 	[return]	True
 
 
@@ -401,7 +397,7 @@ Check If Question Is Uploaded
 	Input Text								css=textarea[ng-model='newQuestion.text']	${question_data.data.description}
 
 	Click Element							css=div[ng-model='newQuestion.questionOf'] span
-	Wait Enable And Click Element			xpath=//span[@class='ui-select-choices-row-inner' and contains(., 'Загальне питання по аукціону')]
+	Wait Enable And Click Element			xpath=//span[@class='ui-select-choices-row-inner' and contains(., 'Загальне запитання')]
 
 	Click Button							css=button[tid='sendQuestion']
 	Sleep									5s
@@ -411,11 +407,10 @@ Check If Question Is Uploaded
 
 Відповісти на запитання
 	[Arguments]  ${user_name}  ${tender_id}  ${answer}  ${question_id}
-	Wait Until Element Is Visible	xpath=//div[@class='row questionsBox ng-scope' and contains(., '${question_id}')]//button[@class='btn-answer']	${COMMONWAIT}
-	Click Element	xpath=//button[@class='btn-answer' and @tid='question.showAnswerBlock']
-	Wait Until Element Is Visible	css=textarea[tid='data.question.answerEdit']	${COMMONWAIT}
-	Input Text	css=textarea[tid='data.question.answerEdit']	${answer.data.answer}
-	Click Button	css=button[tid='answerQuestion']
+	Wait Until Element Is Visible	xpath=//div[@class='row question' and contains(., '${question_id}')]//button[@tid='answerQuestion']	${COMMONWAIT}
+	Wait Until Element Is Visible	xpath=//div[@class='row question' and contains(., '${question_id}')]//input[@tid='input.answer']	${COMMONWAIT}
+	Input Text	xpath=//div[@class='row question' and contains(., '${question_id}')]//input[@tid='input.answer']	${answer.data.answer}
+	Click Button	xpath=//div[@class='row question' and contains(., '${question_id}')]//button[@tid='answerQuestion']
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar	${COMMONWAIT}
 
 
@@ -424,13 +419,14 @@ Check If Question Is Uploaded
 	Run Keyword If	'без кваліфікації' in '${TEST NAME}'	Fail	Is not implemented yet
 	#дождаться появления поля ввода ссуммы только в случае выполнения первого позитивного теста
 	Run Keyword Unless	'Неможливість подати цінову' in '${TEST NAME}' or 'подати повторно цінову' in '${TEST NAME}'
-		...  Wait For Element With Reload	css=input[ng-model='newbid.amount']	5
-	${amount} = 						Convert To String	${bid.data.value.amount}
-	Input Text							css=input[ng-model='newbid.amount']		${amount}
-	Click Button						css=button[ng-click='createBid(newbid)']
+		...  Wait Until Element Is Enabled	css=button[tid='createBid']	${COMMONWAIT}
+	Click Button	css=button[tid='createBid']
+	Wait Until Element Is Enabled	css=#amount	${COMMONWAIT}
+	${amount} = 	Convert To String	${bid.data.value.amount}
+	Input Text	css=#amount	${amount}
+	Click Button	xpath=//button[@tid='createBid' and @class='btn btn-success']
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar			${COMMONWAIT}
-
 
 Скасувати цінову пропозицію
 	[Arguments]  ${user_name}  ${tender_id}
@@ -517,17 +513,17 @@ Check If Question Is Uploaded
 	[Arguments]  ${user_name}  ${tender_id}  ${bid_index}
 	Wait For Ajax
 	Sleep	10s
-	Wait Until Element Is Visible	xpath=//div[@class='text-info questionsBox']	${COMMONWAIT}
-	${index} = 	Get Index Number	xpath=//div[@class='text-info questionsBox']	${bid_index}
-	${result} = 	Get Matching Xpath Count	(//div[@class='text-info questionsBox'])[${index}]//a[@tid='bid.document.title']
+	Wait Until Element Is Visible	xpath=//div[@ng-repeat='bid in data.bids']	${COMMONWAIT}
+	${index} = 	Get Index Number	xpath=//div[@ng-repeat='bid in data.bids']	${bid_index}
+	${result} = 	Get Matching Xpath Count	(//div[@ng-repeat='bid in data.bids'])[${index}]//a[@tid='bid.document.title']
 	[return]  ${result}
 
 
 Отримати дані із документу пропозиції
 	[Arguments]  ${user_name}  ${tender_id}  ${bid_index}  ${document_index}  ${field}
-	${bid_index} = 	Get Index Number	xpath=//div[@class='text-info questionsBox']	${bid_index}
+	${bid_index} = 	Get Index Number	xpath=//div[@ng-repeat='bid in data.bids']	${bid_index}
 	${document_index} = 	sum_of_numbers	${document_index}	1
-	${result} =	Get Text	xpath=((//div[@class='text-info questionsBox'])[${bid_index}]//span[@tid='bid.document.type'])[${document_index}]
+	${result} =	Get Text	xpath=((//div[@ng-repeat='bid in data.bids'])[${bid_index}]//span[@tid='bid.document.type'])[${document_index}]
 	[return]	${result}
 
 
@@ -639,11 +635,11 @@ Check If Question Is Uploaded
 
 Завантажити угоду до тендера
   [Arguments]  ${username}  ${tender_id}  ${contract_num}  ${file_path}
-	Wait Until Element Is Visible			css=label[tid='docContract']	${COMMONWAIT}
-	Choose File								css=input[id='docsContractI']	${file_path}
-	sleep									10s
+	Wait Until Element Is Visible	css=label[tid='docContract']	${COMMONWAIT}
+	Choose File	css=input[id='docsContractI']	${file_path}
+	sleep	10s
 	Wait For Ajax
-	Wait Until Element Is Not Visible		css=div.progress.progress-bar	${COMMONWAIT}
+	Wait Until Element Is Not Visible	css=div.progress.progress-bar	${COMMONWAIT}
 	Wait Until Element Is Enabled	css=button[tid='contractConfirm']	${COMMONWAIT}
 	Click Button	css=button[tid='contractConfirm']
 	Wait For Ajax
@@ -677,6 +673,12 @@ Check If Question Is Uploaded
 	${result} = 	Get Matching Xpath Count	//div[@id='fileitem']
 	[return]  ${result}
 
+
+Отримати кількість предметів в тендері
+	[Arguments]  ${user_name}  ${tender_id}
+	Wait Until Element Is Visible	css=span[tid='item.classification.description']	${COMMONWAIT}
+	${result} = 	Get Matching Xpath Count	//span[@tid='item.classification.description']
+	[return]  ${result}
 
 #Custom Keywords
 Login
