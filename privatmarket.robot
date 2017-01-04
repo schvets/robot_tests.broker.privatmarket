@@ -421,6 +421,7 @@ Check If Question Is Uploaded
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar			${COMMONWAIT}
 
+
 Скасувати цінову пропозицію
 	[Arguments]  ${user_name}  ${tender_id}
 	Wait For Element With Reload		css=button[tid='btn.deleteBid']	5
@@ -694,9 +695,10 @@ Login
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar			${COMMONWAIT}
 	Wait Until Element Is Not visible	css=a[id='confirmButton']
+
 	#Close message notification
-	Wait Enable And Click Element	css=button[ng-click='later()']
-	Wait Until Element Is Not visible	css=button[ng-click='later()']
+	${notification_visibility} = 	Run Keyword And Return Status	Wait Until Element Is Visible	css=button[ng-click='later()']
+	Run Keyword If	'${notification_visibility}' == 'True'	Click Element	css=button[ng-click='later()']
 	Wait Until Element Is Visible		css=input[tid='global.search']
 
 
