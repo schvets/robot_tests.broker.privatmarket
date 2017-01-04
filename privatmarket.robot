@@ -119,9 +119,8 @@ ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 	Input text	css=input[tid='data.title']	${tender_data.data.title}
 	Input text	css=input[tid='data.dgfID']	${tender_data.data.dgfID}
 	Select From List	css=select[tid='data.procurementMethodType']	string:${tender_data.data.procurementMethodType}
-	Run Keyword If	'${tender_data.data.procurementMethodType}' == 'dgfFinancialAssets'		Run Keywords	Wait Until Element Is Visible	css=input[tid='dgfDecisionDate']
-	...   AND   	Input Text	css=input[tid='dgfDecisionDate']	${correctDate}
-	...   AND   	Input text	css=input[tid='data.dgfDecisionID']	${tender_data.data.dgfDecisionID}
+	Input Text	css=input[tid='dgfDecisionDate']	${correctDate}
+	Input text	css=input[tid='data.dgfDecisionID']	${tender_data.data.dgfDecisionID}
 
 	Select From List	css=select[tid='data.tenderAttempts']	number:${tender_data.data.tenderAttempts}
 	Input text	css=textarea[tid='data.description']	${tender_data.data.description}
@@ -129,6 +128,9 @@ ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 	Run Keyword If	'${tender_data.data.value.valueAddedTaxIncluded}' == 'True'	Click Element	css=input[tid='data.value.valueAddedTaxIncluded']
 		...  ELSE	Click Element	css=input[tid='data.value.valueAddedTaxNotIncluded']
 	Input text	css=input[tid='data.minimalStep.amount']	'${tender_data.data.minimalStep.amount}'
+	#date/time
+	Set Date And Time	css=input[tid='auctionStartDate']	css=div[tid='auctionStartTime'] input[ng-model='hours']	css=div[tid='auctionStartTime'] input[ng-model='minutes']	${tender_data.data.auctionPeriod.startDate}
+
 
 	#items
 	: FOR  ${index}  IN RANGE  ${items_number}
@@ -153,8 +155,6 @@ ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 	\	Input text	xpath=(//input[@tid='item.address.streetAddress'])[${path_index}]	${items[${index}].deliveryAddress.streetAddress}
 	\	Input text	xpath=(//input[@tid='item.address.locality'])[${path_index}]	${items[${index}].deliveryAddress.locality}
 
-	#date/time
-	Set Date And Time	css=input[tid='auctionStartDate']	css=div[tid='auctionStartTime'] input[ng-model='hours']	css=div[tid='auctionStartTime'] input[ng-model='minutes']	${tender_data.data.auctionPeriod.startDate}
 	Click Button	css=button[tid='btn.createlot']
 	Wait Until element Is Visible	css=div[tid='data.title']	${COMMONWAIT}
 	Wait For Element With Reload	css=div[tid='data.auctionID']
@@ -309,15 +309,6 @@ Wait for question
 	[return]	${result}
 
 
-#Отримати дату та час
-#	[Arguments]  ${element_name}
-#	${result_full} =	Отримати текст елемента	${element_name}
-#	${result_full} =	Replace String			${result_full}	з${SPACE}	${EMPTY}
-#	${result_full} =	Replace String			${result_full}	до${SPACE}	${EMPTY}
-#	${result} = 		get_time_with_offset	${result_full}
-#	[return]	${result}
-
-
 Отримати дату та час
 	[Arguments]  ${element_name}
 	${result_full} =	Отримати текст елемента	${element_name}
@@ -360,7 +351,7 @@ Wait for question
 
 Отримати інформацію із пропозиції
 	[Arguments]  ${user_name}  ${tender_id}  ${field}
-	${locator} = 	Set Variable If	'${field}' == 'value.amount'	css=span[tid='bid.value.amount']	null
+	${locator} = 	Set Variable If	'${field}' == 'value.amount'	css=span[tid='bid.amount']	null
 	Wait For Ajax
 	Wait For Element With Reload		${locator}
 	${result} = 	Get Text			${locator}
@@ -425,31 +416,28 @@ Check If Question Is Uploaded
 	Click Button	css=button[tid='createBid']
 	Wait Until Element Is Enabled	css=#amount	${COMMONWAIT}
 	${amount} = 	Convert To String	${bid.data.value.amount}
-	Input Text	css=#amount	${amount}
-	Click Button	xpath=//button[@tid='createBid' and @class='btn btn-success']
+	Input Text	css=input[tid='bid.value.amount']	${amount}
+	Click Button	css=div#bid button[tid='createBid']
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar			${COMMONWAIT}
 
 Скасувати цінову пропозицію
 	[Arguments]  ${user_name}  ${tender_id}
-	Wait For Element With Reload		css=button[ng-click='deleteBid(bid)']	5
-	Wait Until Element Is Visible		css=button[ng-click='deleteBid(bid)']	${COMMONWAIT}
-	Click Button						css=button[ng-click='deleteBid(bid)']
+	Wait For Element With Reload		css=button[tid='btn.deleteBid']	5
+	Wait Visibulity And Click Element	css=button[tid='btn.deleteBid']
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar			${COMMONWAIT}
-	Wait Until Element Is Not Visible	css=button[ng-click='deleteBid(bid)']	${COMMONWAIT}
+	Wait Until Element Is Not Visible	css=button[tid='btn.deleteBid']	${COMMONWAIT}
 
 
 Змінити цінову пропозицію
 	[Arguments]  ${user_name}  ${tender_id}  ${name}  ${value}
 	${amount} = 						Convert To String	${value}
-
-	Wait For Element With Reload		css=label[ng-click='showModifyBidOrSave(bid)']	5
-	Wait Until Element Is Visible		css=label[ng-click='showModifyBidOrSave(bid)']	${COMMONWAIT}
-	Click Element						css=label[ng-click='showModifyBidOrSave(bid)']
-	Clear Element Text					css=input[tid='bid.value.newAmount']
-	Input Text							css=input[tid='bid.value.newAmount']			${amount}
-	Click Element						css=label[ng-click='showModifyBidOrSave(bid)']
+	Wait For Element With Reload		css=button[tid='modifyBid']	5
+	Wait Visibulity And Click Element	css=button[tid='modifyBid']
+	Clear Element Text					css=input[tid='bid.value.amount']
+	Input Text							css=input[tid='bid.value.amount']			${amount}
+	Click Element						css=div#bid button[tid='createBid']
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar					${COMMONWAIT}
 
@@ -504,11 +492,14 @@ Check If Question Is Uploaded
 
 Завантажити фінансову ліцензію
 	[Arguments]  ${user_name}  ${tender_id}  ${financial_license_path}
-	Wait For Element With Reload	css=label[tid='modifyDoc']
-	Wait Until Element Is Visible	css=label[tid='modifyDoc']	${COMMONWAIT}
-	Choose File		css=input[id='modifyDoc']	${financial_license_path}
+	Wait For Element With Reload	css=button[tid='modifyBid']
+	Wait Visibulity And Click Element	css=button[tid='modifyBid']
+	Wait Until Element Is Visible	css=a[tid='btn.addFinLicenseDocs']	${COMMONWAIT}
+	Choose File		css=input[tid='finLicense']	${financial_license_path}
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar	${COMMONWAIT}
+	Click Button	css=div#bid button[tid='createBid']
+	Wait Until Element Is Not Visible	css=div#bid button[tid='createBid']
 
 
 Отримати кількість документів в ставці
