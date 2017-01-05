@@ -53,7 +53,8 @@ ${tender_data.questions.answer}							span[@tid='data.question.answer']
 ${tender_data.doc.title}								xpath=(//div[@id='fileitem'])
 ${tender_data.status}									css=span[tid='data.statusName']
 
-${tender_data.cancellations[0].status}					css=span[tid='cancellation.status']
+
+${tender_data.cancellations[0].status}					xpath=//span[@tid='data.statusName' and contains(., 'Скасований лот')]
 ${tender_data.cancellations[0].reason}					css=span[tid='cancellation.reason']
 ${tender_data.cancellation.doc.title}					xpath=//a[@tid='cancellation.doc.title']
 ${tender_data.cancellation.doc.description}				css=span[tid='cancellation.doc.description']
@@ -181,6 +182,7 @@ ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 	Run Keyword And Return If	'${element}' == 'tender_cancellation_title'				Отримати заголовок документа				${element}
 	Run Keyword And Return If	'${element}' == 'procurementMethodType'					Отримати тип оголошеного лоту				${element}
 	Run Keyword And Return If	'${element}' == 'tenderAttempts'						Отримати значення поля Лоти виставляються	${element}
+	Run Keyword And Return If	'${element}' == 'cancellations[0].status'				Перевірити cancellations[0].status	${element}
 
 	Run Keyword And Return If	'Period.' in '${element}'								Отримати дату та час						${element}
 
@@ -357,6 +359,11 @@ Wait for question
 	${result} = 	Get Text			${locator}
 	${result} = 	Convert To Number	${result}
 	[return]  ${result}
+
+
+Перевірити cancellations[0].status
+	[Arguments]  ${user_name}  ${tender_id}  ${field}
+	Run Keyword And Return Status
 
 
 Задати запитання на предмет
@@ -576,7 +583,7 @@ Check If Question Is Uploaded
 	[Arguments]  ${username}  ${tender_uaid}  ${reason}  ${doc_path}  ${description}
 
 	privatmarket.Пошук тендера по ідентифікатору	${username}	${tender_uaid}
-	Wait Enable And Click Element			css=button[tid='cancelBtn']
+	Wait Enable And Click Element			css=button[tid='btn.cancellationLot']
 	Wait For Ajax
 
 	#add doc
