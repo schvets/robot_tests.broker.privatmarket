@@ -135,26 +135,8 @@ ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 
 	#items
 	: FOR  ${index}  IN RANGE  ${items_number}
-	\	${path_index} =	Sum Of Numbers	${index}	1
-	\	Run Keyword If	'1' != '${path_index}'	Click Button	css=button[tid='btn.additem']
-	\	Wait Until Element Is Enabled	xpath=(//textarea[@tid='item.description'])[${path_index}]
-	\	Input text	xpath=(//textarea[@tid='item.description'])[${path_index}]	${items[${index}].description}
-	#classification
-	\	Input text	xpath=(//div[@tid='classification']//input)[${path_index}]	${items[${index}].classification.id}
-	\	Wait Until Element Is Enabled	xpath=(//ul[contains(@class, 'ui-select-choices-content')])[${path_index}]
-	\	Wait Enable And Click Element	xpath=//span[@class='ui-select-choices-row-inner' and contains(., '${items[${index}].classification.id}')]
-	#quantity
-	\	Input text	xpath=(//input[@tid='item.unit.code'])[${path_index}]	${items[${index}].unit.code}
-	\	Input text	xpath=(//input[@tid='item.unit.name'])[${path_index}]	${items[${index}].unit.name}
-	\	Input text	xpath=(//input[@tid='item.quantity'])[${path_index}]	${items[${index}].quantity}
-	#address
-	\	Select Checkbox	xpath=(//input[@tid='item.address.checkbox'])[${path_index}]
-	\	Wait Until Element Is Enabled	xpath=(//input[@tid='item.address.countryName'])[${path_index}]
-	\	Input text	xpath=(//input[@tid='item.address.countryName'])[${path_index}]	${items[${index}].deliveryAddress.countryName}
-	\	Input text	xpath=(//input[@tid='item.address.postalCode'])[${path_index}]	${items[${index}].deliveryAddress.postalCode}
-	\	Input text	xpath=(//input[@tid='item.address.region'])[${path_index}]	${items[${index}].deliveryAddress.region}
-	\	Input text	xpath=(//input[@tid='item.address.streetAddress'])[${path_index}]	${items[${index}].deliveryAddress.streetAddress}
-	\	Input text	xpath=(//input[@tid='item.address.locality'])[${path_index}]	${items[${index}].deliveryAddress.locality}
+	\	${should_we_click_btn.additem} =	Set Variable If		'0' != '${index}'	${True}	${False}
+	\	Додати новий предмет закупівлі	${items[${index}]}	${should_we_click_btn.additem}
 
 	Click Button	css=button[tid='btn.createlot']
 	Wait Until element Is Visible	css=div[tid='data.title']	${COMMONWAIT}
@@ -164,6 +146,42 @@ ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 	Wait For Ajax
 	[return]  ${tender_id}
 
+
+Додати предмет закупівлі
+	[Arguments]  ${user_name}  ${tender_id}  ${item}
+	Wait Visibulity And Click Element	css=button[tid='btn.modifyLot']
+	Додати новий предмет закупівлі	${items[${index}]}	${should_we_click_btn.additem}
+	Click Element	css=button[tid='btn.createlot']
+
+
+Додати новий предмет закупівлі
+	[Arguments]  ${item}  ${should_we_click_btn.additem}=${False}
+	Run Keyword If	${should_we_click_btn.additem}	Wait Visibulity And Click Element	css=button[tid='btn.additem']
+#	debug     add item
+	Wait Until Element Is Enabled	xpath=(//textarea[@tid='item.description'])[last()]
+	Input text	xpath=(//textarea[@tid='item.description'])[last()]	${item.description}
+	#classification
+	Input text	xpath=(//div[@tid='classification']//input)[last()]	${item.classification.id}
+	Wait Until Element Is Enabled	xpath=(//ul[contains(@class, 'ui-select-choices-content')])[last()]
+	Wait Enable And Click Element	xpath=//span[@class='ui-select-choices-row-inner' and contains(., '${item.classification.id}')]
+	#quantity
+	Input text	xpath=(//input[@tid='item.unit.code'])[last()]	${item.unit.code}
+	Input text	xpath=(//input[@tid='item.unit.name'])[last()]	${item.unit.name}
+	Input text	xpath=(//input[@tid='item.quantity'])[last()]	${item.quantity}
+	#address
+	Select Checkbox	xpath=(//input[@tid='item.address.checkbox'])[last()]
+	Wait Until Element Is Enabled	xpath=(//input[@tid='item.address.countryName'])[last()]
+	Input text	xpath=(//input[@tid='item.address.countryName'])[last()]	${item.deliveryAddress.countryName}
+	Input text	xpath=(//input[@tid='item.address.postalCode'])[last()]	${item.deliveryAddress.postalCode}
+	Input text	xpath=(//input[@tid='item.address.region'])[last()]	${item.deliveryAddress.region}
+	Input text	xpath=(//input[@tid='item.address.streetAddress'])[last()]	${item.deliveryAddress.streetAddress}
+	Input text	xpath=(//input[@tid='item.address.locality'])[last()]	${item.deliveryAddress.locality}
+
+
+Видалити предмет закупівлі
+	[Arguments]  ${user_name}  ${tender_id}  ${item}
+#	debug    dell item
+	Fail	Is not implemented yet
 
 Пошук тендера по ідентифікатору
 	[Arguments]  ${user_name}  ${tender_id}
@@ -407,6 +425,7 @@ Check If Question Is Uploaded
 
 Відповісти на запитання
 	[Arguments]  ${user_name}  ${tender_id}  ${answer}  ${question_id}
+#	debug     answer question
 	Wait Until Element Is Visible	xpath=//div[@class='row question' and contains(., '${question_id}')]//button[@tid='answerQuestion']	${COMMONWAIT}
 	Wait Until Element Is Visible	xpath=//div[@class='row question' and contains(., '${question_id}')]//input[@tid='input.answer']	${COMMONWAIT}
 	Input Text	xpath=//div[@class='row question' and contains(., '${question_id}')]//input[@tid='input.answer']	${answer.data.answer}
@@ -459,43 +478,40 @@ Check If Question Is Uploaded
 	Wait Until Element Is Not Visible		css=div.progress.progress-bar	${COMMONWAIT}
 
 
-Завантажити документ
-	[Arguments]  ${user_name}  ${filepath}  ${tender_id}=${None}
-	Wait Until Element Is Visible	css=span[tid='editBtn']
-	Click Element	css=span[tid='editBtn']
-	Wait Until Element Is Visible	css=div[tid='btn.add.docs']
-	Click Element	css=div[tid='btn.add.docs']
-	Wait Until Element Is Enabled	css=div[tid='btn.addFiles']	${COMMONWAIT}
-	Choose File		css=input[id='fileInputPr']	${filepath}
+Додати документ до аукціону
+	[Arguments]  ${filepath}  ${file_type}
+	Wait Visibulity And Click Element	css=button[tid='btn.modifyLot']
+	Wait Until Element Is Visible	css=div[tid='auction.docs'] div[tid='btn.addFiles']
+	Choose File	css=div[tid='auction.docs'] input#input-doc-lot	${filepath}
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar	${COMMONWAIT}
-	${elements} = 	Get Webelements	css=select[tid='doc.type']
+	${elements} = 	Get Webelements	css=div[tid='auction.docs'] select[tid='doc.type']
 	${element} = 	Get From List	${elements}	-1
-	Select From List	${element}	string:technicalSpecifications
+	Select From List	${element}	${file_type}
+	Wait Until Element Is Visible	css=button[tid='btn.createlot']
 	Wait For Ajax
-	Click Element	css=button[tid='btn.addDocs']
-	Wait Until Element Is Not Visible	css=button[tid='btn.addDocs']	${COMMONWAIT}
-	Wait Until Element Is Visible	css=button[tid='btn.refreshlot']
-	Click Element	css=button[tid='btn.refreshlot']
+	Click Element	css=button[tid='btn.createlot']
+
+
+Завантажити документ
+	[Arguments]  ${user_name}  ${filepath}  ${tender_id}=${None}
+	Додати документ до аукціону	${filepath}	string:technicalSpecifications
 
 
 Завантажити ілюстрацію
 	[Arguments]  ${user_name}  ${tender_id}  ${filepath}
-	Wait Until Element Is Visible	css=span[tid='editBtn']	${COMMONWAIT}
-	Click Element	css=span[tid='editBtn']
-	Wait Until Element Is Visible	css=div[tid='btn.add.docs']	${COMMONWAIT}
-	Click Element	css=div[tid='btn.add.docs']
-	Wait Until Element Is Enabled	css=div[tid='btn.addFiles']	${COMMONWAIT}
-	Choose File		css=input[id='fileInputPr']	${filepath}
-	Wait For Ajax
-	Wait Until Element Is Not Visible	css=div.progress.progress-bar	${COMMONWAIT}
-	${elements} = 	Get Webelements	css=select[tid='doc.type']
-	${element} = 	Get From List	${elements}	-1
-	Select From List	${element}	string:illustration
-	Wait For Ajax
-	Click Element	css=button[tid='btn.addDocs']
-	Wait Until Element Is Visible	css=button[tid='btn.refreshlot']	${COMMONWAIT}
-	Click Element	css=button[tid='btn.refreshlot']
+	Додати документ до аукціону	${filepath}	string:illustration
+
+
+Завантажити документ в тендер з типом
+	[Arguments]  ${user_name}  ${tender_id}  ${filepath}  ${doc_type}
+	run keyword if  'tenderNotice' in '${doc_type}'	fail  Is not implemented yet
+	Додати документ до аукціону	${filepath}	string:${doc_type}
+
+
+Додати публічний паспорт активу
+	[Arguments]  ${user_name}  ${tender_id}  ${filepath}
+	Fail	Is not implemented yet
 
 
 Завантажити фінансову ліцензію
@@ -530,18 +546,10 @@ Check If Question Is Uploaded
 
 Додати Virtual Data Room
 	[Arguments]  ${user_name}  ${tender_id}  ${vdr_url}
-	Wait Until Element Is Visible	css=span[tid='editBtn']	${COMMONWAIT}
-	Click Element	css=span[tid='editBtn']
-	Wait Until Element Is Visible	css=div[tid='btn.add.docs']	${COMMONWAIT}
-	Click Element	css=div[tid='btn.add.docs']
-	Wait Until Element Is Enabled	css=div[tid='btn.addVDR']	${COMMONWAIT}
-	Click Element	css=div[tid='btn.addVDR']
-	Wait Until Element Is Visible	css=input[tid='doc.urlText']	${COMMONWAIT}
-	Input Text	css=input[tid='doc.urlText']	${vdr_url}
-	Input Text	css=input[tid='doc.title']	vdr
-	Click Element	css=button[tid='btn.addDocs']
-	Wait Until Element Is Visible	css=button[tid='btn.refreshlot']	${COMMONWAIT}
-	Click Element	css=button[tid='btn.refreshlot']
+	Wait Visibulity And Click Element	css=button[tid='btn.modifyLot']
+	Wait Until Element Is Visible	css=input[tid='vdr.url']	${COMMONWAIT}
+	Input Text	css=input[tid='vdr.url']	${vdr_url}
+	Click Element	css=button[tid='btn.createlot']
 
 
 Змінити документ в ставці
@@ -558,7 +566,8 @@ Check If Question Is Uploaded
 
 Отримати посилання на аукціон для глядача
 	[Arguments]  ${user_name}  ${tender_id}  ${lot_id}=1
-	${url} = 	privatmarket.Отримати посилання на аукціон для учасника	${user_name}	${tender_id}
+	Wait For Element With Reload			css=a[tid='bid.participationUrl']	5
+	${url} = 	Get Element Attribute		css=a[tid='bid.participationUrl']@href
 	[return]  ${url}
 
 
@@ -635,7 +644,7 @@ Check If Question Is Uploaded
 
 
 Завантажити угоду до тендера
-  [Arguments]  ${username}  ${tender_id}  ${contract_num}  ${file_path}
+	[Arguments]  ${username}  ${tender_id}  ${contract_num}  ${file_path}
 	Wait Until Element Is Visible	css=label[tid='docContract']	${COMMONWAIT}
 	Choose File	css=input[id='docsContractI']	${file_path}
 	sleep	10s
@@ -647,7 +656,7 @@ Check If Question Is Uploaded
 
 
 Скасування рішення кваліфікаційної комісії
-  [Arguments]  ${username}  ${tender_uaid}  ${award_num}
+	[Arguments]  ${username}  ${tender_uaid}  ${award_num}
 	Wait Until Element Is Visible	css=button[tid='btn.award.cancelled']	${COMMONWAIT}
 	${buttons_list} = 	Get Webelements	css=button[tid='btn.award.cancelled']
 	Click Button	${buttons_list[${award_num}]}
@@ -684,6 +693,7 @@ Check If Question Is Uploaded
 #Custom Keywords
 Login
 	[Arguments]  ${username}
+	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar			${COMMONWAIT}
 	Sleep				7s
 	Wait Enable And Click Element		css=a[ui-sref='modal.login']
@@ -701,11 +711,12 @@ Login
 	Sleep								3s
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar			${COMMONWAIT}
-	Wait Until Element Is Not visible	css=a[id='confirmButton']
+	Wait Until Element Is Not Visible	css=a[id='confirmButton']
 
 	#Close message notification
 	${notification_visibility} = 	Run Keyword And Return Status	Wait Until Element Is Visible	css=button[ng-click='later()']
 	Run Keyword If	'${notification_visibility}' == 'True'	Click Element	css=button[ng-click='later()']
+	Wait Until Element Is Not Visible	css=button[ng-click='later()']
 	Wait Until Element Is Visible		css=input[tid='global.search']
 
 
