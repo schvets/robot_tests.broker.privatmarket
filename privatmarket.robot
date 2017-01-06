@@ -150,14 +150,13 @@ ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 Додати предмет закупівлі
 	[Arguments]  ${user_name}  ${tender_id}  ${item}
 	Wait Visibulity And Click Element	css=button[tid='btn.modifyLot']
-	Додати новий предмет закупівлі	${items[${index}]}	${should_we_click_btn.additem}
+	Додати новий предмет закупівлі	${item}
 	Click Element	css=button[tid='btn.createlot']
 
 
 Додати новий предмет закупівлі
 	[Arguments]  ${item}  ${should_we_click_btn.additem}=${False}
 	Run Keyword If	${should_we_click_btn.additem}	Wait Visibulity And Click Element	css=button[tid='btn.additem']
-#	debug     add item
 	Wait Until Element Is Enabled	xpath=(//textarea[@tid='item.description'])[last()]
 	Input text	xpath=(//textarea[@tid='item.description'])[last()]	${item.description}
 	#classification
@@ -180,8 +179,12 @@ ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 
 Видалити предмет закупівлі
 	[Arguments]  ${user_name}  ${tender_id}  ${item}
-#	debug    dell item
-	Fail	Is not implemented yet
+	Wait Visibulity And Click Element	css=button[tid='btn.modifyLot']
+	Wait Visibulity And Click Element	xpath=//div[@ng-repeat='item in lot.data.items']//a[@tid='remove.item']
+	Click Element	css=button[tid='btn.createlot']
+	Wait Until Element Is Visible	css=button[tid='btn.modifyLot']
+	Element Should Not Be Visible	css=//div[@tid='item.description' and contains(., '${item}')]
+
 
 Пошук тендера по ідентифікатору
 	[Arguments]  ${user_name}  ${tender_id}
@@ -425,11 +428,11 @@ Check If Question Is Uploaded
 
 Відповісти на запитання
 	[Arguments]  ${user_name}  ${tender_id}  ${answer}  ${question_id}
-#	debug     answer question
 	Wait Until Element Is Visible	xpath=//div[@class='row question' and contains(., '${question_id}')]//button[@tid='answerQuestion']	${COMMONWAIT}
 	Wait Until Element Is Visible	xpath=//div[@class='row question' and contains(., '${question_id}')]//input[@tid='input.answer']	${COMMONWAIT}
 	Input Text	xpath=//div[@class='row question' and contains(., '${question_id}')]//input[@tid='input.answer']	${answer.data.answer}
 	Click Button	xpath=//div[@class='row question' and contains(., '${question_id}')]//button[@tid='answerQuestion']
+	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar	${COMMONWAIT}
 
 
@@ -559,15 +562,15 @@ Check If Question Is Uploaded
 
 Отримати посилання на аукціон для учасника
 	[Arguments]  ${user_name}  ${tender_id}
-	Wait For Element With Reload			xpath=//a[@tid='public.data.auctionUrl' and contains(@href, 'https://auction-sandbox.ea.openprocurement.org')]	5
-	${url} = 	Get Element Attribute		xpath=//a[@tid='public.data.auctionUrl' and contains(@href, 'https://auction-sandbox.ea.openprocurement.org')]@href
+	Wait For Element With Reload			xpath=//a[@tid='bid.participationUrl']	5
+	${url} = 	Get Element Attribute		xpath=//a[@tid='bid.participationUrl']@href
 	[return]  ${url}
 
 
 Отримати посилання на аукціон для глядача
 	[Arguments]  ${user_name}  ${tender_id}  ${lot_id}=1
-	Wait For Element With Reload			css=a[tid='bid.participationUrl']	5
-	${url} = 	Get Element Attribute		css=a[tid='bid.participationUrl']@href
+	Wait For Element With Reload			css=a[tid='public.data.auctionUrl']	5
+	${url} = 	Get Element Attribute		css=a[tid='public.data.auctionUrl']@href
 	[return]  ${url}
 
 
