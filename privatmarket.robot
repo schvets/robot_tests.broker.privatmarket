@@ -158,7 +158,7 @@ ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 	[Arguments]  ${user_name}  ${tender_id}  ${field}  ${value}
 	Wait Visibulity And Click Element	css=button[tid='btn.modifyLot']
 	Змінити ${field}	${field}	${value}
-	debug    change auction
+#	debug    change auction
 	Click Element	css=button[tid='btn.createlot']
 	Wait Until Element Is Visible	css=button[tid='btn.modifyLot']
 	Element Should Not Be Visible	css=//div[@tid='item.description' and contains(., '${item}')]
@@ -166,7 +166,7 @@ ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 
 Змінити value.amount
 	[Arguments]  ${field}  ${value}
-	debug    value.amount
+#	debug    value.amount
 
 
 Додати предмет закупівлі
@@ -526,7 +526,7 @@ Check If Question Is Uploaded
 Завантажити документ
 	[Arguments]  ${user_name}  ${filepath}  ${tender_id}=${None}
 	Додати документ до аукціону	${filepath}	string:technicalSpecifications
-	debug     ilustration
+#	debug     ilustration
 
 
 Завантажити ілюстрацію
