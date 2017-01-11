@@ -304,7 +304,9 @@ Wait for question
 Отримати інформацію із документа по індексу
 	[Arguments]  ${username}  ${tender_uaid}  ${doc_index}  ${element}
 	${index}=	sum of numbers	${doc_index}	1
-	${result}=	Execute Javascript	return document.evaluate("(//div[@tid='doc.documentType'])[${index}]", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.innerHTML
+	#получим тип документа по индексу
+	${result}=	Get Element Attribute	xpath=(//div[contains(@ng-repeat, 'distinctDocuments')]/a)[${index}]@tid
+	${result}=	Remove String	${result}	data.
 	[return]	${result}
 
 
@@ -348,8 +350,8 @@ Wait for question
 
 Отримати значення поля Лоти виставляються
 	[Arguments]  ${element_name}
-	${text}=	Execute Javascript	return document.querySelector("span[tid='data.tenderAttempts']").innerHTML
-	${result}=	Convert To Number	${text}
+	${result}=	Execute Javascript	return document.querySelector("span[tid='data.tenderAttempts']").innerHTML
+	${result}=	Convert To Integer	${result}
 	[return]	${result}
 
 
