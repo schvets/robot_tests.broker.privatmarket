@@ -40,6 +40,7 @@ def get_current_year():
 
 def get_month_number(month_name):
     monthes = [u"січня", u"лютого", u"березня", u"квітня", u"травня", u"червня",
-               u"липня", u"серпня", u"вересня", u"жовтня", u"листопада", u"грудня"]
-    return monthes.index(month_name) + 1
-
+               u"липня", u"серпня", u"вересня", u"жовтня", u"листопада", u"грудня",
+               u"January", u"February", u"March", u"April", u"May", u"June",
+               u"July", u"August", u"September", u"October", u"November", u"December"]
+    return monthes.index(month_name) % 12 + 1
