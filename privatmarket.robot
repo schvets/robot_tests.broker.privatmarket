@@ -55,9 +55,9 @@ ${tender_data.status}									css=span[tid='data.statusName']
 
 
 ${tender_data.cancellations[0].status}					xpath=//span[@tid='data.statusName' and contains(., 'Скасований лот')]
-${tender_data.cancellations[0].reason}					css=span[tid='cancellation.reason']
-${tender_data.cancellation.doc.title}					xpath=//a[@tid='cancellation.doc.title']
-${tender_data.cancellation.doc.description}				css=span[tid='cancellation.doc.description']
+${tender_data.cancellations[0].reason}					css=div[tid='cancellations.reason']
+${tender_data.cancellation.doc.title}					css=div[tid='doc.title']
+${tender_data.cancellation.doc.description}				css=div[tid='cancellations.doc.description']
 
 ${tender_data.procurementMethodType}					css=div[tid='data.procurementMethodTypeName']
 ${tender_data.tenderAttempts}							css=span[tid='data.tenderAttempts']
@@ -333,7 +333,6 @@ Wait for question
 	${element} =	Set Variable If		'скасування лоту' in '${TEST_NAME}'		cancellation.doc.${element}		doc.${element}
 
 	Run Keyword And Return If	'${element}' == 'doc.title'		Отримати заголовок документації до лоту		${element}	${doc_id}
-	Run Keyword And Return If	'${element}' == 'cancellation.doc.title'	Отримати заголовок документа	${element}	${doc_id}
 
 	Wait Until Element Is Visible	${tender_data.${element}}	timeout=${COMMONWAIT}
 	${result} =		Отримати текст	${element}
@@ -771,7 +770,7 @@ Check If Question Is Uploaded
 	[Arguments]  ${element}
 	Wait Until Element Is Visible	${tender_data.${element}}
 	Wait For Element With Any Text	${tender_data.${element}}
-	${result} = 	Get Text	css=div[tid='data.procurementMethodType']
+	${result} =	Execute Javascript	return document.querySelector("div[tid='data.procurementMethodType']").innerHTML
 	[return]	${result}
 
 
