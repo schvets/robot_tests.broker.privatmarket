@@ -584,9 +584,6 @@ Check If Question Is Uploaded
 
 Завантажити документ в тендер з типом
 	[Arguments]  ${user_name}  ${tender_id}  ${file_path}  ${doc_type}
-#	${doc_type_full} = 	Set Variable	string:${doc_type}
-#	Run Keyword If  'tenderNotice' in '${doc_type}'	Додати посилання	${doc_type_full}	${file_path}
-	Run Keyword If  'tenderNotice' in '${doc_type}'	debug   tenderNotice
 	Додати документ до аукціону	${file_path}	string:${doc_type}
 
 
@@ -646,17 +643,17 @@ Check If Question Is Uploaded
 #	Input Text	xpath=(//input[@tid='docurl.title'])[last()]	${accessDetails}
 #	Select From List	xpath=(//select[@tid='docurl.type'])[last()]	string:x_dgfAssetFamiliarization
 
-	debug     offline doc
+#	debug     offline doc
 #	Auction publication section
 	Wait Until Element Is Visible	css=button[tid='btn.createlot']
 	Wait For Ajax
 	Click Element	css=button[tid='btn.createlot']
 	Wait For Ajax
-	debug    publicate lot
+#	debug    publicate lot
 	Wait Until Element Is Visible	css=button[tid='btn.publicateLot']
 	Click Button	css=button[tid='btn.publicateLot']
 	Wait Until Element Is Not Visible	css=button[tid='btn.publicateLot']	${COMMONWAIT}
-	debug   after second publication
+#	debug   after second publication
 
 
 Змінити документ в ставці
