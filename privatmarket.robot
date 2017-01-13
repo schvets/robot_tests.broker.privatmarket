@@ -697,12 +697,9 @@ Check If Question Is Uploaded
 
 Отримати тип оголошеного лоту
 	[Arguments]  ${element}
+	Wait Until Element Is Visible	${tender_data.${element}}
 	Wait For Element With Any Text	${tender_data.${element}}
-	${text} =	Отримати текст елемента		${element}
-	${result} =	Set Variable If
-	...  '${text}' == 'продаж майна'	dgfOtherAssets
-	...  '${text}' == 'продаж прав вимоги за кредитами'	dgfFinancialAssets
-	...  ${text}
+	${result} =	Execute Javascript	return document.querySelector("div[tid='data.procurementMethodType']").innerHTML
 	[return]	${result}
 
 
