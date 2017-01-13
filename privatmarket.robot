@@ -160,8 +160,8 @@ ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 	Run Keyword If	${at_modification_page}	Click Element	css=button[tid='btn.modifyLot']
 	Wait Until Element Is Visible	css=input[tid='data.title']
 
-#	TODO Модифицировать эту часть после того как будет реализована часть редактирования
-#	Run Keyword	Змінити ${field}	${value}
+	#TODO Модифицировать эту часть после того как будет реализована часть редактирования
+	Run Keyword	Змінити ${field}	${value}
 #	Click Element	css=button[tid='btn.createlot']
 #	Wait Until Element Is Visible	css=button[tid='btn.modifyLot']
 #	Element Should Contain	${tender_data.${field}}	${value}
@@ -221,6 +221,9 @@ ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 
 Змінити tenderAttempts
 	[Arguments]  ${value}
+	${element} = 	Set Variable	css=select[tid='data.tenderAttempts']@disabled
+	${is_element_disabled} = 	Get Element Attribute	${element}
+	Run Keyword If	'true' == '${is_element_disabled}'	Fail	Element '${element}' is unreadable
 	Select From List	css=select[tid='data.tenderAttempts']	number:${value}
 
 
@@ -486,7 +489,6 @@ Check If Question Is Uploaded
 	[Arguments]  ${title}
 	Reload Page
 	Wait For Ajax
-#	Wait Enable And Click Element	css=a[ng-click='hideAddFilters = !hideAddFilters']
 	Wait Until Element Is Enabled	xpath=//div[@ng-repeat='question in data.questions']//span[@tid='data.question.title' and contains(., '${title}')]	3
 	[return]	True
 
@@ -563,14 +565,11 @@ Check If Question Is Uploaded
 
 Додати документ до аукціону
 	[Arguments]  ${filepath}  ${file_type}
-#	Wait Visibulity And Click Element	css=button[tid='btn.modifyLot']
 	Wait Until Element Is Visible	css=div[tid='auction.docs'] div[tid='btn.addFiles']
 	Choose File	css=div[tid='auction.docs'] input#input-doc-lot	${filepath}
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar	${COMMONWAIT}
-	${elements} = 	Get Webelements	css=div[tid='auction.docs'] select[tid='doc.type']
-	${element} = 	Get From List	${elements}	-1
-	Select From List	${element}	${file_type}
+	Select From List	xpath=(//div[@tid='auction.docs']//select[@tid='doc.type'])[last()]	${file_type}
 
 
 Завантажити документ
@@ -585,13 +584,15 @@ Check If Question Is Uploaded
 
 Завантажити документ в тендер з типом
 	[Arguments]  ${user_name}  ${tender_id}  ${file_path}  ${doc_type}
-	run keyword if  'tenderNotice' in '${doc_type}'	fail  Is not implemented yet
+#	${doc_type_full} = 	Set Variable	string:${doc_type}
+#	Run Keyword If  'tenderNotice' in '${doc_type}'	Додати посилання	${doc_type_full}	${file_path}
+	Run Keyword If  'tenderNotice' in '${doc_type}'	debug   tenderNotice
 	Додати документ до аукціону	${file_path}	string:${doc_type}
 
 
 Додати публічний паспорт активу
 	[Arguments]  ${user_name}  ${tender_id}  ${filepath}
-	Fail	Is not implemented yet
+	Додати посилання	string:x_dgfPublicAssetCertificate	${file_path}
 
 
 Завантажити фінансову ліцензію
@@ -624,15 +625,28 @@ Check If Question Is Uploaded
 	[return]	${result}
 
 
+Додати посилання
+	[Arguments]  ${link_type}  ${link}
+	Wait Visibulity And Click Element	css=div[tid='btn.addUrl']
+	Wait Until Element Is Visible	xpath=(//input[@tid='docurl.url'])[last()]	10s
+	Input Text	xpath=(//input[@tid='docurl.url'])[last()]	${link}
+	Select From List	xpath=(//select[@tid='docurl.type'])[last()]	${link_type}
+
+
 Додати Virtual Data Room
 	[Arguments]  ${user_name}  ${tender_id}  ${vdr_url}
-	Wait Until Element Is Visible	css=input[tid='vdr.url']	${COMMONWAIT}
-	Input Text	css=input[tid='vdr.url']	${vdr_url}
+	Додати посилання	string:virtualDataRoom	${vdr_url}
 
 
 Додати офлайн документ
 	[Arguments]  ${user_name}  ${tender_id}  ${accessDetails}
+	#TODO    offline doc
+#	Wait Visibulity And Click Element	css=div[tid='btn.addUrl']
+#	Wait Until Element Is Visible	xpath=(//input[@tid='docurl.url'])[last()]	10s
+#	Input Text	xpath=(//input[@tid='docurl.title'])[last()]	${accessDetails}
+#	Select From List	xpath=(//select[@tid='docurl.type'])[last()]	string:x_dgfAssetFamiliarization
 
+	debug     offline doc
 #	Auction publication section
 	Wait Until Element Is Visible	css=button[tid='btn.createlot']
 	Wait For Ajax
@@ -758,12 +772,9 @@ Check If Question Is Uploaded
 
 Отримати тип оголошеного лоту
 	[Arguments]  ${element}
+	Wait Until Element Is Visible	${tender_data.${element}}
 	Wait For Element With Any Text	${tender_data.${element}}
-	${text} =	Отримати текст елемента		${element}
-	${result} =	Set Variable If
-	...  '${text}' == 'продаж майна'	dgfOtherAssets
-	...  '${text}' == 'продаж прав вимоги за кредитами'	dgfFinancialAssets
-	...  ${text}
+	${result} = 	Get Text	css=div[tid='data.procurementMethodType']
 	[return]	${result}
 
 
