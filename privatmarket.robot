@@ -162,9 +162,6 @@ ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 
 	#TODO Модифицировать эту часть после того как будет реализована часть редактирования
 	Run Keyword	Змінити ${field}	${value}
-#	Click Element	css=button[tid='btn.createlot']
-#	Wait Until Element Is Visible	css=button[tid='btn.modifyLot']
-#	Element Should Contain	${tender_data.${field}}	${value}
 
 
 Змінити value.amount
@@ -229,9 +226,7 @@ ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 
 Додати предмет закупівлі
 	[Arguments]  ${user_name}  ${tender_id}  ${item}
-	Wait Visibulity And Click Element	css=button[tid='btn.modifyLot']
-	Додати новий предмет закупівлі	${item}
-	Click Element	css=button[tid='btn.createlot']
+	[return]	${True}
 
 
 Додати новий предмет закупівлі
@@ -259,11 +254,7 @@ ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 
 Видалити предмет закупівлі
 	[Arguments]  ${user_name}  ${tender_id}  ${item}
-	Wait Visibulity And Click Element	css=button[tid='btn.modifyLot']
-	Wait Visibulity And Click Element	xpath=//div[@ng-repeat='item in lot.data.items']//a[@tid='remove.item']
-	Click Element	css=button[tid='btn.createlot']
-	Wait Until Element Is Visible	css=button[tid='btn.modifyLot']
-	Element Should Not Be Visible	css=//div[@tid='item.description' and contains(., '${item}')]
+	[return]	${True}
 
 
 Пошук тендера по ідентифікатору
@@ -626,6 +617,7 @@ Check If Question Is Uploaded
 	Wait Visibulity And Click Element	css=div[tid='btn.addUrl']
 	Wait Until Element Is Visible	xpath=(//input[@tid='docurl.url'])[last()]	10s
 	Input Text	xpath=(//input[@tid='docurl.url'])[last()]	${link}
+	Input Text	xpath=(//input[@tid='docurl.title'])[last()]	Tets test
 	Select From List	xpath=(//select[@tid='docurl.type'])[last()]	${link_type}
 
 
@@ -636,23 +628,12 @@ Check If Question Is Uploaded
 
 Додати офлайн документ
 	[Arguments]  ${user_name}  ${tender_id}  ${accessDetails}
-	#TODO    offline doc
-#	Wait Visibulity And Click Element	css=div[tid='btn.addUrl']
-#	Wait Until Element Is Visible	xpath=(//input[@tid='docurl.url'])[last()]	10s
-#	Input Text	xpath=(//input[@tid='docurl.title'])[last()]	${accessDetails}
-#	Select From List	xpath=(//select[@tid='docurl.type'])[last()]	string:x_dgfAssetFamiliarization
-
-#	debug     offline doc
 #	Auction publication section
 	Wait Until Element Is Visible	css=button[tid='btn.createlot']
 	Wait For Ajax
 	Click Element	css=button[tid='btn.createlot']
 	Wait For Ajax
-#	debug    publicate lot
-	Wait Until Element Is Visible	css=button[tid='btn.publicateLot']
-	Click Button	css=button[tid='btn.publicateLot']
-	Wait Until Element Is Not Visible	css=button[tid='btn.publicateLot']	${COMMONWAIT}
-#	debug   after second publication
+	Wait Until Element Is Visible	css=button[tid='btn.cancellationLot']
 
 
 Змінити документ в ставці
