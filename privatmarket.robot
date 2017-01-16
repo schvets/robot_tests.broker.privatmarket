@@ -160,7 +160,6 @@ ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 	Run Keyword If	${at_modification_page}	Click Element	css=button[tid='btn.modifyLot']
 	Wait Until Element Is Visible	css=input[tid='data.title']
 
-	#TODO Модифицировать эту часть после того как будет реализована часть редактирования
 	Run Keyword	Змінити ${field}	${value}
 
 
