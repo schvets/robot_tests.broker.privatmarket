@@ -139,6 +139,7 @@ ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 	\	Додати новий предмет закупівлі	${items[${index}]}	${should_we_click_btn.additem}
 
 	Click Button	css=button[tid='btn.createlot']
+	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar	${COMMONWAIT}
 	Wait Until Element Is Visible	css=div[tid='data.title']	${COMMONWAIT}
 	Wait For Ajax
@@ -614,10 +615,11 @@ Check If Question Is Uploaded
 Додати посилання
 	[Arguments]  ${link_type}  ${link}
 	Wait Visibulity And Click Element	css=div[tid='btn.addUrl']
+	Wait Until Element Is Visible	xpath=(//select[@tid='docurl.type'])[last()]	10s
+	Select From List	xpath=(//select[@tid='docurl.type'])[last()]	${link_type}
 	Wait Until Element Is Visible	xpath=(//input[@tid='docurl.url'])[last()]	10s
 	Input Text	xpath=(//input[@tid='docurl.url'])[last()]	${link}
 	Input Text	xpath=(//input[@tid='docurl.title'])[last()]	Tets test
-	Select From List	xpath=(//select[@tid='docurl.type'])[last()]	${link_type}
 
 
 Додати Virtual Data Room
@@ -627,6 +629,13 @@ Check If Question Is Uploaded
 
 Додати офлайн документ
 	[Arguments]  ${user_name}  ${tender_id}  ${accessDetails}
+	Wait Visibulity And Click Element	css=div[tid='btn.addUrl']
+	Wait Until Element Is Visible	xpath=(//select[@tid='docurl.type'])[last()]	10s
+	Select From List	xpath=(//select[@tid='docurl.type'])[last()]	string:x_dgfAssetFamiliarization
+	Wait Until Element Is Visible	xpath=(//input[@tid='docurl.title'])[last()]	10s
+	Input Text	xpath=(//input[@tid='docurl.title'])[last()]	${accessDetails}
+	Input Text	xpath=(//textarea[@tid='docurl.addfield'])[last()]	${accessDetails}
+
 #	Auction publication section
 	Wait Until Element Is Visible	css=button[tid='btn.createlot']
 	Wait For Ajax
@@ -740,6 +749,7 @@ Check If Question Is Uploaded
 
 Скасування рішення кваліфікаційної комісії
 	[Arguments]  ${username}  ${tender_uaid}  ${award_num}
+	Wait For Element With Reload	css=button[tid='btn.award.cancelled']
 	Wait Until Element Is Visible	css=button[tid='btn.award.cancelled']	${COMMONWAIT}
 	${buttons_list} = 	Get Webelements	css=button[tid='btn.award.cancelled']
 	Click Button	${buttons_list[${award_num}]}
@@ -794,12 +804,13 @@ Login
 	${notification_visibility} = 	Run Keyword And Return Status	Wait Until Element Is Visible	css=button[ng-click='later()']
 	Run Keyword If	'${notification_visibility}' == 'True'	Click Element	css=button[ng-click='later()']
 	Wait Until Element Is Not Visible	css=button[ng-click='later()']
-	Wait Until Element Is Visible		css=input[tid='global.search']
+	Wait For Ajax
+	Wait Until Element Is Visible		css=input[tid='global.search']	${COMMONWAIT}
 
 
 Wait For Ajax
 	Get Location
-	Sleep			4s
+	Sleep	4s
 
 
 Wait Until Element Not Stale
