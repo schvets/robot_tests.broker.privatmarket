@@ -354,8 +354,9 @@ Wait for question
 	[Arguments]  ${username}  ${tender_uaid}  ${doc_index}  ${element}
 	${index}=	sum of numbers	${doc_index}	1
 	#получим тип документа по индексу
-	${result}=	Get Element Attribute	xpath=(//div[contains(@ng-repeat, 'distinctDocuments')]/a)[${index}]@tid
-	${result}=	Remove String	${result}	data.
+	${result} = 	Get Element Attribute	xpath=(//div[contains(@ng-repeat, 'distinctDocuments')]/*)[${index}]@tid
+	Run Keyword And Return If	'${result}' == '${None}'	Get Element Attribute	xpath=(//div[contains(@ng-repeat, 'distinctDocuments')])[${index}]//div[@id="fileitem"]@documenttype
+	${result} = 	Remove String	${result}	data.
 	[return]	${result}
 
 
@@ -784,6 +785,20 @@ Login
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar			${COMMONWAIT}
 	Sleep				7s
 	Wait Enable And Click Element		css=a[ui-sref='modal.login']
+
+	Run Keyword If	'Owner' in '${username}'	Login with P24	${username}
+	Run Keyword If	'Provider' in '${username}'	Login with email	${username}
+
+	#Close message notification
+	${notification_visibility} = 	Run Keyword And Return Status	Wait Until Element Is Visible	css=button[ng-click='later()']
+	Run Keyword If	'${notification_visibility}' == 'True'	Click Element	css=button[ng-click='later()']
+	Wait Until Element Is Not Visible	css=button[ng-click='later()']
+	Wait For Ajax
+	Wait Until Element Is Visible		css=input[tid='global.search']	${COMMONWAIT}
+
+
+Login with P24
+	[Arguments]  ${username}
 	Wait Enable And Click Element		xpath=//a[contains(@href, 'https://bankid.privatbank.ua')]
 
 	Wait Until Element Is Visible		css=input[id='loginLikePhone']			5s
@@ -800,12 +815,19 @@ Login
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar			${COMMONWAIT}
 	Wait Until Element Is Not Visible	css=a[id='confirmButton']
 
-	#Close message notification
-	${notification_visibility} = 	Run Keyword And Return Status	Wait Until Element Is Visible	css=button[ng-click='later()']
-	Run Keyword If	'${notification_visibility}' == 'True'	Click Element	css=button[ng-click='later()']
-	Wait Until Element Is Not Visible	css=button[ng-click='later()']
+
+Login with email
+	[Arguments]  ${username}
+
+	Wait Until Element Is Visible	css=input[id='email']	5s
+	Input Text	css=input[id='email']	${USERS.users['${username}'].login}
+	Input Text	css=input[id='password']	${USERS.users['${username}'].password}
+	Click Element	css=button[type='submit']
+
+	Sleep	3s
 	Wait For Ajax
-	Wait Until Element Is Visible		css=input[tid='global.search']	${COMMONWAIT}
+	Wait Until Element Is Not Visible	css=div.progress.progress-bar			${COMMONWAIT}
+	Wait Until Element Is Not Visible	css=button[type='submit']
 
 
 Wait For Ajax
