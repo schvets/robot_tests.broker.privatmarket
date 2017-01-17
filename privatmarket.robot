@@ -139,6 +139,7 @@ ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 	\	Додати новий предмет закупівлі	${items[${index}]}	${should_we_click_btn.additem}
 
 	Click Button	css=button[tid='btn.createlot']
+	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar	${COMMONWAIT}
 	Wait Until Element Is Visible	css=div[tid='data.title']	${COMMONWAIT}
 	Wait For Ajax
@@ -156,24 +157,76 @@ ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 
 Внести зміни в тендер
 	[Arguments]  ${user_name}  ${tender_id}  ${field}  ${value}
-	Wait Visibulity And Click Element	css=button[tid='btn.modifyLot']
-	Змінити ${field}	${field}	${value}
-#	debug    change auction
-	Click Element	css=button[tid='btn.createlot']
-	Wait Until Element Is Visible	css=button[tid='btn.modifyLot']
-	Element Should Not Be Visible	css=//div[@tid='item.description' and contains(., '${item}')]
+	${at_modification_page} = 	Run Keyword And return Status	Wait Until Element Is Visible	css=button[tid='btn.modifyLot']	10s
+	Run Keyword If	${at_modification_page}	Click Element	css=button[tid='btn.modifyLot']
+	Wait Until Element Is Visible	css=input[tid='data.title']
+
+	Run Keyword	Змінити ${field}	${value}
 
 
 Змінити value.amount
-	[Arguments]  ${field}  ${value}
-#	debug    value.amount
+	[Arguments]  ${value}
+	Input text	css=input[tid='data.minimalStep.amount']	'${value}'
+
+
+Змінити minimalStep.amount
+	[Arguments]  ${value}
+	Input text	css=input[tid='data.minimalStep.amount']	'${value}'
+
+
+Змінити title
+	[Arguments]  ${value}
+	Input text	css=input[tid='data.title']	${value}
+
+
+Змінити description
+	[Arguments]  ${value}
+	Input text	css=textarea[tid='data.description']	${value}
+
+
+Змінити procuringEntity.name
+	[Arguments]  ${value}
+	Input text	css=input[tid='procuringEntity.name']	${value}
+
+
+Змінити tenderPeriod.startDate
+	[Arguments]  ${value}
+	Set Date And Time	css=input[tid='auctionStartDate']	css=div[tid='auctionStartTime'] input[ng-model='hours']	css=div[tid='auctionStartTime'] input[ng-model='minutes']	${value}
+
+
+Змінити eligibilityCriteria
+	[Arguments]  ${value}
+	Input text	css=input[tid='eligibilityCriteria']	${value}
+
+
+Змінити guarantee
+	[Arguments]  ${value}
+	Input text	css=input[tid='guarantyAmount']	${value}
+
+
+Змінити dgfDecisionDate
+	[Arguments]  ${value}
+	${correctDate} =	Convert Date	 ${value}	result_format=%d/%m/%Y
+	${correctDate} =	Convert To String	${correctDate}
+	Input Text	css=input[tid='dgfDecisionDate']	${correctDate}
+
+
+Змінити dgfDecisionID
+	[Arguments]  ${value}
+	Input text	css=input[tid='data.dgfDecisionID']	${value}
+
+
+Змінити tenderAttempts
+	[Arguments]  ${value}
+	${element} = 	Set Variable	css=select[tid='data.tenderAttempts']@disabled
+	${is_element_disabled} = 	Get Element Attribute	${element}
+	Run Keyword If	'true' == '${is_element_disabled}'	Fail	Element '${element}' is unreadable
+	Select From List	css=select[tid='data.tenderAttempts']	number:${value}
 
 
 Додати предмет закупівлі
 	[Arguments]  ${user_name}  ${tender_id}  ${item}
-	Wait Visibulity And Click Element	css=button[tid='btn.modifyLot']
-	Додати новий предмет закупівлі	${item}
-	Click Element	css=button[tid='btn.createlot']
+	[return]	${True}
 
 
 Додати новий предмет закупівлі
@@ -201,11 +254,7 @@ ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 
 Видалити предмет закупівлі
 	[Arguments]  ${user_name}  ${tender_id}  ${item}
-	Wait Visibulity And Click Element	css=button[tid='btn.modifyLot']
-	Wait Visibulity And Click Element	xpath=//div[@ng-repeat='item in lot.data.items']//a[@tid='remove.item']
-	Click Element	css=button[tid='btn.createlot']
-	Wait Until Element Is Visible	css=button[tid='btn.modifyLot']
-	Element Should Not Be Visible	css=//div[@tid='item.description' and contains(., '${item}')]
+	[return]	${True}
 
 
 Пошук тендера по ідентифікатору
@@ -430,7 +479,6 @@ Check If Question Is Uploaded
 	[Arguments]  ${title}
 	Reload Page
 	Wait For Ajax
-#	Wait Enable And Click Element	css=a[ng-click='hideAddFilters = !hideAddFilters']
 	Wait Until Element Is Enabled	xpath=//div[@ng-repeat='question in data.questions']//span[@tid='data.question.title' and contains(., '${title}')]	3
 	[return]	True
 
@@ -507,27 +555,16 @@ Check If Question Is Uploaded
 
 Додати документ до аукціону
 	[Arguments]  ${filepath}  ${file_type}
-	Wait Visibulity And Click Element	css=button[tid='btn.modifyLot']
 	Wait Until Element Is Visible	css=div[tid='auction.docs'] div[tid='btn.addFiles']
 	Choose File	css=div[tid='auction.docs'] input#input-doc-lot	${filepath}
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar	${COMMONWAIT}
-	${elements} = 	Get Webelements	css=div[tid='auction.docs'] select[tid='doc.type']
-	${element} = 	Get From List	${elements}	-1
-	Select From List	${element}	${file_type}
-	Wait Until Element Is Visible	css=button[tid='btn.createlot']
-	Wait For Ajax
-	Click Element	css=button[tid='btn.createlot']
-	Wait For Ajax
-	Wait Until Element Is Visible	css=button[tid='btn.publicateLot']
-	Click Button	css=button[tid='btn.publicateLot']
-	Wait Until Element Is Not Visible	css=button[tid='btn.publicateLot']	${COMMONWAIT}
+	Select From List	xpath=(//div[@tid='auction.docs']//select[@tid='doc.type'])[last()]	${file_type}
 
 
 Завантажити документ
 	[Arguments]  ${user_name}  ${filepath}  ${tender_id}=${None}
 	Додати документ до аукціону	${filepath}	string:technicalSpecifications
-#	debug     ilustration
 
 
 Завантажити ілюстрацію
@@ -537,13 +574,12 @@ Check If Question Is Uploaded
 
 Завантажити документ в тендер з типом
 	[Arguments]  ${user_name}  ${tender_id}  ${file_path}  ${doc_type}
-	run keyword if  'tenderNotice' in '${doc_type}'	fail  Is not implemented yet
 	Додати документ до аукціону	${file_path}	string:${doc_type}
 
 
 Додати публічний паспорт активу
 	[Arguments]  ${user_name}  ${tender_id}  ${filepath}
-	Fail	Is not implemented yet
+	Додати посилання	string:x_dgfPublicAssetCertificate	${file_path}
 
 
 Завантажити фінансову ліцензію
@@ -576,12 +612,36 @@ Check If Question Is Uploaded
 	[return]	${result}
 
 
+Додати посилання
+	[Arguments]  ${link_type}  ${link}
+	Wait Visibulity And Click Element	css=div[tid='btn.addUrl']
+	Wait Until Element Is Visible	xpath=(//select[@tid='docurl.type'])[last()]	10s
+	Select From List	xpath=(//select[@tid='docurl.type'])[last()]	${link_type}
+	Wait Until Element Is Visible	xpath=(//input[@tid='docurl.url'])[last()]	10s
+	Input Text	xpath=(//input[@tid='docurl.url'])[last()]	${link}
+	Input Text	xpath=(//input[@tid='docurl.title'])[last()]	Tets test
+
+
 Додати Virtual Data Room
 	[Arguments]  ${user_name}  ${tender_id}  ${vdr_url}
-	Wait Visibulity And Click Element	css=button[tid='btn.modifyLot']
-	Wait Until Element Is Visible	css=input[tid='vdr.url']	${COMMONWAIT}
-	Input Text	css=input[tid='vdr.url']	${vdr_url}
+	Додати посилання	string:virtualDataRoom	${vdr_url}
+
+
+Додати офлайн документ
+	[Arguments]  ${user_name}  ${tender_id}  ${accessDetails}
+	Wait Visibulity And Click Element	css=div[tid='btn.addUrl']
+	Wait Until Element Is Visible	xpath=(//select[@tid='docurl.type'])[last()]	10s
+	Select From List	xpath=(//select[@tid='docurl.type'])[last()]	string:x_dgfAssetFamiliarization
+	Wait Until Element Is Visible	xpath=(//input[@tid='docurl.title'])[last()]	10s
+	Input Text	xpath=(//input[@tid='docurl.title'])[last()]	${accessDetails}
+	Input Text	xpath=(//textarea[@tid='docurl.addfield'])[last()]	${accessDetails}
+
+#	Auction publication section
+	Wait Until Element Is Visible	css=button[tid='btn.createlot']
+	Wait For Ajax
 	Click Element	css=button[tid='btn.createlot']
+	Wait For Ajax
+	Wait Until Element Is Visible	css=button[tid='btn.cancellationLot']
 
 
 Змінити документ в ставці
@@ -682,13 +742,14 @@ Check If Question Is Uploaded
 	sleep	10s
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar	${COMMONWAIT}
-	Wait Until Element Is Enabled	css=button[tid='contractConfirm']	${COMMONWAIT}
-	Click Button	css=button[tid='contractConfirm']
+	Wait Until Element Is Enabled	css=button[tid='contractActivate']	${COMMONWAIT}
+	Click Button	css=button[tid='contractActivate']
 	Wait For Ajax
 
 
 Скасування рішення кваліфікаційної комісії
 	[Arguments]  ${username}  ${tender_uaid}  ${award_num}
+	Wait For Element With Reload	css=button[tid='btn.award.cancelled']
 	Wait Until Element Is Visible	css=button[tid='btn.award.cancelled']	${COMMONWAIT}
 	${buttons_list} = 	Get Webelements	css=button[tid='btn.award.cancelled']
 	Click Button	${buttons_list[${award_num}]}
@@ -697,12 +758,9 @@ Check If Question Is Uploaded
 
 Отримати тип оголошеного лоту
 	[Arguments]  ${element}
+	Wait Until Element Is Visible	${tender_data.${element}}
 	Wait For Element With Any Text	${tender_data.${element}}
-	${text} =	Отримати текст елемента		${element}
-	${result} =	Set Variable If
-	...  '${text}' == 'продаж майна'	dgfOtherAssets
-	...  '${text}' == 'продаж прав вимоги за кредитами'	dgfFinancialAssets
-	...  ${text}
+	${result} =	Execute Javascript	return document.querySelector("div[tid='data.procurementMethodType']").innerHTML
 	[return]	${result}
 
 
@@ -746,12 +804,13 @@ Login
 	${notification_visibility} = 	Run Keyword And Return Status	Wait Until Element Is Visible	css=button[ng-click='later()']
 	Run Keyword If	'${notification_visibility}' == 'True'	Click Element	css=button[ng-click='later()']
 	Wait Until Element Is Not Visible	css=button[ng-click='later()']
-	Wait Until Element Is Visible		css=input[tid='global.search']
+	Wait For Ajax
+	Wait Until Element Is Visible		css=input[tid='global.search']	${COMMONWAIT}
 
 
 Wait For Ajax
 	Get Location
-	Sleep			4s
+	Sleep	4s
 
 
 Wait Until Element Not Stale

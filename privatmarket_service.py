@@ -44,3 +44,4 @@ def get_month_number(month_name):
                u"January", u"February", u"March", u"April", u"May", u"June",
                u"July", u"August", u"September", u"October", u"November", u"December"]
     return monthes.index(month_name) % 12 + 1
+
