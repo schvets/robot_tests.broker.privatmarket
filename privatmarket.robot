@@ -557,6 +557,8 @@ Check If Question Is Uploaded
 Завантажити документ в ставку
 	[Arguments]  ${user_name}  ${filepath}  ${tender_id}=${None}
 	Wait Until Element Is Visible			css=label[tid='modifyDoc']		${COMMONWAIT}
+	Execute Javascript	document.querySelector("input[id='modifyDoc']").className = ''
+	Sleep	2s
 	Choose File								css=input[id='modifyDoc']		${filepath}
 	sleep									10s
 	Wait For Ajax
@@ -566,6 +568,8 @@ Check If Question Is Uploaded
 Додати документ до аукціону
 	[Arguments]  ${filepath}  ${file_type}
 	Wait Until Element Is Visible	css=div[tid='auction.docs'] div[tid='btn.addFiles']
+	Execute Javascript	document.querySelector("div[tid='auction.docs'] input#input-doc-lot").className = ''
+	Sleep	2s
 	Choose File	css=div[tid='auction.docs'] input#input-doc-lot	${filepath}
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar	${COMMONWAIT}
@@ -703,7 +707,9 @@ Check If Question Is Uploaded
 
 	#add doc
 	Wait Until Element Is Visible			css=button[tid='docCancellation']		${COMMONWAIT}
-	Choose File								css=#docsCancellation		${doc_path}
+	Execute Javascript	document.querySelector("#docsCancellation").className = ''
+	Sleep	2s
+	Choose File	css=#docsCancellation		${doc_path}
 	Wait For Ajax
 
 	#input description
@@ -741,6 +747,8 @@ Check If Question Is Uploaded
 	[Arguments]  ${username}  ${tender_id}  ${file_path}  ${bid_index}
 	privatmarket.Пошук тендера по ідентифікатору	${username}	${tender_id}
 	Wait Until Element Is Visible	css=label[tid='docProtocol']	${COMMONWAIT}
+	Execute Javascript	document.querySelector("input[id='docsProtocolI']").className = ''
+	Sleep	2s
 	Choose File		css=input[id='docsProtocolI']	${file_path}
 	Wait For Ajax
 	Wait Until Element Is Not Visible		css=div.progress.progress-bar	${COMMONWAIT}
@@ -752,6 +760,8 @@ Check If Question Is Uploaded
 Завантажити угоду до тендера
 	[Arguments]  ${username}  ${tender_id}  ${contract_num}  ${file_path}
 	Wait Until Element Is Visible	xpath=//*[@tid='docContract']	${COMMONWAIT}
+	Execute Javascript	document.querySelector("input[id='docsContractI']").className = ''
+	Sleep	2s
 	Choose File	css=input[id='docsContractI']	${file_path}
 	sleep	10s
 	Wait For Ajax
