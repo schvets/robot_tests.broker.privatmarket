@@ -83,17 +83,18 @@ ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 	${prefs}			Create Dictionary		download.default_directory=${OUTPUT_DIR}	plugins.plugins_disabled=${disabled}
 
 	${options}= 	Evaluate	sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
-	Call Method	${options}		add_argument	--allow-running-insecure-content
-	Call Method	${options}		add_argument	--disable-web-security
-	Call Method	${options}		add_argument	--nativeEvents\=false
-	Call Method	${options}		add_experimental_option	prefs	${prefs}
+	Call Method	${options}	add_argument	--allow-running-insecure-content
+	Call Method	${options}	add_argument	--disable-web-security
+	Call Method	${options}	add_argument	--nativeEvents\=false
+	Call Method	${options}	add_experimental_option	prefs	${prefs}
 
 	Run Keyword If	'phantomjs' in '${browser}'	Create Webdriver	PhantomJS	${username}	service_args=${service_args}
-	...   ELSE	Create WebDriver	Chrome	chrome_options=${options}	alias=${username}
+	...   ELSE IF	'chrome' in '${browser}'	Create WebDriver	Chrome	chrome_options=${options}	alias=${username}
+	...   ELSE	Open Browser	${USERS.users['${username}'].homepage}	ff	alias=${username}
 
-	Set Window Size									@{USERS.users['${username}'].size}
-	Set Window Position								@{USERS.users['${username}'].position}
-	Set Selenium Implicit Wait						10s
+	Set Window Size	@{USERS.users['${username}'].size}
+	Set Window Position	@{USERS.users['${username}'].position}
+	Set Selenium Implicit Wait	10s
 	Go To	${USERS.users['${username}'].homepage}
 	Run Keyword Unless	'Viewer' in '${username}'	Login	${username}
 
@@ -125,10 +126,16 @@ ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 
 	Select From List	css=select[tid='data.tenderAttempts']	number:${tender_data.data.tenderAttempts}
 	Input text	css=textarea[tid='data.description']	${tender_data.data.description}
-	Input text	css=input[tid='data.value.amount']	'${tender_data.data.value.amount}'
+	${amount_to_enter} = 	Convert To String	${tender_data.data.value.amount}
+	${amount_to_enter} = 	Replace String	${amount_to_enter}	.	,
+	Click Element	css=input[tid='data.value.amount']
+	Input text	css=input[tid='data.value.amount']	${amount_to_enter}
 	Run Keyword If	'${tender_data.data.value.valueAddedTaxIncluded}' == 'True'	Click Element	css=input[tid='data.value.valueAddedTaxIncluded']
-		...  ELSE	Click Element	css=input[tid='data.value.valueAddedTaxNotIncluded']
-	Input text	css=input[tid='data.minimalStep.amount']	'${tender_data.data.minimalStep.amount}'
+	...  ELSE	Click Element	css=input[tid='data.value.valueAddedTaxNotIncluded']
+	${amount_to_enter} = 	Convert To String	${tender_data.data.minimalStep.amount}
+	${amount_to_enter} = 	Replace String	${amount_to_enter}	.	,
+	Click Element	css=input[tid='data.minimalStep.amount']
+	Input text	css=input[tid='data.minimalStep.amount']	${amount_to_enter}
 	#date/time
 	Set Date And Time	css=input[tid='auctionStartDate']	css=div[tid='auctionStartTime'] input[ng-model='hours']	css=div[tid='auctionStartTime'] input[ng-model='minutes']	${tender_data.data.auctionPeriod.startDate}
 
@@ -354,8 +361,9 @@ Wait for question
 	[Arguments]  ${username}  ${tender_uaid}  ${doc_index}  ${element}
 	${index}=	sum of numbers	${doc_index}	1
 	#получим тип документа по индексу
-	${result}=	Get Element Attribute	xpath=(//div[contains(@ng-repeat, 'distinctDocuments')]/a)[${index}]@tid
-	${result}=	Remove String	${result}	data.
+	${result} = 	Get Element Attribute	xpath=(//div[contains(@ng-repeat, 'distinctDocuments')]/*)[${index}]@tid
+	Run Keyword And Return If	'${result}' == '${None}'	Get Element Attribute	xpath=(//div[contains(@ng-repeat, 'distinctDocuments')])[${index}]//div[@id="fileitem"]@documenttype
+	${result} = 	Remove String	${result}	data.
 	[return]	${result}
 
 
@@ -517,6 +525,7 @@ Check If Question Is Uploaded
 	Click Button	css=button[tid='createBid']
 	Wait Until Element Is Enabled	css=#amount	${COMMONWAIT}
 	${amount} = 	Convert To String	${bid.data.value.amount}
+	${amount} = 	Replace String	${amount}	.	,
 	Input Text	css=input[tid='bid.value.amount']	${amount}
 	Click Button	css=div#bid button[tid='createBid']
 	Wait For Ajax
@@ -534,7 +543,8 @@ Check If Question Is Uploaded
 
 Змінити цінову пропозицію
 	[Arguments]  ${user_name}  ${tender_id}  ${name}  ${value}
-	${amount} = 						Convert To String	${value}
+	${amount} = 	Convert To String	${value}
+	${amount} = 	Replace String	${amount}	.	,
 	Wait For Element With Reload		css=button[tid='modifyBid']	5
 	Wait Visibulity And Click Element	css=button[tid='modifyBid']
 	Clear Element Text					css=input[tid='bid.value.amount']
@@ -547,6 +557,8 @@ Check If Question Is Uploaded
 Завантажити документ в ставку
 	[Arguments]  ${user_name}  ${filepath}  ${tender_id}=${None}
 	Wait Until Element Is Visible			css=label[tid='modifyDoc']		${COMMONWAIT}
+	Execute Javascript	document.querySelector("input[id='modifyDoc']").className = ''
+	Sleep	2s
 	Choose File								css=input[id='modifyDoc']		${filepath}
 	sleep									10s
 	Wait For Ajax
@@ -556,6 +568,8 @@ Check If Question Is Uploaded
 Додати документ до аукціону
 	[Arguments]  ${filepath}  ${file_type}
 	Wait Until Element Is Visible	css=div[tid='auction.docs'] div[tid='btn.addFiles']
+	Execute Javascript	document.querySelector("div[tid='auction.docs'] input#input-doc-lot").className = ''
+	Sleep	2s
 	Choose File	css=div[tid='auction.docs'] input#input-doc-lot	${filepath}
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar	${COMMONWAIT}
@@ -586,7 +600,11 @@ Check If Question Is Uploaded
 	[Arguments]  ${user_name}  ${tender_id}  ${financial_license_path}
 	Wait For Element With Reload	css=button[tid='modifyBid']
 	Wait Visibulity And Click Element	css=button[tid='modifyBid']
+	Wait For Ajax
 	Wait Until Element Is Visible	css=a[tid='btn.addFinLicenseDocs']	${COMMONWAIT}
+
+	Execute Javascript	document.querySelector("input[tid='finLicense']").className = ''
+	Sleep	2s
 	Choose File		css=input[tid='finLicense']	${financial_license_path}
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar	${COMMONWAIT}
@@ -641,7 +659,7 @@ Check If Question Is Uploaded
 	Wait For Ajax
 	Click Element	css=button[tid='btn.createlot']
 	Wait For Ajax
-	Wait Until Element Is Visible	css=button[tid='btn.cancellationLot']
+	Wait Until Element Is Visible	css=button[tid='btn.cancellationLot']	${COMMONWAIT}
 
 
 Змінити документ в ставці
@@ -651,8 +669,11 @@ Check If Question Is Uploaded
 
 Отримати посилання на аукціон для учасника
 	[Arguments]  ${user_name}  ${tender_id}
-	Wait For Element With Reload			xpath=//a[@tid='bid.participationUrl']	5
-	${url} = 	Get Element Attribute		xpath=//a[@tid='bid.participationUrl']@href
+	Go To	${USERS.users['${username}'].homepage}
+	Run Keyword And Ignore Error	Login	${user_name}
+	Пошук тендера по ідентифікатору	${tender_id}
+	Wait For Element With Reload	xpath=//a[@tid='bid.participationUrl']	5
+	${url} = 	Get Element Attribute	xpath=//a[@tid='bid.participationUrl']@href
 	[return]  ${url}
 
 
@@ -674,10 +695,10 @@ Check If Question Is Uploaded
 
 Підтвердити підписання контракту
 	[Arguments]  ${username}  ${tender_uaid}  ${contract_num}
-	Wait For Element With Reload			css=button[tid='contractActivate']
-	Wait Until Element Is Enabled			css=button[tid='contractActivate']	${COMMONWAIT}
-	Click Button							css=button[tid='contractActivate']
-	Wait Until Element Is Not Visible		css=button[tid='contractActivate']	${COMMONWAIT}
+	Wait For Element With Reload			css=label[tid='contractActivate']
+	Wait Until Element Is Enabled			css=label[tid='contractActivate']	${COMMONWAIT}
+	Click Button							css=label[tid='contractActivate']
+	Wait Until Element Is Not Visible		css=label[tid='contractActivate']	${COMMONWAIT}
 
 
 Скасувати закупівлю
@@ -689,7 +710,9 @@ Check If Question Is Uploaded
 
 	#add doc
 	Wait Until Element Is Visible			css=button[tid='docCancellation']		${COMMONWAIT}
-	Choose File								css=#docsCancellation		${doc_path}
+	Execute Javascript	document.querySelector("#docsCancellation").className = ''
+	Sleep	2s
+	Choose File	css=#docsCancellation		${doc_path}
 	Wait For Ajax
 
 	#input description
@@ -712,7 +735,10 @@ Check If Question Is Uploaded
 	[Arguments]  ${username}  ${file_path}  ${tender_id}  ${award_num}
 	Wait For Ajax
 	Wait Until Element Is Visible	css=button[tid='btn.award.addDocForCancel']	${COMMONWAIT}
-	Choose File		xpath=//button[@tid='btn.award.addDocForCancel']/following-sibling::input	${file_path}
+	${file_input_path} = 	Set Variable	//button[@tid='btn.award.addDocForCancel']/following-sibling::input
+	Execute Javascript	document.evaluate(${file_input_path}, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.className = ''
+	Sleep	2s
+	Choose File		xpath=${file_input_path}	${file_path}
 	Wait For Ajax
 
 
@@ -727,6 +753,8 @@ Check If Question Is Uploaded
 	[Arguments]  ${username}  ${tender_id}  ${file_path}  ${bid_index}
 	privatmarket.Пошук тендера по ідентифікатору	${username}	${tender_id}
 	Wait Until Element Is Visible	css=label[tid='docProtocol']	${COMMONWAIT}
+	Execute Javascript	document.querySelector("input[id='docsProtocolI']").className = ''
+	Sleep	2s
 	Choose File		css=input[id='docsProtocolI']	${file_path}
 	Wait For Ajax
 	Wait Until Element Is Not Visible		css=div.progress.progress-bar	${COMMONWAIT}
@@ -737,12 +765,14 @@ Check If Question Is Uploaded
 
 Завантажити угоду до тендера
 	[Arguments]  ${username}  ${tender_id}  ${contract_num}  ${file_path}
-	Wait Until Element Is Visible	css=label[tid='docContract']	${COMMONWAIT}
+	Wait Until Element Is Visible	xpath=//*[@tid='docContract']	${COMMONWAIT}
+	Execute Javascript	document.querySelector("input[id='docsContractI']").className = ''
+	Sleep	2s
 	Choose File	css=input[id='docsContractI']	${file_path}
 	sleep	10s
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar	${COMMONWAIT}
-	Wait Until Element Is Enabled	css=button[tid='contractActivate']	${COMMONWAIT}
+	Wait Until Element Is Enabled	css=lable[tid='contractActivate']	${COMMONWAIT}
 	Click Button	css=button[tid='contractActivate']
 	Wait For Ajax
 
@@ -784,6 +814,20 @@ Login
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar			${COMMONWAIT}
 	Sleep				7s
 	Wait Enable And Click Element		css=a[ui-sref='modal.login']
+
+	Run Keyword If	'Owner' in '${username}'	Login with P24	${username}
+	Run Keyword If	'Provider' in '${username}'	Login with email	${username}
+
+	#Close message notification
+	${notification_visibility} = 	Run Keyword And Return Status	Wait Until Element Is Visible	css=button[ng-click='later()']
+	Run Keyword If	'${notification_visibility}' == 'True'	Click Element	css=button[ng-click='later()']
+	Wait Until Element Is Not Visible	css=button[ng-click='later()']
+	Wait For Ajax
+	Wait Until Element Is Visible		css=input[tid='global.search']	${COMMONWAIT}
+
+
+Login with P24
+	[Arguments]  ${username}
 	Wait Enable And Click Element		xpath=//a[contains(@href, 'https://bankid.privatbank.ua')]
 
 	Wait Until Element Is Visible		css=input[id='loginLikePhone']			5s
@@ -800,12 +844,19 @@ Login
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar			${COMMONWAIT}
 	Wait Until Element Is Not Visible	css=a[id='confirmButton']
 
-	#Close message notification
-	${notification_visibility} = 	Run Keyword And Return Status	Wait Until Element Is Visible	css=button[ng-click='later()']
-	Run Keyword If	'${notification_visibility}' == 'True'	Click Element	css=button[ng-click='later()']
-	Wait Until Element Is Not Visible	css=button[ng-click='later()']
+
+Login with email
+	[Arguments]  ${username}
+
+	Wait Until Element Is Visible	css=input[id='email']	5s
+	Input Text	css=input[id='email']	${USERS.users['${username}'].login}
+	Input Text	css=input[id='password']	${USERS.users['${username}'].password}
+	Click Element	css=button[type='submit']
+
+	Sleep	3s
 	Wait For Ajax
-	Wait Until Element Is Visible		css=input[tid='global.search']	${COMMONWAIT}
+	Wait Until Element Is Not Visible	css=div.progress.progress-bar			${COMMONWAIT}
+	Wait Until Element Is Not Visible	css=button[type='submit']
 
 
 Wait For Ajax
