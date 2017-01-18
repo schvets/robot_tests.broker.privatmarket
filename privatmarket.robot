@@ -659,7 +659,7 @@ Check If Question Is Uploaded
 	Wait For Ajax
 	Click Element	css=button[tid='btn.createlot']
 	Wait For Ajax
-	Wait Until Element Is Visible	css=button[tid='btn.cancellationLot']
+	Wait Until Element Is Visible	css=button[tid='btn.cancellationLot']	${COMMONWAIT}
 
 
 Змінити документ в ставці
@@ -669,8 +669,11 @@ Check If Question Is Uploaded
 
 Отримати посилання на аукціон для учасника
 	[Arguments]  ${user_name}  ${tender_id}
-	Wait For Element With Reload			xpath=//a[@tid='bid.participationUrl']	5
-	${url} = 	Get Element Attribute		xpath=//a[@tid='bid.participationUrl']@href
+	Go To	${USERS.users['${username}'].homepage}
+	Run Keyword And Ignore Error	Login	${user_name}
+	Пошук тендера по ідентифікатору	${tender_id}
+	Wait For Element With Reload	xpath=//a[@tid='bid.participationUrl']	5
+	${url} = 	Get Element Attribute	xpath=//a[@tid='bid.participationUrl']@href
 	[return]  ${url}
 
 
@@ -732,7 +735,10 @@ Check If Question Is Uploaded
 	[Arguments]  ${username}  ${file_path}  ${tender_id}  ${award_num}
 	Wait For Ajax
 	Wait Until Element Is Visible	css=button[tid='btn.award.addDocForCancel']	${COMMONWAIT}
-	Choose File		xpath=//button[@tid='btn.award.addDocForCancel']/following-sibling::input	${file_path}
+	${file_input_path} = 	Set Variable	//button[@tid='btn.award.addDocForCancel']/following-sibling::input
+	Execute Javascript	document.evaluate(${file_input_path}, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.className = ''
+	Sleep	2s
+	Choose File		xpath=${file_input_path}	${file_path}
 	Wait For Ajax
 
 
