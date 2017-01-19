@@ -108,6 +108,7 @@ ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 
 Створити тендер
 	[Arguments]  ${user_name}  ${tender_data}
+	${os} = 	Evaluate	platform.system()	platform
 	${items} = 	Get From Dictionary	${tender_data.data}	items
 	${items_number} =	Get Length  ${items}
 	Wait Enable And Click Element	css=#simple-dropdown
@@ -127,15 +128,18 @@ ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 	Select From List	css=select[tid='data.tenderAttempts']	number:${tender_data.data.tenderAttempts}
 	Input text	css=textarea[tid='data.description']	${tender_data.data.description}
 	${amount_to_enter} = 	Convert To String	${tender_data.data.value.amount}
-	${amount_to_enter} = 	Replace String	${amount_to_enter}	.	,
+	${amount_to_enter2} = 	Replace String	${amount_to_enter}	.	,
 	Click Element	css=input[tid='data.value.amount']
-	Input text	css=input[tid='data.value.amount']	${amount_to_enter}
+	Run Keyword If	'${os}' == 'Linux'	Input text	css=input[tid='data.value.amount']	${amount_to_enter}
+	...  ELSE	Input text	css=input[tid='data.value.amount']	${amount_to_enter2}
+
 	Run Keyword If	'${tender_data.data.value.valueAddedTaxIncluded}' == 'True'	Click Element	css=input[tid='data.value.valueAddedTaxIncluded']
 	...  ELSE	Click Element	css=input[tid='data.value.valueAddedTaxNotIncluded']
 	${amount_to_enter} = 	Convert To String	${tender_data.data.minimalStep.amount}
-	${amount_to_enter} = 	Replace String	${amount_to_enter}	.	,
+	${amount_to_enter2} = 	Replace String	${amount_to_enter}	.	,
 	Click Element	css=input[tid='data.minimalStep.amount']
-	Input text	css=input[tid='data.minimalStep.amount']	${amount_to_enter}
+	Run Keyword If	'${os}' == 'Linux'	Input text	css=input[tid='data.minimalStep.amount']	${amount_to_enter}
+	...  ELSE	Input text	css=input[tid='data.minimalStep.amount']	${amount_to_enter2}
 	#date/time
 	Set Date And Time	css=input[tid='auctionStartDate']	css=div[tid='auctionStartTime'] input[ng-model='hours']	css=div[tid='auctionStartTime'] input[ng-model='minutes']	${tender_data.data.auctionPeriod.startDate}
 
@@ -145,6 +149,7 @@ ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 	\	${should_we_click_btn.additem} =	Set Variable If		'0' != '${index}'	${True}	${False}
 	\	Додати новий предмет закупівлі	${items[${index}]}	${should_we_click_btn.additem}
 
+    debug
 	Click Button	css=button[tid='btn.createlot']
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar	${COMMONWAIT}
@@ -154,6 +159,7 @@ ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 	#publication
 	Wait Until Element Is Visible	css=button[tid='btn.publicateLot']
 	Click Button	css=button[tid='btn.publicateLot']
+	Wait For Ajax
 	Wait Until Element Is Not Visible	css=button[tid='btn.publicateLot']	${COMMONWAIT}
 	Wait For Element With Reload	css=div[tid='data.auctionID']
 	${tender_id} = 	Get Text	css=div[tid='data.auctionID']
@@ -487,7 +493,8 @@ Check If Question Is Uploaded
 	[Arguments]  ${title}
 	Reload Page
 	Wait For Ajax
-	Wait Until Element Is Enabled	xpath=//div[@ng-repeat='question in data.questions']//span[@tid='data.question.title' and contains(., '${title}')]	3
+	@{subtitle} = 	Split String	${title}	'
+	Wait Until Element Is Enabled	xpath=//div[@ng-repeat='question in data.questions']//span[@tid='data.question.title' and contains(., '${subtitle[0]}')]	3
 	[return]	True
 
 
@@ -518,6 +525,7 @@ Check If Question Is Uploaded
 
 Подати цінову пропозицію
 	[Arguments]  ${user_name}  ${tender_id}  ${bid}
+	${os} = 	Evaluate	platform.system()	platform
 	Run Keyword If	'без кваліфікації' in '${TEST NAME}'	Fail	Is not implemented yet
 	#дождаться появления поля ввода ссуммы только в случае выполнения первого позитивного теста
 	Run Keyword Unless	'Неможливість подати цінову' in '${TEST NAME}' or 'подати повторно цінову' in '${TEST NAME}'
@@ -525,8 +533,9 @@ Check If Question Is Uploaded
 	Click Button	css=button[tid='createBid']
 	Wait Until Element Is Enabled	css=#amount	${COMMONWAIT}
 	${amount} = 	Convert To String	${bid.data.value.amount}
-	${amount} = 	Replace String	${amount}	.	,
-	Input Text	css=input[tid='bid.value.amount']	${amount}
+	${amount2} = 	Replace String	${amount}	.	,
+	Run Keyword If	'${os}' == 'Linux'	Input Text	css=input[tid='bid.value.amount']	${amount}
+	...  ELSE	Input Text	css=input[tid='bid.value.amount']	${amount2}
 	Click Button	css=div#bid button[tid='createBid']
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar			${COMMONWAIT}
@@ -543,12 +552,16 @@ Check If Question Is Uploaded
 
 Змінити цінову пропозицію
 	[Arguments]  ${user_name}  ${tender_id}  ${name}  ${value}
+	${os} = 	Evaluate	platform.system()	platform
 	${amount} = 	Convert To String	${value}
-	${amount} = 	Replace String	${amount}	.	,
+	${amount2} = 	Replace String	${amount}	.	,
+
 	Wait For Element With Reload		css=button[tid='modifyBid']	5
 	Wait Visibulity And Click Element	css=button[tid='modifyBid']
 	Clear Element Text					css=input[tid='bid.value.amount']
-	Input Text							css=input[tid='bid.value.amount']			${amount}
+	Run Keyword If	'${os}' == 'Linux'	Input Text	css=input[tid='bid.value.amount']	${amount}
+	...  ELSE	Input Text	css=input[tid='bid.value.amount']	${amount2}
+
 	Click Element						css=div#bid button[tid='createBid']
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar					${COMMONWAIT}
@@ -671,7 +684,7 @@ Check If Question Is Uploaded
 	[Arguments]  ${user_name}  ${tender_id}
 	Go To	${USERS.users['${username}'].homepage}
 	Run Keyword And Ignore Error	Login	${user_name}
-	Пошук тендера по ідентифікатору	${tender_id}
+	privatmarket.Пошук тендера по ідентифікатору	${username}	${tender_id}
 	Wait For Element With Reload	xpath=//a[@tid='bid.participationUrl']	5
 	${url} = 	Get Element Attribute	xpath=//a[@tid='bid.participationUrl']@href
 	[return]  ${url}
@@ -736,7 +749,7 @@ Check If Question Is Uploaded
 	Wait For Ajax
 	Wait Until Element Is Visible	css=button[tid='btn.award.addDocForCancel']	${COMMONWAIT}
 	${file_input_path} = 	Set Variable	//button[@tid='btn.award.addDocForCancel']/following-sibling::input
-	Execute Javascript	document.evaluate(${file_input_path}, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.className = ''
+	Execute Javascript	document.evaluate("${file_input_path}", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.className = ''
 	Sleep	2s
 	Choose File		xpath=${file_input_path}	${file_path}
 	Wait For Ajax
