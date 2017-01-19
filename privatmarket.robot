@@ -568,7 +568,7 @@ Check If Question Is Uploaded
 
 Завантажити документ в ставку
 	[Arguments]  ${user_name}  ${filepath}  ${tender_id}=${None}
-	Wait Until Element Is Visible			xpath=//*[@tid='modifyDoc']		${COMMONWAIT}
+	Wait Until Element Is Visible			css=[tid='modifyDoc']		${COMMONWAIT}
 	Execute Javascript	document.querySelector("input[id='modifyDoc']").className = ''
 	Sleep	2s
 	Choose File								css=input[id='modifyDoc']		${filepath}
@@ -764,7 +764,7 @@ Check If Question Is Uploaded
 Завантажити протокол аукціону
 	[Arguments]  ${username}  ${tender_id}  ${file_path}  ${bid_index}
 	privatmarket.Пошук тендера по ідентифікатору	${username}	${tender_id}
-	Wait Until Element Is Visible	xpath=//*[@tid='docProtocol']	${COMMONWAIT}
+	Wait Until Element Is Visible	css=[tid='docProtocol']	${COMMONWAIT}
 	Execute Javascript	document.querySelector("input[id='docsProtocolI']").className = ''
 	Sleep	2s
 	Choose File		css=input[id='docsProtocolI']	${file_path}
@@ -784,8 +784,8 @@ Check If Question Is Uploaded
 	sleep	10s
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar	${COMMONWAIT}
-	Wait Until Element Is Enabled	xpath=//*[@tid='contractActivate']	${COMMONWAIT}
-	Click Button	xpath=//*[@tid='contractActivate']
+	Wait Until Element Is Enabled	css=[tid='contractActivate']	${COMMONWAIT}
+	Click Button	css=[tid='contractActivate']
 	Wait For Ajax
 
 
