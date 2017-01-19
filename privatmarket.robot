@@ -159,6 +159,7 @@ ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 	#publication
 	Wait Until Element Is Visible	css=button[tid='btn.publicateLot']
 	Click Button	css=button[tid='btn.publicateLot']
+	Wait For Ajax
 	Wait Until Element Is Not Visible	css=button[tid='btn.publicateLot']	${COMMONWAIT}
 	Wait For Element With Reload	css=div[tid='data.auctionID']
 	${tender_id} = 	Get Text	css=div[tid='data.auctionID']
@@ -683,7 +684,7 @@ Check If Question Is Uploaded
 	[Arguments]  ${user_name}  ${tender_id}
 	Go To	${USERS.users['${username}'].homepage}
 	Run Keyword And Ignore Error	Login	${user_name}
-	privatmarket.Пошук тендера по ідентифікатору	${tender_id}
+	privatmarket.Пошук тендера по ідентифікатору	${username}	${tender_id}
 	Wait For Element With Reload	xpath=//a[@tid='bid.participationUrl']	5
 	${url} = 	Get Element Attribute	xpath=//a[@tid='bid.participationUrl']@href
 	[return]  ${url}
