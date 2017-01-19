@@ -391,7 +391,6 @@ Wait for question
 	${file_url} =	Get Element Attribute	${doc}@url
 	download_file_from_url  ${file_url}  ${OUTPUT_DIR}${/}${file_name}
 	Sleep	5s
-	debug     download file
 	[return]	${file_name}
 
 
@@ -567,7 +566,7 @@ Check If Question Is Uploaded
 
 Завантажити документ в ставку
 	[Arguments]  ${user_name}  ${filepath}  ${tender_id}=${None}
-	Wait Until Element Is Visible			css=[tid='modifyDoc']		${COMMONWAIT}
+	Wait Until Element Is Visible			xpath=//*[@tid='modifyDoc']		${COMMONWAIT}
 	Execute Javascript	document.querySelector("input[id='modifyDoc']").className = ''
 	Sleep	2s
 	Choose File								css=input[id='modifyDoc']		${filepath}
@@ -620,6 +619,7 @@ Check If Question Is Uploaded
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar	${COMMONWAIT}
 	Click Button	css=div#bid button[tid='createBid']
+	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div#bid button[tid='createBid']
 
 
@@ -706,10 +706,10 @@ Check If Question Is Uploaded
 
 Підтвердити підписання контракту
 	[Arguments]  ${username}  ${tender_uaid}  ${contract_num}
-	Wait For Element With Reload			css=[tid='contractActivate']
-	Wait Until Element Is Enabled			css=[tid='contractActivate']	${COMMONWAIT}
-	Click Button							css=[tid='contractActivate']
-	Wait Until Element Is Not Visible		css=[tid='contractActivate']	${COMMONWAIT}
+	Wait Until Element Is Enabled			xpath=//*[@tid='contractActivate']	${COMMONWAIT}
+	Click Element							xpath=//*[@tid='contractActivate']
+	Wait For Ajax
+	Wait Until Element Is Not Visible		xpath=//*[@tid='contractActivate']	${COMMONWAIT}
 
 
 Скасувати закупівлю
@@ -763,7 +763,7 @@ Check If Question Is Uploaded
 Завантажити протокол аукціону
 	[Arguments]  ${username}  ${tender_id}  ${file_path}  ${bid_index}
 	privatmarket.Пошук тендера по ідентифікатору	${username}	${tender_id}
-	Wait Until Element Is Visible	css=[tid='docProtocol']	${COMMONWAIT}
+	Wait Until Element Is Visible	xpath=//*[@tid='docProtocol']	${COMMONWAIT}
 	Execute Javascript	document.querySelector("input[id='docsProtocolI']").className = ''
 	Sleep	2s
 	Choose File		css=input[id='docsProtocolI']	${file_path}
@@ -783,9 +783,7 @@ Check If Question Is Uploaded
 	sleep	10s
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar	${COMMONWAIT}
-	Wait Until Element Is Enabled	css=[tid='contractActivate']	${COMMONWAIT}
-	Click Button	css=[tid='contractActivate']
-	Wait For Ajax
+	Wait Until Element Is Enabled	xpath=//*[@tid='contractActivate']	${COMMONWAIT}
 
 
 Скасування рішення кваліфікаційної комісії
@@ -994,6 +992,7 @@ Set Date And Time
 	Wait Until Element Is Visible	${element_min}	timeout=${COMMONWAIT}
 	Set Date	${date_element}	${date}
 	Set Time	${element_hour}	${element_min}	${date}
+
 
 Get Index Number
 	[Arguments]  ${elements}  ${element_index}
