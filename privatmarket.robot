@@ -21,6 +21,7 @@ ${tender_data.minimalStep.valueAddedTaxIncluded}		css=span[tid='data.minimalStep
 
 ${tender_data.auctionID}								css=div[tid='data.auctionID']
 ${tender_data.dgfID}									css=div[tid='data.dgfID']
+${tender_data.status}									css=span[tid='data.statusName']
 ${tender_data.enquiryPeriod.startDate}					css=span[tid='data.enquiryPeriod.startDate']
 ${tender_data.enquiryPeriod.endDate}					css=span[tid='data.enquiryPeriod.endDate']
 ${tender_data.tenderPeriod.startDate}					css=span[tid='data.tenderPeriod.startDate']
@@ -51,8 +52,6 @@ ${tender_data.questions.date}							span[@tid='data.quesion.date']
 ${tender_data.questions.answer}							span[@tid='data.question.answer']
 
 ${tender_data.doc.title}								xpath=(//div[@id='fileitem'])
-${tender_data.status}									css=span[tid='data.statusName']
-
 
 ${tender_data.cancellations[0].status}					xpath=//span[@tid='data.statusName' and contains(., 'Скасований лот')]
 ${tender_data.cancellations[0].reason}					css=div[tid='cancellations.reason']
@@ -149,7 +148,6 @@ ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 	\	${should_we_click_btn.additem} =	Set Variable If		'0' != '${index}'	${True}	${False}
 	\	Додати новий предмет закупівлі	${items[${index}]}	${should_we_click_btn.additem}
 
-    debug
 	Click Button	css=button[tid='btn.createlot']
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar	${COMMONWAIT}
@@ -375,7 +373,7 @@ Wait for question
 
 Отримати текст елемента
 	[Arguments]  ${element_name}
-	${temp_name} = 					Remove String	${element_name}	'
+	${temp_name} = 	Remove String	${element_name}	'
 	${selector} = 	Set Variable If
 		...  'css=' in '${temp_name}' or 'xpath=' in '${temp_name}'	${element_name}
 		...  ${tender_data.${element_name}}
@@ -388,12 +386,11 @@ Wait for question
 
 Отримати документ
 	[Arguments]  ${username}  ${tender_uaid}  ${doc_id}
-	${file_name} =	Get Element Attribute	${tender_data.doc.title}[2]@title
-	${file_name} =	Replace String			${file_name}	:	-
-	${file_name} =	Replace String			${file_name}	~	-
-	${file_name} =	Replace String			${file_name}	\\	%5C
-	Click Element							${tender_data.doc.title}[2]
-	Sleep									8s
+	${doc} = 	Set Variable	xpath=//div[@id='fileitem' and contains(., '${doc_id}')]
+	${file_name} =	Get Element Attribute	${doc}@title
+	${file_url} =	Get Element Attribute	${doc}@url
+	download_file_from_url  ${file_url}  ${OUTPUT_DIR}${/}${file_name}
+	Sleep	5s
 	[return]	${file_name}
 
 
@@ -569,7 +566,7 @@ Check If Question Is Uploaded
 
 Завантажити документ в ставку
 	[Arguments]  ${user_name}  ${filepath}  ${tender_id}=${None}
-	Wait Until Element Is Visible			css=label[tid='modifyDoc']		${COMMONWAIT}
+	Wait Until Element Is Visible			xpath=//*[@tid='modifyDoc']		${COMMONWAIT}
 	Execute Javascript	document.querySelector("input[id='modifyDoc']").className = ''
 	Sleep	2s
 	Choose File								css=input[id='modifyDoc']		${filepath}
@@ -622,6 +619,7 @@ Check If Question Is Uploaded
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar	${COMMONWAIT}
 	Click Button	css=div#bid button[tid='createBid']
+	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div#bid button[tid='createBid']
 
 
@@ -708,10 +706,10 @@ Check If Question Is Uploaded
 
 Підтвердити підписання контракту
 	[Arguments]  ${username}  ${tender_uaid}  ${contract_num}
-	Wait For Element With Reload			css=label[tid='contractActivate']
-	Wait Until Element Is Enabled			css=label[tid='contractActivate']	${COMMONWAIT}
-	Click Button							css=label[tid='contractActivate']
-	Wait Until Element Is Not Visible		css=label[tid='contractActivate']	${COMMONWAIT}
+	Wait Until Element Is Enabled			xpath=//*[@tid='contractActivate']	${COMMONWAIT}
+	Click Element							xpath=//*[@tid='contractActivate']
+	Wait For Ajax
+	Wait Until Element Is Not Visible		xpath=//*[@tid='contractActivate']	${COMMONWAIT}
 
 
 Скасувати закупівлю
@@ -765,7 +763,7 @@ Check If Question Is Uploaded
 Завантажити протокол аукціону
 	[Arguments]  ${username}  ${tender_id}  ${file_path}  ${bid_index}
 	privatmarket.Пошук тендера по ідентифікатору	${username}	${tender_id}
-	Wait Until Element Is Visible	css=label[tid='docProtocol']	${COMMONWAIT}
+	Wait Until Element Is Visible	xpath=//*[@tid='docProtocol']	${COMMONWAIT}
 	Execute Javascript	document.querySelector("input[id='docsProtocolI']").className = ''
 	Sleep	2s
 	Choose File		css=input[id='docsProtocolI']	${file_path}
@@ -785,9 +783,7 @@ Check If Question Is Uploaded
 	sleep	10s
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar	${COMMONWAIT}
-	Wait Until Element Is Enabled	css=lable[tid='contractActivate']	${COMMONWAIT}
-	Click Button	css=button[tid='contractActivate']
-	Wait For Ajax
+	Wait Until Element Is Enabled	xpath=//*[@tid='contractActivate']	${COMMONWAIT}
 
 
 Скасування рішення кваліфікаційної комісії
@@ -996,6 +992,7 @@ Set Date And Time
 	Wait Until Element Is Visible	${element_min}	timeout=${COMMONWAIT}
 	Set Date	${date_element}	${date}
 	Set Time	${element_hour}	${element_min}	${date}
+
 
 Get Index Number
 	[Arguments]  ${elements}  ${element_index}
