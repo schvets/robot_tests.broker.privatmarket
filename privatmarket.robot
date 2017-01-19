@@ -21,6 +21,7 @@ ${tender_data.minimalStep.valueAddedTaxIncluded}		css=span[tid='data.minimalStep
 
 ${tender_data.auctionID}								css=div[tid='data.auctionID']
 ${tender_data.dgfID}									css=div[tid='data.dgfID']
+${tender_data.status}									css=span[tid='data.statusName']
 ${tender_data.enquiryPeriod.startDate}					css=span[tid='data.enquiryPeriod.startDate']
 ${tender_data.enquiryPeriod.endDate}					css=span[tid='data.enquiryPeriod.endDate']
 ${tender_data.tenderPeriod.startDate}					css=span[tid='data.tenderPeriod.startDate']
@@ -51,8 +52,6 @@ ${tender_data.questions.date}							span[@tid='data.quesion.date']
 ${tender_data.questions.answer}							span[@tid='data.question.answer']
 
 ${tender_data.doc.title}								xpath=(//div[@id='fileitem'])
-${tender_data.status}									css=span[tid='data.statusName']
-
 
 ${tender_data.cancellations[0].status}					xpath=//span[@tid='data.statusName' and contains(., 'Скасований лот')]
 ${tender_data.cancellations[0].reason}					css=div[tid='cancellations.reason']
@@ -374,7 +373,7 @@ Wait for question
 
 Отримати текст елемента
 	[Arguments]  ${element_name}
-	${temp_name} = 					Remove String	${element_name}	'
+	${temp_name} = 	Remove String	${element_name}	'
 	${selector} = 	Set Variable If
 		...  'css=' in '${temp_name}' or 'xpath=' in '${temp_name}'	${element_name}
 		...  ${tender_data.${element_name}}
@@ -387,12 +386,12 @@ Wait for question
 
 Отримати документ
 	[Arguments]  ${username}  ${tender_uaid}  ${doc_id}
-	${file_name} =	Get Element Attribute	${tender_data.doc.title}[2]@title
-	${file_name} =	Replace String			${file_name}	:	-
-	${file_name} =	Replace String			${file_name}	~	-
-	${file_name} =	Replace String			${file_name}	\\	%5C
-	Click Element							${tender_data.doc.title}[2]
-	Sleep									8s
+	${doc} = 	Set Variable	xpath=//div[@id='fileitem' and contains(., '${doc_id}')]
+	${file_name} =	Get Element Attribute	${doc}@title
+	${file_url} =	Get Element Attribute	${doc}@url
+	download_file_from_url  ${file_url}  ${OUTPUT_DIR}${/}${file_name}
+	Sleep	5s
+	debug     download file
 	[return]	${file_name}
 
 
