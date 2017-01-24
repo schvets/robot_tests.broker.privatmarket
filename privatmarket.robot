@@ -53,7 +53,7 @@ ${tender_data.questions.answer}							span[@tid='data.question.answer']
 
 ${tender_data.doc.title}								xpath=(//div[@id='fileitem'])
 
-${tender_data.cancellations[0].status}					xpath=//span[@tid='data.statusName' and contains(., 'Відмінений аукціон')]
+${tender_data.cancellations[0].status}					xpath=//span[@tid='data.statusName' and contains(., 'Торги відмінено')]
 ${tender_data.cancellations[0].reason}					css=div[tid='cancellations.reason']
 ${tender_data.cancellation.doc.title}					css=div[tid='doc.title']
 ${tender_data.cancellation.doc.description}				css=div[tid='cancellations.doc.description']
@@ -471,7 +471,7 @@ Wait for question
 
 
 Перевірити cancellations[0].status
-	${is_present} = 	Run Keyword And Return Status	Element Should Contain	css=span[tid='data.statusName']	Відмінений аукціон
+	${is_present} = 	Run Keyword And Return Status	Element Should Contain	css=span[tid='data.statusName']	Торги відмінено
 	${status} = 	Set Variable If	'${is_present}' == 'True'	active	not active
 	[return]  ${status}
 
