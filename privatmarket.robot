@@ -53,7 +53,7 @@ ${tender_data.questions.answer}							span[@tid='data.question.answer']
 
 ${tender_data.doc.title}								xpath=(//div[@id='fileitem'])
 
-${tender_data.cancellations[0].status}					xpath=//span[@tid='data.statusName' and contains(., 'Скасований лот')]
+${tender_data.cancellations[0].status}					xpath=//span[@tid='data.statusName' and contains(., 'Відмінений аукціон')]
 ${tender_data.cancellations[0].reason}					css=div[tid='cancellations.reason']
 ${tender_data.cancellation.doc.title}					css=div[tid='doc.title']
 ${tender_data.cancellation.doc.description}				css=div[tid='cancellations.doc.description']
@@ -80,6 +80,7 @@ ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 	${browser} =		Convert To Lowercase	${USERS.users['${username}'].browser}
 	${disabled}			Create List				Chrome PDF Viewer
 	${prefs}			Create Dictionary		download.default_directory=${OUTPUT_DIR}	plugins.plugins_disabled=${disabled}
+	${desired_capabilities} =  Create Dictionary  webdriver.log.file=${OUTPUT_DIR}${/}webdriver_log.txt  webdriver.firefox.logfile =${OUTPUT_DIR}${/}firefox_log.txt
 
 	${options}= 	Evaluate	sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
 	Call Method	${options}	add_argument	--allow-running-insecure-content
@@ -89,7 +90,7 @@ ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 
 	Run Keyword If	'phantomjs' in '${browser}'	Create Webdriver	PhantomJS	${username}	service_args=${service_args}
 	...   ELSE IF	'chrome' in '${browser}'	Create WebDriver	Chrome	chrome_options=${options}	alias=${username}
-	...   ELSE	Open Browser	${USERS.users['${username}'].homepage}	ff	alias=${username}
+	...   ELSE	Open Browser	${USERS.users['${username}'].homepage}	ff	alias=${username}	desired_capabilities=${desired_capabilities}
 
 	Set Window Size	@{USERS.users['${username}'].size}
 	Set Window Position	@{USERS.users['${username}'].position}
@@ -449,9 +450,9 @@ Wait for question
 	...  '${text}' == 'Кваліфікація переможця'	active.qualification
 	...  '${text}' == 'Пропозиції розглянуто'	active.awarded
 	...  '${text}' == 'Активний лот'	active
-	...  '${text}' == 'Неуспішний лот'	unsuccessful
-	...  '${text}' == 'Завершений лот'	complete
-	...  '${text}' == 'Скасований лот'	cancelled
+	...  '${text}' == 'Аукціон не відбувся'	unsuccessful
+	...  '${text}' == 'Завершений аукціон'	complete
+	...  '${text}' == 'Відмінений аукціон'	cancelled
 	...  ${element}
 	[return]  ${result}
 
@@ -467,7 +468,7 @@ Wait for question
 
 
 Перевірити cancellations[0].status
-	${is_present} = 	Run Keyword And Return Status	Element Should Contain	css=span[tid='data.statusName']	Скасований лот
+	${is_present} = 	Run Keyword And Return Status	Element Should Contain	css=span[tid='data.statusName']	Відмінений аукціон
 	${status} = 	Set Variable If	'${is_present}' == 'True'	active	not active
 	[return]  ${status}
 
@@ -769,8 +770,8 @@ Check If Question Is Uploaded
 	Choose File		css=input[id='docsProtocolI']	${file_path}
 	Wait For Ajax
 	Wait Until Element Is Not Visible		css=div.progress.progress-bar	${COMMONWAIT}
-	Wait Until Element Is Enabled	css=button[tid='confirmProtocol']	${COMMONWAIT}
-	Click Button	css=button[tid='confirmProtocol']
+	Wait Until Element Is Enabled	xpath=//*[@tid='confirmProtocol']	${COMMONWAIT}
+	Click Element	xpath=//*[@tid='confirmProtocol']
 	Sleep	20s
 
 
