@@ -444,14 +444,18 @@ Wait for question
 	${text} =	Отримати текст елемента	${element}
 	${result} =	Set Variable If
 	...  '${text}' == 'Період уточнень'	active.enquiries
-	...  '${text}' == 'Очікування пропозицій'	active.tendering
-	...  '${text}' == 'Період аукціону'	active.auction
-	...  '${text}' == 'Кваліфікація переможця'	active.qualification
-	...  '${text}' == 'Пропозиції розглянуто'	active.awarded
+	...  '${text}' == 'Період прийому пропозицій'	active.tendering
+	...  '${text}' == 'Аукціон'	active.auction
+	...  '${text}' == 'Кваліфікація'	active.qualification
+	...  '${text}' == 'Оплачено, очікується підписання договору'	active.awarded
 	...  '${text}' == 'Активний лот'	active
-	...  '${text}' == 'Аукціон не відбувся'	unsuccessful
-	...  '${text}' == 'Завершений аукціон'	complete
-	...  '${text}' == 'Відмінений аукціон'	cancelled
+	...  '${text}' == 'Торги не відбулися'	unsuccessful
+	...  '${text}' == 'Завершено'	complete
+	...  '${text}' == 'Торги відмінено'	cancelled
+	...  '${text}' == 'Очікується протокол'	pending
+	...  '${text}' == 'Очікується оплата'	validation
+	...  '${text}' == 'Не поступила оплата'	nopayment
+	...  '${text}' == 'Не опубліковано у ЦБД'	draft
 	...  ${element}
 	[return]  ${result}
 
