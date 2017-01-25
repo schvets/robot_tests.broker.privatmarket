@@ -157,20 +157,23 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Wait Until Element Is Enabled			id=tenders	timeout=${COMMONWAIT}
 	Switch To Frame							id=tenders
 	Sleep									1s
+
 	Switch To Education Mode
 	Wait Until Element Is Visible			css=button[ng-click='template.newTender()']
 	Click Button							css=button[ng-click='template.newTender()']
+	Wait For Ajax
 
 	#choose UK language
 	${status} =	Run Keyword And Return Status	Element Should Be Visible	css=a#lang_uk
 	Run Keyword If	${status}	Click Element	css=a#lang_uk
 	Wait For Ajax
+
 #step 0
 	#we should add choosing of procurementMethodType
+	Wait Until Element Is Enabled				css=input[data-id='procurementName']				${COMMONWAIT}
 	Input Text									css=input[data-id='procurementName']				${tender_data.data.title}
 	Sleep	1s
 	Input Text									css=textarea[data-id='procurementDescription']		${tender_data.data.description}
-	Sleep	1s
 
 	#CPV
 	Mark Step									CPV
@@ -357,9 +360,16 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 
 Змінити лот
 	[Arguments]  ${username}  ${tender_id}  ${lot_id}  ${field_name}  ${field_value}
-	Wait Until Element Is Visible	css=button[ng-click='act.createAfp()']	timeout=${COMMONWAIT}
-	Click Button					css=button[ng-click='act.createAfp()']
-	Wait For Ajax
+#	Wait Until Element Is Visible	css=button[ng-click='act.createAfp()']	timeout=${COMMONWAIT}
+#	Click Button					css=button[ng-click='act.createAfp()']
+#	Wait For Ajax
+	Змінити поле ${field_name}
+	Click Button					css=button[data-id='actSave']
+	Close Confirmation				Данные успешно сохранены
+
+
+Змінити поле value.amount
+	[Arguments]  ${username}  ${tender_id}  ${lot_id}  ${field_name}  ${field_value}
 	Wait Until Element Is Visible	css=span[ng-bind='model.ptr.value.amount | accounting:2']	timeout=${COMMONWAIT}
 	Wait Until Element Is Visible	id=tab_1	timeout=${COMMONWAIT}
 	Click Element					id=tab_1
@@ -367,8 +377,13 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Wait Until Element Is Visible	css=input[data-id='valueAmount']	timeout=${COMMONWAIT}
 	Clear Element Text				css=input[data-id='valueAmount']
 	Input Text						css=input[data-id='valueAmount']		${field_value}
-	Click Button					css=button[data-id='actSave']
-	Close Confirmation				Данные успешно сохранены
+
+
+Змінити поле minimalStep.amount
+	[Arguments]  ${username}  ${tender_id}  ${lot_id}  ${field_name}  ${field_value}
+	Wait Until Element Is Visible	css=input[data-id='minimalStepAmount']	timeout=${COMMONWAIT}
+	Clear Element Text				css=input[data-id='minimalStepAmount']
+	Input Text						css=input[data-id='minimalStepAmount']	${field_value}
 
 
 Створити лот із предметом закупівлі
@@ -394,21 +409,23 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Set Date And Time		css=input[ng-model='model.ptr.tenderPeriod.ed.d']	css=timepicker-pop[input-time='model.ptr.tenderPeriod.ed.t'] input[ng-model='inputTime']	${field_value}
 
 
+Можливість змінити поле value.amount
+	[Arguments]  @{field_value}
+	debug     поле value.amount
+
 Завантажити документ
 	[Arguments]  ${user}  ${document}  ${tenderUaId}
 	Wait For Ajax
-	Wait Until Element Is Visible	css=button[ng-click='act.createAfp()']	timeout=${COMMONWAIT}
-	Wait Until Element Is Enabled	css=button[ng-click='act.createAfp()']	timeout=${COMMONWAIT}
-	Click Button					css=button[ng-click='act.createAfp()']
+	Wait Until Element Is Enabled	css=button[ng-click='commonActions.createAfp()']	timeout=${COMMONWAIT}
+	Click Button					css=button[ng-click='commonActions.createAfp()']
 	Wait For Ajax
-	Wait Until Element Is Visible	id=tab_3	timeout=${COMMONWAIT}
 	Wait Until Element Is Enabled	id=tab_3	timeout=${COMMONWAIT}
 	Click Element					id=tab_3
 	Wait For Ajax
 	Wait Until Element Is Visible	xpath=//select[@data-id='vfv']	timeout=${COMMONWAIT}
+
 	#doc type is for tender
-	Click Element					xpath=//select[@data-id='vfv']/option[@value=0]
-	Execute Javascript				$("input[type='file']").css('display', '')
+	Select From List By Value		xpath=//select[@data-id='vfv']	0
 	Choose File						css=input[type='file']	${document}
 	sleep							3s
 	Wait Until Element Is Visible	css=a[data-id='actGetDocument']			timeout=${COMMONWAIT}
@@ -421,16 +438,21 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 Завантажити документ в лот
 	[Arguments]  ${user}  ${document}  ${tender_id}  ${lot_id}
 	#start work with lot
-	Click button					css=div[ng-show='!lot.expanded'] button[data-id='actExpand']
+	Click button					xpath=//div[@ng-show='!lot.expanded' and contains(., '${lot_id}')]//button[@data-id='actExpand']
 	#doc type is for tender
-	Click Element					xpath=//div[@ng-show='lot.expanded']//select[@ng-model='lot.currentVfv']/option[@value=0]
-	Execute Javascript				$("div[ng-show='lot.expanded'] input[type='file']").css('display', '')
-	Choose File						css=div[ng-show='lot.expanded'] input[type='file']	${document}
-	sleep							3s
-	Wait Until Element Is Visible	css=div[ng-show='lot.expanded'] a[data-id='actGetDocument']	timeout=${COMMONWAIT}
+	#TODO  dell next step when the bug with file type will be fixed
+	Select From List By Value		xpath=//select[@data-id='vfv']	0
+	Select From List By Value		xpath=//div[@ng-show='lot.expanded' and contains(., '${lot_id}')]//select[@ng-model='lot.currentVfv']	0
 
-	Click Button								css=button[data-id='actSave']
-	Close Confirmation							Данные успешно сохранены
+	Execute Javascript				$("div[ng-show='lot.expanded'] input[type='file']").css('display', '')
+	Choose File						xpath=//div[@ng-show='lot.expanded' and contains(., '${lot_id}')]//input[@type='file']	${document}
+	sleep							3s
+	Wait Until Element Is Visible	xpath=//div[@ng-show='lot.expanded' and contains(., '${lot_id}')]//a[@data-id='actGetDocument']	timeout=${COMMONWAIT}
+
+	Click Button					css=button[data-id='actSave']
+	Close Confirmation				Данные успешно сохранены
+	Click Element					css=a[data-id='goBack']
+
 	[return]  ${document}
 
 
@@ -773,7 +795,7 @@ Chose interface language
 Отримати bid.status
 	Wait For Element With Reload	xpath=//table[@class='bids']//tr[1]/td[4 and contains(., 'Недійсна')]	1	3	3
 	${status} = 	Get Text		xpath=//table[@class='bids']//tr[1]/td[4]
-	${status} = 	Set Variable If	'Недійсна' in ${status}	invalid	wrong status
+	${status} = 	Set Variable If	'Недійсна' in '${status}'	invalid	wrong status
 	[return]	${status}
 
 
@@ -1622,9 +1644,8 @@ Login
 	Input Text							xpath=//div[@id="login_modal" and @style='display: block;']//input[@type='password']	${USERS.users['${username}'].password}
 	Click Element						xpath=//div[@id="login_modal" and @style='display: block;']//button[@type='submit']
 	Wait Until Element Is Visible		css=ul.user-menu  timeout=30
-	Sleep								3s
 	Wait For Ajax
-	Wait Until Element Not Stale		css=a[data-target='#select_cabinet']  10
+	Sleep								5s
 	Wait Until Element Is Visible		css=a[data-target='#select_cabinet']  timeout=${COMMONWAIT}
 
 
@@ -1678,11 +1699,13 @@ Mark Step
 
 Close Confirmation
 	[Arguments]	${confirmation_text}
+	Wait Until Element Is Visible		css=p.ng-binding							${COMMONWAIT}
+	Wait Until Element Contains			css=p.ng-binding							${confirmation_text}	${COMMONWAIT}
 	Wait For Ajax
-	Wait Until Element Contains			css=p.ng-binding	${confirmation_text}	${COMMONWAIT}
-	Wait Visibulity And Click Element	xpath=//button[@ng-click='close()']
-	Wait Until Element Is Not Visible	xpath=//button[@ng-controller='inFrameModalCtrl']	${COMMONWAIT}
-	Wait For Ajax
+	Wait Until Element Is Enabled		xpath=//button[@ng-click='close()']			${COMMONWAIT}
+	Click Button						xpath=//button[@ng-click='close()']
+	Sleep								2s
+	Wait Until Element Is Not Visible	xpath=//button[@ng-click='close()']	${COMMONWAIT}
 
 
 Close Formatted Confirmation
