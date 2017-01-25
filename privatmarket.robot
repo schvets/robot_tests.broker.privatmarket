@@ -524,6 +524,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 Відкрити детальну інформацію про позицію
 	[Arguments]  ${index}
 	${locator} = 						Set Variable			xpath=(//a[@ng-click='adb.showCl = !adb.showCl;'])[${index}]
+	Wait Until Element Is Visible		${locator}
 	${element_class} =					Get Element Attribute	${locator}@class
 	Run Keyword If	'checked-item' in '${element_class}'		Return From Keyword
 	Sleep								1s
@@ -1182,13 +1183,17 @@ Chose interface language
 
 Отримати інформацію з contracts[0].status
 	[Arguments]  ${element}
-	Wait Enable And Click Element		css=.nav-tab li:nth-of-type(3)>a
-	Click Element						${tender_data_awards[0].suppliers[0].name}
+	Run Keyword If	'статусу підписаної' in '${TEST_NAME}'		sleep	120s
+	Reload And Switch To Tab	1
+	${locator} = 						Set Variable			css=.nav-tab li:nth-of-type(3)
+	${element_class} =					Get Element Attribute	${locator}@class
+	Run Keyword Unless	'checked-nav' in '${element_class}'		Wait Enable And Click Element		css=.nav-tab li:nth-of-type(3)>a
+	Wait Enable And Click Element		${tender_data_awards[0].suppliers[0].name}
 	Wait Until Element Is Visible		${tender_data_contracts[0].status}	timeout=${COMMONWAIT}
 	${text} =		Отримати текст елемента  ${element}
 	${result} =		Set Variable If
 		...  'Очiкує пiдписання' in '${text}'	pending
-		...  'Підписаний' in '${text}'	active
+		...  'Підписаний' in '${text}'			active
 	[return]	${result}
 
 
@@ -1352,7 +1357,7 @@ Chose interface language
 	[Arguments]  ${provider}  ${tender_id}
 	privatmarket.Пошук тендера по ідентифікатору	${provider}	${tender_id}
 	Wait For Ajax
-	Switch To Tab						3
+	Wait For Element With Reload		css=button[ng-click='act.setComplaintResolved(q, false)']	3
 	Wait Enable And Click Element		css=button[ng-click='act.setComplaintResolved(q, false)']
 	Close Formatted Confirmation	Ваша вимога була успішно переведена в звернення. Чекайте наступного рішення!
 
