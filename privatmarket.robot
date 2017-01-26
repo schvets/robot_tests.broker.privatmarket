@@ -711,10 +711,12 @@ Check If Question Is Uploaded
 
 Підтвердити підписання контракту
 	[Arguments]  ${username}  ${tender_uaid}  ${contract_num}
-	Wait Until Element Is Enabled			xpath=//*[@tid='contractActivate']	${COMMONWAIT}
-	Click Element							xpath=//*[@tid='contractActivate']
+	Wait Until Element Is Enabled	xpath=//input[@tid='contractNumber']	${COMMONWAIT}
+	Input Text	xpath=//input[@tid='contractNumber']	${contract_num}
+	Wait Until Element Is Enabled	xpath=//*[@tid='contractConfirm']	${COMMONWAIT}
+	Click Element	xpath=//*[@tid='contractConfirm']
 	Wait For Ajax
-	Wait Until Element Is Not Visible		xpath=//*[@tid='contractActivate']	${COMMONWAIT}
+	Wait Until Element Is Not Visible	xpath=//*[@tid='contractConfirm']	${COMMONWAIT}
 
 
 Скасувати закупівлю
@@ -788,7 +790,7 @@ Check If Question Is Uploaded
 	sleep	10s
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar	${COMMONWAIT}
-	Wait Until Element Is Enabled	xpath=//*[@tid='contractActivate']	${COMMONWAIT}
+	Wait Until Element Is Enabled	xpath=//*[@tid='contractConfirm']	${COMMONWAIT}
 
 
 Скасування рішення кваліфікаційної комісії
