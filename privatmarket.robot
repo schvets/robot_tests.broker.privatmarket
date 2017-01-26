@@ -709,14 +709,29 @@ Check If Question Is Uploaded
 	Wait For Ajax
 
 
-Підтвердити підписання контракту
-	[Arguments]  ${username}  ${tender_uaid}  ${contract_num}
-	Wait Until Element Is Enabled	xpath=//input[@tid='contractNumber']	${COMMONWAIT}
-	Input Text	xpath=//input[@tid='contractNumber']	${contract_num}
+Завантажити угоду до тендера
+	[Arguments]  ${username}  ${tender_id}  ${contract_num}  ${file_path}
+	Wait Until Element Is Visible	xpath=//*[@tid='docContract']	${COMMONWAIT}
+	Execute Javascript	document.querySelector("input[id='docsContractI']").className = ''
+	Sleep	2s
+	Choose File	css=input[id='docsContractI']	${file_path}
+	sleep	10s
+	Wait For Ajax
+	Wait Until Element Is Not Visible	css=div.progress.progress-bar	${COMMONWAIT}
 	Wait Until Element Is Enabled	xpath=//*[@tid='contractConfirm']	${COMMONWAIT}
 	Click Element	xpath=//*[@tid='contractConfirm']
 	Wait For Ajax
 	Wait Until Element Is Not Visible	xpath=//*[@tid='contractConfirm']	${COMMONWAIT}
+
+
+Підтвердити підписання контракту
+	[Arguments]  ${username}  ${tender_uaid}  ${contract_num}
+	Wait For Ajax
+	Wait Until Element Is Enabled	xpath=//input[@tid='contractNumber']	${COMMONWAIT}
+	Input Text	xpath=//input[@tid='contractNumber']	${contract_num}
+	Wait Visibulity And Click Element	xpath=//*[@tid='contractActivate']
+	Wait For Ajax
+	Wait Until Element Is Not Visible	xpath=//*[@tid='contractActivate']	${COMMONWAIT}
 
 
 Скасувати закупівлю
@@ -779,18 +794,6 @@ Check If Question Is Uploaded
 	Wait Until Element Is Enabled	xpath=//*[@tid='confirmProtocol']	${COMMONWAIT}
 	Click Element	xpath=//*[@tid='confirmProtocol']
 	Sleep	20s
-
-
-Завантажити угоду до тендера
-	[Arguments]  ${username}  ${tender_id}  ${contract_num}  ${file_path}
-	Wait Until Element Is Visible	xpath=//*[@tid='docContract']	${COMMONWAIT}
-	Execute Javascript	document.querySelector("input[id='docsContractI']").className = ''
-	Sleep	2s
-	Choose File	css=input[id='docsContractI']	${file_path}
-	sleep	10s
-	Wait For Ajax
-	Wait Until Element Is Not Visible	css=div.progress.progress-bar	${COMMONWAIT}
-	Wait Until Element Is Enabled	xpath=//*[@tid='contractConfirm']	${COMMONWAIT}
 
 
 Скасування рішення кваліфікаційної комісії
