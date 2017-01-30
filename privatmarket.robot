@@ -642,7 +642,7 @@ Check If Question Is Uploaded
 	[Arguments]  ${user_name}  ${tender_id}  ${bid_index}  ${document_index}  ${field}
 	${bid_index} = 	Get Index Number	xpath=//div[@ng-repeat='bid in data.bids']	${bid_index}
 	${document_index} = 	sum_of_numbers	${document_index}	1
-	${result} =	Get Text	xpath=((//div[@ng-repeat='bid in data.bids'])[${bid_index}]//span[@tid='bid.document.type'])[${document_index}]
+	${result} =	Get Text	xpath=((//div[@ng-repeat='bid in data.bids'])[${bid_index}]//span[@tid='bid.document.type.auctionProtocol'])[${document_index}]
 	[return]	${result}
 
 
