@@ -721,6 +721,7 @@ Check If Question Is Uploaded
 	Wait Until Element Is Enabled	xpath=//*[@tid='contractConfirm']	${COMMONWAIT}
 	Click Element	xpath=//*[@tid='contractConfirm']
 	Wait For Ajax
+	Close Confirmation
 	Wait Until Element Is Not Visible	xpath=//*[@tid='contractConfirm']	${COMMONWAIT}
 
 
@@ -731,6 +732,7 @@ Check If Question Is Uploaded
 	Input Text	xpath=//input[@tid='contractNumber']	${contract_num}
 	Wait Visibulity And Click Element	xpath=//*[@tid='contractActivate']
 	Wait For Ajax
+	Close Confirmation
 	Wait Until Element Is Not Visible	xpath=//*[@tid='contractActivate']	${COMMONWAIT}
 
 
@@ -803,6 +805,7 @@ Check If Question Is Uploaded
 	${buttons_list} = 	Get Webelements	css=button[tid='btn.award.cancelled']
 	Click Button	${buttons_list[${award_num}]}
 	Wait For Ajax
+	Close Confirmation
 
 
 Отримати тип оголошеного лоту
@@ -1024,3 +1027,9 @@ Try Wait For Element With Any Text
 	${text} = 	Get Text	${element}
 	Should Not Be Equal As Strings  ${text}  ${EMPTY}
 
+
+Close Confirmation
+	Wait Until Element Is Visible	xpath=//*[@tid='dialogModal']//*[@tid='defaultOk']	${COMMONWAIT}
+	Click Element	xpath=//*[@tid='dialogModal']//*[@tid='defaultOk']
+	Wait For Ajax
+	Wait Until Element Is Not Visible	xpath=//*[@tid='dialogModal']//*[@tid='defaultOk']	${COMMONWAIT}
