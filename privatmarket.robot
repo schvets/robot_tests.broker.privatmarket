@@ -80,7 +80,6 @@ ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 	${browser} =		Convert To Lowercase	${USERS.users['${username}'].browser}
 	${disabled}			Create List				Chrome PDF Viewer
 	${prefs}			Create Dictionary		download.default_directory=${OUTPUT_DIR}	plugins.plugins_disabled=${disabled}
-	${desired_capabilities} =  Create Dictionary  webdriver.log.file=${OUTPUT_DIR}${/}webdriver_log.txt  webdriver.firefox.logfile =${OUTPUT_DIR}${/}firefox_log.txt
 
 	${options}= 	Evaluate	sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
 	Call Method	${options}	add_argument	--allow-running-insecure-content
@@ -90,7 +89,7 @@ ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 
 	Run Keyword If	'phantomjs' in '${browser}'	Create Webdriver	PhantomJS	${username}	service_args=${service_args}
 	...   ELSE IF	'chrome' in '${browser}'	Create WebDriver	Chrome	chrome_options=${options}	alias=${username}
-	...   ELSE	Open Browser	${USERS.users['${username}'].homepage}	ff	alias=${username}	desired_capabilities=${desired_capabilities}
+	...   ELSE	Open Browser	${USERS.users['${username}'].homepage}	ff	alias=${username}
 
 	Set Window Size	@{USERS.users['${username}'].size}
 	Set Window Position	@{USERS.users['${username}'].position}
@@ -641,7 +640,9 @@ Check If Question Is Uploaded
 Отримати дані із документу пропозиції
 	[Arguments]  ${user_name}  ${tender_id}  ${bid_index}  ${document_index}  ${field}
 	${bid_index} = 	Get Index Number	xpath=//div[@ng-repeat='bid in data.bids']	${bid_index}
+	debug    in1
 	${document_index} = 	sum_of_numbers	${document_index}	1
+	debug    in2
 	${result} =	Get Text	xpath=((//div[@ng-repeat='bid in data.bids'])[${bid_index}]//span[contains(@tid, 'bid.document.type')])[${document_index}]
 	[return]	${result}
 
