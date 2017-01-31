@@ -640,9 +640,7 @@ Check If Question Is Uploaded
 Отримати дані із документу пропозиції
 	[Arguments]  ${user_name}  ${tender_id}  ${bid_index}  ${document_index}  ${field}
 	${bid_index} = 	Get Index Number	xpath=//div[@ng-repeat='bid in data.bids']	${bid_index}
-	debug    in1
 	${document_index} = 	sum_of_numbers	${document_index}	1
-	debug    in2
 	${result} =	Get Text	xpath=((//div[@ng-repeat='bid in data.bids'])[${bid_index}]//span[contains(@tid, 'bid.document.type')])[${document_index}]
 	[return]	${result}
 
