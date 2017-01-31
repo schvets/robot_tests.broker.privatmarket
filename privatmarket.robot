@@ -53,7 +53,7 @@ ${tender_data.questions.answer}							span[@tid='data.question.answer']
 
 ${tender_data.doc.title}								xpath=(//div[@id='fileitem'])
 
-${tender_data.cancellations[0].status}					xpath=//span[@tid='data.statusName' and contains(., 'Скасований лот')]
+${tender_data.cancellations[0].status}					xpath=//span[@tid='data.statusName' and contains(., 'Торги відмінено')]
 ${tender_data.cancellations[0].reason}					css=div[tid='cancellations.reason']
 ${tender_data.cancellation.doc.title}					css=div[tid='doc.title']
 ${tender_data.cancellation.doc.description}				css=div[tid='cancellations.doc.description']
@@ -443,14 +443,18 @@ Wait for question
 	${text} =	Отримати текст елемента	${element}
 	${result} =	Set Variable If
 	...  '${text}' == 'Період уточнень'	active.enquiries
-	...  '${text}' == 'Очікування пропозицій'	active.tendering
-	...  '${text}' == 'Період аукціону'	active.auction
-	...  '${text}' == 'Кваліфікація переможця'	active.qualification
-	...  '${text}' == 'Пропозиції розглянуто'	active.awarded
+	...  '${text}' == 'Період прийому пропозицій'	active.tendering
+	...  '${text}' == 'Аукціон'	active.auction
+	...  '${text}' == 'Кваліфікація'	active.qualification
+	...  '${text}' == 'Оплачено, очікується підписання договору'	active.awarded
 	...  '${text}' == 'Активний лот'	active
-	...  '${text}' == 'Неуспішний лот'	unsuccessful
-	...  '${text}' == 'Завершений лот'	complete
-	...  '${text}' == 'Скасований лот'	cancelled
+	...  '${text}' == 'Торги не відбулися'	unsuccessful
+	...  '${text}' == 'Завершено'	complete
+	...  '${text}' == 'Торги відмінено'	cancelled
+	...  '${text}' == 'Очікується протокол'	pending
+	...  '${text}' == 'Очікується оплата'	validation
+	...  '${text}' == 'Не поступила оплата'	nopayment
+	...  '${text}' == 'Не опубліковано у ЦБД'	draft
 	...  ${element}
 	[return]  ${result}
 
@@ -466,7 +470,7 @@ Wait for question
 
 
 Перевірити cancellations[0].status
-	${is_present} = 	Run Keyword And Return Status	Element Should Contain	css=span[tid='data.statusName']	Скасований лот
+	${is_present} = 	Run Keyword And Return Status	Element Should Contain	css=span[tid='data.statusName']	Торги відмінено
 	${status} = 	Set Variable If	'${is_present}' == 'True'	active	not active
 	[return]  ${status}
 
@@ -637,7 +641,7 @@ Check If Question Is Uploaded
 	[Arguments]  ${user_name}  ${tender_id}  ${bid_index}  ${document_index}  ${field}
 	${bid_index} = 	Get Index Number	xpath=//div[@ng-repeat='bid in data.bids']	${bid_index}
 	${document_index} = 	sum_of_numbers	${document_index}	1
-	${result} =	Get Text	xpath=((//div[@ng-repeat='bid in data.bids'])[${bid_index}]//span[@tid='bid.document.type'])[${document_index}]
+	${result} =	Get Text	xpath=((//div[@ng-repeat='bid in data.bids'])[${bid_index}]//span[contains(@tid, 'bid.document.type')])[${document_index}]
 	[return]	${result}
 
 
@@ -704,12 +708,31 @@ Check If Question Is Uploaded
 	Wait For Ajax
 
 
+Завантажити угоду до тендера
+	[Arguments]  ${username}  ${tender_id}  ${contract_num}  ${file_path}
+	Wait Until Element Is Visible	xpath=//*[@tid='docContract']	${COMMONWAIT}
+	Execute Javascript	document.querySelector("input[id='docsContractI']").className = ''
+	Sleep	2s
+	Choose File	css=input[id='docsContractI']	${file_path}
+	sleep	10s
+	Wait For Ajax
+	Wait Until Element Is Not Visible	css=div.progress.progress-bar	${COMMONWAIT}
+	Wait Until Element Is Enabled	xpath=//*[@tid='contractConfirm']	${COMMONWAIT}
+	Click Element	xpath=//*[@tid='contractConfirm']
+	Wait For Ajax
+	Close Confirmation
+	Wait Until Element Is Not Visible	xpath=//*[@tid='contractConfirm']	${COMMONWAIT}
+
+
 Підтвердити підписання контракту
 	[Arguments]  ${username}  ${tender_uaid}  ${contract_num}
-	Wait Until Element Is Enabled			xpath=//*[@tid='contractActivate']	${COMMONWAIT}
-	Click Element							xpath=//*[@tid='contractActivate']
 	Wait For Ajax
-	Wait Until Element Is Not Visible		xpath=//*[@tid='contractActivate']	${COMMONWAIT}
+	Wait Until Element Is Enabled	xpath=//input[@tid='contractNumber']	${COMMONWAIT}
+	Input Text	xpath=//input[@tid='contractNumber']	${contract_num}
+	Wait Visibulity And Click Element	xpath=//*[@tid='contractActivate']
+	Wait For Ajax
+	Close Confirmation
+	Wait Until Element Is Not Visible	xpath=//*[@tid='contractActivate']	${COMMONWAIT}
 
 
 Скасувати закупівлю
@@ -769,21 +792,9 @@ Check If Question Is Uploaded
 	Choose File		css=input[id='docsProtocolI']	${file_path}
 	Wait For Ajax
 	Wait Until Element Is Not Visible		css=div.progress.progress-bar	${COMMONWAIT}
-	Wait Until Element Is Enabled	css=button[tid='confirmProtocol']	${COMMONWAIT}
-	Click Button	css=button[tid='confirmProtocol']
+	Wait Until Element Is Enabled	xpath=//*[@tid='confirmProtocol']	${COMMONWAIT}
+	Click Element	xpath=//*[@tid='confirmProtocol']
 	Sleep	20s
-
-
-Завантажити угоду до тендера
-	[Arguments]  ${username}  ${tender_id}  ${contract_num}  ${file_path}
-	Wait Until Element Is Visible	xpath=//*[@tid='docContract']	${COMMONWAIT}
-	Execute Javascript	document.querySelector("input[id='docsContractI']").className = ''
-	Sleep	2s
-	Choose File	css=input[id='docsContractI']	${file_path}
-	sleep	10s
-	Wait For Ajax
-	Wait Until Element Is Not Visible	css=div.progress.progress-bar	${COMMONWAIT}
-	Wait Until Element Is Enabled	xpath=//*[@tid='contractActivate']	${COMMONWAIT}
 
 
 Скасування рішення кваліфікаційної комісії
@@ -793,6 +804,7 @@ Check If Question Is Uploaded
 	${buttons_list} = 	Get Webelements	css=button[tid='btn.award.cancelled']
 	Click Button	${buttons_list[${award_num}]}
 	Wait For Ajax
+	Close Confirmation
 
 
 Отримати тип оголошеного лоту
@@ -1014,3 +1026,9 @@ Try Wait For Element With Any Text
 	${text} = 	Get Text	${element}
 	Should Not Be Equal As Strings  ${text}  ${EMPTY}
 
+
+Close Confirmation
+	Wait Until Element Is Visible	xpath=//*[@tid='dialogModal']//*[@tid='defaultOk']	${COMMONWAIT}
+	Click Element	xpath=//*[@tid='dialogModal']//*[@tid='defaultOk']
+	Wait For Ajax
+	Wait Until Element Is Not Visible	xpath=//*[@tid='dialogModal']//*[@tid='defaultOk']	${COMMONWAIT}
