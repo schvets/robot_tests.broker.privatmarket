@@ -8,8 +8,12 @@ from pytz import timezone
 
 def get_month_number(month_name):
     monthes = [u"янв.", u"февр.", u"марта", u"апр.", u"мая", u"июня",
-               u"июля", u"авг.", u"сент.", u"окт.", u"нояб.", u"дек."]
-    return monthes.index(month_name) + 1
+               u"июля", u"авг.", u"сент.", u"окт.", u"нояб.", u"дек.",
+               u"січ.", u"лют.", u"бер.", u"квіт.", u"трав.", u"черв.",
+               u"лип.", u"серп.", u"вер.", u"жовт.", u"лист.", u"груд.",
+               u"січня", u"лютого", u"березня", u"квітня", u"травня", u"червня",
+               u"липня", u"серпня", u"вересня", u"жовтня", u"листопада", u"грудня"]
+    return monthes.index(month_name) % 12 + 1
 
 
 def read_file_content(file_path):
@@ -114,7 +118,7 @@ def get_doc_identifier(doc_type_name):
 
 def get_unit_name(current_name):
     dictionary = {
-        u'кілограм': {u'килограмм', u'килограмма', u'килограммов'},
+        u'кілограми': {u'килограмм', u'килограмма', u'килограммов'},
         u'пара': {u'пара', u'пары', u'пар'},
         u'літр': {u'литр', u'литра', u'литров'},
         u'набір': {u'набор', u'набора', u'наборов'},
@@ -150,7 +154,7 @@ def get_unit_name(current_name):
 
 def get_unit_code(name):
     dictionary = {
-        u'кілограм': u'KGM',
+        u'кілограми': u'KGM',
         u'пара': u'PR',
         u'літр': u'LTR',
         u'набір': u'SET',
