@@ -410,7 +410,7 @@ Wait for question
 
 Отримати значення поля Лоти виставляються
 	[Arguments]  ${element_name}
-	${result}=	Execute Javascript	return document.querySelector("span[tid='data.tenderAttempts']").innerHTML
+	${result}=	Get Element Attribute	css=span[tid='data.tenderAttempts']@tidvalue
 	${result}=	Convert To Integer	${result}
 	[return]	${result}
 
@@ -641,7 +641,7 @@ Check If Question Is Uploaded
 	[Arguments]  ${user_name}  ${tender_id}  ${bid_index}  ${document_index}  ${field}
 	${bid_index} = 	Get Index Number	xpath=//div[@ng-repeat='bid in data.bids']	${bid_index}
 	${document_index} = 	sum_of_numbers	${document_index}	1
-	${result} =	Get Text	xpath=((//div[@ng-repeat='bid in data.bids'])[${bid_index}]//span[contains(@tid, 'bid.document.type')])[${document_index}]
+	${result} =	Get Element Attribute	xpath=((//div[@ng-repeat='bid in data.bids'])[${bid_index}]//span[contains(@tid, 'bid.document.type')])[${document_index}]@tidvalue
 	[return]	${result}
 
 
@@ -811,7 +811,8 @@ Check If Question Is Uploaded
 	[Arguments]  ${element}
 	Wait Until Element Is Visible	${tender_data.${element}}
 	Wait For Element With Any Text	${tender_data.${element}}
-	${result} =	Execute Javascript	return document.querySelector("div[tid='data.procurementMethodType']").innerHTML
+	${result} =	Get Element Attribute	css=div[tid='data.procurementMethodType']@tidvalue
+#	${result} =	Execute Javascript	return document.querySelector("div[tid='data.procurementMethodType']").innerHTML
 	[return]	${result}
 
 
