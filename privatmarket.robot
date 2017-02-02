@@ -58,7 +58,7 @@ ${tender_data.cancellations[0].reason}					css=div[tid='cancellations.reason']
 ${tender_data.cancellation.doc.title}					css=div[tid='doc.title']
 ${tender_data.cancellation.doc.description}				css=div[tid='cancellations.doc.description']
 
-${tender_data.procurementMethodType}					css=div[tid='data.procurementMethodTypeName']
+${tender_data.procurementMethodType}					css=div[tid='data.procurementMethodType']
 ${tender_data.tenderAttempts}							css=span[tid='data.tenderAttempts']
 ${tender_data.dgfDecisionDate}							css=span[tid='data.dgfDecisionDate']
 ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
