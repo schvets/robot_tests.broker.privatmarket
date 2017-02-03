@@ -115,8 +115,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Run Keyword Unless	'Viewer' in '${username}'	Login	${username}
 	#Close message notification
 	Wait For Ajax
-	Wait Until Element Is Enabled	id=tenders	timeout=${COMMONWAIT}
-	Switch To Frame	id=tenders
+	Switch To PMFrame
 	Close notification
 
 
@@ -564,7 +563,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Задати питання
 	[Arguments]  ${provider}  ${tender_id}  ${question}
-#	privatmarket.Пошук тендера по ідентифікатору	${provider}	${tender_id}
 	Wait For Ajax
 	Switch To Tab	2
 	Wait Until Element Not Stale	xpath=//button[@ng-click='act.sendEnquiry()']	40
@@ -642,12 +640,34 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Click Element	css=button[ng-click='commonActions.goNext(1)']
 	Click If Visible	id=btnSaveComplaint
 	Wait Until Element Contains	css=div.step-info-title	3/3	10s
-	debug    fill adress
-#	Switch To PMFrame
+	Fill Adress
+	Fill Adress
+	Fill Phone
+	Switch To PMFrame
 	Wait Enable And Click Element	${locator_tenderClaim.buttonSend}
 	Close Confirmation	Ваша заявка була успішно включена до черги на відправку!
 	[return]	${Arguments[2]}
 
+
+Fill Adress
+	switch to pmframe
+	Wait Visibulity And Click Element	xpath=//a[contains(@ng-click, 'address')]
+	wait until element is visible	id=addressPostalCode
+	Input Text	id=addressPostalCode	49000
+	Input Text	id=addressRegion	Region
+	Input Text	id=addressLocality	Locality
+	Input Text	id=addressStreet	Street
+	Click Button	id=btnSaveComplaint
+	wait until element is not visible	id=addressPostalCode
+
+
+Fill Phone
+	switch to pmframe
+	Wait Visibulity And Click Element	xpath=//a[contains(@ng-click, 'person')]
+	wait until element is visible	id=personPhone
+	Input Text	id=personPhone	+380670000000
+	Click Button	id=btnSaveComplaint
+	wait until element is not visible	id=addressPostalCode
 
 Дочекатися статусу заявки
 	[Arguments]  ${status}
@@ -667,33 +687,16 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}
 	Wait For Ajax
 	Wait Until Element Is Not Visible	${locator_tenderClaim.buttonCreate}	${COMMONWAIT}
-#	Wait Until Element Is Enabled		css=input[ng-model='model.userPrice']	${COMMONWAIT}
 	Wait Until Element Contains	css=div.step-info-title	1/3	${COMMONWAIT}
 
 
 Змінити цінову пропозицію
 	[Arguments]  ${username}  ${tender_uaid}  ${fieldname}  ${fieldvalue}
-#	privatmarket.Пошук тендера по ідентифікатору	${username}   ${tender_uaid}
-#	Wait For Ajax
 	Відкрити заявку
-	debug      edit bid
-
-#	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}
-#	Wait For Ajax
-#	Wait For Element Value				css=input[ng-model='model.person.lastName']
-#	Wait Until Element Is Enabled		${locator_tenderClaim.fieldEmail}	${COMMONWAIT}
-#	sleep								5s
-
 	Run Keyword 						Змінити ${fieldname}	${fieldvalue}
 #	Switch To PMFrame
 	Wait Enable And Click Element	${locator_tenderClaim.buttonSend}
 	Close Confirmation	Ваша заявка була успішно збережена!
-
-#	debug      end bid
-#	Wait Until Element Is Visible		css=div.afp-info.ng-scope.ng-binding
-#	Wait For Ajax
-#	${claim_id}=						Get text			css=div.afp-info.ng-scope.ng-binding
-#	${result}=							Get Regexp Matches	${claim_id}	Номер заявки: (\\d*),	1
 	[return]	${TRUE}
 
 
@@ -711,15 +714,13 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	[Arguments]  ${fieldvalue}
 	#get correct step
 	Click Element	css=button[ng-click='commonActions.goNext(1)']
-	debug   changevalue1
-	Wait Visibulity And Click Element	id=btnSaveComplaint
-	debug   changevalue2
-	Wait Until Element Is Not Visible	id=btnSaveComplaint	10s
+	Click If Visible  	id=btnSaveComplaint
 	#input value
+	Wait Until Element Contains	css=div.step-info-title	2/3	10s
 	Input Text	${locator_tenderClaim.fieldPrice}	${fieldvalue}
 	#go to the exit
-	Wait Until Element Contains	css=div.step-info-title	2/3	10s
 	Click Element	css=button[ng-click='commonActions.goNext(1)']
+	Click If Visible  	id=btnSaveComplaint
 	Wait Until Element Contains	css=div.step-info-title	3/3	10s
 
 
@@ -759,44 +760,55 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Завантажити документ в ставку
 	[Arguments]  ${user}  ${filePath}  ${tenderId}  ${doc_type}=documents
+	${url} = 	Get Location
 	Відкрити заявку
-	debug   add file to bid
 
-	Wait Until Element Is Enabled		css=button[ng-click='act.chooseFile()']	${COMMONWAIT}
-	Scroll Page To Element				css=button[ng-click='act.chooseFile()']
-	sleep  3s
+	Wait Visibulity And Click Element	css=div[ng-if='model.canAddFiles'] a
+	Wait Visibulity And Click Element	xpath=//div[contains(@ng-if, 'changeFile')]
+	Choose File	id=afpFile	${filePath}
+	Wait Visibulity And Click Element	xpath=//a[contains(@ng-class, 'fileType')]
+	Wait Visibulity And Click Element	xpath=//li[contains(@ng-click, 'act.setFileType')][1]
+	Wait Visibulity And Click Element	xpath=//a[contains(@ng-class, 'lang')]
+	Wait Visibulity And Click Element	xpath=//li[contains(@class, 'lang')][2]
 
-	${list_item} =	get_doc_identifier	${doc_type}
-	Select From List By Value			css=select[ng-model='model.currFileVfv']	${list_item}
-	${correctFilePath} = 				Replace String		${filePath}	\\	\/
-
-	Execute Javascript					$("#fileToUpload").removeClass();
-	Choose File							css=input#fileToUpload	${correctFilePath}
-
+	debug    choose file language
 	${upload_response} =	Зберегти доданий файл	${filePath}
-	#before step for Change File
-	privatmarket.Пошук тендера по ідентифікатору	${user}	${tenderId}
+	Go To	${url}
 	[return]	${upload_response}
 
 
 Зберегти доданий файл
 	[Arguments]  ${filePath}
-	Wait Until Element Is Not Visible	css=div[ng-show='progressVisible'] div.progress-bar	timeout=30
-	Sleep								5s
-	Wait Until Element Is Visible		xpath=(//div[contains(@class, 'file-item')])[1]	timeout=30
+	Switch To PMFrame
+	Wait Visibulity And Click Element	css=button.error-button
 
-	Click Button						${locator_tenderClaim.buttonSend}
-	Close confirmation					Ваша заявка была успешно сохранена!
-	${dateModified}						Get text	css=span.file-tlm
-	Click Element						${locator_tenderClaim.buttonGoBack}
-	wait until element is visible		css=table.bids tr
+	debug   add file to bid2
+	#go to the exit
+	Switch To PMFrame
+	Click Element	css=button[ng-click='commonActions.goNext(1)']
+	Wait Until Element Contains	css=div.step-info-title	2/3	10s
+	Click Element	css=button[ng-click='commonActions.goNext(1)']
+	Click If Visible	id=btnSaveComplaint
+	Wait Until Element Contains	css=div.step-info-title	3/3	10s
+
+	Click Button	${locator_tenderClaim.buttonSend}
+	Close confirmation	Ваша заявка була успішно збережена!
+
+	debug   add file to bid
+	Wait For Ajax
+	Switch To PMFrame
+	Wait Until Element Is Visible	css=div#tenderStatus	${COMMONWAIT}
+	Wait Visibulity And Click Element	xpath=//li[contains(@ng-class, 'lot-parts')]
+	Wait Until Element Is Visible		css=table.bids tr
+#TODO   Требуется перезагружать страницу и перед проверкой файла всякий раз открывать нужную вкладку
 	Wait For Element With Reload		xpath=//table[@class='bids']//tr[1]/td//img[contains(@src,'clip_icon.png')]	1
 
-	#получим ссылку на файл и его id
-	Scroll Page To Element				css=a[ng-click='act.showDocWin(b)']
+	#получим ссылку на файл, его id и дату
 	Click Element						css=a[ng-click='act.showDocWin(b)']
 	Wait For Ajax
+#	TODO поправить путь к ссылке файла, получать атрибут
 	Wait Until Element Is Enabled		xpath=(//div[@ng-click='openUrl(file.url)'])[last()]	5s
+	${dateModified}						Get text	(//span[contains(@class, 'file-tlm')])[last()]
 	${url} = 							Execute Javascript	var scope = angular.element($("div[ng-click='openUrl(file.url)']")).last().scope(); return scope.file.url
 	${uploaded_file_data} =				fill_file_data  ${url}  ${filePath}  ${dateModified}  ${dateModified}
 	${upload_response} = 				Create Dictionary
@@ -1008,7 +1020,7 @@ Reload And Switch To Tab
 	[Arguments]  ${tab_number}
 	Mark Step					in_reload
 	Reload Page
-	Switch To Frame		id=tenders
+	Switch To PMFrame
 	Switch To Tab		${tab_number}
 	Wait For Ajax
 
@@ -1049,7 +1061,7 @@ Chose UK language
 
 Click If Visible
 	[Arguments]	${locator}
-	${is_visible} = 	Run Keyword And return Status	Wait Until Element Is Visible	${locator}
+	${is_visible} = 	Run Keyword And return Status	Wait Until Element Is Visible	${locator}	10s
 	Return From Keyword If	'${is_visible}' == '${FALSE}'	${False}
 	Click Element	${locator}
 	Wait Until Element Is Not Visible	${locator}
@@ -1063,4 +1075,5 @@ Close notification
 
 Switch To PMFrame
 	${frame_visibility} = 	Run Keyword And Return Status	Wait Until Element Is Enabled	id=tenders	timeout=5s
+	Wait For Ajax
 	Run Keyword If	${frame_visibility}	Switch To Frame	id=tenders
