@@ -118,7 +118,7 @@ def get_doc_identifier(doc_type_name):
 
 def get_unit_name(current_name):
     dictionary = {
-        u'кілограми': {u'килограмм', u'килограмма', u'килограммов'},
+        u'кілограм': {u'килограмм', u'килограмма', u'килограммов'},
         u'пара': {u'пара', u'пары', u'пар'},
         u'літр': {u'литр', u'литра', u'литров'},
         u'набір': {u'набор', u'набора', u'наборов'},
@@ -154,7 +154,7 @@ def get_unit_name(current_name):
 
 def get_unit_code(name):
     dictionary = {
-        u'кілограми': u'KGM',
+        u'кілограм': u'KGM',
         u'пара': u'PR',
         u'літр': u'LTR',
         u'набір': u'SET',
@@ -187,7 +187,7 @@ def get_status_type(status_name):
                        u'Период уточнений': 'active.enquiries',
                        u'Период уточнений завершен': 'active.enquiries.ended',
                        u'Подача предложений': 'active.tendering',
-                       u'Идут торги': 'active.auction',
+                       u'Торги': 'active.auction',
                        u'Квалификация победителя': 'active.qualification',
                        u'Предложения рассмотрены': 'active.awarded',
                        u'Закупка не состоялась': 'unsuccessful',

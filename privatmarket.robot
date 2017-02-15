@@ -50,7 +50,7 @@ ${tender_data_items.quantity}									xpath=//div[@ng-if='adb.quantity']/div[2]/
 ${tender_data_questions[0].description}							css=div.question-div
 ${tender_data_questions[0].date}								xpath=//div[@class = 'question-head title']/b[2]
 ${tender_data_questions[0].title}								css=div.question-head.title span
-${tender_data_questions[0].answer}								css=div[ng-bind-html='q.answer']
+${tender_data_questions[0].answer}								xpath=//div[@ng-if='q.answer']//div[@class='ng-binding']
 ${tender_data_lots.title}										css=div.lot-head span.ng-binding
 ${tender_data_lots.description}									css=section.lot-description section.description
 ${tender_data_lots.value.amount}								css=section.lot-description div[ng-if='model.checkedLot.value'] div.info-item-val
@@ -106,8 +106,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	${service args}=	Create List	--ignore-ssl-errors=true	--ssl-protocol=tlsv1
 	${browser} =		Convert To Lowercase	${USERS.users['${username}'].browser}
 
-#	Open Browser	${USERS.users['${username}'].homepage}	ff	alias=${username}
-	Open Browser	${USERS.users['${username}'].homepage}	ff	alias=${username}	ff_profile_dir=C:\\Users\\Oks\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\6o60lsgy.AutotestUser
+	Open Browser	${USERS.users['${username}'].homepage}	ff	alias=${username}
+#	Open Browser	${USERS.users['${username}'].homepage}	ff	alias=${username}	ff_profile_dir=C:\\Users\\Oks\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\6o60lsgy.AutotestUser
 
 	Set Window Position	@{USERS.users['${username}'].position}
 	Set Window Size	@{USERS.users['${username}'].size}
@@ -853,7 +853,10 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Отримати посилання на аукціон для глядача
 	[Arguments]  ${user}  ${tenderId}
-	${result} =	Отримати посилання на аукціон	${user}  ${tenderId}
+	Wait For Element With Reload	css=button#takepartLink	1
+	Click Button	css=button#takepartLink
+	Wait Until Element Is Visible	xpath=//a[contains(@href, 'https://auction-sandbox.openprocurement.org/tenders/')]  timeout=30
+	${result} = 	Get Element Attribute	xpath=//a[contains(@href, 'https://auction-sandbox.openprocurement.org/tenders/')]@href
 	[return]  ${result}
 
 
@@ -865,11 +868,10 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Отримати посилання на аукціон
 	[Arguments]  ${user}  ${tenderId}
-	privatmarket.Пошук тендера по ідентифікатору	${user}   ${tenderId}
 	Wait For Element With Reload	css=button#takepartLink	1
 	Click Button	css=button#takepartLink
-	Wait Until Element Is Visible	xpath=//a[contains(@href, 'https://auction-sandbox.openprocurement.org/tenders/']  timeout=30
-	${result} = 	Get Element Attribute	xpath=//a[contains(@href, 'https://auction-sandbox.openprocurement.org/tenders/']@href
+	Wait Until Element Is Visible	xpath=//a[contains(@href, 'https://auction-sandbox.openprocurement.org/tenders/')]  timeout=30
+	${result} = 	Get Element Attribute	xpath=//a[contains(@href, 'https://auction-sandbox.openprocurement.org/tenders/')]@href
 	[return]  ${result}
 
 
