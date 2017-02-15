@@ -146,6 +146,94 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait Until Element Not Stale	xpath=//div[contains(@class,'title-div')]	40
 
 
+Створити тендер
+	[Arguments]  ${username}  ${tender_data}
+	${items} =								Get From Dictionary	${tender_data.data}	items
+	${features} =							Get From Dictionary	${tender_data.data}	features
+	${lots} =								Get From Dictionary	${tender_data.data}	lots
+
+	Close notification
+	Chose UK language
+	Close notification
+	Sleep	3s
+	Wait Until Element Not Stale	css=input#search-query-input	${COMMONWAIT}
+	Wait Until Element Is Visible	css=input#search-query-input	timeout=${COMMONWAIT}
+	Wait Until Element Is Enabled	css=tr[ng-repeat='t in model.tenderList']	timeout=${COMMONWAIT}
+	Check Current Mode
+#go to form
+	debug    ownet
+	Click Button	css=button[ng-click='template.newTender()']
+	Wait Visibulity And Click Element	xpath=(//div[@class='big-button-step'])[1]
+#step 0
+	#we should add choosing of procurementMethodType
+	Input Text									css=input[data-id='procurementName']				${tender_data.data.title}
+	Input Text									css=textarea[data-id='procurementDescription']		${tender_data.data.description}
+
+	#CPV
+	Click Button								xpath=(//button[@data-id='actChoose'])[1]
+	Wait Until Element Is Visible				css=section[data-id='classificationTreeModal']		${COMMONWAIT}
+	Wait Until Element Is Visible				css=input[data-id='query']							${COMMONWAIT}
+	Search By Query								css=input[data-id='query']	${items[0].classification.id}
+	Click Button								css=button[data-id='actConfirm']
+
+	#additionalClassifications
+	Click Button								css=section[data-id='additionalClassifications'] button[data-id='actChoose']
+	Wait Until Element Is Visible				css=section[data-id='classificationTreeModal']		${COMMONWAIT}
+	Wait Until Element Is Visible				css=input[data-id='query']							${COMMONWAIT}
+	Search By Query								css=input[data-id='query']							${items[0].additionalClassifications[0].id}
+	Click Button								css=button[data-id='actConfirm']
+
+	Click Button								css=button[data-id='actSave']
+	Close Confirmation							Данные успешно сохранены
+
+#step 1
+	Click Element		css=#tab_1
+	Додати lots			${lots}
+#step 2
+	Додати items		${items}
+
+#step 3
+	Click Element			css=#tab_2
+	${features_count} = 	Get Length	${features}
+	Run Keyword If	${features_count} > 0	Додати features	${features}
+
+
+Додати lots
+	[Arguments]  ${lots}
+	${lots_count} = 			Get Length	${lots}
+
+	: FOR    ${index}    IN RANGE    0    ${lots_count}
+	\    Mark Step		lot_num_${index}
+	\    Click button											css=button[ng-click='model.addLot()']
+	\    Wait Until Element Is Enabled							css=input[data-id='title']	10s
+	\    Input Text		css=input[data-id='title']				${lots[${index}].title}
+	\    Input Text		css=textarea[data-id='description']		${lots[${index}].description}
+	\    ${value_amount} = 			Convert to String			${lots[${index}].value.amount}
+	\    ${minimalStep_amount} = 	Convert to String			${lots[${index}].minimalStep.amount}
+	\    Input Text		css=input[data-id='valueAmount']		${value_amount}
+	\    Sleep			1s
+	\    Input Text		css=input[data-id='minimalStepAmount']	${minimalStep_amount}
+	\    Sleep			1s
+	\    Input Text		css=input[data-id='guaranteeAmount']	1
+
+
+Додати items
+	[Arguments]  ${items}
+	${items_count} = 			Get Length	${items}
+	: FOR    ${index}    IN RANGE    0    ${items_count}
+	\    Mark Step		item_num_${index}
+	\    Click button											css=button[ng-click='model.addItem(lot)']
+	\    Wait Until Element Is Enabled							css=input[ng-model='item.description']	10s
+	\    debug    in items
+	\    Input Text		css=input[ng-model='item.description']	${items[${index}].description}
+	\    Input Text		css=input[data-id='quantity']	${items[${index}].quantity}
+	\    Click Element	xpath=//select[@data-id='unit']/option[text()='${items[${index}].unit.name}']
+	\    ${deliveryDate} =	Get Regexp Matches	${items[${index}].deliveryDate.endDate}	(\\d{4}-\\d{2}-\\d{2})
+	\    ${deliveryDate} =	Convert Date	${deliveryDate}	result_format=%d-%m-%Y
+	\    Execute Javascript	$("input[ng-model='item.deliveryDate.sd.d']").datepicker('setDate', '${items[${index}].deliveryDate.endDate}');
+	\    Execute Javascript	$("input[ng-model='item.deliveryDate.ed.d']").datepicker('setDate', '${items[${index}].deliveryDate.endDate}');
+
+
 Відкрити детальну інформацию по позиціям
 	#check if extra information is already opened
 	${element_class} =	Get Element Attribute	xpath=//li[contains(@ng-class, 'description')]@class
@@ -982,17 +1070,7 @@ Wait For Tender
 Try Search Tender
 	[Arguments]	${tender_id}  ${education_type}
 	Switch To PMFrame
-	#проверим правильный ли режим
-	Mark Step	 --------before a#test-model-switch
-	${current_type} =	Get text	css=a#test-model-switch
-	Mark Step	 --------current_type1
-	${check_result} =	Run Keyword If	'Войти в демо-режим' in '${current_type}'	Set Variable  True
-	Mark Step	 --------current_type2
-	Run Keyword If	${check_result} and ${education_type}	Run Keywords	Switch To Education Mode
-	...   AND   Wait For Ajax
-	...   AND   Wait Until Element Not Stale	css=button[ng-click='template.newTender()']	40
-	...   AND   Wait Until Element Is Enabled	css=button[ng-click='template.newTender()']	timeout=${COMMONWAIT}
-	Mark Step	 --------current_type3
+	Check Current Mode	${education_type}
 
 	#заполним поле поиска
 	${text_in_search} =	Get Value	css=input#search-query-input
@@ -1006,6 +1084,21 @@ Try Search Tender
 	Wait For Ajax Overflow Vanish
 	Wait Until Element Is Enabled	id=${tender_id}	timeout=10
 	[return]	True
+
+
+Check Current Mode
+	[Arguments]	${education_type}=${True}
+	#проверим правильный ли режим
+	Mark Step	 --------before a#test-model-switch
+	${current_type} =	Get text	css=a#test-model-switch
+	Mark Step	 --------current_type1
+	${check_result} =	Run Keyword If	'Войти в демо-режим' in '${current_type}'	Set Variable  True
+	Mark Step	 --------current_type2
+	Run Keyword If	${check_result} and ${education_type}	Run Keywords	Switch To Education Mode
+	...   AND   Wait For Ajax
+	...   AND   Wait Until Element Not Stale	css=button[ng-click='template.newTender()']	40
+	...   AND   Wait Until Element Is Enabled	css=button[ng-click='template.newTender()']	timeout=${COMMONWAIT}
+	Mark Step	 --------current_type3
 
 
 Switch To Education Mode
