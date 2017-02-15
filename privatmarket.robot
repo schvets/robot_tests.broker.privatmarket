@@ -860,23 +860,22 @@ Fill Phone
 
 Отримати посилання на аукціон для глядача
 	[Arguments]  ${user}  ${tenderId}
-	${result} =	Отримати посилання на аукціон	${user}  ${tenderId}
+	Wait For Element With Reload	css=button#takepartLink	1
+	Click Button	css=button#takepartLink
+	Wait Until Element Is Visible	xpath=//a[contains(@href, 'https://auction-sandbox.openprocurement.org/tenders/')]  timeout=30
+	${result} = 	Get Element Attribute	xpath=//a[contains(@href, 'https://auction-sandbox.openprocurement.org/tenders/')]@href
 	[return]  ${result}
 
 
 Отримати посилання на аукціон для учасника
 	[Arguments]  ${user}  ${tenderId}
-	${result} =	Отримати посилання на аукціон	${user}  ${tenderId}
-	[return]  ${result}
-
-
-Отримати посилання на аукціон
-	[Arguments]  ${user}  ${tenderId}
-	privatmarket.Пошук тендера по ідентифікатору	${user}   ${tenderId}
 	Wait For Element With Reload	css=button#takepartLink	1
 	Click Button	css=button#takepartLink
-	Wait Until Element Is Visible	xpath=//a[contains(@href, 'https://auction-sandbox.openprocurement.org/tenders/']  timeout=30
-	${result} = 	Get Element Attribute	xpath=//a[contains(@href, 'https://auction-sandbox.openprocurement.org/tenders/']@href
+	Wait Until Element Is Visible	css=div[ng-click='commonActions.sendRedir(bid.afpId)']	timeout=30
+	${request_string} =	Convert To String
+		...  return (function(){var link = angular.element($x("(//div[@ng-click='commonActions.sendRedir(bid.afpId)'])[1]")).last().scope().model.ad.auctionUrl; if(!link || link=='None'){return false;} else return true;})()
+	Wait For Condition	${request_string}	${COMMONWAIT}
+	${result} =	Execute Javascript	return angular.element($x("(//div[@ng-click='commonActions.sendRedir(bid.afpId)'])[1]")).last().scope().model.ad.auctionUrl
 	[return]  ${result}
 
 
