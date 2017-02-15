@@ -569,7 +569,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait Until Element Is Enabled	xpath=//button[@ng-click='act.sendEnquiry()']	10
 	Click Button	xpath=//button[@ng-click='act.sendEnquiry()']
 	Заповнити форму питання	${question.data.title}	${question.data.description}	${USERS.users['${provider}'].email}
-	Sleep	10s
+	Sleep	30s
 	[return]  True
 
 
