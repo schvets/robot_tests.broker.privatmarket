@@ -106,8 +106,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	${service args}=	Create List	--ignore-ssl-errors=true	--ssl-protocol=tlsv1
 	${browser} =		Convert To Lowercase	${USERS.users['${username}'].browser}
 
-#	Open Browser	${USERS.users['${username}'].homepage}	ff	alias=${username}
-	Open Browser	${USERS.users['${username}'].homepage}	ff	alias=${username}	ff_profile_dir=C:\\Users\\Oks\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\6o60lsgy.AutotestUser
+	Open Browser	${USERS.users['${username}'].homepage}	ff	alias=${username}
+#	Open Browser	${USERS.users['${username}'].homepage}	ff	alias=${username}	ff_profile_dir=C:\\Users\\Oks\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\6o60lsgy.AutotestUser
 
 	Set Window Position	@{USERS.users['${username}'].position}
 	Set Window Size	@{USERS.users['${username}'].size}
@@ -688,6 +688,7 @@ Fill Phone
 	Wait For Ajax
 	Wait Until Element Is Not Visible	${locator_tenderClaim.buttonCreate}	${COMMONWAIT}
 	Wait Until Element Contains	css=div.step-info-title	1/3	${COMMONWAIT}
+	Switch To PMFrame
 
 
 Змінити цінову пропозицію
@@ -760,9 +761,14 @@ Fill Phone
 
 Завантажити документ в ставку
 	[Arguments]  ${user}  ${filePath}  ${tenderId}  ${doc_type}=documents
-	${url} = 	Get Location
 	Відкрити заявку
+	Додати документ в ставку	${filePath}
+	${upload_response} =	Зберегти доданий файл	${filePath}
+	[return]	${upload_response}
 
+
+Додати документ в ставку
+	[Arguments]  ${filePath}
 	Wait Visibulity And Click Element	css=div[ng-if='model.canAddFiles'] a
 	Wait Visibulity And Click Element	xpath=//div[contains(@ng-if, 'changeFile')]
 	Choose File	id=afpFile	${filePath}
@@ -771,18 +777,13 @@ Fill Phone
 	Wait Visibulity And Click Element	xpath=//a[contains(@ng-class, 'lang')]
 	Wait Visibulity And Click Element	xpath=//li[contains(@class, 'lang')][2]
 
-	debug    choose file language
-	${upload_response} =	Зберегти доданий файл	${filePath}
-	Go To	${url}
-	[return]	${upload_response}
-
 
 Зберегти доданий файл
 	[Arguments]  ${filePath}
 	Switch To PMFrame
 	Wait Visibulity And Click Element	css=button.error-button
+	Wait For Ajax
 
-	debug   add file to bid2
 	#go to the exit
 	Switch To PMFrame
 	Click Element	css=button[ng-click='commonActions.goNext(1)']
@@ -794,39 +795,38 @@ Fill Phone
 	Click Button	${locator_tenderClaim.buttonSend}
 	Close confirmation	Ваша заявка була успішно збережена!
 
-	debug   add file to bid
+	#save file data
 	Wait For Ajax
 	Switch To PMFrame
 	Wait Until Element Is Visible	css=div#tenderStatus	${COMMONWAIT}
 	Wait Visibulity And Click Element	xpath=//li[contains(@ng-class, 'lot-parts')]
-	Wait Until Element Is Visible		css=table.bids tr
-#TODO   Требуется перезагружать страницу и перед проверкой файла всякий раз открывать нужную вкладку
-	Wait For Element With Reload		xpath=//table[@class='bids']//tr[1]/td//img[contains(@src,'clip_icon.png')]	1
+	Wait Until Element Is Visible	css=table.bids tr
+	#switch to correct tab and find element
+	Wait For Element With Reload	xpath=//table[@class='bids']//tr[1]/td//img[contains(@src,'clip_icon.png')]	6
+	Wait For Element With Reload	xpath=//table[@class='bids']//tr[1]/td//span[contains(., 'Відправлена')]	6
 
 	#получим ссылку на файл, его id и дату
-	Click Element						css=a[ng-click='act.showDocWin(b)']
+	Click Element	css=a[ng-click='act.showDocWin(b)']
 	Wait For Ajax
-#	TODO поправить путь к ссылке файла, получать атрибут
-	Wait Until Element Is Enabled		xpath=(//div[@ng-click='openUrl(file.url)'])[last()]	5s
-	${dateModified}						Get text	(//span[contains(@class, 'file-tlm')])[last()]
-	${url} = 							Execute Javascript	var scope = angular.element($("div[ng-click='openUrl(file.url)']")).last().scope(); return scope.file.url
-	${uploaded_file_data} =				fill_file_data  ${url}  ${filePath}  ${dateModified}  ${dateModified}
-	${upload_response} = 				Create Dictionary
-	Set To Dictionary					${upload_response}	upload_response	${uploaded_file_data}
+	Wait Until Element Is Enabled	xpath=(//div[@ng-click='openUrl(file.url)'])[last()]	5s
+	${dateModified} = 	Get text	xpath=(//span[contains(@class, 'file-tlm')])[last()]
+	${url} = 	Execute Javascript	var scope = angular.element($("div[ng-click='openUrl(file.url)']")).last().scope(); return scope.file.uploadUrl
+	Click Element	css=span[ng-click='act.hideModal()']
+	${uploaded_file_data} = 	fill_file_data  ${url}  ${filePath}  ${dateModified}  ${dateModified}
+	${upload_response} = 	Create Dictionary
+	Set To Dictionary	${upload_response}	upload_response	${uploaded_file_data}
 	[return]	${upload_response}
 
 
-Змінити документ в ставці
+Змінити документ в ставці
 	[Arguments]  ${user}  ${filePath}  ${bidid}  ${docid}
 	Відкрити заявку
-	Scroll Page To Element				css=button[ng-click='act.chooseFile()']
-	sleep  2s
-
-	${correctFilePath} = 				Replace String		${filePath}	\\	\/
-	Execute Javascript					$("#fileToUpload").removeClass();
-	Execute Javascript					angular.element($("input[ng-model='model.fileName']")).scope().$parent.act.changeFile(angular.element("div.file-item").scope().file);
-	Choose File							css=input#fileToUpload    ${correctFilePath}
-
+	Switch To PMFrame
+	Wait Visibulity And Click Element	css=i.icon-edit
+	Choose File	id=changeFile	${filePath}
+	Wait For Ajax
+	Wait Visibulity And Click Element	xpath=//a[contains(@ng-class, 'lang')]
+	Wait Visibulity And Click Element	xpath=//li[contains(@class, 'lang')][2]
 	${uploaded_file_data} =				Зберегти доданий файл	${filePath}
 	[return]  ${uploaded_file_data}
 
