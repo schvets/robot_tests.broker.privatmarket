@@ -108,8 +108,8 @@ def get_identification_scheme(scheme):
 def get_doc_identifier(doc_type_name):
     type_dictionary = {
                        'eligibility_documents': 20,
-                       'qualification_documents': 21,
-                       'documents': 48,
+                       'qualification_documents': u'Підтвердження відповідності кваліфікаційним критеріям',
+                       'documents': u'Документи, що підтверджують відповідність',
                        'financial_documents': 49
                        }
     type_name = type_dictionary.get(doc_type_name)
