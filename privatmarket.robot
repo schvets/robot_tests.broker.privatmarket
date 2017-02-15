@@ -687,6 +687,7 @@ Fill Phone
 	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}
 	Wait For Ajax
 	Wait Until Element Is Not Visible	${locator_tenderClaim.buttonCreate}	${COMMONWAIT}
+	Switch To PMFrame
 	Wait Until Element Contains	css=div.step-info-title	1/3	${COMMONWAIT}
 	Switch To PMFrame
 

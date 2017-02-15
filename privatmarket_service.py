@@ -187,7 +187,7 @@ def get_status_type(status_name):
                        u'Период уточнений': 'active.enquiries',
                        u'Период уточнений завершен': 'active.enquiries.ended',
                        u'Подача предложений': 'active.tendering',
-                       u'Идут торги': 'active.auction',
+                       u'Торги': 'active.auction',
                        u'Квалификация победителя': 'active.qualification',
                        u'Предложения рассмотрены': 'active.awarded',
                        u'Закупка не состоялась': 'unsuccessful',
