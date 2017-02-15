@@ -50,7 +50,7 @@ ${tender_data_items.quantity}									xpath=//div[@ng-if='adb.quantity']/div[2]/
 ${tender_data_questions[0].description}							css=div.question-div
 ${tender_data_questions[0].date}								xpath=//div[@class = 'question-head title']/b[2]
 ${tender_data_questions[0].title}								css=div.question-head.title span
-${tender_data_questions[0].answer}								css=div[ng-bind-html='q.answer']
+${tender_data_questions[0].answer}								xpath=//div[@ng-if='q.answer']//div[@class='ng-binding']
 ${tender_data_lots.title}										css=div.lot-head span.ng-binding
 ${tender_data_lots.description}									css=section.lot-description section.description
 ${tender_data_lots.value.amount}								css=section.lot-description div[ng-if='model.checkedLot.value'] div.info-item-val
