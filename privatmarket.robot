@@ -112,7 +112,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Set Window Position	@{USERS.users['${username}'].position}
 	Set Window Size	@{USERS.users['${username}'].size}
 	Set Selenium Implicit Wait	10s
-	Run Keyword Unless	'Viewer' in '${username}'	Login	${username}
+#	Run Keyword Unless	'Viewer' in '${username}'
+	Login	${username}
 	#Close message notification
 	Wait For Ajax
 	Switch To PMFrame
@@ -148,54 +149,84 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Створити тендер
 	[Arguments]  ${username}  ${tender_data}
-	${items} =								Get From Dictionary	${tender_data.data}	items
-#	${features} =							Get From Dictionary	${tender_data.data}	features
-#	${lots} =								Get From Dictionary	${tender_data.data}	lots
+	${presence} = 	Run Keyword And Return Status	List Should Contain Value	${tender_data.data}	lots
+	@{lots} = 		Run Keyword If	${presence}		Get From Dictionary	${tender_data.data}	lots
+	${presence} = 	Run Keyword And Return Status	List Should Contain Value	${tender_data.data}	items
+	@{items} = 		Run Keyword If	${presence}		Get From Dictionary	${tender_data.data}	items
+	${presence} = 	Run Keyword And Return Status	List Should Contain Value	${tender_data.data}	features
+	@{features} = 	Run Keyword If	${presence}		Get From Dictionary	${tender_data.data}	features
 
+	Wait For Ajax
 	Close notification
 	Chose UK language
-	Close notification
-	Sleep	3s
+	Wait For Ajax
+#	Close notification
+#	Sleep	3s
 	Wait Until Element Not Stale	css=input#search-query-input	${COMMONWAIT}
 	Wait Until Element Is Visible	css=input#search-query-input	timeout=${COMMONWAIT}
 	Wait Until Element Is Enabled	css=tr[ng-repeat='t in model.tenderList']	timeout=${COMMONWAIT}
 	Check Current Mode
 #go to form
-	debug    ownet
 	Click Button	css=button[ng-click='template.newTender()']
+	Wait For Ajax
 	Wait Visibulity And Click Element	xpath=(//div[@class='big-button-step'])[1]
 #step 0
 	#we should add choosing of procurementMethodType
-	Input Text									css=input[data-id='procurementName']				${tender_data.data.title}
-	Input Text									css=textarea[data-id='procurementDescription']		${tender_data.data.description}
+	Wait For Ajax
+	Input Text	css=input[data-id='procurementName']				${tender_data.data.title}
+	Input Text	css=textarea[data-id='procurementDescription']		${tender_data.data.description}
 
 	#CPV
-	Click Button								xpath=(//button[@data-id='actChoose'])[1]
-	Wait Until Element Is Visible				css=section[data-id='classificationTreeModal']		${COMMONWAIT}
-	Wait Until Element Is Visible				css=input[data-id='query']							${COMMONWAIT}
-	Search By Query								css=input[data-id='query']	${items[0].classification.id}
-	Click Button								css=button[data-id='actConfirm']
+#	Switch To PMFrame
+	Click Element	xpath=(//span[@data-id='actChoose'])[1]
+	Wait Until Element Is Visible	css=section[data-id='classificationTreeModal']	${COMMONWAIT}
+	Wait Until Element Is Visible	css=input[data-id='query']	${COMMONWAIT}
+	Search By Query	css=input[data-id='query']	${items[0].classification.id}
+	Click Button	css=button[data-id='actConfirm']
+
+
+
+
 
 	#additionalClassifications
-	Click Button								css=section[data-id='additionalClassifications'] button[data-id='actChoose']
-	Wait Until Element Is Visible				css=section[data-id='classificationTreeModal']		${COMMONWAIT}
-	Wait Until Element Is Visible				css=input[data-id='query']							${COMMONWAIT}
-	Search By Query								css=input[data-id='query']							${items[0].additionalClassifications[0].id}
-	Click Button								css=button[data-id='actConfirm']
+#	TODO почемуто нет нужного поля
+#	Click Button	css=section[data-id='additionalClassifications'] button[data-id='actChoose']
+#	Wait Until Element Is Visible	css=section[data-id='classificationTreeModal']		${COMMONWAIT}
+#	Wait Until Element Is Visible	css=input[data-id='query']	${COMMONWAIT}
+#	Search By Query	css=input[data-id='query']	${items[0].additionalClassifications[0].id}
+#	Click Button	css=button[data-id='actConfirm']
 
-	Click Button								css=button[data-id='actSave']
-	Close Confirmation							Данные успешно сохранены
+	Set Date And Time	css=input[ng-model='model.ptr.enquiryPeriod.sd.d']	css=span[data-id='ptrEnquiryPeriodStartDate'] input[ng-model='inputTime']	${tender_data.data.enquiryPeriod.startDate}
+	Set Date And Time	css=input[ng-model='model.ptr.enquiryPeriod.ed.d']	css=span[data-id='ptrEnquiryPeriodEndDate'] input[ng-model='inputTime']	${tender_data.data.enquiryPeriod.endDate}
+	Set Date And Time	css=input[ng-model='model.ptr.tenderPeriod.sd.d']	css=span[data-id='ptrTenderPeriodStartDate'] input[ng-model='inputTime']	${tender_data.data.tenderPeriod.startDate}
+	Set Date And Time	css=input[ng-model='model.ptr.tenderPeriod.ed.d']	css=span[data-id='ptrTenderPeriodEndDate'] input[ng-model='inputTime']	${tender_data.data.tenderPeriod.endDate}
+
+#procuringEntityAddress
+	Input Text	css=input[data-id='postalCode']	${tender_data.data.procuringEntity.address.postalCode}
+	Input Text	css=input[data-id='countryName']	${tender_data.data.procuringEntity.address.countryName}
+	Input Text	css=input[data-id='region']	${tender_data.data.procuringEntity.address.region}
+	Input Text	css=input[data-id='locality']	${tender_data.data.procuringEntity.address.locality}
+	Input Text	css=input[data-id='streetAddress']	${tender_data.data.procuringEntity.address.streetAddress}
+#contactPoint
+	Input Text	css=input[data-id='name']	${tender_data.data.procuringEntity.contactPoint.name}
+	${modified_phone} = 	Remove String	${tender_data.data.procuringEntity.contactPoint.telephone}	${SPACE}
+	Input Text	css=input[data-id='telephone']	+38067${modified_phone}
+	debug     fill other data
+	Click Button	css=button[data-id='actSave']
+#	Close Confirmation	Данные успешно сохранены
 
 #step 1
 	Click Element		css=#tab_1
-	Додати lots			${lots}
+	${count} = 	Get Length	${lots}
+	Run Keyword If	${count} > 0	Додати lots	${lots}
 #step 2
-	Додати items		${items}
+	${count} = 	Get Length	${items}
+	Run Keyword If	${count} > 0	Додати items	${items}
 
 #step 3
 	Click Element			css=#tab_2
-	${features_count} = 	Get Length	${features}
-	Run Keyword If	${features_count} > 0	Додати features	${features}
+	${count} = 	Get Length	${features}
+	Run Keyword If	${count} > 0	Додати features	${features}
 
 
 Додати lots
@@ -1083,6 +1114,7 @@ Try Search Tender
 
 Check Current Mode
 	[Arguments]	${education_type}=${True}
+	Switch To PMFrame
 	#проверим правильный ли режим
 	Mark Step	 --------before a#test-model-switch
 	${current_type} =	Get text	css=a#test-model-switch
@@ -1098,7 +1130,7 @@ Check Current Mode
 
 Switch To Education Mode
 	Wait Until Element Is Enabled		css=a#test-model-switch	timeout=${COMMONWAIT}
-	Sleep								3s
+	Wait For Ajax
 	Click Element						css=a#test-model-switch
 	Wait Until Element Contains			css=a#test-model-switch	Выйти из демо-режима	${COMMONWAIT}
 	Wait For Ajax Overflow Vanish
@@ -1144,6 +1176,7 @@ Click element by JS
 
 
 Chose UK language
+	Switch To PMFrame
 	Click If Visible	xpath=//a[.='uk']
 
 
@@ -1156,6 +1189,7 @@ Click If Visible
 
 
 Close notification
+	Switch To PMFrame
 	${notification_visibility} = 	Run Keyword And Return Status	Wait Until Element Is Visible	css=section[data-id='popupHelloModal'] span[data-id='actClose']	${COMMONWAIT}
 	Run Keyword If	${notification_visibility}	Click Element	css=section[data-id='popupHelloModal'] span[data-id='actClose']
 	Wait Until Element Is Not Visible	css=section[data-id='popupHelloModal'] span[data-id='actClose']
@@ -1165,3 +1199,45 @@ Switch To PMFrame
 	${frame_visibility} = 	Run Keyword And Return Status	Wait Until Element Is Enabled	id=tenders	timeout=5s
 	Wait For Ajax
 	Run Keyword If	${frame_visibility}	Switch To Frame	id=tenders
+
+
+Search By Query
+	[Arguments]  ${element}  ${query}
+	Input Text	${element}	${query}+
+	Sleep	1s
+	Press Key	${element}	\\08
+	Wait Until Element Is Enabled	css=input[id='found_${query}']	${COMMONWAIT}
+	Wait Until Element Not Stale	xpath=//div[input[@id='found_${query}']]	5
+	Click Element	xpath=//div[input[@id='found_${query}']]
+
+
+Get Locator And Type
+	[Arguments]	${full_locator}
+	${temp_locator} = 	Replace String	${full_locator}	'	${EMPTY}
+	${locator} = 	Run Keyword If	'css' in '${temp_locator}'	Get Substring	${full_locator}	4
+		...   ELSE IF	'xpath' in '${temp_locator}'	Get Substring	${full_locator}	6
+		...   ELSE		${full_locator}
+
+	${type} =	Set Variable If	'css' in '${temp_locator}'	css
+		...  	'xpath' in '${temp_locator}'	xpath
+		...  	None
+	[return]  ${locator}  ${type}
+
+
+Set Date And Time
+	[Arguments]  ${date_element}  ${time_element}  ${date}
+	Wait Until Element Is Visible	${date_element}	timeout=${COMMONWAIT}
+	Set Date	${date_element}	${date}
+	Set Time	${time_element}	${date}
+
+
+Set Date
+	[Arguments]  ${element}  ${date}
+	${locator}  ${type} = 	Get Locator And Type	${element}
+	Execute Javascript	$("${locator}").datepicker('setDate', '${date}');
+
+
+Set Time
+	[Arguments]  ${element_time}  ${date}
+	${time} =	Get Regexp Matches	${date}	T(\\d{2}:\\d{2})	1
+	Input Text	${element_time}	${time}
