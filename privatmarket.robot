@@ -149,8 +149,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 Створити тендер
 	[Arguments]  ${username}  ${tender_data}
 	${items} =								Get From Dictionary	${tender_data.data}	items
-	${features} =							Get From Dictionary	${tender_data.data}	features
-	${lots} =								Get From Dictionary	${tender_data.data}	lots
+#	${features} =							Get From Dictionary	${tender_data.data}	features
+#	${lots} =								Get From Dictionary	${tender_data.data}	lots
 
 	Close notification
 	Chose UK language
@@ -284,11 +284,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait For Element With Reload	css=div.lot-chooser	1
 	Click Element					css=div.lot-chooser
 	Click Element					xpath=//div[@ng-repeat='lot in model.lotPortion' and contains(., '${lot_id}')]
-
-
-Створити тендер
-	[Arguments]  @{ARGUMENTS}
-	Fail  Функція не підтримується майданчиком
 
 
 Отримати інформацію із тендера
@@ -961,9 +956,9 @@ Fill Phone
 	Click Button	css=button#takepartLink
 	Wait Until Element Is Visible	css=div[ng-click='commonActions.sendRedir(bid.afpId)']	timeout=30
 	${request_string} =	Convert To String
-		...  return (function(){var link = angular.element($x("(//div[@ng-click='commonActions.sendRedir(bid.afpId)'])[1]")).last().scope().model.ad.auctionUrl; if(!link || link=='None'){return false;} else return true;})()
+		...  return (function(){var link = angular.element($("div[ng-click='commonActions.sendRedir(bid.afpId)']")).last().scope().model.ad.auctionUrl; if(!link || link=='None'){return false;} else return true;})()
 	Wait For Condition	${request_string}	${COMMONWAIT}
-	${result} =	Execute Javascript	return angular.element($x("(//div[@ng-click='commonActions.sendRedir(bid.afpId)'])[1]")).last().scope().model.ad.auctionUrl
+	${result} =	Execute Javascript	return angular.element($("div[ng-click='commonActions.sendRedir(bid.afpId)']")).last().scope().model.ad.auctionUrl
 	[return]  ${result}
 
 
