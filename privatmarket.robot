@@ -97,6 +97,9 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 *** Keywords ***
 Підготувати дані для оголошення тендера
 	[Arguments]  ${username}  ${tender_data}
+	${tender_data.data} = 	Run Keyword If	'PrivatMarket_Owner' == '${username}'	modify_test_data	${tender_data.data}
+#	Run Keyword If	'${role_name}' == 'tender_owner'	Return From Keyword	${tender_data}
+	${tender_data.data} = 	modify_test_data	${tender_data.data}
 	[return]	${tender_data}
 
 
@@ -106,8 +109,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	${service args}=	Create List	--ignore-ssl-errors=true	--ssl-protocol=tlsv1
 	${browser} =		Convert To Lowercase	${USERS.users['${username}'].browser}
 
-	Open Browser	${USERS.users['${username}'].homepage}	ff	alias=${username}
-#	Open Browser	${USERS.users['${username}'].homepage}	ff	alias=${username}	ff_profile_dir=C:\\Users\\Oks\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\6o60lsgy.AutotestUser
+#	Open Browser	${USERS.users['${username}'].homepage}	ff	alias=${username}
+	Open Browser	${USERS.users['${username}'].homepage}	ff	alias=${username}	ff_profile_dir=C:\\Users\\Oks\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\6o60lsgy.AutotestUser
 
 	Set Window Position	@{USERS.users['${username}'].position}
 	Set Window Size	@{USERS.users['${username}'].size}
@@ -170,6 +173,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Click Button	css=button[ng-click='template.newTender()']
 	Wait For Ajax
 	Wait Visibulity And Click Element	xpath=(//div[@class='big-button-step'])[1]
+	Delete Draft
 #step 0
 	#we should add choosing of procurementMethodType
 	Wait For Ajax
@@ -210,15 +214,15 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 #contactPoint
 	Input Text	css=input[data-id='name']	${tender_data.data.procuringEntity.contactPoint.name}
 	${modified_phone} = 	Remove String	${tender_data.data.procuringEntity.contactPoint.telephone}	${SPACE}
-	Input Text	css=input[data-id='telephone']	+38067${modified_phone}
-	debug     fill other data
+	${modified_phone} = 	Remove String	${modified_phone}	-
+	${modified_phone} = 	Remove String	${modified_phone}	(
+	${modified_phone} = 	Remove String	${modified_phone}	)
+	${modified_phone} = 	Set Variable If	'+38' in '${modified_phone}'	${modified_phone}	+38067${modified_phone}
+	Input Text	css=input[data-id='telephone']	${modified_phone}
 	Click Button	css=button[data-id='actSave']
-#	Close Confirmation	Данные успешно сохранены
 
 #step 1
-	Click Element		css=#tab_1
-	${count} = 	Get Length	${lots}
-	Run Keyword If	${count} > 0	Додати lots	${lots}
+	Додати lots	${lots}
 #step 2
 	${count} = 	Get Length	${items}
 	Run Keyword If	${count} > 0	Додати items	${items}
@@ -227,15 +231,16 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Click Element			css=#tab_2
 	${count} = 	Get Length	${features}
 	Run Keyword If	${count} > 0	Додати features	${features}
+	debug    the end
 
 
 Додати lots
 	[Arguments]  ${lots}
 	${lots_count} = 			Get Length	${lots}
+	Switch To PMFrame
 
 	: FOR    ${index}    IN RANGE    0    ${lots_count}
 	\    Mark Step		lot_num_${index}
-	\    Click button											css=button[ng-click='model.addLot()']
 	\    Wait Until Element Is Enabled							css=input[data-id='title']	10s
 	\    Input Text		css=input[data-id='title']				${lots[${index}].title}
 	\    Input Text		css=textarea[data-id='description']		${lots[${index}].description}
@@ -245,24 +250,26 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	\    Sleep			1s
 	\    Input Text		css=input[data-id='minimalStepAmount']	${minimalStep_amount}
 	\    Sleep			1s
+	\    Click Element	css=div.lot-guarantee label
+	\    Wait Until Element Is Visible	css=input[data-id='guaranteeAmount']	10s
 	\    Input Text		css=input[data-id='guaranteeAmount']	1
 
 
 Додати items
 	[Arguments]  ${items}
 	${items_count} = 			Get Length	${items}
+	Switch To PMFrame
 	: FOR    ${index}    IN RANGE    0    ${items_count}
 	\    Mark Step		item_num_${index}
-	\    Click button											css=button[ng-click='model.addItem(lot)']
-	\    Wait Until Element Is Enabled							css=input[ng-model='item.description']	10s
-	\    debug    in items
-	\    Input Text		css=input[ng-model='item.description']	${items[${index}].description}
-	\    Input Text		css=input[data-id='quantity']	${items[${index}].quantity}
-	\    Click Element	xpath=//select[@data-id='unit']/option[text()='${items[${index}].unit.name}']
+	\    Wait Until Element Is Enabled	css=input[ng-model='item.description']	10s
+	\    Input Text	css=input[ng-model='item.description']	${items[${index}].description}
+	\    Input Text	css=input[data-id='quantity']	${items[${index}].quantity}
+	\    ${unit_ru_name} = 	get_unit_ru_name	${items[${index}].unit.name}
+	\    Click Element	xpath=//select[@data-id='unit']/option[text()='${unit_ru_name}']
 	\    ${deliveryDate} =	Get Regexp Matches	${items[${index}].deliveryDate.endDate}	(\\d{4}-\\d{2}-\\d{2})
-	\    ${deliveryDate} =	Convert Date	${deliveryDate}	result_format=%d-%m-%Y
-	\    Execute Javascript	$("input[ng-model='item.deliveryDate.sd.d']").datepicker('setDate', '${items[${index}].deliveryDate.endDate}');
-	\    Execute Javascript	$("input[ng-model='item.deliveryDate.ed.d']").datepicker('setDate', '${items[${index}].deliveryDate.endDate}');
+	\    ${deliveryDate} =	Convert Date	${deliveryDate[0]}	result_format=%d-%m-%Y
+	\    Set Date	css=input[ng-model='item.deliveryDate.sd.d']	${items[${index}].deliveryDate.endDate}
+	\    Set Date	css=input[ng-model='item.deliveryDate.ed.d']	${items[${index}].deliveryDate.endDate}
 
 
 Відкрити детальну інформацию по позиціям
@@ -1206,6 +1213,7 @@ Search By Query
 	Input Text	${element}	${query}+
 	Sleep	1s
 	Press Key	${element}	\\08
+	Wait For Ajax
 	Wait Until Element Is Enabled	css=input[id='found_${query}']	${COMMONWAIT}
 	Wait Until Element Not Stale	xpath=//div[input[@id='found_${query}']]	5
 	Click Element	xpath=//div[input[@id='found_${query}']]
@@ -1241,3 +1249,16 @@ Set Time
 	[Arguments]  ${element_time}  ${date}
 	${time} =	Get Regexp Matches	${date}	T(\\d{2}:\\d{2})	1
 	Input Text	${element_time}	${time}
+
+
+Delete Draft
+	Switch To PMFrame
+	${visibility} = 	Run Keyword And Return Status	Wait Until Element Is Visible	css=button[data-id='actDeleteDraft']	${COMMONWAIT}
+	Run Keyword Unless	${visibility}	Return From Keyword	${False}
+	Click Button	css=button[data-id='actDeleteDraft']
+	Wait Visibulity And Click Element	css=button[ng-click='close(true)']
+	Wait Until Element Is Not Visible	css=button[ng-click='close(true)']
+	Switch To PMFrame
+	Wait Visibulity And Click Element	css=button[ng-click='template.newTender()']
+	Wait For Ajax
+	Wait Visibulity And Click Element	xpath=(//div[@class='big-button-step'])[1]

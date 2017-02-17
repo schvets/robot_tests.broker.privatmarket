@@ -196,3 +196,51 @@ def get_status_type(status_name):
                        }
     type_name = type_dictionary.get(status_name)
     return type_name
+
+
+def modify_test_data(initial_data):
+    initial_data['lots'] = [privatmarket_munchify(
+    {
+        "description": u'Тестовий лот',
+        "title": initial_data['title'],
+        "value": {
+            "currency": "UAH",
+            "amount": initial_data['value']['amount'],
+            "valueAddedTaxIncluded": True
+        },
+        "minimalStep": {
+            "currency": "UAH",
+            "amount": initial_data['minimalStep']['amount'],
+            "valueAddedTaxIncluded": True
+        },
+        "status": "active"
+    })]
+    return initial_data
+
+
+def get_unit_ru_name(name):
+    dictionary = {
+        u'кілограми': u'килограмм',
+        u'кілометер': u'километр',
+        u'пара': u'пара',
+        u'літр': u'литр',
+        u'набір': u'набор',
+        u'пачок': u'пачка',
+        u'метри': u'метр',
+        u'послуга': u'услуга',
+        u'метри кубічні': u'метр кубический',
+        u'тони': u'тонна',
+        u'метри квадратні': u'метр квадратный',
+        u'кілометри': u'километр',
+        u'штуки': u'штука',
+        u'місяць': u'месяц',
+        u'пачка': u'пачка',
+        u'упаковка': u'упаковка',
+        u'гектар': u'гектар',
+        u'блок': u'блок'
+    }
+    expected_name = dictionary.get(name)
+    if expected_name:
+        return expected_name
+    else:
+        return name
