@@ -109,8 +109,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	${service args}=	Create List	--ignore-ssl-errors=true	--ssl-protocol=tlsv1
 	${browser} =		Convert To Lowercase	${USERS.users['${username}'].browser}
 
-	Open Browser	${USERS.users['${username}'].homepage}	ff	alias=${username}
-#	Open Browser	${USERS.users['${username}'].homepage}	ff	alias=${username}	ff_profile_dir=C:\\Users\\Oks\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\6o60lsgy.AutotestUser
+#	Open Browser	${USERS.users['${username}'].homepage}	ff	alias=${username}
+	Open Browser	${USERS.users['${username}'].homepage}	ff	alias=${username}	ff_profile_dir=C:\\Users\\Oks\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\6o60lsgy.AutotestUser
 
 	Set Window Position	@{USERS.users['${username}'].position}
 	Set Window Size	@{USERS.users['${username}'].size}
@@ -143,7 +143,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Click Element	css=tr#${tenderId}
 
 	Wait For Ajax
-#	Switch To Frame	id=tenders
 	Switch To PMFrame
 	Wait Until Element Is Not Visible	css=input#search-query-input	20s
 	Wait Until Element Is Visible	id=tenderStatus	timeout=${COMMONWAIT}
@@ -187,10 +186,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait Until Element Is Visible	css=input[data-id='query']	${COMMONWAIT}
 	Search By Query	css=input[data-id='query']	${items[0].classification.id}
 	Click Button	css=button[data-id='actConfirm']
-
-
-
-
+	Wait Until Element Is Not Visible	css=section[data-id='classificationTreeModal']	${COMMONWAIT}
 
 	#additionalClassifications
 #	TODO почемуто нет нужного поля
@@ -200,6 +196,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 #	Search By Query	css=input[data-id='query']	${items[0].additionalClassifications[0].id}
 #	Click Button	css=button[data-id='actConfirm']
 
+	Wait Until Element Is Visible	css=input[ng-model='model.ptr.enquiryPeriod.sd.d']	10s
 	Set Date And Time	css=input[ng-model='model.ptr.enquiryPeriod.sd.d']	css=span[data-id='ptrEnquiryPeriodStartDate'] input[ng-model='inputTime']	${tender_data.data.enquiryPeriod.startDate}
 	Set Date And Time	css=input[ng-model='model.ptr.enquiryPeriod.ed.d']	css=span[data-id='ptrEnquiryPeriodEndDate'] input[ng-model='inputTime']	${tender_data.data.enquiryPeriod.endDate}
 	Set Date And Time	css=input[ng-model='model.ptr.tenderPeriod.sd.d']	css=span[data-id='ptrTenderPeriodStartDate'] input[ng-model='inputTime']	${tender_data.data.tenderPeriod.startDate}
@@ -218,6 +215,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	${modified_phone} = 	Remove String	${modified_phone}	(
 	${modified_phone} = 	Remove String	${modified_phone}	)
 	${modified_phone} = 	Set Variable If	'+38' in '${modified_phone}'	${modified_phone}	+38067${modified_phone}
+	${modified_phone} = 	Get Substring	${modified_phone}	0	13
 	Input Text	css=input[data-id='telephone']	${modified_phone}
 	Click Button	css=button[data-id='actSave']
 
@@ -226,12 +224,25 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 #step 2
 	${count} = 	Get Length	${items}
 	Run Keyword If	${count} > 0	Додати items	${items}
+	Click Button	css=button[data-id='actSave']
+	Wait Until Element Is Visible	css=section[data-id="step3"]	10s
 
 #step 3
 	Click Element			css=#tab_2
 	${count} = 	Get Length	${features}
 	Run Keyword If	${count} > 0	Додати features	${features}
-	debug    the end
+	Click Button	css=button[data-id='actSave']
+#step 4
+	Wait Until Element Is Visible	css=section[data-id="step4"]	10s
+	Click Button	css=button[data-id='actSave']
+#step 5
+	Wait Until Element Is Visible	css=section[data-id="step5"]	10s
+	Click Button	css=button[data-id='actSend']
+	Close Confirmation In Editor	Закупка поставлена в очередь на отправку в ProZorro. Статус закупки Вы можете отслеживать в личном кабинете.
+	Switch To PMFrame
+	debug     statusError
+#	Wait Until Element Is Visible	id=tenderStatus	timeout=${COMMONWAIT}
+	Wait Until Element Not Stale	xpath=//div[contains(@class,'title-div')]	40
 
 
 Додати lots
@@ -268,8 +279,12 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	\    Click Element	xpath=//select[@data-id='unit']/option[text()='${unit_ru_name}']
 	\    ${deliveryDate} =	Get Regexp Matches	${items[${index}].deliveryDate.endDate}	(\\d{4}-\\d{2}-\\d{2})
 	\    ${deliveryDate} =	Convert Date	${deliveryDate[0]}	result_format=%d-%m-%Y
-	\    Set Date	css=input[ng-model='item.deliveryDate.sd.d']	${items[${index}].deliveryDate.endDate}
 	\    Set Date	css=input[ng-model='item.deliveryDate.ed.d']	${items[${index}].deliveryDate.endDate}
+
+
+Завантажити документ
+	[Arguments]  ${user_name}  ${filepath}  ${tenderId}
+	debug     addfile
 
 
 Відкрити детальну інформацию по позиціям
@@ -1068,6 +1083,16 @@ Close Confirmation
 	Wait For Ajax
 
 
+Close Confirmation In Editor
+	[Arguments]	${confirmation_text}
+	Wait For Ajax
+	Wait Until Element Is Visible		css=div.modal-body.info-div	${COMMONWAIT}
+	Wait Until Element Contains			css=div.modal-body.info-div	${confirmation_text}	${COMMONWAIT}
+	Wait Visibulity And Click Element	css=button[ng-click='close()']
+	Wait Until Element Is Not Visible	css=div.modal-body.info-div	${COMMONWAIT}
+	Wait For Ajax
+
+
 Wait For Notification
 	[Arguments]	${message_text}
 	Wait For Ajax
@@ -1242,7 +1267,7 @@ Set Date And Time
 Set Date
 	[Arguments]  ${element}  ${date}
 	${locator}  ${type} = 	Get Locator And Type	${element}
-	Execute Javascript	$("${locator}").datepicker('setDate', '${date}');
+	Execute Javascript	$("${locator}").datepicker('setDate', new Date(Date.parse("${date}")));
 
 
 Set Time
