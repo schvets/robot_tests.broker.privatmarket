@@ -754,7 +754,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Задати питання
 	[Arguments]  ${provider}  ${tender_id}  ${question}
-	Оновити сторінку з тендером
+	privatmarket.Оновити сторінку з тендером
 	Switch To Tab	2
 	Wait For Ajax
 	Wait Until Element Not Stale	xpath=//button[@ng-click='act.sendEnquiry()']	40
@@ -829,7 +829,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	...	${ARGUMENTS[0]} ==  username
 	...	${ARGUMENTS[1]} ==  tenderId
 	...	${ARGUMENTS[2]} ==  bid
-	Оновити сторінку з тендером
+	privatmarket.Оновити сторінку з тендером
 
 	Run Keyword If	'без прив’язки до лоту' in '${TEST_NAME}'	Fail  Така ситуація не може виникнути
 	Run Keyword If	'без нецінового показника' in '${TEST_NAME}'	Fail  Така ситуація не може виникнути
@@ -856,7 +856,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Switch To PMFrame
 	Wait Enable And Click Element	${locator_tenderClaim.buttonSend}
 	Close Confirmation	Ваша заявка була успішно включена до черги на відправку!
-	Оновити сторінку з тендером
+	privatmarket.Оновити сторінку з тендером
 	[return]	${Arguments[2]}
 
 
