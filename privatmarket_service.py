@@ -215,6 +215,8 @@ def modify_test_data(initial_data):
         },
         "status": "active"
     })]
+    initial_data['procuringEntity']['name'] = u'Товариство З Обмеженою Відповідальністю \'Сільськогосподарська Фірма \'Рубіжне\''
+    initial_data['items'][0]['unit']['name'] = get_unit_ru_name(initial_data['items'][0]['unit']['name'])
     return initial_data
 
 

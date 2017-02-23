@@ -109,8 +109,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	${service args}=	Create List	--ignore-ssl-errors=true	--ssl-protocol=tlsv1
 	${browser} =		Convert To Lowercase	${USERS.users['${username}'].browser}
 
-#	Open Browser	${USERS.users['${username}'].homepage}	ff	alias=${username}
-	Open Browser	${USERS.users['${username}'].homepage}	ff	alias=${username}	ff_profile_dir=C:\\Users\\Oks\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\6o60lsgy.AutotestUser
+	Open Browser	${USERS.users['${username}'].homepage}	ff	alias=${username}
+#	Open Browser	${USERS.users['${username}'].homepage}	ff	alias=${username}	ff_profile_dir=C:\\Users\\Oks\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\6o60lsgy.AutotestUser
 
 	Set Window Position	@{USERS.users['${username}'].position}
 	Set Window Size	@{USERS.users['${username}'].size}
@@ -125,6 +125,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Пошук тендера по ідентифікатору
 	[Arguments]  ${username}  ${tenderId}
+	Go To	${USERS.users['${username}'].homepage}
+	Wait For Ajax
 	Close notification
 	Chose UK language
 	Close notification
@@ -189,7 +191,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Wait Until Element Is Not Visible	css=section[data-id='classificationTreeModal']	${COMMONWAIT}
 
 	#additionalClassifications
-#	TODO почемуто нет нужного поля
+#	TODO почему-то нет нужного поля
 #	Click Button	css=section[data-id='additionalClassifications'] button[data-id='actChoose']
 #	Wait Until Element Is Visible	css=section[data-id='classificationTreeModal']		${COMMONWAIT}
 #	Wait Until Element Is Visible	css=input[data-id='query']	${COMMONWAIT}
@@ -240,9 +242,13 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Click Button	css=button[data-id='actSend']
 	Close Confirmation In Editor	Закупка поставлена в очередь на отправку в ProZorro. Статус закупки Вы можете отслеживать в личном кабинете.
 	Switch To PMFrame
-	debug     statusError
 #	Wait Until Element Is Visible	id=tenderStatus	timeout=${COMMONWAIT}
 	Wait Until Element Not Stale	xpath=//div[contains(@class,'title-div')]	40
+	Wait For Element With Reload	xpath=//div[@id='tenderStatus' and contains(., 'Период уточнений')]	1
+	${tender_id} = 	Get Text	css=div#tenderId
+#	Go To	${USERS.users['${username}'].homepage}
+#	Wait For Ajax
+	[return]  ${tender_id}
 
 
 Додати lots
@@ -275,16 +281,49 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	\    Wait Until Element Is Enabled	css=input[ng-model='item.description']	10s
 	\    Input Text	css=input[ng-model='item.description']	${items[${index}].description}
 	\    Input Text	css=input[data-id='quantity']	${items[${index}].quantity}
-	\    ${unit_ru_name} = 	get_unit_ru_name	${items[${index}].unit.name}
-	\    Click Element	xpath=//select[@data-id='unit']/option[text()='${unit_ru_name}']
+#	\    ${unit_ru_name} = 	get_unit_ru_name	${items[${index}].unit.name}
+	\    Click Element	xpath=//select[@data-id='unit']/option[text()='${items[${index}].unit.name}']
 	\    ${deliveryDate} =	Get Regexp Matches	${items[${index}].deliveryDate.endDate}	(\\d{4}-\\d{2}-\\d{2})
 	\    ${deliveryDate} =	Convert Date	${deliveryDate[0]}	result_format=%d-%m-%Y
+	\    Click Element	xpath=//input[contains(@ng-model, 'item.adressTypeMode')][1]
+	\    Wait Until Element Is Visible	css=input[data-id='postalCode']	10s
+	\    Input Text	css=input[data-id='postalCode']	${items[${index}].deliveryAddress.postalCode}
+	\    Input Text	css=input[data-id='countryName']	${items[${index}].deliveryAddress.countryName}
+	\    Input Text	css=input[data-id='region']	${items[${index}].deliveryAddress.region}
+	\    Input Text	css=input[data-id='locality']	${items[${index}].deliveryAddress.locality}
+	\    Input Text	css=input[data-id='streetAddress']	${items[${index}].deliveryAddress.streetAddress}
 	\    Set Date	css=input[ng-model='item.deliveryDate.ed.d']	${items[${index}].deliveryDate.endDate}
 
 
 Завантажити документ
 	[Arguments]  ${user_name}  ${filepath}  ${tenderId}
-	debug     addfile
+#	перейдем к редактированию
+	Wait For Element With Reload	css=button[ng-click='commonActions.createAfp()']	1
+	Wait For Ajax
+	Wait Until Element Is Visible	css=button[ng-click='commonActions.createAfp()']	10s
+	Click Button	css=button[ng-click='commonActions.createAfp()']
+#	откроем нужную вкладку
+	Wait Visibulity And Click Element	css=#tab_3 a
+#	загрузим файл
+	Click Element	css=label[for='documentation_tender_yes']
+	Wait Visibulity And Click Element	css=div.file-loader a
+
+	Wait Visibulity And Click Element	css=div[ng-if="!model.file.title"]
+	Choose File	id=afpFile	${filePath}
+	Sleep	5s
+	Wait Visibulity And Click Element	xpath=//a[contains(@ng-class, 'file.currFileVfvError')]
+	Wait Visibulity And Click Element	xpath=//li[contains(@ng-click, 'setFileType')][1]
+	Wait Visibulity And Click Element	xpath=//button[contains(@ng-click, 'addFileFunction')]
+	Wait Until Element Is Visible	xpath=//i[contains(@ng-click, 'deleteFileFunction')]
+	Click Button	css=button[data-id='actSave']
+	Wait Until Element Is Visible	css=section[data-id="step5"]	10s
+	Click Button	css=button[data-id='actSend']
+#Дождемся подтверждения и обновим страницу, поскольку тут не выходит его закрыть
+	Wait Until Element Is Visible		css=div.modal-body.info-div	${COMMONWAIT}
+	Wait Until Element Contains			css=div.modal-body.info-div	Закупка поставлена в очередь на отправку в ProZorro. Статус закупки Вы можете отслеживать в личном кабинете.	${COMMONWAIT}	Закупка поставлена в очередь на отправку в ProZorro. Статус закупки Вы можете отслеживать в личном кабинете.
+	Reload Page
+	Wait For Ajax
+
 
 
 Відкрити детальну інформацию по позиціям
@@ -626,8 +665,24 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 
 Внести зміни в тендер
-	[Arguments]  @{ARGUMENTS}
-	Fail  Функція не підтримується майданчиком
+	[Arguments]  ${user_name}  ${tenderId}	${parameter}	${value}
+	Wait For Element With Reload	css=button[ng-click='commonActions.createAfp()']	1
+	Wait For Ajax
+	Wait Until Element Is Visible	css=button[ng-click='commonActions.createAfp()']	10s
+	Click Button	css=button[ng-click='commonActions.createAfp()']
+	Wait Visibulity And Click Element	css=#tab_0 a
+	Wait Until Element Is Visible	css=textarea[data-id='procurementDescription']
+	Input Text	css=textarea[data-id='procurementDescription']	${value}
+
+	Click Button	css=button[data-id='actSave']
+	Wait Until Element Is Visible	css=section[data-id="step2"]	10s
+	Wait Visibulity And Click Element	css=#tab_4 a
+	Click Button	css=button[data-id='actSend']
+	#Дождемся подтверждения и обновим страницу, поскольку тут не выходит его закрыть
+	Wait Until Element Is Visible		css=div.modal-body.info-div	${COMMONWAIT}
+	Wait Until Element Contains			css=div.modal-body.info-div	Закупка поставлена в очередь на отправку в ProZorro. Статус закупки Вы можете отслеживать в личном кабинете.	${COMMONWAIT}	Закупка поставлена в очередь на отправку в ProZorro. Статус закупки Вы можете отслеживать в личном кабинете.
+	Reload Page
+	Wait For Ajax
 
 
 Створити вимогу
@@ -699,8 +754,9 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Задати питання
 	[Arguments]  ${provider}  ${tender_id}  ${question}
-	Wait For Ajax
+	Оновити сторінку з тендером
 	Switch To Tab	2
+	Wait For Ajax
 	Wait Until Element Not Stale	xpath=//button[@ng-click='act.sendEnquiry()']	40
 	Wait Until Element Is Enabled	xpath=//button[@ng-click='act.sendEnquiry()']	10
 	Click Button	xpath=//button[@ng-click='act.sendEnquiry()']
@@ -713,8 +769,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	[Arguments]  ${title}  ${description}  ${email}
 	Wait For Ajax
 	sleep	4s
-	Wait For Element Value	css=input[ng-model='model.person.phone']
-	Wait Until Element Not Stale	xpath=//input[@ng-model="model.question.title"]	40
+#	Wait For Element Value	css=input[ng-model='model.person.phone']
 	Wait Until Element Is Visible	xpath=//input[@ng-model="model.question.title"]				timeout=10
 	Wait Until Element Is Enabled	xpath=//input[@ng-model="model.question.title"]				timeout=10
 	Input text	xpath=//input[@ng-model="model.question.title"]				${title}
@@ -740,6 +795,24 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	[return]  True
 
 
+Відповісти на питання
+	[Arguments]  ${username}  ${tender_uaid}  ${question}  ${answer_data}  ${question_id}
+	Switch To PMFrame
+	Switch To Tab	2
+	Wait For Element With Reload	xpath=//button[contains(@ng-click, 'act.answerFaq')]	2
+	Wait Visibulity And Click Element	xpath=//button[contains(@ng-click, 'act.answerFaq')]
+	Wait Until Element Is Visible	id=questionAnswer	15s
+	Input Text	id=questionAnswer	${answer_data.data.answer}
+	Sleep	2s
+	Click Element	id=btnSendAnswer
+	Wait For Notification	Ваша відповідь успішно відправлена!
+	Wait Until Element Not Stale	css=span[ng-click='act.hideModal()']	40
+	Click Element	css=span[ng-click='act.hideModal()']
+	Wait Until Element Is Not Visible	id=questionAnswer	timeout=20
+	Sleep	30s
+#	div.question-answer-send-status публікується
+
+
 Оновити сторінку з тендером
 	[Arguments]  @{ARGUMENTS}
 	[Documentation]
@@ -756,6 +829,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	...	${ARGUMENTS[0]} ==  username
 	...	${ARGUMENTS[1]} ==  tenderId
 	...	${ARGUMENTS[2]} ==  bid
+	Оновити сторінку з тендером
 
 	Run Keyword If	'без прив’язки до лоту' in '${TEST_NAME}'	Fail  Така ситуація не може виникнути
 	Run Keyword If	'без нецінового показника' in '${TEST_NAME}'	Fail  Така ситуація не може виникнути
@@ -782,6 +856,7 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Switch To PMFrame
 	Wait Enable And Click Element	${locator_tenderClaim.buttonSend}
 	Close Confirmation	Ваша заявка була успішно включена до черги на відправку!
+	Оновити сторінку з тендером
 	[return]	${Arguments[2]}
 
 
@@ -889,11 +964,6 @@ Fill Phone
 	${status} =						Set Variable	invalid
 	${bid} =						get_bid_data	${status}
 	[return]	${bid}
-
-
-Відповісти на питання
-	[Arguments]  @{ARGUMENTS}
-	Fail  Функція не підтримується майданчиком
 
 
 Завантажити документ в ставку
@@ -1146,7 +1216,7 @@ Try Search Tender
 
 Check Current Mode
 	[Arguments]	${education_type}=${True}
-	Switch To PMFrame
+	privatmarket.Оновити сторінку з тендером
 	#проверим правильный ли режим
 	Mark Step	 --------before a#test-model-switch
 	${current_type} =	Get text	css=a#test-model-switch
@@ -1161,10 +1231,12 @@ Check Current Mode
 
 
 Switch To Education Mode
-	Wait Until Element Is Enabled		css=a#test-model-switch	timeout=${COMMONWAIT}
+	[Arguments]	${education_type}=${True}
+	Wait Until Element Is Enabled	css=a#test-model-switch	timeout=${COMMONWAIT}
 	Wait For Ajax
-	Click Element						css=a#test-model-switch
-	Wait Until Element Contains			css=a#test-model-switch	Выйти из демо-режима	${COMMONWAIT}
+	Mark Step	 --------before click
+	Click Element	css=a#test-model-switch
+	Wait Until Element Contains	css=a#test-model-switch	Выйти из демо-режима	${COMMONWAIT}
 	Wait For Ajax Overflow Vanish
 
 
