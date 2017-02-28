@@ -10,95 +10,94 @@ Library  privatmarket_service.py
 *** Variables ***
 ${COMMONWAIT}	40
 
-${tender_data_title}											xpath=//div[contains(@class,'title-div')]
-${tender_data_description}										id=tenderDescription
-${tender_data_procurementMethodType}							id=tenderType
-${tender_data_status}											id=tenderStatus
-${tender_data_value.amount}										id=tenderBudget
-${tender_data_value.currency}									id=tenderBudgetCcy
-${tender_data_value.valueAddedTaxIncluded}						id=tenderBudgetTax
-${tender_data_tenderID}											id=tenderId
-${tender_data_procuringEntity.name}								css=a[ng-click='commonActions.openCard()']
-${tender_data_enquiryPeriod.startDate}							xpath=(//span[@ng-if='p.bd'])[1]
-${tender_data_enquiryPeriod.endDate}							xpath=(//span[contains(@ng-if, 'p.ed')])[1]
-${tender_data_tenderPeriod.startDate}							xpath=(//span[@ng-if='p.bd'])[2]
-${tender_data_tenderPeriod.endDate}								xpath=(//span[contains(@ng-if, 'p.ed')])[2]
-${tender_data_auctionPeriod.startDate}							xpath=(//span[@ng-if='p.bd'])[3]
-${tender_data_minimalStep.amount}								css=div#lotMinStepAmount
-${tender_data_items.description}								xpath=//a[contains(@ng-click, 'adb.showCl = !adb.showCl')]
-${tender_data_items.deliveryDate.endDate}						xpath=//div[@ng-if='adb.deliveryDate.endDate']/div[2]
-${tender_data_items.deliveryLocation.latitude}					css=span.latitude
-${tender_data_items.deliveryLocation.longitude}					css=span.longitude
-${tender_data_items.deliveryAddress.countryName}				css=span#countryName
-${tender_data_items.deliveryAddress.postalCode}					css=span#postalCode
-${tender_data_items.deliveryAddress.region}						css=span#region
-${tender_data_items.deliveryAddress.locality}					css=span#locality
-${tender_data_items.deliveryAddress.streetAddress}				css=span#streetAddress
-${tender_data_items.classification.scheme}						xpath=//div[@ng-if="adb.classification"]
-${tender_data_items.classification.id}							xpath=//div[@ng-if="adb.classification"]
-${tender_data_items.classification.description}					xpath=//div[@ng-if="adb.classification"]
-${tender_data_items.additionalClassifications[0].scheme}		xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
-${tender_data_items.additionalClassifications[0].id}			xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
+${tender_data_title}	xpath=//div[contains(@class,'title-div')]
+${tender_data_description}	id=tenderDescription
+${tender_data_procurementMethodType}	id=tenderType
+${tender_data_status}	id=tenderStatus
+${tender_data_value.amount}	id=tenderBudget
+${tender_data_value.currency}	id=tenderBudgetCcy
+${tender_data_value.valueAddedTaxIncluded}	id=tenderBudgetTax
+${tender_data_tenderID}	id=tenderId
+${tender_data_procuringEntity.name}	css=a[ng-click='commonActions.openCard()']
+${tender_data_enquiryPeriod.startDate}	xpath=(//span[@ng-if='p.bd'])[1]
+${tender_data_enquiryPeriod.endDate}	xpath=(//span[contains(@ng-if, 'p.ed')])[1]
+${tender_data_tenderPeriod.startDate}	xpath=(//span[@ng-if='p.bd'])[2]
+${tender_data_tenderPeriod.endDate}	xpath=(//span[contains(@ng-if, 'p.ed')])[2]
+${tender_data_auctionPeriod.startDate}	xpath=(//span[@ng-if='p.bd'])[3]
+${tender_data_minimalStep.amount}	css=div#lotMinStepAmount
+${tender_data_items.description}	xpath=//a[contains(@ng-click, 'adb.showCl = !adb.showCl')]
+${tender_data_items.deliveryDate.endDate}	xpath=//div[@ng-if='adb.deliveryDate.endDate']/div[2]
+${tender_data_items.deliveryLocation.latitude}	css=span.latitude
+${tender_data_items.deliveryLocation.longitude}	css=span.longitude
+${tender_data_items.deliveryAddress.countryName}	css=span#countryName
+${tender_data_items.deliveryAddress.postalCode}	css=span#postalCode
+${tender_data_items.deliveryAddress.region}	css=span#region
+${tender_data_items.deliveryAddress.locality}	css=span#locality
+${tender_data_items.deliveryAddress.streetAddress}	css=span#streetAddress
+${tender_data_items.classification.scheme}	xpath=//div[@ng-if="adb.classification"]
+${tender_data_items.classification.id}	xpath=//div[@ng-if="adb.classification"]
+${tender_data_items.classification.description}	path=//div[@ng-if="adb.classification"]
+${tender_data_items.additionalClassifications[0].scheme}	xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
+${tender_data_items.additionalClassifications[0].id}	xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
 ${tender_data_items.additionalClassifications[0].description}	xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
 #TODO для чего следующие 3 строки
 ${tender_data_items.additionalClassifications.[0].description}	xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
-${tender_data_items.additionalClassifications.[0].id}			xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
-${tender_data_items.additionalClassifications.[0].scheme}		xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
-${tender_data_items.unit.name}									xpath=//div[@ng-if='adb.quantity']/div[2]/span[2]
-${tender_data_items.unit.code}									xpath=//div[@ng-if='adb.quantity']/div[2]/span[2]
-${tender_data_items.quantity}									xpath=//div[@ng-if='adb.quantity']/div[2]/span
-${tender_data_questions[0].description}							css=div.question-div
-${tender_data_questions[0].date}								xpath=//div[@class = 'question-head title']/b[2]
-${tender_data_questions[0].title}								css=div.question-head.title span
-${tender_data_questions[0].answer}								xpath=//div[@ng-if='q.answer']//div[@class='ng-binding']
-${tender_data_lots.title}										css=div.lot-head span.ng-binding
-${tender_data_lots.description}									css=section.lot-description section.description
-${tender_data_lots.value.amount}								css=section.lot-description div[ng-if='model.checkedLot.value'] div.info-item-val
-${tender_data_bids}												xpath=(//table[@class='bids']//tr)[2]
-${tender_data_cancellations[0].status}							xpath=//*[@id='nolotSection']/div[1]/div[1]
-${tender_data_cancellations[0].reason}							xpath=//*[@id='nolotSection']/div[1]/div[2]
-${tender_data_cancellations[0].documents[0].title}				css=.file-name.ng-binding
-${tender_data_title_en}											css=.title-div.ng-binding
-${tender_data_title_ru}											css=.title-div.ng-binding
-${tender_data_description_en}									css=#tenderDescription
-${tender_data_description_ru}									css=#tenderDescription
-${tender_data_procuringEntity.address.countryName}				css=#procurerAddr #countryName
-${tender_data_procuringEntity.address.locality}					css=#procurerAddr #locality
-${tender_data_procuringEntity.address.postalCode}				css=#procurerAddr #postalCode
-${tender_data_procuringEntity.address.region}					css=#procurerAddr #region
-${tender_data_procuringEntity.address.streetAddress}			css=#procurerAddr #streetAddress
-${tender_data_procuringEntity.contactPoint.name}				xpath=//div[@class='delivery-info']/div[2]/div[@class='info-item-val ng-binding']
-${tender_data_procuringEntity.contactPoint.telephone}			xpath=//div[@class='delivery-info']/div[4]/div[@class='info-item-val ng-binding']
-${tender_data_procuringEntity.contactPoint.url}					xpath=//div[@class='delivery-info']/div[5]/div[@class='info-item-val ng-binding']
-${tender_data_procuringEntity.identifier.legalName}				xpath=//div[@id='procurerLegalName']/div[2]
-${tender_data_procuringEntity.identifier.scheme}				xpath=//div[@id='procurerId']/div[1]
-${tender_data_procuringEntity.identifier.id}					xpath=//div[@id='procurerId']/div[2]
-${tender_data_causeDescription}									css=#tenderType>div
-${tender_data_documents[0].title}								css=.file-name.ng-binding
-${complaints[0].title}											xpath=(//div[@class='title']/span)[1]
-${complaints[0].description}									xpath=(//div[@ng-bind-html='q.description'])[1]
-${complaints[0].documents.title}								xpath=(//span[@class='file-name'])[1]
-${complaints[0].status}											xpath=(//div[contains(@ng-if,'q.status')])[1]
+${tender_data_items.additionalClassifications.[0].id}	xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
+${tender_data_items.additionalClassifications.[0].scheme}	xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
+${tender_data_items.unit.name}	xpath=//div[@ng-if='adb.quantity']/div[2]/span[2]
+${tender_data_items.unit.code}	xpath=//div[@ng-if='adb.quantity']/div[2]/span[2]
+${tender_data_items.quantity}	xpath=//div[@ng-if='adb.quantity']/div[2]/span
+${tender_data_questions[0].description}	css=div.question-div
+${tender_data_questions[0].date}	xpath=//div[@class = 'question-head title']/b[2]
+${tender_data_questions[0].title}	css=div.question-head.title span
+${tender_data_questions[0].answer}	xpath=//div[@ng-if='q.answer']//div[@class='ng-binding']
+${tender_data_lots.title}	css=div.lot-head span.ng-binding
+${tender_data_lots.description}	css=section.lot-description section.description
+${tender_data_lots.value.amount}	css=section.lot-description div[ng-if='model.checkedLot.value'] div.info-item-val
+${tender_data_bids}	xpath=(//table[@class='bids']//tr)[2]
+${tender_data_cancellations[0].status}	xpath=//*[@id='nolotSection']/div[1]/div[1]
+${tender_data_cancellations[0].reason}	xpath=//*[@id='nolotSection']/div[1]/div[2]
+${tender_data_cancellations[0].documents[0].title}	css=.file-name.ng-binding
+${tender_data_title_en}	css=.title-div.ng-binding
+${tender_data_title_ru}	css=.title-div.ng-binding
+${tender_data_description_en}	css=#tenderDescription
+${tender_data_description_ru}	css=#tenderDescription
+${tender_data_procuringEntity.address.countryName}	css=#procurerAddr #countryName
+${tender_data_procuringEntity.address.locality}	css=#procurerAddr #locality
+${tender_data_procuringEntity.address.postalCode}	css=#procurerAddr #postalCode
+${tender_data_procuringEntity.address.region}	css=#procurerAddr #region
+${tender_data_procuringEntity.address.streetAddress}	css=#procurerAddr #streetAddress
+${tender_data_procuringEntity.contactPoint.name}	xpath=//div[@class='delivery-info']/div[2]/div[@class='info-item-val ng-binding']
+${tender_data_procuringEntity.contactPoint.telephone}	xpath=//div[@class='delivery-info']/div[4]/div[@class='info-item-val ng-binding']
+${tender_data_procuringEntity.contactPoint.url}	xpath=//div[@class='delivery-info']/div[5]/div[@class='info-item-val ng-binding']
+${tender_data_procuringEntity.identifier.legalName}	xpath=//div[@id='procurerLegalName']/div[2]
+${tender_data_procuringEntity.identifier.scheme}	xpath=//div[@id='procurerId']/div[1]
+${tender_data_procuringEntity.identifier.id}	xpath=//div[@id='procurerId']/div[2]
+${tender_data_causeDescription}	css=#tenderType>div
+${tender_data_documents[0].title}	css=.file-name.ng-binding
+${complaints[0].title}	xpath=(//div[@class='title']/span)[1]
+${complaints[0].description}	xpath=(//div[@ng-bind-html='q.description'])[1]
+${complaints[0].documents.title}	xpath=(//span[@class='file-name'])[1]
+${complaints[0].status}	xpath=(//div[contains(@ng-if,'q.status')])[1]
 
-${locator_tenderCreation.buttonEdit}			xpath=//button[@ng-click='act.createAfp()']
-${locator_tenderCreation.buttonSave}			css=button.btn.btn-success
-${locator_tenderCreation.buttonBack}			xpath=//a[@ng-click='act.goBack()']
-${locator_tenderCreation.description}			css=textarea[ng-model='model.filterData.adbName']
-${locator_tenderClaim.buttonCreate}				css=button[ng-click='commonActions.createAfp()']
-${locator_tenderClaim.fieldPrice}				css=input[ng-model='model.userPrice']
+${locator_tenderCreation.buttonEdit}	xpath=//button[@ng-click='act.createAfp()']
+${locator_tenderCreation.buttonSave}	css=button.btn.btn-success
+${locator_tenderCreation.buttonBack}	xpath=//a[@ng-click='act.goBack()']
+${locator_tenderCreation.description}	css=textarea[ng-model='model.filterData.adbName']
+${locator_tenderClaim.buttonCreate}	css=button[ng-click='commonActions.createAfp()']
+${locator_tenderClaim.fieldPrice}	css=input[ng-model='model.userPrice']
 ${locator_tenderClaim.checkedLot.fieldPrice}	xpath=//input[@ng-model='model.checkedLot.userPrice']
-${locator_tenderClaim.fieldEmail}				css=input[ng-model='model.person.email']
-${locator_tenderClaim.buttonSend}				css=button[ng-click='act.sendAfp()']
-${locator_tenderClaim.buttonCancel}				css=a[ng-click='act.delAfp()']
-${locator_tenderClaim.buttonGoBack}				css=a[ng-click='act.ret2Ad()']
-${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
+${locator_tenderClaim.fieldEmail}	css=input[ng-model='model.person.email']
+${locator_tenderClaim.buttonSend}	css=button[ng-click='act.sendAfp()']
+${locator_tenderClaim.buttonCancel}	css=a[ng-click='act.delAfp()']
+${locator_tenderClaim.buttonGoBack}	css=a[ng-click='act.ret2Ad()']
+${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 
 
 *** Keywords ***
 Підготувати дані для оголошення тендера
 	[Arguments]  ${username}  ${tender_data}
 	${tender_data.data} = 	Run Keyword If	'PrivatMarket_Owner' == '${username}'	modify_test_data	${tender_data.data}
-#	Run Keyword If	'${role_name}' == 'tender_owner'	Return From Keyword	${tender_data}
 	${tender_data.data} = 	modify_test_data	${tender_data.data}
 	[return]	${tender_data}
 
@@ -110,12 +109,10 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	${browser} =		Convert To Lowercase	${USERS.users['${username}'].browser}
 
 	Open Browser	${USERS.users['${username}'].homepage}	ff	alias=${username}
-#	Open Browser	${USERS.users['${username}'].homepage}	ff	alias=${username}	ff_profile_dir=C:\\Users\\Oks\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\6o60lsgy.AutotestUser
 
 	Set Window Position	@{USERS.users['${username}'].position}
 	Set Window Size	@{USERS.users['${username}'].size}
 	Set Selenium Implicit Wait	10s
-#	Run Keyword Unless	'Viewer' in '${username}'
 	Login	${username}
 	#Close message notification
 	Wait For Ajax
@@ -164,8 +161,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Close notification
 	Chose UK language
 	Wait For Ajax
-#	Close notification
-#	Sleep	3s
 	Wait Until Element Not Stale	css=input#search-query-input	${COMMONWAIT}
 	Wait Until Element Is Visible	css=input#search-query-input	timeout=${COMMONWAIT}
 	Wait Until Element Is Enabled	css=tr[ng-repeat='t in model.tenderList']	timeout=${COMMONWAIT}
@@ -182,7 +177,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Input Text	css=textarea[data-id='procurementDescription']		${tender_data.data.description}
 
 	#CPV
-#	Switch To PMFrame
 	Click Element	xpath=(//span[@data-id='actChoose'])[1]
 	Wait Until Element Is Visible	css=section[data-id='classificationTreeModal']	${COMMONWAIT}
 	Wait Until Element Is Visible	css=input[data-id='query']	${COMMONWAIT}
@@ -190,27 +184,20 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Click Button	css=button[data-id='actConfirm']
 	Wait Until Element Is Not Visible	css=section[data-id='classificationTreeModal']	${COMMONWAIT}
 
-	#additionalClassifications
-#	TODO почему-то нет нужного поля
-#	Click Button	css=section[data-id='additionalClassifications'] button[data-id='actChoose']
-#	Wait Until Element Is Visible	css=section[data-id='classificationTreeModal']		${COMMONWAIT}
-#	Wait Until Element Is Visible	css=input[data-id='query']	${COMMONWAIT}
-#	Search By Query	css=input[data-id='query']	${items[0].additionalClassifications[0].id}
-#	Click Button	css=button[data-id='actConfirm']
-
+	#date
 	Wait Until Element Is Visible	css=input[ng-model='model.ptr.enquiryPeriod.sd.d']	10s
 	Set Date And Time	css=input[ng-model='model.ptr.enquiryPeriod.sd.d']	css=span[data-id='ptrEnquiryPeriodStartDate'] input[ng-model='inputTime']	${tender_data.data.enquiryPeriod.startDate}
 	Set Date And Time	css=input[ng-model='model.ptr.enquiryPeriod.ed.d']	css=span[data-id='ptrEnquiryPeriodEndDate'] input[ng-model='inputTime']	${tender_data.data.enquiryPeriod.endDate}
 	Set Date And Time	css=input[ng-model='model.ptr.tenderPeriod.sd.d']	css=span[data-id='ptrTenderPeriodStartDate'] input[ng-model='inputTime']	${tender_data.data.tenderPeriod.startDate}
 	Set Date And Time	css=input[ng-model='model.ptr.tenderPeriod.ed.d']	css=span[data-id='ptrTenderPeriodEndDate'] input[ng-model='inputTime']	${tender_data.data.tenderPeriod.endDate}
 
-#procuringEntityAddress
+	#procuringEntityAddress
 	Input Text	css=input[data-id='postalCode']	${tender_data.data.procuringEntity.address.postalCode}
 	Input Text	css=input[data-id='countryName']	${tender_data.data.procuringEntity.address.countryName}
 	Input Text	css=input[data-id='region']	${tender_data.data.procuringEntity.address.region}
 	Input Text	css=input[data-id='locality']	${tender_data.data.procuringEntity.address.locality}
 	Input Text	css=input[data-id='streetAddress']	${tender_data.data.procuringEntity.address.streetAddress}
-#contactPoint
+	#contactPoint
 	Input Text	css=input[data-id='name']	${tender_data.data.procuringEntity.contactPoint.name}
 	${modified_phone} = 	Remove String	${tender_data.data.procuringEntity.contactPoint.telephone}	${SPACE}
 	${modified_phone} = 	Remove String	${modified_phone}	-
@@ -242,12 +229,9 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Click Button	css=button[data-id='actSend']
 	Close Confirmation In Editor	Закупка поставлена в очередь на отправку в ProZorro. Статус закупки Вы можете отслеживать в личном кабинете.
 	Switch To PMFrame
-#	Wait Until Element Is Visible	id=tenderStatus	timeout=${COMMONWAIT}
 	Wait Until Element Not Stale	xpath=//div[contains(@class,'title-div')]	40
 	Wait For Element With Reload	xpath=//div[@id='tenderStatus' and contains(., 'Период уточнений')]	1
 	${tender_id} = 	Get Text	css=div#tenderId
-#	Go To	${USERS.users['${username}'].homepage}
-#	Wait For Ajax
 	[return]  ${tender_id}
 
 
@@ -257,7 +241,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Switch To PMFrame
 
 	: FOR    ${index}    IN RANGE    0    ${lots_count}
-	\    Mark Step		lot_num_${index}
 	\    Wait Until Element Is Enabled							css=input[data-id='title']	10s
 	\    Input Text		css=input[data-id='title']				${lots[${index}].title}
 	\    Input Text		css=textarea[data-id='description']		${lots[${index}].description}
@@ -277,11 +260,9 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	${items_count} = 			Get Length	${items}
 	Switch To PMFrame
 	: FOR    ${index}    IN RANGE    0    ${items_count}
-	\    Mark Step		item_num_${index}
 	\    Wait Until Element Is Enabled	css=input[ng-model='item.description']	10s
 	\    Input Text	css=input[ng-model='item.description']	${items[${index}].description}
 	\    Input Text	css=input[data-id='quantity']	${items[${index}].quantity}
-#	\    ${unit_ru_name} = 	get_unit_ru_name	${items[${index}].unit.name}
 	\    Click Element	xpath=//select[@data-id='unit']/option[text()='${items[${index}].unit.name}']
 	\    ${deliveryDate} =	Get Regexp Matches	${items[${index}].deliveryDate.endDate}	(\\d{4}-\\d{2}-\\d{2})
 	\    ${deliveryDate} =	Convert Date	${deliveryDate[0]}	result_format=%d-%m-%Y
@@ -345,10 +326,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 	Wait Until Element Is Visible					css=a[ng-click='model.shwFull = !model.shwFull']	timeout=${COMMONWAIT}
 	${attribute} =	Get Element Attribute			css=a[ng-click='model.shwFull = !model.shwFull'] span@id
-	Mark Step  ${attribute}
 	Run Keyword If	'showMore' in '${attribute}'	Click Element	css=a[ng-click='model.shwFull = !model.shwFull']
 	${attribute} =	Get Element Attribute			css=a[ng-click='model.shwFull = !model.shwFull'] span@id
-	Mark Step  ${attribute}
 
 	Wait Until Element Is Visible		xpath=//div[@class='lot-head']/b	timeout=${COMMONWAIT}
 	${current_lot} = 					Get Text	css=div.lot-head b
@@ -357,18 +336,12 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	${lot} = 							Evaluate	${lot}+1
 
 	#If current lot is that one we need, then just leave it
-	Mark Step  Choose_lot_0
-	Mark Step  ${lot} == ${current_lot}
 	Return From Keyword If	${lot} == ${current_lot}	True
-	Mark Step  Choose_lot_1
 	Wait For Element With Reload		css=div.lot-chooser	1
 	Click Element						css=div.lot-chooser
-	Mark Step  Choose_lot_2
 	Wait Until Element Is Visible		xpath=(//div[@ng-repeat='lot in model.lotPortion'])[${lot}]	timeout=${COMMONWAIT}
 	Click Element						xpath=(//div[@ng-repeat='lot in model.lotPortion'])[${lot}]
-	Mark Step  Choose_lot_3
 	Wait Until Element Is Not Visible	xpath=(//div[@ng-repeat='lot in model.lotPortion'])[${lot}]	timeout=${COMMONWAIT}
-	Mark Step  Choose_lot_4
 
 
 Обрати потрібний лот за id
@@ -407,7 +380,6 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 
 Отримати інформацію зі сторінки
 	[Arguments]  ${item}  ${base_element}
-	Mark Step    otrymaty - ${base_element}
 	${element} = 	Replace String	${base_element}	items[${item}]	items
 	${element} = 	Replace String	${element}	lots[${item}]	lots
 
@@ -447,8 +419,8 @@ ${locator_tender.ajax_overflow}					xpath=//div[@class='ajax_overflow']
 	Run Keyword And Return If	'${element}' == 'auctionPeriod.startDate'				Отримати інформацію з ${element}	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'procurementMethodType'					Отримати інформацію з ${element}	${element}
 
-	Run Keyword If	'${element}' == 'questions[0].title'		Wait For Element With Reload	${tender_data_${element}}	2
-	Run Keyword If	'${element}' == 'questions[0].answer'		Wait For Element With Reload	${tender_data_${element}}	2
+	Run Keyword If	'${element}' == 'questions[0].title'		Wait For Element With Reload	${tender_data_${element}}	5
+	Run Keyword If	'${element}' == 'questions[0].answer'		Wait For Element With Reload	${tender_data_${element}}	5
 
 	Run Keyword And Return If	'${element}' == 'cancellations[0].status'					Отримати інформацію з ${element}	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'cancellations[0].documents[0].title'		Отримати інформацію з ${element}	${element}	${item}
@@ -1137,12 +1109,6 @@ Wait Visibulity And Click Element
 	Click Element					${elementLocator}
 
 
-Mark Step
-	[Arguments]  ${stepName}
-	${time} =	Get Time
-	log to console	_${stepName} - ${time}
-
-
 Close Confirmation
 	[Arguments]	${confirmation_text}
 	Wait For Ajax
@@ -1177,7 +1143,6 @@ Wait For Element Value
 	${cssLocator} =	Get Substring	${locator}	4
 	Wait For Condition				return window.$($("${cssLocator}")).val()!='' && window.$($("${cssLocator}")).val()!='None'	${COMMONWAIT}
 	${value}=	get value			${locator}
-	Mark Step						_value_when_we_wait_it_${value}
 
 
 Scroll Page To Element
@@ -1191,7 +1156,6 @@ Scroll Page To Element
 
 Wait For Tender
 	[Arguments]	${tender_id}  ${education_type}
-	Mark Step  in_Wait For Tender
 	Wait Until Keyword Succeeds	10min	10s	Try Search Tender	${tender_id}	${education_type}
 
 
@@ -1202,7 +1166,6 @@ Try Search Tender
 
 	#заполним поле поиска
 	${text_in_search} =	Get Value	css=input#search-query-input
-	Mark Step	 --------text_in_search
 	Run Keyword Unless	'${tender_id}' == '${text_in_search}'	Run Keywords	Clear Element Text	css=input#search-query-input
 	...   AND   sleep	1s
 	...   AND   Input Text	css=input#search-query-input	${tender_id}
@@ -1218,23 +1181,18 @@ Check Current Mode
 	[Arguments]	${education_type}=${True}
 	privatmarket.Оновити сторінку з тендером
 	#проверим правильный ли режим
-	Mark Step	 --------before a#test-model-switch
 	${current_type} =	Get text	css=a#test-model-switch
-	Mark Step	 --------current_type1
 	${check_result} =	Run Keyword If	'Войти в демо-режим' in '${current_type}'	Set Variable  True
-	Mark Step	 --------current_type2
 	Run Keyword If	${check_result} and ${education_type}	Run Keywords	Switch To Education Mode
 	...   AND   Wait For Ajax
 	...   AND   Wait Until Element Not Stale	css=button[ng-click='template.newTender()']	40
 	...   AND   Wait Until Element Is Enabled	css=button[ng-click='template.newTender()']	timeout=${COMMONWAIT}
-	Mark Step	 --------current_type3
 
 
 Switch To Education Mode
 	[Arguments]	${education_type}=${True}
 	Wait Until Element Is Enabled	css=a#test-model-switch	timeout=${COMMONWAIT}
 	Wait For Ajax
-	Mark Step	 --------before click
 	Click Element	css=a#test-model-switch
 	Wait Until Element Contains	css=a#test-model-switch	Выйти из демо-режима	${COMMONWAIT}
 	Wait For Ajax Overflow Vanish
@@ -1242,7 +1200,6 @@ Switch To Education Mode
 
 Reload And Switch To Tab
 	[Arguments]  ${tab_number}
-	Mark Step					in_reload
 	Reload Page
 	Switch To PMFrame
 	Switch To Tab		${tab_number}
@@ -1257,13 +1214,11 @@ Switch To Tab
 
 Wait For Element With Reload
 	[Arguments]  ${locator}  ${tab_number}
-	Mark Step					in_wait
-	Wait Until Keyword Succeeds			4min	10s	Try Search Element	${locator}	${tab_number}
+	Wait Until Keyword Succeeds			5min	10s	Try Search Element	${locator}	${tab_number}
 
 
 Try Search Element
 	[Arguments]	${locator}  ${tab_number}
-	Mark Step					in_search
 	Reload And Switch To Tab			${tab_number}
 	Wait For Ajax
 	Wait Until Element Is Enabled		${locator}	3
