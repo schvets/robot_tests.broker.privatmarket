@@ -185,6 +185,7 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	Wait Until Element Is Not Visible	css=section[data-id='classificationTreeModal']	${COMMONWAIT}
 
 	#date
+	Switch To PMFrame
 	Wait Until Element Is Visible	css=input[ng-model='model.ptr.enquiryPeriod.sd.d']	10s
 	Set Date And Time	css=input[ng-model='model.ptr.enquiryPeriod.sd.d']	css=span[data-id='ptrEnquiryPeriodStartDate'] input[ng-model='inputTime']	${tender_data.data.enquiryPeriod.startDate}
 	Set Date And Time	css=input[ng-model='model.ptr.enquiryPeriod.ed.d']	css=span[data-id='ptrEnquiryPeriodEndDate'] input[ng-model='inputTime']	${tender_data.data.enquiryPeriod.endDate}
@@ -1294,13 +1295,15 @@ Set Date And Time
 Set Date
 	[Arguments]  ${element}  ${date}
 	${locator}  ${type} = 	Get Locator And Type	${element}
-	Execute Javascript	$("${locator}").datepicker('setDate', new Date(Date.parse("${date}")));
+	Execute Javascript	jQuery.noConflict(); $("${locator}").datepicker('setDate', new Date(Date.parse("${date}")));
 
 
 Set Time
-	[Arguments]  ${element_time}  ${date}
+	[Arguments]  ${element}  ${date}
 	${time} =	Get Regexp Matches	${date}	T(\\d{2}:\\d{2})	1
-	Input Text	${element_time}	${time}
+#	${locator}  ${type} = 	Get Locator And Type	${element}
+#	Execute Javascript	jQuery.noConflict(); $("${locator}").val("${time}")
+	Input Text	${element}	${time[0]}
 
 
 Delete Draft
