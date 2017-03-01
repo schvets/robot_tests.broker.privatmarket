@@ -36,7 +36,7 @@ ${tender_data_items.deliveryAddress.locality}	css=span#locality
 ${tender_data_items.deliveryAddress.streetAddress}	css=span#streetAddress
 ${tender_data_items.classification.scheme}	xpath=//div[@ng-if="adb.classification"]
 ${tender_data_items.classification.id}	xpath=//div[@ng-if="adb.classification"]
-${tender_data_items.classification.description}	path=//div[@ng-if="adb.classification"]
+${tender_data_items.classification.description}	xpath=//div[@ng-if="adb.classification"]
 ${tender_data_items.additionalClassifications[0].scheme}	xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
 ${tender_data_items.additionalClassifications[0].id}	xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
 ${tender_data_items.additionalClassifications[0].description}	xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
