@@ -1301,8 +1301,6 @@ Set Date
 Set Time
 	[Arguments]  ${element}  ${date}
 	${time} =	Get Regexp Matches	${date}	T(\\d{2}:\\d{2})	1
-#	${locator}  ${type} = 	Get Locator And Type	${element}
-#	Execute Javascript	jQuery.noConflict(); $("${locator}").val("${time}")
 	Input Text	${element}	${time[0]}
 
 
