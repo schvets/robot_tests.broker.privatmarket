@@ -98,7 +98,7 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 Підготувати дані для оголошення тендера
 	[Arguments]  ${username}  ${tender_data}
 	${tender_data.data} = 	Run Keyword If	'PrivatMarket_Owner' == '${username}'	modify_test_data	${tender_data.data}
-	${tender_data.data} = 	modify_test_data	${tender_data.data}
+#	${tender_data.data} = 	modify_test_data	${tender_data.data}
 	[return]	${tender_data}
 
 
@@ -117,7 +117,7 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	#Close message notification
 	Wait For Ajax
 	Switch To PMFrame
-	Close notification
+#	Close notification
 
 
 Пошук тендера по ідентифікатору
@@ -187,6 +187,10 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	#date
 	Switch To PMFrame
 	Wait Until Element Is Visible	css=input[ng-model='model.ptr.enquiryPeriod.sd.d']	10s
+	log to console    ${tender_data.data.enquiryPeriod.startDate}
+	log to console    ${tender_data.data.enquiryPeriod.endDate}
+	log to console    ${tender_data.data.tenderPeriod.startDate}
+	log to console    ${tender_data.data.tenderPeriod.endDate}
 	Set Date And Time	css=input[ng-model='model.ptr.enquiryPeriod.sd.d']	css=span[data-id='ptrEnquiryPeriodStartDate'] input[ng-model='inputTime']	${tender_data.data.enquiryPeriod.startDate}
 	Set Date And Time	css=input[ng-model='model.ptr.enquiryPeriod.ed.d']	css=span[data-id='ptrEnquiryPeriodEndDate'] input[ng-model='inputTime']	${tender_data.data.enquiryPeriod.endDate}
 	Set Date And Time	css=input[ng-model='model.ptr.tenderPeriod.sd.d']	css=span[data-id='ptrTenderPeriodStartDate'] input[ng-model='inputTime']	${tender_data.data.tenderPeriod.startDate}
@@ -1146,6 +1150,14 @@ Wait For Element Value
 	${value}=	get value			${locator}
 
 
+Wait For Sspecific Element Value
+	[Arguments]	${locator}  ${value}
+	Wait For Ajax
+	${cssLocator} =	Get Substring	${locator}	4
+	Wait For Condition				return window.$($("${cssLocator}")).val()=='${value}'	${COMMONWAIT}
+	${value}=	get value			${locator}
+
+
 Scroll Page To Element
 	[Arguments]	${locator}
 	${cssLocator} =		Run Keyword If	'css' in '${TEST_NAME}'	Get Substring	${locator}	4
@@ -1295,7 +1307,12 @@ Set Date And Time
 Set Date
 	[Arguments]  ${element}  ${date}
 	${locator}  ${type} = 	Get Locator And Type	${element}
-	Execute Javascript	jQuery.noConflict(); $("${locator}").datepicker('setDate', new Date(Date.parse("${date}")));
+	${date_partial} =	Get Regexp Matches	${date}	(\\d{4}-\\d{2}-\\d{2})	1
+	Input Text	${element}	${date_partial[0]}
+	Wait For Sspecific Element Value	${element}	${date_partial[0]}
+	Click element	${element}
+	Sleep	2s
+	Press Key	${element}	\\08
 
 
 Set Time
