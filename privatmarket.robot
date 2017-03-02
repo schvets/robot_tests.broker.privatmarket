@@ -1309,7 +1309,8 @@ Set Date
 	${locator}  ${type} = 	Get Locator And Type	${element}
 	${date_partial} =	Get Regexp Matches	${date}	(\\d{4}-\\d{2}-\\d{2})	1
 	Input Text	${element}	${date_partial[0]}
-	Wait For Sspecific Element Value	${element}	${date_partial[0]}
+#	Wait For Sspecific Element Value	${element}	${date_partial[0]}
+	Sleep	2s
 	Click element	${element}
 	Sleep	2s
 	Press Key	${element}	\\08
