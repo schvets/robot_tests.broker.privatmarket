@@ -117,7 +117,7 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	#Close message notification
 	Wait For Ajax
 	Switch To PMFrame
-#	Close notification
+	#Close notification
 
 
 Пошук тендера по ідентифікатору
@@ -187,14 +187,10 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	#date
 	Switch To PMFrame
 	Wait Until Element Is Visible	css=input[ng-model='model.ptr.enquiryPeriod.sd.d']	10s
-	log to console    ${tender_data.data.enquiryPeriod.startDate}
-	log to console    ${tender_data.data.enquiryPeriod.endDate}
-	log to console    ${tender_data.data.tenderPeriod.startDate}
-	log to console    ${tender_data.data.tenderPeriod.endDate}
-	Set Date And Time	css=input[ng-model='model.ptr.enquiryPeriod.sd.d']	css=span[data-id='ptrEnquiryPeriodStartDate'] input[ng-model='inputTime']	${tender_data.data.enquiryPeriod.startDate}
-	Set Date And Time	css=input[ng-model='model.ptr.enquiryPeriod.ed.d']	css=span[data-id='ptrEnquiryPeriodEndDate'] input[ng-model='inputTime']	${tender_data.data.enquiryPeriod.endDate}
-	Set Date And Time	css=input[ng-model='model.ptr.tenderPeriod.sd.d']	css=span[data-id='ptrTenderPeriodStartDate'] input[ng-model='inputTime']	${tender_data.data.tenderPeriod.startDate}
-	Set Date And Time	css=input[ng-model='model.ptr.tenderPeriod.ed.d']	css=span[data-id='ptrTenderPeriodEndDate'] input[ng-model='inputTime']	${tender_data.data.tenderPeriod.endDate}
+	Set Date And Time	enquiryPeriod	startDate	css=span[data-id='ptrEnquiryPeriodStartDate'] input[ng-model='inputTime']	${tender_data.data.enquiryPeriod.startDate}
+	Set Date And Time	enquiryPeriod	endDate	css=span[data-id='ptrEnquiryPeriodEndDate'] input[ng-model='inputTime']	${tender_data.data.enquiryPeriod.endDate}
+	Set Date And Time	tenderPeriod	startDate	css=span[data-id='ptrTenderPeriodStartDate'] input[ng-model='inputTime']	${tender_data.data.tenderPeriod.startDate}
+	Set Date And Time	tenderPeriod	endDate	css=span[data-id='ptrTenderPeriodEndDate'] input[ng-model='inputTime']	${tender_data.data.tenderPeriod.endDate}
 
 	#procuringEntityAddress
 	Input Text	css=input[data-id='postalCode']	${tender_data.data.procuringEntity.address.postalCode}
@@ -278,7 +274,7 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	\    Input Text	css=input[data-id='region']	${items[${index}].deliveryAddress.region}
 	\    Input Text	css=input[data-id='locality']	${items[${index}].deliveryAddress.locality}
 	\    Input Text	css=input[data-id='streetAddress']	${items[${index}].deliveryAddress.streetAddress}
-	\    Set Date	css=input[ng-model='item.deliveryDate.ed.d']	${items[${index}].deliveryDate.endDate}
+	\    Set Date In Item	0	deliveryDate	endDate	${items[${index}].deliveryDate.endDate}
 
 
 Завантажити документ
@@ -1298,22 +1294,19 @@ Get Locator And Type
 
 
 Set Date And Time
-	[Arguments]  ${date_element}  ${time_element}  ${date}
-	Wait Until Element Is Visible	${date_element}	timeout=${COMMONWAIT}
-	Set Date	${date_element}	${date}
+	[Arguments]  ${element}  ${fild}  ${time_element}  ${date}
+	Set Date	${element}	${fild}	${date}
 	Set Time	${time_element}	${date}
 
 
 Set Date
-	[Arguments]  ${element}  ${date}
-	${locator}  ${type} = 	Get Locator And Type	${element}
-	${date_partial} =	Get Regexp Matches	${date}	(\\d{4}-\\d{2}-\\d{2})	1
-	Input Text	${element}	${date_partial[0]}
-#	Wait For Sspecific Element Value	${element}	${date_partial[0]}
-	Sleep	2s
-	Click element	${element}
-	Sleep	2s
-	Press Key	${element}	\\08
+	[Arguments]  ${element}  ${fild}  ${date}
+	Execute Javascript	var s = angular.element('[ng-controller=CreateProcurementCtrl]').scope(); s.model.ptr.${element}.${fild} = new Date(Date.parse("${date}")); s.model.prepareDateModel(s.model.ptr, '${element}'); s.$root.$apply()
+
+
+Set Date In Item
+	[Arguments]  ${index}  ${element}  ${fild}  ${date}
+	Execute Javascript	var s = angular.element('[ng-controller=CreateProcurementCtrl]').scope(); s.model.ptr.items[${index}].${element}.${fild} = new Date(Date.parse("${date}")); s.model.prepareDateModel(s.model.ptr.items[${index}], '${element}'); s.$root.$apply()
 
 
 Set Time
