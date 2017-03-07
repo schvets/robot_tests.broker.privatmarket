@@ -207,6 +207,7 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	${modified_phone} = 	Set Variable If	'+38' in '${modified_phone}'	${modified_phone}	+38067${modified_phone}
 	${modified_phone} = 	Get Substring	${modified_phone}	0	13
 	Input Text	css=input[data-id='telephone']	${modified_phone}
+	Input Text	css=input[data-id='email']	pbecommercetest1@ukr.net
 	Click Button	css=button[data-id='actSave']
 
 #step 1
