@@ -275,7 +275,7 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	\    Input Text	css=input[data-id='region']	${items[${index}].deliveryAddress.region}
 	\    Input Text	css=input[data-id='locality']	${items[${index}].deliveryAddress.locality}
 	\    Input Text	css=input[data-id='streetAddress']	${items[${index}].deliveryAddress.streetAddress}
-	\    Set Date In Item	0	deliveryDate	endDate	${items[${index}].deliveryDate.endDate}
+	\    Set Date In Item	${index}	deliveryDate	endDate	${items[${index}].deliveryDate.endDate}
 
 
 Завантажити документ
