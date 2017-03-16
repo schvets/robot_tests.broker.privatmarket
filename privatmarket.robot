@@ -207,7 +207,7 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	${modified_phone} = 	Set Variable If	'+38' in '${modified_phone}'	${modified_phone}	+38067${modified_phone}
 	${modified_phone} = 	Get Substring	${modified_phone}	0	13
 	Input Text	css=input[data-id='telephone']	${modified_phone}
-	Input Text	css=input[data-id='email']	test@test.test
+	Input Text	css=input[data-id='email']	${USERS.users['${username}'].email}
 	Click Button	css=button[data-id='actSave']
 
 #step 1
@@ -275,7 +275,7 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	\    Input Text	css=input[data-id='region']	${items[${index}].deliveryAddress.region}
 	\    Input Text	css=input[data-id='locality']	${items[${index}].deliveryAddress.locality}
 	\    Input Text	css=input[data-id='streetAddress']	${items[${index}].deliveryAddress.streetAddress}
-	\    Set Date In Item	0	deliveryDate	endDate	${items[${index}].deliveryDate.endDate}
+	\    Set Date In Item	${index}	deliveryDate	endDate	${items[${index}].deliveryDate.endDate}
 
 
 Завантажити документ
@@ -297,7 +297,7 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	Wait Visibulity And Click Element	xpath=//a[contains(@ng-class, 'file.currFileVfvError')]
 	Wait Visibulity And Click Element	xpath=//li[contains(@ng-click, 'setFileType')][1]
 	Wait Visibulity And Click Element	xpath=//button[contains(@ng-click, 'addFileFunction')]
-	Wait Until Element Is Visible	xpath=//i[contains(@ng-click, 'deleteFileFunction')]
+#	Wait Until Element Is Visible	xpath=//i[contains(@ng-click, 'deleteFileFunction')]
 	Click Button	css=button[data-id='actSave']
 	Wait Until Element Is Visible	css=section[data-id="step5"]	10s
 	Click Button	css=button[data-id='actSend']
