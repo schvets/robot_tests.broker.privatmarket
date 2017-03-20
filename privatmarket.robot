@@ -321,29 +321,29 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	Wait Until Element Is Visible	css=div[ng-if='adb.classification']
 
 
-Обрати потрібний лот
-	[Arguments]  ${lot}
-	#show more info about lots
-	Return From Keyword If	'None' in '${lot}'	False
-
-	Wait Until Element Is Visible					css=a[ng-click='model.shwFull = !model.shwFull']	timeout=${COMMONWAIT}
-	${attribute} =	Get Element Attribute			css=a[ng-click='model.shwFull = !model.shwFull'] span@id
-	Run Keyword If	'showMore' in '${attribute}'	Click Element	css=a[ng-click='model.shwFull = !model.shwFull']
-	${attribute} =	Get Element Attribute			css=a[ng-click='model.shwFull = !model.shwFull'] span@id
-
-	Wait Until Element Is Visible		xpath=//div[@class='lot-head']/b	timeout=${COMMONWAIT}
-	${current_lot} = 					Get Text	css=div.lot-head b
-	${current_lot} = 					Get Regexp Matches	${current_lot}	№(\\d)	1
-	${current_lot} = 					Convert To Integer	${current_lot[0]}
-	${lot} = 							Evaluate	${lot}+1
-
-	#If current lot is that one we need, then just leave it
-	Return From Keyword If	${lot} == ${current_lot}	True
-	Wait For Element With Reload		css=div.lot-chooser	1
-	Click Element						css=div.lot-chooser
-	Wait Until Element Is Visible		xpath=(//div[@ng-repeat='lot in model.lotPortion'])[${lot}]	timeout=${COMMONWAIT}
-	Click Element						xpath=(//div[@ng-repeat='lot in model.lotPortion'])[${lot}]
-	Wait Until Element Is Not Visible	xpath=(//div[@ng-repeat='lot in model.lotPortion'])[${lot}]	timeout=${COMMONWAIT}
+#Обрати потрібний лот
+#	[Arguments]  ${lot}
+#	#show more info about lots
+#	Return From Keyword If	'None' in '${lot}'	False
+#
+#	Wait Until Element Is Visible					css=a[ng-click='model.shwFull = !model.shwFull']	timeout=${COMMONWAIT}
+#	${attribute} =	Get Element Attribute			css=a[ng-click='model.shwFull = !model.shwFull'] span@id
+#	Run Keyword If	'showMore' in '${attribute}'	Click Element	css=a[ng-click='model.shwFull = !model.shwFull']
+#	${attribute} =	Get Element Attribute			css=a[ng-click='model.shwFull = !model.shwFull'] span@id
+#
+#	Wait Until Element Is Visible		xpath=//div[@class='lot-head']/b	timeout=${COMMONWAIT}
+#	${current_lot} = 					Get Text	css=div.lot-head b
+#	${current_lot} = 					Get Regexp Matches	${current_lot}	№(\\d)	1
+#	${current_lot} = 					Convert To Integer	${current_lot[0]}
+#	${lot} = 							Evaluate	${lot}+1
+#
+#	#If current lot is that one we need, then just leave it
+#	Return From Keyword If	${lot} == ${current_lot}	True
+#	Wait For Element With Reload		css=div.lot-chooser	1
+#	Click Element						css=div.lot-chooser
+#	Wait Until Element Is Visible		xpath=(//div[@ng-repeat='lot in model.lotPortion'])[${lot}]	timeout=${COMMONWAIT}
+#	Click Element						xpath=(//div[@ng-repeat='lot in model.lotPortion'])[${lot}]
+#	Wait Until Element Is Not Visible	xpath=(//div[@ng-repeat='lot in model.lotPortion'])[${lot}]	timeout=${COMMONWAIT}
 
 
 Обрати потрібний лот за id
@@ -734,26 +734,26 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	Wait Until Element Not Stale	xpath=//button[@ng-click='act.sendEnquiry()']	40
 	Wait Until Element Is Enabled	xpath=//button[@ng-click='act.sendEnquiry()']	10
 	Click Button	xpath=//button[@ng-click='act.sendEnquiry()']
-	Заповнити форму питання	${question.data.title}	${question.data.description}	${USERS.users['${provider}'].email}
+	Заповнити форму питання	${provider}	${tender_id}	${question}
 	Sleep	30s
 	[return]  True
 
 
 Заповнити форму питання
-	[Arguments]  ${title}  ${description}  ${email}
+	[Arguments]  ${provider}  ${tender_id}  ${question}
 	Wait For Ajax
 	sleep	4s
 #	Wait For Element Value	css=input[ng-model='model.person.phone']
 	Wait Until Element Is Visible	xpath=//input[@ng-model="model.question.title"]				timeout=10
 	Wait Until Element Is Enabled	xpath=//input[@ng-model="model.question.title"]				timeout=10
-	Input text	xpath=//input[@ng-model="model.question.title"]				${title}
-	Input text	xpath=//textarea[@ng-model='model.question.description']	${description}
-	Input text	xpath=//input[@ng-model='model.person.email']				${email}
+	Input text	xpath=//input[@ng-model="model.question.title"]				${question.data.title}
+	Input text	xpath=//textarea[@ng-model='model.question.description']	${question.data.description}
+	Input text	xpath=//input[@ng-model='model.person.email']				${USERS.users['${provider}'].email}
 	Select From List By Value	id=addressCountry	UA
-	Input text	id=addressPostalCode	49000
-	Input text	id=addressRegion	Днепропетровская
-	Input text	id=addressLocality	Днепр
-	Input text	id=addressStreet	Улица
+	Input text	id=addressPostalCode	${question.data.author.address.postalCode}
+	Input text	id=addressRegion	${question.data.author.address.region}
+	Input text	id=addressLocality	${question.data.author.address.locality}
+	Input text	id=addressStreet	${question.data.author.address.streetAddress}
 	Click Button	xpath=//button[@ng-click='act.sendQuestion()']
 	Wait For Notification	Ваше запитання успішно включено до черги на відправку. Дякуємо за звернення!
 	Wait Until Element Not Stale	css=span[ng-click='act.hideModal()']	40
@@ -824,9 +824,8 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	Click Element	css=button[ng-click='commonActions.goNext(1)']
 	Click If Visible	id=btnSaveComplaint
 	Wait Until Element Contains	css=div.step-info-title	3/3	10s
-	Fill Adress
-	Fill Adress
-	Fill Phone
+	Fill Adress	${ARGUMENTS[2]}
+	Fill Phone	${ARGUMENTS[2]}
 	Switch To PMFrame
 	Wait Enable And Click Element	${locator_tenderClaim.buttonSend}
 	Close Confirmation	Ваша заявка була успішно включена до черги на відправку!
@@ -835,22 +834,24 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 
 
 Fill Adress
+	[Arguments]  ${bid}
 	switch to pmframe
 	Wait Visibulity And Click Element	xpath=//a[contains(@ng-click, 'address')]
 	wait until element is visible	id=addressPostalCode
-	Input Text	id=addressPostalCode	49000
-	Input Text	id=addressRegion	Region
-	Input Text	id=addressLocality	Locality
-	Input Text	id=addressStreet	Street
+	Input text	id=addressPostalCode	${bid.data.tenderers[0].address.postalCode}
+	Input text	id=addressRegion	${bid.data.tenderers[0].address.region}
+	Input text	id=addressLocality	${bid.data.tenderers[0].address.locality}
+	Input text	id=addressStreet	${bid.data.tenderers[0].address.streetAddress}
 	Click Button	id=btnSaveComplaint
 	wait until element is not visible	id=addressPostalCode
 
 
 Fill Phone
+	[Arguments]  ${bid}
 	switch to pmframe
 	Wait Visibulity And Click Element	xpath=//a[contains(@ng-click, 'person')]
 	wait until element is visible	id=personPhone
-	Input Text	id=personPhone	+380670000000
+	Input Text	id=personPhone	${bid.data.tenderers[0].contactPoint.telephone}
 	Click Button	id=btnSaveComplaint
 	wait until element is not visible	id=addressPostalCode
 
