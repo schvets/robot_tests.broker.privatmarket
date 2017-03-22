@@ -169,10 +169,12 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	Click Button	css=button[ng-click='template.newTender()']
 	Wait For Ajax
 	Wait Visibulity And Click Element	xpath=(//div[@class='big-button-step'])[1]
-	Delete Draft
+#	Delete Draft
 #step 0
 	#we should add choosing of procurementMethodType
 	Wait For Ajax
+	Switch To PMFrame
+	Wait Until Element Is Visible	css=input[data-id='procurementName']	15s
 	Input Text	css=input[data-id='procurementName']				${tender_data.data.title}
 	Input Text	css=textarea[data-id='procurementDescription']		${tender_data.data.description}
 
@@ -1317,14 +1319,14 @@ Set Time
 	Input Text	${element}	${time[0]}
 
 
-Delete Draft
-	Switch To PMFrame
-	${visibility} = 	Run Keyword And Return Status	Wait Until Element Is Visible	css=button[data-id='actDeleteDraft']	${COMMONWAIT}
-	Run Keyword Unless	${visibility}	Return From Keyword	${False}
-	Click Button	css=button[data-id='actDeleteDraft']
-	Wait Visibulity And Click Element	css=button[ng-click='close(true)']
-	Wait Until Element Is Not Visible	css=button[ng-click='close(true)']
-	Switch To PMFrame
-	Wait Visibulity And Click Element	css=button[ng-click='template.newTender()']
-	Wait For Ajax
-	Wait Visibulity And Click Element	xpath=(//div[@class='big-button-step'])[1]
+#Delete Draft
+#	Switch To PMFrame
+#	${visibility} = 	Run Keyword And Return Status	Wait Until Element Is Visible	css=button[data-id='actDeleteDraft']	${COMMONWAIT}
+#	Run Keyword Unless	${visibility}	Return From Keyword	${False}
+#	Click Button	css=button[data-id='actDeleteDraft']
+#	Wait Visibulity And Click Element	css=button[ng-click='close(true)']
+#	Wait Until Element Is Not Visible	css=button[ng-click='close(true)']
+#	Switch To PMFrame
+#	Wait Visibulity And Click Element	css=button[ng-click='template.newTender()']
+#	Wait For Ajax
+#	Wait Visibulity And Click Element	xpath=(//div[@class='big-button-step'])[1]
