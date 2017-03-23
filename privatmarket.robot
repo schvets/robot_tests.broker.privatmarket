@@ -247,16 +247,20 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	: FOR    ${index}    IN RANGE    0    ${lots_count}
 	\    Wait Until Element Is Enabled							css=input[data-id='title']	10s
 	\    Input Text		css=input[data-id='title']				${lots[${index}].title}
+	\    Wait Until Element Is Enabled							css=textarea[data-id='description']	10s
 	\    Input Text		css=textarea[data-id='description']		${lots[${index}].description}
 	\    ${value_amount} = 			Convert to String			${lots[${index}].value.amount}
 	\    ${minimalStep_amount} = 	Convert to String			${lots[${index}].minimalStep.amount}
+	\    Wait Until Element Is Enabled							css=input[data-id='valueAmount']	10s
 	\    Input Text		css=input[data-id='valueAmount']		${value_amount}
-	\    Sleep			1s
+	\    Sleep			3s
+#	\    //todo: попап  при сумме > 50к
 	\    Wait Until Element Is Visible 	css=input[data-id='minimalStepAmount']	15s
-	\    Input Text		css=input[data-id='minimalStepAmount']	${minimalStep_amount}
-	\    Sleep			1s
+	\    Input Text		css=input[data-id='minimalStepAmount']	${minimalStep_amount}1
+#	\    Sleep			1s
 	\    Wait Until Element Is Visible	css=div.lot-guarantee label	15s
-	\    Click Element	css=div.lot-guarantee label
+	\    Wait Visibulity And Click Element	css=div.lot-guarantee label
+#	\    Click Element	css=div.lot-guarantee label
 	\    Wait Until Element Is Visible	css=input[data-id='guaranteeAmount']	10s
 	\    Input Text		css=input[data-id='guaranteeAmount']	1
 
@@ -268,17 +272,24 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	: FOR    ${index}    IN RANGE    0    ${items_count}
 	\    Wait Until Element Is Enabled	css=input[ng-model='item.description']	10s
 	\    Input Text	css=input[ng-model='item.description']	${items[${index}].description}
-	\    Input Text	css=input[data-id='quantity']	${items[${index}].quantity}
-	\    Click Element	xpath=//select[@data-id='unit']/option[text()='${items[${index}].unit.name}']
+	\    Wait Element Visibulity And Imput Text	css=input[data-id='quantity']	${items[${index}].quantity}
+#	\    Input Text	css=input[data-id='quantity']	${items[${index}].quantity}
+	\    Wait Visibulity And Click Element	xpath=//select[@data-id='unit']/option[text()='${items[${index}].unit.name}']
+#	\    Click Element	xpath=//select[@data-id='unit']/option[text()='${items[${index}].unit.name}']
 	\    ${deliveryDate} =	Get Regexp Matches	${items[${index}].deliveryDate.endDate}	(\\d{4}-\\d{2}-\\d{2})
 	\    ${deliveryDate} =	Convert Date	${deliveryDate[0]}	result_format=%d-%m-%Y
-	\    Click Element	xpath=//input[contains(@ng-model, 'item.adressTypeMode')][1]
+	\    Wait Visibulity And Click Element	xpath=//input[contains(@ng-model, 'item.adressTypeMode')][1]
+#	\    Click Element	xpath=//input[contains(@ng-model, 'item.adressTypeMode')][1]
 	\    Wait Until Element Is Visible	css=input[data-id='postalCode']	10s
 	\    Input Text	css=input[data-id='postalCode']	${items[${index}].deliveryAddress.postalCode}
-	\    Input Text	css=input[data-id='countryName']	${items[${index}].deliveryAddress.countryName}
-	\    Input Text	css=input[data-id='region']	${items[${index}].deliveryAddress.region}
-	\    Input Text	css=input[data-id='locality']	${items[${index}].deliveryAddress.locality}
-	\    Input Text	css=input[data-id='streetAddress']	${items[${index}].deliveryAddress.streetAddress}
+	\    Wait Element Visibulity And Imput Text	css=input[data-id='countryName']	${items[${index}].deliveryAddress.countryName}
+#	\    Input Text	css=input[data-id='countryName']	${items[${index}].deliveryAddress.countryName}
+	\    Wait Element Visibulity And Imput Text	css=input[data-id='region']	${items[${index}].deliveryAddress.region}
+#	\    Input Text	css=input[data-id='region']	${items[${index}].deliveryAddress.region}
+	\    Wait Element Visibulity And Imput Text	css=input[data-id='locality'	${items[${index}].deliveryAddress.locality}
+#	\    Input Text	css=input[data-id='locality']	${items[${index}].deliveryAddress.locality}
+	\    Wait Element Visibulity And Imput Text	css=input[data-id='streetAddress']	${items[${index}].deliveryAddress.streetAddress}
+#	\    Input Text	css=input[data-id='streetAddress']	${items[${index}].deliveryAddress.streetAddress}
 	\    Set Date In Item	${index}	deliveryDate	endDate	${items[${index}].deliveryDate.endDate}
 
 
@@ -286,12 +297,13 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	[Arguments]  ${user_name}  ${filepath}  ${tenderId}
 #	перейдем к редактированию
 	Wait For Element With Reload	css=button[ng-click='commonActions.createAfp()']	1
-	Wait For Ajax
+#	Wait For Ajax
 	Wait Until Element Is Visible	css=button[ng-click='commonActions.createAfp()']	10s
 	Click Button	css=button[ng-click='commonActions.createAfp()']
 #	откроем нужную вкладку
 	Wait Visibulity And Click Element	css=#tab_3 a
 #	загрузим файл
+//todo: add wait for element
 	Click Element	css=label[for='documentation_tender_yes']
 	Wait Visibulity And Click Element	css=div.file-loader a
 
@@ -302,6 +314,7 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	Wait Visibulity And Click Element	xpath=//li[contains(@ng-click, 'setFileType')][1]
 	Wait Visibulity And Click Element	xpath=//button[contains(@ng-click, 'addFileFunction')]
 #	Wait Until Element Is Visible	xpath=//i[contains(@ng-click, 'deleteFileFunction')]
+//todo: add wait for element
 	Click Button	css=button[data-id='actSave']
 	Wait Until Element Is Visible	css=section[data-id="step5"]	10s
 	Click Button	css=button[data-id='actSend']
@@ -1115,6 +1128,11 @@ Wait Visibulity And Click Element
 	Wait Until Element Is Visible	${elementLocator}	${COMMONWAIT}
 	Click Element					${elementLocator}
 
+Wait Element Visibulity And Imput Text
+	[Arguments]  ${elementLocator}  ${imput}
+	Wait Until Element Is Visible	${elementLocator}	${COMMONWAIT}
+	Input Text	${elementLocator}	${imput}
+
 
 Close Confirmation
 	[Arguments]	${confirmation_text}
@@ -1270,8 +1288,8 @@ Close notification
 
 
 Switch To PMFrame
-	${frame_visibility} = 	Run Keyword And Return Status	Wait Until Element Is Enabled	id=tenders	timeout=5s
-	Wait For Ajax
+	${frame_visibility} = 	Run Keyword And Return Status	Wait Until Element Is Enabled	id=tenders	timeout=10s
+#	Wait For Ajax
 	Run Keyword If	${frame_visibility}	Switch To Frame	id=tenders
 
 
