@@ -330,7 +330,7 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 #	откроем нужную вкладку
 	Wait Visibulity And Click Element	css=#tab_3 a
 #	загрузим файл
-//todo: add wait for element
+#//todo: add wait for element
 	Click Element	css=label[for='documentation_tender_yes']
 	Wait Visibulity And Click Element	css=div.file-loader a
 
@@ -341,7 +341,7 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	Wait Visibulity And Click Element	xpath=//li[contains(@ng-click, 'setFileType')][1]
 	Wait Visibulity And Click Element	xpath=//button[contains(@ng-click, 'addFileFunction')]
 #	Wait Until Element Is Visible	xpath=//i[contains(@ng-click, 'deleteFileFunction')]
-//todo: add wait for element
+#//todo: add wait for element
 	Click Button	css=button[data-id='actSave']
 	Wait Until Element Is Visible	css=section[data-id="step5"]	10s
 	Click Button	css=button[data-id='actSend']
