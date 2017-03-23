@@ -125,7 +125,7 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	Go To	${USERS.users['${username}'].homepage}
 	Wait For Ajax
 	Close notification
-	Chose UK language
+#	Chose UK language
 	Close notification
 #	Sleep	3s
 	Wait Until Element Not Stale	css=input#search-query-input	${COMMONWAIT}
