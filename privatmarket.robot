@@ -688,8 +688,9 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	Wait For Ajax
 	Wait Until Element Is Visible	css=button[ng-click='commonActions.createAfp()']	10s
 	Click Button	css=button[ng-click='commonActions.createAfp()']
-	Wait Visibulity And Click Element	css=#tab_0 a
-	Wait Until Element Is Visible	css=textarea[data-id='procurementDescription']
+	Switch To PMFrame
+#	Wait Visibulity And Click Element	css=#tab_0 a
+	Wait Until Element Is Visible	css=textarea[data-id='procurementDescription']	15s
 	Input Text	css=textarea[data-id='procurementDescription']	${value}
 
 	Click Button	css=button[data-id='actSave']
@@ -1086,6 +1087,7 @@ Fill Phone
 Отримати посилання на аукціон для глядача
 	[Arguments]  ${user}  ${tenderId}
 	Wait For Element With Reload	css=button#takepartLink	1
+	Wait Until Element Is Visible	css=button#takepartLink	20s
 	Click Button	css=button#takepartLink
 	Wait Until Element Is Visible	xpath=//a[contains(@href, 'https://auction-sandbox.openprocurement.org/tenders/')]  timeout=30
 	${result} = 	Get Element Attribute	xpath=//a[contains(@href, 'https://auction-sandbox.openprocurement.org/tenders/')]@href
