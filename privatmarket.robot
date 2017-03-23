@@ -160,7 +160,7 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 
 	Wait For Ajax
 	Close notification
-	Chose UK language
+#	Chose UK language
 	Wait For Ajax
 	Wait Until Element Not Stale	css=input#search-query-input	${COMMONWAIT}
 	Wait Until Element Is Visible	css=input#search-query-input	timeout=${COMMONWAIT}
@@ -176,35 +176,45 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	#we should add choosing of procurementMethodType
 	Wait For Ajax
 	Switch To PMFrame
-	Wait Until Element Is Visible	css=input[data-id='procurementName']	15s
+	Wait Until Element Is Visible	css=input[data-id='procurementName']	30s
 	Input Text	css=input[data-id='procurementName']				${tender_data.data.title}
-	Wait Until Element Is Visible	css=textarea[data-id='procurementDescription']
+	Wait Until Element Is Visible	css=textarea[data-id='procurementDescription']	30s
 	Input Text	css=textarea[data-id='procurementDescription']		${tender_data.data.description}
 
 	#CPV
-	Wait Until Element Is Visible	xpath=(//span[@data-id='actChoose'])[1]
+	Wait Until Element Is Visible	xpath=(//span[@data-id='actChoose'])[1]	30s
 	Click Element	xpath=(//span[@data-id='actChoose'])[1]
 	Wait Until Element Is Visible	css=section[data-id='classificationTreeModal']	${COMMONWAIT}
 	Wait Until Element Is Visible	css=input[data-id='query']	${COMMONWAIT}
 	Search By Query	css=input[data-id='query']	${items[0].classification.id}
+	Wait Until Element Is Visible	css=button[data-id='actConfirm']	15s
 	Click Button	css=button[data-id='actConfirm']
-	Wait Until Element Is Not Visible	css=section[data-id='classificationTreeModal']	${COMMONWAIT}
+#	Wait Until Element Is Not Visible	css=section[data-id='classificationTreeModal']	${COMMONWAIT}
 
 	#date
 	Switch To PMFrame
-	Wait Until Element Is Visible	css=input[ng-model='model.ptr.enquiryPeriod.sd.d']	10s
+	Wait Until Element Is Visible	css=input[ng-model='model.ptr.enquiryPeriod.sd.d']	15s
 	Set Date And Time	enquiryPeriod	startDate	css=span[data-id='ptrEnquiryPeriodStartDate'] input[ng-model='inputTime']	${tender_data.data.enquiryPeriod.startDate}
+	Wait Until Element Is Visible	css=span[data-id='ptrEnquiryPeriodEndDate'] input[ng-model='inputTime']	15s
 	Set Date And Time	enquiryPeriod	endDate	css=span[data-id='ptrEnquiryPeriodEndDate'] input[ng-model='inputTime']	${tender_data.data.enquiryPeriod.endDate}
+	Wait Until Element Is Visible	css=span[data-id='ptrTenderPeriodStartDate'] input[ng-model='inputTime']	15s
 	Set Date And Time	tenderPeriod	startDate	css=span[data-id='ptrTenderPeriodStartDate'] input[ng-model='inputTime']	${tender_data.data.tenderPeriod.startDate}
+	Wait Until Element Is Visible	css=span[data-id='ptrTenderPeriodEndDate'] input[ng-model='inputTime']	15s
 	Set Date And Time	tenderPeriod	endDate	css=span[data-id='ptrTenderPeriodEndDate'] input[ng-model='inputTime']	${tender_data.data.tenderPeriod.endDate}
 
 	#procuringEntityAddress
+	Wait Until Element Is Visible	css=input[data-id='postalCode']	15s
 	Input Text	css=input[data-id='postalCode']	${tender_data.data.procuringEntity.address.postalCode}
+	Wait Until Element Is Visible	css=input[data-id='countryName']	15s
 	Input Text	css=input[data-id='countryName']	${tender_data.data.procuringEntity.address.countryName}
+	Wait Until Element Is Visible	css=input[data-id='region']	15s
 	Input Text	css=input[data-id='region']	${tender_data.data.procuringEntity.address.region}
+	Wait Until Element Is Visible	css=input[data-id='locality']	15s
 	Input Text	css=input[data-id='locality']	${tender_data.data.procuringEntity.address.locality}
+	Wait Until Element Is Visible	css=input[data-id='streetAddress']	15s
 	Input Text	css=input[data-id='streetAddress']	${tender_data.data.procuringEntity.address.streetAddress}
 	#contactPoint
+	Wait Until Element Is Visible	css=input[data-id='name']	15s
 	Input Text	css=input[data-id='name']	${tender_data.data.procuringEntity.contactPoint.name}
 	${modified_phone} = 	Remove String	${tender_data.data.procuringEntity.contactPoint.telephone}	${SPACE}
 	${modified_phone} = 	Remove String	${modified_phone}	-
@@ -212,12 +222,16 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	${modified_phone} = 	Remove String	${modified_phone}	)
 	${modified_phone} = 	Set Variable If	'+38' in '${modified_phone}'	${modified_phone}	+38067${modified_phone}
 	${modified_phone} = 	Get Substring	${modified_phone}	0	13
+	Wait Until Element Is Visible	css=input[data-id='telephone']	15s
 	Input Text	css=input[data-id='telephone']	${modified_phone}
+	Wait Until Element Is Visible	css=input[data-id='email']	15s
 	Input Text	css=input[data-id='email']	${USERS.users['${username}'].email}
+	Wait Until Element Is Visible	css=button[data-id='actSave']	15s
 	Click Button	css=button[data-id='actSave']
 
 #step 1
 	Додати lots	${lots}
+
 #step 2
 	${count} = 	Get Length	${items}
 	Run Keyword If	${count} > 0	Додати items	${items}
@@ -225,15 +239,22 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	Wait Until Element Is Visible	css=section[data-id="step3"]	10s
 
 #step 3
-	Click Element			css=#tab_2
-	${count} = 	Get Length	${features}
-	Run Keyword If	${count} > 0	Додати features	${features}
+#	Click Element			css=#tab_2
+#	${count} = 	Get Length	${features}
+#	Run Keyword If	${count} > 0	Додати features	${features}
+	Wait Until Element Is Visible	css=button[data-id='actSave']	10s
 	Click Button	css=button[data-id='actSave']
+
 #step 4
 	Wait Until Element Is Visible	css=section[data-id="step4"]	10s
+#	Додати документ при створенні закупівлі
+#todo: implement method Додати документ при створенні закупівлі
+	Wait Until Element Is Visible	css=button[data-id='actSave']	10s
 	Click Button	css=button[data-id='actSave']
+
 #step 5
 	Wait Until Element Is Visible	css=section[data-id="step5"]	10s
+	Wait Until Element Is Visible	css=button[data-id='actSend']	10s
 	Click Button	css=button[data-id='actSend']
 	Close Confirmation In Editor	Закупка поставлена в очередь на отправку в ProZorro. Статус закупки Вы можете отслеживать в личном кабинете.
 	Switch To PMFrame
@@ -249,20 +270,20 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	Switch To PMFrame
 
 	: FOR    ${index}    IN RANGE    0    ${lots_count}
-	\    Wait Until Element Is Enabled							css=input[data-id='title']	10s
+	\    Wait Until Element Is Visible							css=input[data-id='title']	10s
 	\    Input Text		css=input[data-id='title']				${lots[${index}].title}
-	\    Wait Until Element Is Enabled							css=textarea[data-id='description']	10s
+	\    Wait Until Element Is Visible							css=textarea[data-id='description']	10s
 	\    Input Text		css=textarea[data-id='description']		${lots[${index}].description}
 	\    ${value_amount} = 			Convert to String			${lots[${index}].value.amount}
 	\    ${minimalStep_amount} = 	Convert to String			${lots[${index}].minimalStep.amount}
-	\    Wait Until Element Is Enabled							css=input[data-id='valueAmount']	10s
+	\    Wait Until Element Is Visible							css=input[data-id='valueAmount']	10s
 	\    Input Text		css=input[data-id='valueAmount']		${value_amount}
 	\    Sleep			3s
-#	\    //todo: попап  при сумме > 50к
 	\    Wait Until Element Is Visible 	css=input[data-id='minimalStepAmount']	15s
-	\    Input Text		css=input[data-id='minimalStepAmount']	${minimalStep_amount}1
+#	\    Input Text		css=input[data-id='minimalStepAmount']	${minimalStep_amount}1
+	\    Input Text		css=input[data-id='minimalStepAmount']	${minimalStep_amount}
 #	\    Sleep			1s
-	\    Wait Until Element Is Visible	css=div.lot-guarantee label	15s
+#	\    Wait Until Element Is Visible	css=div.lot-guarantee label	15s
 	\    Wait Visibulity And Click Element	css=div.lot-guarantee label
 #	\    Click Element	css=div.lot-guarantee label
 	\    Wait Until Element Is Visible	css=input[data-id='guaranteeAmount']	10s
@@ -274,7 +295,8 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	${items_count} = 			Get Length	${items}
 	Switch To PMFrame
 	: FOR    ${index}    IN RANGE    0    ${items_count}
-	\    Wait Until Element Is Enabled	css=input[ng-model='item.description']	10s
+#	todo: настроить тесты для нескольких предметов закупки по индексу
+	\    Wait Until Element Is Visible	css=input[ng-model='item.description']	10s
 	\    Input Text	css=input[ng-model='item.description']	${items[${index}].description}
 	\    Wait Element Visibulity And Imput Text	css=input[data-id='quantity']	${items[${index}].quantity}
 #	\    Input Text	css=input[data-id='quantity']	${items[${index}].quantity}
@@ -294,6 +316,7 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 #	\    Input Text	css=input[data-id='locality']	${items[${index}].deliveryAddress.locality}
 	\    Wait Element Visibulity And Imput Text	css=input[data-id='streetAddress']	${items[${index}].deliveryAddress.streetAddress}
 #	\    Input Text	css=input[data-id='streetAddress']	${items[${index}].deliveryAddress.streetAddress}
+	\    Wait Until Element Is Visible	css=input[ng-model='item.deliveryDate.ed.d']	15s
 	\    Set Date In Item	${index}	deliveryDate	endDate	${items[${index}].deliveryDate.endDate}
 
 
