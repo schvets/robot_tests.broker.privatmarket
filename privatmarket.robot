@@ -127,7 +127,7 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	Close notification
 	Chose UK language
 	Close notification
-	Sleep	3s
+#	Sleep	3s
 	Wait Until Element Not Stale	css=input#search-query-input	${COMMONWAIT}
 	Wait Until Element Is Visible	css=input#search-query-input	timeout=${COMMONWAIT}
 	Wait Until Element Is Enabled	css=tr[ng-repeat='t in model.tenderList']	timeout=${COMMONWAIT}
@@ -137,13 +137,14 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 		...  ELSE	Set Variable	True
 
 	Wait For Tender	${tenderId}	${education_type}
-	sleep	3s
-	Wait Until Element Not Stale	css=tr#${tenderId}	40
+#	sleep	3s
+#	Wait Until Element Not Stale	css=tr#${tenderId}	40
+	Wait Until Element Is Visible	css=tr#${tenderId}	40
 	Click Element	css=tr#${tenderId}
 
 	Wait For Ajax
 	Switch To PMFrame
-	Wait Until Element Is Not Visible	css=input#search-query-input	20s
+#	Wait Until Element Is Not Visible	css=input#search-query-input	20s
 	Wait Until Element Is Visible	id=tenderStatus	timeout=${COMMONWAIT}
 	Wait Until Element Not Stale	xpath=//div[contains(@class,'title-div')]	40
 
@@ -166,6 +167,7 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	Wait Until Element Is Enabled	css=tr[ng-repeat='t in model.tenderList']	timeout=${COMMONWAIT}
 	Check Current Mode
 #go to form
+	Wait Until Element Is Visible	css=button[ng-click='template.newTender()']	15s
 	Click Button	css=button[ng-click='template.newTender()']
 	Wait For Ajax
 	Wait Visibulity And Click Element	xpath=(//div[@class='big-button-step'])[1]
@@ -176,9 +178,11 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	Switch To PMFrame
 	Wait Until Element Is Visible	css=input[data-id='procurementName']	15s
 	Input Text	css=input[data-id='procurementName']				${tender_data.data.title}
+	Wait Until Element Is Visible	css=textarea[data-id='procurementDescription']
 	Input Text	css=textarea[data-id='procurementDescription']		${tender_data.data.description}
 
 	#CPV
+	Wait Until Element Is Visible	xpath=(//span[@data-id='actChoose'])[1]
 	Click Element	xpath=(//span[@data-id='actChoose'])[1]
 	Wait Until Element Is Visible	css=section[data-id='classificationTreeModal']	${COMMONWAIT}
 	Wait Until Element Is Visible	css=input[data-id='query']	${COMMONWAIT}
@@ -1091,8 +1095,8 @@ Login
 
 Wait For Ajax
 	Get Location
-	sleep				5s
-	Wait For Condition	return window.jQuery!=undefined && jQuery.active==0	100s
+#	sleep				5s
+#	Wait For Condition	return window.jQuery!=undefined && jQuery.active==0	100s
 
 
 Wait Until Element Not Stale
@@ -1269,7 +1273,8 @@ Click element by JS
 
 Chose UK language
 	Switch To PMFrame
-	Click If Visible	xpath=//a[.='uk']
+	Wait Until Element Is Visible	xpath=//a[.='uk']	10s
+	Click Element	xpath=//a[.='uk']
 
 
 Click If Visible
@@ -1284,7 +1289,7 @@ Close notification
 	Switch To PMFrame
 	${notification_visibility} = 	Run Keyword And Return Status	Wait Until Element Is Visible	css=section[data-id='popupHelloModal'] span[data-id='actClose']	${COMMONWAIT}
 	Run Keyword If	${notification_visibility}	Click Element	css=section[data-id='popupHelloModal'] span[data-id='actClose']
-	Wait Until Element Is Not Visible	css=section[data-id='popupHelloModal'] span[data-id='actClose']
+#	Wait Until Element Is Not Visible	css=section[data-id='popupHelloModal'] span[data-id='actClose']
 
 
 Switch To PMFrame
