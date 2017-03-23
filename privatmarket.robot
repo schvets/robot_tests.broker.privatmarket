@@ -251,9 +251,11 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	\    ${value_amount} = 			Convert to String			${lots[${index}].value.amount}
 	\    ${minimalStep_amount} = 	Convert to String			${lots[${index}].minimalStep.amount}
 	\    Input Text		css=input[data-id='valueAmount']		${value_amount}
-	\    Sleep			1s
+	\    Wait Until Element Is Visible 	css=input[data-id='minimalStepAmount']	15s
+#	\    Sleep			1s
 	\    Input Text		css=input[data-id='minimalStepAmount']	${minimalStep_amount}
-	\    Sleep			1s
+#	\    Sleep			1s
+	\    Wait Until Element Is Visible	css=div.lot-guarantee label	15s
 	\    Click Element	css=div.lot-guarantee label
 	\    Wait Until Element Is Visible	css=input[data-id='guaranteeAmount']	10s
 	\    Input Text		css=input[data-id='guaranteeAmount']	1
@@ -1076,8 +1078,8 @@ Login
 
 Wait For Ajax
 	Get Location
-	sleep				3s
-	Wait For Condition	return window.jQuery!=undefined && jQuery.active==0	60s
+	sleep				5s
+	Wait For Condition	return window.jQuery!=undefined && jQuery.active==0	80s
 
 
 Wait Until Element Not Stale
