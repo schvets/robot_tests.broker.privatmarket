@@ -690,7 +690,7 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	[Arguments]  ${user_name}  ${tenderId}	${parameter}	${value}
 	Wait For Element With Reload	css=button[ng-click='commonActions.createAfp()']	1
 	Wait For Ajax
-	Wait Until Element Is Visible	css=button[ng-click='commonActions.createAfp()']	10s
+	Wait Until Element Is Visible	css=button[ng-click='commonActions.createAfp()']	30s
 	Click Button	css=button[ng-click='commonActions.createAfp()']
 	Wait For Ajax
 	Switch To PMFrame
@@ -700,9 +700,9 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 
 	Wait Until Element Is Visible	css=button[data-id='actSave']	30s
 	Click Button	css=button[data-id='actSave']
-	Wait Until Element Is Visible	css=section[data-id="step2"]	10s
+	Wait Until Element Is Visible	css=section[data-id="step2"]	30s
 	Wait Visibulity And Click Element	css=#tab_4 a
-	Wait Until Element Is Visible	css=button[data-id='actSend']	10s
+	Wait Until Element Is Visible	css=button[data-id='actSend']	30s
 	Click Button	css=button[data-id='actSend']
 	#Дождемся подтверждения и обновим страницу, поскольку тут не выходит его закрыть
 	Wait Until Element Is Visible		css=div.modal-body.info-div	${COMMONWAIT}
@@ -1346,7 +1346,7 @@ Close notification
 
 
 Switch To PMFrame
-	${frame_visibility} = 	Run Keyword And Return Status	Wait Until Element Is Enabled	id=tenders	timeout=10s
+	${frame_visibility} = 	Run Keyword And Return Status	Wait Until Element Is Enabled	id=tenders	timeout=30s
 #	Wait For Ajax
 	Run Keyword If	${frame_visibility}	Switch To Frame	id=tenders
 
