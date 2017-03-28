@@ -613,8 +613,8 @@ ${locator_tender.bid.BtnNext}	css=button[ng-click='commonActions.goNext(1)']
 	[Arguments]  ${element}  ${item}
 	${text} =	Отримати текст елемента  ${element}  ${item}
 #TODO проверка на текст. Необходимо проверить и заменить
-    log to console  TODO проверка на текст. Необходимо проверить и заменить
-    debug
+#    log to console  TODO проверка на текст. Необходимо проверить и заменить
+#    debug
 	${result} =	Set Variable If	'Отменено' in '${text}'	active
 	[return]  ${result}
 
@@ -684,7 +684,7 @@ ${locator_tender.bid.BtnNext}	css=button[ng-click='commonActions.goNext(1)']
 	#Дождемся подтверждения и обновим страницу, поскольку тут не выходит его закрыть
 	Wait Until Element Is Visible	css=div.modal-body.info-div	${COMMONWAIT}
 #TODO проверка на текст. Необходимо проверить и заменить. PopUp. Закупка поставлена в очередь на отправку в ProZorro. Статус закупки Вы можете отслеживать в личном кабинете.
-	Wait Until Element Contains	css=div.modal-body.info-div	Закупіля поставлена у чергу на відправлення в ProZorro. Статус закупівлі Ви можете відстежити в особистому кабінеті.	${COMMONWAIT}
+	Wait Until Element Contains	css=div.modal-body.info-div	Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.	${COMMONWAIT}
 	Reload Page
 	Wait For Ajax
 
@@ -708,8 +708,8 @@ ${locator_tender.bid.BtnNext}	css=button[ng-click='commonActions.goNext(1)']
 	Wait Until Element Is Enabled		css=div.alert-info	timeout=${COMMONWAIT}
 	Wait Until Element Not Stale		css=div.alert-info	40
 #TODO проверка на текст. Необходимо проверить и заменить
-    log to console  TODO проверка на текст. Необходимо проверить и заменить
-    debug
+#    log to console  TODO проверка на текст. Необходимо проверить и заменить
+#    debug
 	Wait Until Element Contains			css=div.alert-info	Ваше требование успешно сохранено!	${COMMONWAIT}
 	${claim_data} =	Create Dictionary	id=123
 	${claim_resp} =	Create Dictionary	data=${claim_data}
@@ -733,8 +733,8 @@ ${locator_tender.bid.BtnNext}	css=button[ng-click='commonActions.goNext(1)']
 	Wait Until Element Is Enabled		css=div.alert-info	timeout=${COMMONWAIT}
 	Wait Until Element Not Stale		css=div.alert-info	40
 #TODO проверка на текст. Необходимо проверить и заменить
-    log to console  TODO проверка на текст. Необходимо проверить и заменить
-    debug
+#    log to console  TODO проверка на текст. Необходимо проверить и заменить
+#    debug
 	Wait Until Element Contains			css=div.alert-info	Ваше требование успешно отправлено!	${COMMONWAIT}
 	Wait For Ajax
 	sleep								3s
@@ -763,8 +763,8 @@ ${locator_tender.bid.BtnNext}	css=button[ng-click='commonActions.goNext(1)']
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=button[ng-click='act.cancelComplaint()']	timeout=${COMMONWAIT}
 #TODO проверка на текст. Необходимо проверить и заменить
-    log to console  TODO проверка на текст. Необходимо проверить и заменить
-    debug
+#    log to console  TODO проверка на текст. Необходимо проверить и заменить
+#    debug
 	Wait Until Element Contains			css=span#cmplStatus0	Отменено	timeout=${COMMONWAIT}
 
 
@@ -798,8 +798,8 @@ ${locator_tender.bid.BtnNext}	css=button[ng-click='commonActions.goNext(1)']
 	Wait Element Visibulity And Input Text	id=addressStreet	${question.data.author.address.streetAddress}
 	Wait Visibility And Click Element	xpath=//button[@ng-click='act.sendQuestion()']
 #TODO проверка на текст. Необходимо проверить и заменить
-    log to console  TODO проверка на текст. Необходимо проверить и заменить
-    debug
+#    log to console  TODO проверка на текст. Необходимо проверить и заменить
+#    debug
 	Wait For Notification	Ваше запитання успішно включено до черги на відправку. Дякуємо за звернення!
 #	Wait Until Element Not Stale	css=span[ng-click='act.hideModal()']	40
 	Wait Visibility And Click Element	css=span[ng-click='act.hideModal()']
@@ -824,8 +824,8 @@ ${locator_tender.bid.BtnNext}	css=button[ng-click='commonActions.goNext(1)']
 	Sleep	2s
 	Wait Visibility And Click Element	id=btnSendAnswer
 #TODO проверка на текст. Необходимо проверить и заменить
-    log to console  TODO проверка на текст. Необходимо проверить и заменить
-    debug
+#    log to console  TODO проверка на текст. Необходимо проверить и заменить
+#    debug
 	Wait For Notification	Ваша відповідь успішно відправлена!
 #	Wait Until Element Not Stale	css=span[ng-click='act.hideModal()']	40
 	Wait Visibility And Click Element	css=span[ng-click='act.hideModal()']
@@ -876,8 +876,8 @@ ${locator_tender.bid.BtnNext}	css=button[ng-click='commonActions.goNext(1)']
 	Switch To PMFrame
 	Wait Enable And Click Element	${locator_tenderClaim.buttonSend}
 #TODO проверка на текст. Необходимо проверить и заменить
-    log to console  TODO проверка на текст. Необходимо проверить и заменить
-    debug
+#    log to console  TODO проверка на текст. Необходимо проверить и заменить
+#    debug
 	Close Confirmation	Ваша заявка була успішно включена до черги на відправку!
 	privatmarket.Оновити сторінку з тендером
 	[return]	${Arguments[2]}
@@ -933,8 +933,8 @@ Fill Phone
 	Switch To PMFrame
 	Wait Enable And Click Element	${locator_tenderClaim.buttonSend}
 #TODO проверка на текст. Необходимо проверить и заменить
-    log to console  TODO проверка на текст. Необходимо проверить и заменить
-    debug
+#    log to console  TODO проверка на текст. Необходимо проверить и заменить
+#    debug
 	Close Confirmation	Ваша заявка була успішно збережена!
 	[return]	${TRUE}
 
@@ -978,8 +978,8 @@ Fill Phone
 	Wait Enable And Click Element	${locator_tenderClaim.buttonCreate}
 	Wait Enable And Click Element	${locator_tenderClaim.buttonCancel}
 #TODO проверка на текст. Необходимо проверить и заменить
-    log to console  TODO проверка на текст. Необходимо проверить и заменить
-    debug
+#    log to console  TODO проверка на текст. Необходимо проверить и заменить
+#    debug
 	Close Confirmation	Вашау заявку успішно скасовано!
 	Switch To PMFrame
 	Wait Until Element Is Enabled	${locator_tenderClaim.buttonCreate}	${COMMONWAIT}
@@ -1030,8 +1030,8 @@ Fill Phone
 
 	Wait Visibility And Click Element	${locator_tenderClaim.buttonSend}
 #TODO проверка на текст. Необходимо проверить и заменить
-    log to console  TODO проверка на текст. Необходимо проверить и заменить
-    debug
+#    log to console  TODO проверка на текст. Необходимо проверить и заменить
+#    debug
 	Close confirmation	Ваша заявка була успішно збережена!
 
 	#save file data
@@ -1087,8 +1087,8 @@ Fill Phone
 	Wait Element Visibulity And Input Text	css=textarea[ng-model='model.fvHideReason']	${bidid.data.confidentialityRationale}
 	Wait Visibility And Click Element	xpath=//button[contains(@ng-click,'act.setFvHidden')]
 	#TODO проверка на текст. Необходимо проверить и заменить
-    log to console  TODO проверка на текст. Необходимо проверить и заменить
-    debug
+#    log to console  TODO проверка на текст. Необходимо проверить и заменить
+#    debug
 	Wait For Notification			Файл был успешно скрыт!
 
 
