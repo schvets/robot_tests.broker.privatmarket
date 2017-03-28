@@ -227,7 +227,8 @@ def modify_test_data(initial_data):
     # initial_data['procuringEntity']['name'] = u'Товариство З Обмеженою Відповідальністю \'Мак Медіа Прінт\''
     # initial_data['procuringEntity']['name'] = u'Товариство З Обмеженою Відповідальністю \'Сільськогосподарська Фірма \'Рубіжне\''
     initial_data['procuringEntity']['name'] = u'Макстрой Діск, Товариство З Обмеженою Відповідальністю'
-    initial_data['items'][0]['unit']['name'] = get_unit_ru_name(initial_data['items'][0]['unit']['name'])
+    initial_data['items'][0]['unit']['name']
+        # = get_unit_ru_name(initial_data['items'][0]['unit']['name'])
     return initial_data
 
 
