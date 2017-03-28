@@ -11,88 +11,102 @@ Library  privatmarket_service.py
 ${COMMONWAIT}	40
 
 ${tender_data_title}	xpath=//div[contains(@class,'title-div')]
-${tender_data_description}	id=tenderDescription
-${tender_data_procurementMethodType}	id=tenderType
+#${tender_data_description}	id=tenderDescription
+#${tender_data_procurementMethodType}	id=tenderType
 ${tender_data_status}	id=tenderStatus
-${tender_data_value.amount}	id=tenderBudget
-${tender_data_value.currency}	id=tenderBudgetCcy
-${tender_data_value.valueAddedTaxIncluded}	id=tenderBudgetTax
-${tender_data_tenderID}	id=tenderId
-${tender_data_procuringEntity.name}	css=a[ng-click='commonActions.openCard()']
-${tender_data_enquiryPeriod.startDate}	xpath=(//span[@ng-if='p.bd'])[1]
-${tender_data_enquiryPeriod.endDate}	xpath=(//span[contains(@ng-if, 'p.ed')])[1]
-${tender_data_tenderPeriod.startDate}	xpath=(//span[@ng-if='p.bd'])[2]
-${tender_data_tenderPeriod.endDate}	xpath=(//span[contains(@ng-if, 'p.ed')])[2]
-${tender_data_auctionPeriod.startDate}	xpath=(//span[@ng-if='p.bd'])[3]
-${tender_data_minimalStep.amount}	css=div#lotMinStepAmount
+#${tender_data_value.amount}	id=tenderBudget
+#${tender_data_value.currency}	id=tenderBudgetCcy
+#${tender_data_value.valueAddedTaxIncluded}	id=tenderBudgetTax
+#${tender_data_tenderID}	id=tenderId
+#${tender_data_procuringEntity.name}	css=a[ng-click='commonActions.openCard()']
+#${tender_data_enquiryPeriod.startDate}	xpath=(//span[@ng-if='p.bd'])[1]
+#${tender_data_enquiryPeriod.endDate}	xpath=(//span[contains(@ng-if, 'p.ed')])[1]
+#${tender_data_tenderPeriod.startDate}	xpath=(//span[@ng-if='p.bd'])[2]
+#${tender_data_tenderPeriod.endDate}	xpath=(//span[contains(@ng-if, 'p.ed')])[2]
+#${tender_data_auctionPeriod.startDate}	xpath=(//span[@ng-if='p.bd'])[3]
+#${tender_data_minimalStep.amount}	css=div#lotMinStepAmount
 ${tender_data_items.description}	xpath=//a[contains(@ng-click, 'adb.showCl = !adb.showCl')]
-${tender_data_items.deliveryDate.endDate}	xpath=//div[@ng-if='adb.deliveryDate.endDate']/div[2]
-${tender_data_items.deliveryLocation.latitude}	css=span.latitude
-${tender_data_items.deliveryLocation.longitude}	css=span.longitude
-${tender_data_items.deliveryAddress.countryName}	css=span#countryName
-${tender_data_items.deliveryAddress.postalCode}	css=span#postalCode
-${tender_data_items.deliveryAddress.region}	css=span#region
-${tender_data_items.deliveryAddress.locality}	css=span#locality
-${tender_data_items.deliveryAddress.streetAddress}	css=span#streetAddress
-${tender_data_items.classification.scheme}	xpath=//div[@ng-if="adb.classification"]
-${tender_data_items.classification.id}	xpath=//div[@ng-if="adb.classification"]
-${tender_data_items.classification.description}	xpath=//div[@ng-if="adb.classification"]
-${tender_data_items.additionalClassifications[0].scheme}	xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
-${tender_data_items.additionalClassifications[0].id}	xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
-${tender_data_items.additionalClassifications[0].description}	xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
-#TODO для чего следующие 3 строки
-${tender_data_items.additionalClassifications.[0].description}	xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
-${tender_data_items.additionalClassifications.[0].id}	xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
-${tender_data_items.additionalClassifications.[0].scheme}	xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
-${tender_data_items.unit.name}	xpath=//div[@ng-if='adb.quantity']/div[2]/span[2]
-${tender_data_items.unit.code}	xpath=//div[@ng-if='adb.quantity']/div[2]/span[2]
-${tender_data_items.quantity}	xpath=//div[@ng-if='adb.quantity']/div[2]/span
-${tender_data_questions[0].description}	css=div.question-div
-${tender_data_questions[0].date}	xpath=//div[@class = 'question-head title']/b[2]
-${tender_data_questions[0].title}	css=div.question-head.title span
-${tender_data_questions[0].answer}	xpath=//div[@ng-if='q.answer']//div[@class='ng-binding']
-${tender_data_lots.title}	css=div.lot-head span.ng-binding
-${tender_data_lots.description}	css=section.lot-description section.description
-${tender_data_lots.value.amount}	css=section.lot-description div[ng-if='model.checkedLot.value'] div.info-item-val
-${tender_data_bids}	xpath=(//table[@class='bids']//tr)[2]
-${tender_data_cancellations[0].status}	xpath=//*[@id='nolotSection']/div[1]/div[1]
-${tender_data_cancellations[0].reason}	xpath=//*[@id='nolotSection']/div[1]/div[2]
-${tender_data_cancellations[0].documents[0].title}	css=.file-name.ng-binding
-${tender_data_title_en}	css=.title-div.ng-binding
-${tender_data_title_ru}	css=.title-div.ng-binding
-${tender_data_description_en}	css=#tenderDescription
-${tender_data_description_ru}	css=#tenderDescription
-${tender_data_procuringEntity.address.countryName}	css=#procurerAddr #countryName
-${tender_data_procuringEntity.address.locality}	css=#procurerAddr #locality
-${tender_data_procuringEntity.address.postalCode}	css=#procurerAddr #postalCode
-${tender_data_procuringEntity.address.region}	css=#procurerAddr #region
-${tender_data_procuringEntity.address.streetAddress}	css=#procurerAddr #streetAddress
-${tender_data_procuringEntity.contactPoint.name}	xpath=//div[@class='delivery-info']/div[2]/div[@class='info-item-val ng-binding']
-${tender_data_procuringEntity.contactPoint.telephone}	xpath=//div[@class='delivery-info']/div[4]/div[@class='info-item-val ng-binding']
-${tender_data_procuringEntity.contactPoint.url}	xpath=//div[@class='delivery-info']/div[5]/div[@class='info-item-val ng-binding']
-${tender_data_procuringEntity.identifier.legalName}	xpath=//div[@id='procurerLegalName']/div[2]
-${tender_data_procuringEntity.identifier.scheme}	xpath=//div[@id='procurerId']/div[1]
-${tender_data_procuringEntity.identifier.id}	xpath=//div[@id='procurerId']/div[2]
-${tender_data_causeDescription}	css=#tenderType>div
-${tender_data_documents[0].title}	css=.file-name.ng-binding
-${complaints[0].title}	xpath=(//div[@class='title']/span)[1]
-${complaints[0].description}	xpath=(//div[@ng-bind-html='q.description'])[1]
-${complaints[0].documents.title}	xpath=(//span[@class='file-name'])[1]
-${complaints[0].status}	xpath=(//div[contains(@ng-if,'q.status')])[1]
+#${tender_data_items.deliveryDate.endDate}	xpath=//div[@ng-if='adb.deliveryDate.endDate']/div[2]
+#${tender_data_items.deliveryLocation.latitude}	css=span.latitude
+#${tender_data_items.deliveryLocation.longitude}	css=span.longitude
+#${tender_data_items.deliveryAddress.countryName}	css=span#countryName
+#${tender_data_items.deliveryAddress.postalCode}	css=span#postalCode
+#${tender_data_items.deliveryAddress.region}	css=span#region
+#${tender_data_items.deliveryAddress.locality}	css=span#locality
+#${tender_data_items.deliveryAddress.streetAddress}	css=span#streetAddress
+#TODO - следующие 3 локатора одинаковые
+#${tender_data_items.classification.scheme}	xpath=//div[@ng-if="adb.classification"]
+#${tender_data_items.classification.id}	xpath=//div[@ng-if="adb.classification"]
+#${tender_data_items.classification.description}	xpath=//div[@ng-if="adb.classification"]
+#TODO - следующие 3 локатора одинаковые
+#${tender_data_items.additionalClassifications[0].scheme}	xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
+#${tender_data_items.additionalClassifications[0].id}	xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
+#${tender_data_items.additionalClassifications[0].description}	xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
+#TODO - следующие 2 локатора одинаковые
+#${tender_data_items.unit.name}	xpath=//div[@ng-if='adb.quantity']/div[2]/span[2]
+#${tender_data_items.unit.code}	xpath=//div[@ng-if='adb.quantity']/div[2]/span[2]
+#${tender_data_items.quantity}	xpath=//div[@ng-if='adb.quantity']/div[2]/span
+#${tender_data_questions[0].description}	css=div.question-div
+#${tender_data_questions[0].date}	xpath=//div[@class = 'question-head title']/b[2]
+#${tender_data_questions[0].title}	css=div.question-head.title span
+#${tender_data_questions[0].answer}	xpath=//div[@ng-if='q.answer']//div[@class='ng-binding']
+#${tender_data_lots.title}	css=div.lot-head span.ng-binding
+#${tender_data_lots.description}	css=section.lot-description section.description
+#${tender_data_lots.value.amount}	css=section.lot-description div[ng-if='model.checkedLot.value'] div.info-item-val
+#${tender_data_bids}	xpath=(//table[@class='bids']//tr)[2]
+#${tender_data_cancellations[0].status}	xpath=//*[@id='nolotSection']/div[1]/div[1]
+#${tender_data_cancellations[0].reason}	xpath=//*[@id='nolotSection']/div[1]/div[2]
+#${tender_data_cancellations[0].documents[0].title}	css=.file-name.ng-binding
+#${tender_data_title_en}	css=.title-div.ng-binding
+#${tender_data_title_ru}	css=.title-div.ng-binding
+#${tender_data_description_en}	css=#tenderDescription
+#${tender_data_description_ru}	css=#tenderDescription
+#${tender_data_procuringEntity.address.countryName}	css=#procurerAddr #countryName
+#${tender_data_procuringEntity.address.locality}	css=#procurerAddr #locality
+#${tender_data_procuringEntity.address.postalCode}	css=#procurerAddr #postalCode
+#${tender_data_procuringEntity.address.region}	css=#procurerAddr #region
+#${tender_data_procuringEntity.address.streetAddress}	css=#procurerAddr #streetAddress
+#${tender_data_procuringEntity.contactPoint.name}	xpath=//div[@class='delivery-info']/div[2]/div[@class='info-item-val ng-binding']
+#${tender_data_procuringEntity.contactPoint.telephone}	xpath=//div[@class='delivery-info']/div[4]/div[@class='info-item-val ng-binding']
+#${tender_data_procuringEntity.contactPoint.url}	xpath=//div[@class='delivery-info']/div[5]/div[@class='info-item-val ng-binding']
+#${tender_data_procuringEntity.identifier.legalName}	xpath=//div[@id='procurerLegalName']/div[2]
+#${tender_data_procuringEntity.identifier.scheme}	xpath=//div[@id='procurerId']/div[1]
+#${tender_data_procuringEntity.identifier.id}	xpath=//div[@id='procurerId']/div[2]
+#${tender_data_causeDescription}	css=#tenderType>div
+#${tender_data_documents[0].title}	css=.file-name.ng-binding  #todo дубль
+#${complaints[0].title}	xpath=(//div[@class='title']/span)[1]
+#${complaints[0].description}	xpath=(//div[@ng-bind-html='q.description'])[1]
+#${complaints[0].documents.title}	xpath=(//span[@class='file-name'])[1]
+#${complaints[0].status}	xpath=(//div[contains(@ng-if,'q.status')])[1]
 
-${locator_tenderCreation.buttonEdit}	xpath=//button[@ng-click='act.createAfp()']
-${locator_tenderCreation.buttonSave}	css=button.btn.btn-success
-${locator_tenderCreation.buttonBack}	xpath=//a[@ng-click='act.goBack()']
-${locator_tenderCreation.description}	css=textarea[ng-model='model.filterData.adbName']
+#${locator_tenderCreation.buttonEdit}	xpath=//button[@ng-click='act.createAfp()']
+${locator_tenderCreation.buttonSend}	css=button[data-id='actSend']
+#${locator_tenderCreation.buttonSave}	css=button.btn.btn-success
+#${locator_tenderCreation.buttonBack}	xpath=//a[@ng-click='act.goBack()']
+#${locator_tenderCreation.description}	css=textarea[ng-model='model.filterData.adbName']
 ${locator_tenderClaim.buttonCreate}	css=button[ng-click='commonActions.createAfp()']
 ${locator_tenderClaim.fieldPrice}	css=input[ng-model='model.userPrice']
 ${locator_tenderClaim.checkedLot.fieldPrice}	xpath=//input[@ng-model='model.checkedLot.userPrice']
-${locator_tenderClaim.fieldEmail}	css=input[ng-model='model.person.email']
+#${locator_tenderClaim.fieldEmail}	css=input[ng-model='model.person.email']
 ${locator_tenderClaim.buttonSend}	css=button[ng-click='act.sendAfp()']
 ${locator_tenderClaim.buttonCancel}	css=a[ng-click='act.delAfp()']
-${locator_tenderClaim.buttonGoBack}	css=a[ng-click='act.ret2Ad()']
+#${locator_tenderClaim.buttonGoBack}	css=a[ng-click='act.ret2Ad()']
 ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
+${locator_tenderSearch.searchInput}	css=input#search-query-input
+${locator_tenderSearch.tendersList}	css=tr[ng-repeat='t in model.tenderList']
+${locator_tenderSearch.addTender}	css=button[ng-click='template.newTender()']
+${locator_tenderAdding.tenderType}	xpath=(//div[@class='big-button-step'])[1]
+${locator_tenderAdding.procurementName}	css=input[data-id='procurementName']
+${locator_tenderAdding.procurementDescription}	css=input[data-id='procurementDescription']
+${locator_tenderAdding.procurementClassifications}	xpath=(//span[@data-id='actChoose'])[1]
+${locator_tenderAdding.btnSave}	css=button[data-id='actSave']
 
+
+${locator_tender.complaint.btnSave}	id=btnSaveComplaint
+
+
+
+${locator_tender.bid.BtnNext}	css=button[ng-click='commonActions.goNext(1)']
 
 *** Keywords ***
 Підготувати дані для оголошення тендера
@@ -128,9 +142,9 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 #	Chose UK language
 	Close notification
 #	Sleep	3s
-	Wait Until Element Not Stale	css=input#search-query-input	${COMMONWAIT}
-	Wait Until Element Is Visible	css=input#search-query-input	timeout=${COMMONWAIT}
-	Wait Until Element Is Enabled	css=tr[ng-repeat='t in model.tenderList']	timeout=${COMMONWAIT}
+#	Wait Until Element Not Stale	${locator_tenderSearch.searchInput}	${COMMONWAIT}
+	Wait Until Element Is Visible	${locator_tenderSearch.searchInput}	timeout=${COMMONWAIT}
+#	Wait Until Element Is Enabled	${locator_tenderSearch.tendersList}	timeout=${COMMONWAIT}
 
 	${suite_name} = 	Convert To Lowercase	${SUITE_NAME}
 	${education_type} =	Run Keyword If	'negotiation' in '${suite_name}'	Set Variable	False
@@ -139,14 +153,13 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	Wait For Tender	${tenderId}	${education_type}
 #	sleep	3s
 #	Wait Until Element Not Stale	css=tr#${tenderId}	40
-	Wait Until Element Is Visible	css=tr#${tenderId}	40
-	Click Element	css=tr#${tenderId}
+	Wait Visibulity And Click Element	css=tr#${tenderId}
 
 	Wait For Ajax
 	Switch To PMFrame
-#	Wait Until Element Is Not Visible	css=input#search-query-input	20s
-	Wait Until Element Is Visible	id=tenderStatus	timeout=${COMMONWAIT}
-	Wait Until Element Not Stale	xpath=//div[contains(@class,'title-div')]	40
+#	Wait Until Element Is Not Visible	${locator_tenderSearch.searchInput}	20s
+	Wait Until Element Is Visible	${tender_data_status}	${COMMONWAIT}
+#	Wait Until Element Not Stale	${tender_data_title}	40
 
 
 Створити тендер
@@ -162,34 +175,28 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	Close notification
 #	Chose UK language
 	Wait For Ajax
-	Wait Until Element Not Stale	css=input#search-query-input	${COMMONWAIT}
-	Wait Until Element Is Visible	css=input#search-query-input	timeout=${COMMONWAIT}
-	Wait Until Element Is Enabled	css=tr[ng-repeat='t in model.tenderList']	timeout=${COMMONWAIT}
+	Wait Until Element Not Stale	${locator_tenderSearch.searchInput}	${COMMONWAIT}
+	Wait Until Element Is Visible	${locator_tenderSearch.searchInput}	${COMMONWAIT}
+	Wait Until Element Is Enabled	${locator_tenderSearch.tendersList}	${COMMONWAIT}
 	Check Current Mode
 #go to form
-	Wait Until Element Is Visible	css=button[ng-click='template.newTender()']	15s
-	Click Button	css=button[ng-click='template.newTender()']
+	Wait Visibulity And Click Element	${locator_tenderSearch.addTender}
 	Wait For Ajax
-	Wait Visibulity And Click Element	xpath=(//div[@class='big-button-step'])[1]
+	Wait Visibulity And Click Element	${locator_tenderAdding.tenderType}
 #	Delete Draft
 #step 0
 	#we should add choosing of procurementMethodType
 	Wait For Ajax
 	Switch To PMFrame
-	Wait Until Element Is Visible	css=input[data-id='procurementName']	30s
-	Input Text	css=input[data-id='procurementName']				${tender_data.data.title}
-	Wait Until Element Is Visible	css=textarea[data-id='procurementDescription']	30s
-	Input Text	css=textarea[data-id='procurementDescription']		${tender_data.data.description}
+	Wait Element Visibulity And Imput Text	${locator_tenderAdding.procurementName}	${tender_data.data.title}
+	Wait Element Visibulity And Imput Text	${locator_tenderAdding.procurementDescription}	${tender_data.data.description}
 
 	#CPV
-	Wait Until Element Is Visible	xpath=(//span[@data-id='actChoose'])[1]	30s
-	Click Element	xpath=(//span[@data-id='actChoose'])[1]
+	Wait Visibulity And Click Element	${locator_tenderAdding.procurementClassifications}
 	Wait Until Element Is Visible	css=section[data-id='classificationTreeModal']	${COMMONWAIT}
 	Wait Until Element Is Visible	css=input[data-id='query']	${COMMONWAIT}
 	Search By Query	css=input[data-id='query']	${items[0].classification.id}
-	Wait Until Element Is Visible	css=button[data-id='actConfirm']	15s
-	Click Button	css=button[data-id='actConfirm']
-#	Wait Until Element Is Not Visible	css=section[data-id='classificationTreeModal']	${COMMONWAIT}
+	Wait Visibulity And Click Element	css=button[data-id='actConfirm']
 
 	#date
 	Wait For Ajax
@@ -204,31 +211,23 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	Set Date And Time	tenderPeriod	endDate	css=span[data-id='ptrTenderPeriodEndDate'] input[ng-model='inputTime']	${tender_data.data.tenderPeriod.endDate}
 
 	#procuringEntityAddress
-	Wait Until Element Is Visible	css=input[data-id='postalCode']	15s
-	Input Text	css=input[data-id='postalCode']	${tender_data.data.procuringEntity.address.postalCode}
-	Wait Until Element Is Visible	css=input[data-id='countryName']	15s
-	Input Text	css=input[data-id='countryName']	${tender_data.data.procuringEntity.address.countryName}
-	Wait Until Element Is Visible	css=input[data-id='region']	15s
-	Input Text	css=input[data-id='region']	${tender_data.data.procuringEntity.address.region}
-	Wait Until Element Is Visible	css=input[data-id='locality']	15s
-	Input Text	css=input[data-id='locality']	${tender_data.data.procuringEntity.address.locality}
-	Wait Until Element Is Visible	css=input[data-id='streetAddress']	15s
-	Input Text	css=input[data-id='streetAddress']	${tender_data.data.procuringEntity.address.streetAddress}
+	Wait Element Visibulity And Imput Text	css=input[data-id='postalCode']	${tender_data.data.procuringEntity.address.postalCode}
+	Wait Element Visibulity And Imput Text	css=input[data-id='countryName']	${tender_data.data.procuringEntity.address.countryName}
+	Wait Element Visibulity And Imput Text	css=input[data-id='region']	${tender_data.data.procuringEntity.address.region}
+	Wait Element Visibulity And Imput Text	css=input[data-id='locality']	${tender_data.data.procuringEntity.address.locality}
+	Wait Element Visibulity And Imput Text	css=input[data-id='streetAddress']	${tender_data.data.procuringEntity.address.streetAddress}
+
 	#contactPoint
-	Wait Until Element Is Visible	css=input[data-id='name']	15s
-	Input Text	css=input[data-id='name']	${tender_data.data.procuringEntity.contactPoint.name}
+	Wait Element Visibulity And Imput Text	css=input[data-id='name']	${tender_data.data.procuringEntity.contactPoint.name}
 	${modified_phone} = 	Remove String	${tender_data.data.procuringEntity.contactPoint.telephone}	${SPACE}
 	${modified_phone} = 	Remove String	${modified_phone}	-
 	${modified_phone} = 	Remove String	${modified_phone}	(
 	${modified_phone} = 	Remove String	${modified_phone}	)
 	${modified_phone} = 	Set Variable If	'+38' in '${modified_phone}'	${modified_phone}	+38067${modified_phone}
 	${modified_phone} = 	Get Substring	${modified_phone}	0	13
-	Wait Until Element Is Visible	css=input[data-id='telephone']	15s
-	Input Text	css=input[data-id='telephone']	${modified_phone}
-	Wait Until Element Is Visible	css=input[data-id='email']	15s
-	Input Text	css=input[data-id='email']	${USERS.users['${username}'].email}
-	Wait Until Element Is Visible	css=button[data-id='actSave']	15s
-	Click Button	css=button[data-id='actSave']
+	Wait Element Visibulity And Imput Text	css=input[data-id='telephone']	${modified_phone}
+	Wait Element Visibulity And Imput Text	css=input[data-id='email']	${USERS.users['${username}'].email}
+	Wait Visibulity And Click Element	${locator_tenderAdding.btnSave}
 
 #step 1
 	Додати lots	${lots}
@@ -236,30 +235,28 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 #step 2
 	${count} = 	Get Length	${items}
 	Run Keyword If	${count} > 0	Додати items	${items}
-	Click Button	css=button[data-id='actSave']
+	Wait Visibulity And Click Element	${locator_tenderAdding.btnSave}
 	Wait Until Element Is Visible	css=section[data-id="step3"]	10s
 
 #step 3
 #	Click Element			css=#tab_2
 #	${count} = 	Get Length	${features}
 #	Run Keyword If	${count} > 0	Додати features	${features}
-	Wait Until Element Is Visible	css=button[data-id='actSave']	10s
-	Click Button	css=button[data-id='actSave']
+	Wait Visibulity And Click Element	${locator_tenderAdding.btnSave}
 
 #step 4
 	Wait Until Element Is Visible	css=section[data-id="step4"]	10s
 #	Додати документ при створенні закупівлі
 #todo: implement method Додати документ при створенні закупівлі
-	Wait Until Element Is Visible	css=button[data-id='actSave']	10s
-	Click Button	css=button[data-id='actSave']
+	Wait Visibulity And Click Element	${locator_tenderAdding.btnSave}
 
 #step 5
 	Wait Until Element Is Visible	css=section[data-id="step5"]	10s
-	Wait Until Element Is Visible	css=button[data-id='actSend']	10s
-	Click Button	css=button[data-id='actSend']
+	Wait Visibulity And Click Element	${locator_tenderCreation.buttonSend}
+#TODO проверка на текст. Необходимо проверить и заменить
 	Close Confirmation In Editor	Закупка поставлена в очередь на отправку в ProZorro. Статус закупки Вы можете отслеживать в личном кабинете.
 	Switch To PMFrame
-	Wait Until Element Not Stale	xpath=//div[contains(@class,'title-div')]	40
+	Wait Until Element Not Stale	${tender_data_title}	40
 	Wait For Element With Reload	xpath=//div[@id='tenderStatus' and contains(., 'Период уточнений')]	1
 	${tender_id} = 	Get Text	css=div#tenderId
 	[return]  ${tender_id}
@@ -286,9 +283,7 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 #	\    Sleep			1s
 #	\    Wait Until Element Is Visible	css=div.lot-guarantee label	15s
 	\    Wait Visibulity And Click Element	css=div.lot-guarantee label
-#	\    Click Element	css=div.lot-guarantee label
-	\    Wait Until Element Is Visible	css=input[data-id='guaranteeAmount']	10s
-	\    Input Text		css=input[data-id='guaranteeAmount']	1
+	\    Wait Element Visibulity And Imput Text	css=input[data-id='guaranteeAmount']	1
 
 
 Додати items
@@ -300,23 +295,15 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	\    Wait Until Element Is Visible	css=input[ng-model='item.description']	10s
 	\    Input Text	css=input[ng-model='item.description']	${items[${index}].description}
 	\    Wait Element Visibulity And Imput Text	css=input[data-id='quantity']	${items[${index}].quantity}
-#	\    Input Text	css=input[data-id='quantity']	${items[${index}].quantity}
 	\    Wait Visibulity And Click Element	xpath=//select[@data-id='unit']/option[text()='${items[${index}].unit.name}']
-#	\    Click Element	xpath=//select[@data-id='unit']/option[text()='${items[${index}].unit.name}']
 	\    ${deliveryDate} =	Get Regexp Matches	${items[${index}].deliveryDate.endDate}	(\\d{4}-\\d{2}-\\d{2})
 	\    ${deliveryDate} =	Convert Date	${deliveryDate[0]}	result_format=%d-%m-%Y
 	\    Wait Visibulity And Click Element	xpath=//input[contains(@ng-model, 'item.adressTypeMode')][1]
-#	\    Click Element	xpath=//input[contains(@ng-model, 'item.adressTypeMode')][1]
-	\    Wait Until Element Is Visible	css=input[data-id='postalCode']	10s
-	\    Input Text	css=input[data-id='postalCode']	${items[${index}].deliveryAddress.postalCode}
+	\    Wait Element Visibulity And Imput Text	css=input[data-id='postalCode']	${items[${index}].deliveryAddress.postalCode}
 	\    Wait Element Visibulity And Imput Text	css=input[data-id='countryName']	${items[${index}].deliveryAddress.countryName}
-#	\    Input Text	css=input[data-id='countryName']	${items[${index}].deliveryAddress.countryName}
 	\    Wait Element Visibulity And Imput Text	css=input[data-id='region']	${items[${index}].deliveryAddress.region}
-#	\    Input Text	css=input[data-id='region']	${items[${index}].deliveryAddress.region}
 	\    Wait Element Visibulity And Imput Text	css=input[data-id='locality'	${items[${index}].deliveryAddress.locality}
-#	\    Input Text	css=input[data-id='locality']	${items[${index}].deliveryAddress.locality}
 	\    Wait Element Visibulity And Imput Text	css=input[data-id='streetAddress']	${items[${index}].deliveryAddress.streetAddress}
-#	\    Input Text	css=input[data-id='streetAddress']	${items[${index}].deliveryAddress.streetAddress}
 	\    Wait Until Element Is Visible	css=input[ng-model='item.deliveryDate.ed.d']	15s
 	\    Set Date In Item	${index}	deliveryDate	endDate	${items[${index}].deliveryDate.endDate}
 
@@ -324,15 +311,13 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 Завантажити документ
 	[Arguments]  ${user_name}  ${filepath}  ${tenderId}
 #	перейдем к редактированию
-	Wait For Element With Reload	css=button[ng-click='commonActions.createAfp()']	1
+	Wait For Element With Reload	${locator_tenderClaim.buttonCreate}	1
 #	Wait For Ajax
-	Wait Until Element Is Visible	css=button[ng-click='commonActions.createAfp()']	10s
-	Click Button	css=button[ng-click='commonActions.createAfp()']
+	Wait Visibulity And Click Element	${locator_tenderClaim.buttonCreate}
 #	откроем нужную вкладку
 	Wait Visibulity And Click Element	css=#tab_3 a
 #	загрузим файл
-	Wait Until Element Is Visible	css=label[for='documentation_tender_yes']	15s
-	Click Element	css=label[for='documentation_tender_yes']
+	Wait Visibulity And Click Element	css=label[for='documentation_tender_yes']
 	Wait Visibulity And Click Element	css=div.file-loader a
 
 	Wait Visibulity And Click Element	css=div[ng-if="!model.file.title"]
@@ -340,14 +325,16 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	Sleep	5s
 	Wait Visibulity And Click Element	xpath=//a[contains(@ng-class, 'file.currFileVfvError')]
 	Wait Visibulity And Click Element	xpath=//li[contains(@ng-click, 'setFileType')][1]
-	Wait Visibulity And Click Element	xpath=//button[contains(@ng-click, 'addFileFunction')]
-#	Wait Until Element Is Visible	xpath=//i[contains(@ng-click, 'deleteFileFunction')]
-	Wait Until Element Is Visible	css=button[data-id='actSave']	15s
-	Click Button	css=button[data-id='actSave']
+#	Wait Visibulity And Click Element	xpath=//button[contains(@ng-click, 'addFileFunction')]
+	Wait Until Element Is Visible	xpath=//i[contains(@ng-click, 'deleteFileFunction')]
+	Wait Visibulity And Click Element	${locator_tenderAdding.btnSave}
+#	Wait Until Element Is Visible	${locator_tenderAdding.btnSave}	15s
+#	Click Button	${locator_tenderAdding.btnSave}
 	Wait Until Element Is Visible	css=section[data-id="step5"]	10s
-	Click Button	css=button[data-id='actSend']
+	Click Button	${locator_tenderCreation.buttonSend}
 #Дождемся подтверждения и обновим страницу, поскольку тут не выходит его закрыть
 	Wait Until Element Is Visible		css=div.modal-body.info-div	${COMMONWAIT}
+#TODO проверка на текст. Необходимо проверить и заменить
 	Wait Until Element Contains			css=div.modal-body.info-div	Закупка поставлена в очередь на отправку в ProZorro. Статус закупки Вы можете отслеживать в личном кабинете.	${COMMONWAIT}	Закупка поставлена в очередь на отправку в ProZorro. Статус закупки Вы можете отслеживать в личном кабинете.
 	Reload Page
 	Wait For Ajax
@@ -359,52 +346,25 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	${element_class} =	Get Element Attribute	xpath=//li[contains(@ng-class, 'description')]@class
 	Run Keyword IF	'checked-nav' in '${element_class}'	Return From Keyword	True
 
-	Wait Until Element Is Visible	xpath=//li[contains(@ng-class, 'description')]	10s
-	Click Element	xpath=//li[contains(@ng-class, 'description')]
+	Wait Visibulity And Click Element	xpath=//li[contains(@ng-class, 'description')]
 	Wait Until Element Is Visible	xpath=//section[contains(@ng-if, "model.ad.showTab == 'description'")]
 	Wait Until Element Not Stale	xpath=//section[contains(@ng-if, "model.ad.showTab == 'description'")]	40
-	Wait Visibulity And Click Element  xpath=//a[contains(@ng-click, 'adb.showCl = !adb.showCl')]
+	Wait Visibulity And Click Element	${tender_data_items.description}
 	Wait Until Element Is Visible	css=div[ng-if='adb.classification']
-
-
-#Обрати потрібний лот
-#	[Arguments]  ${lot}
-#	#show more info about lots
-#	Return From Keyword If	'None' in '${lot}'	False
-#
-#	Wait Until Element Is Visible					css=a[ng-click='model.shwFull = !model.shwFull']	timeout=${COMMONWAIT}
-#	${attribute} =	Get Element Attribute			css=a[ng-click='model.shwFull = !model.shwFull'] span@id
-#	Run Keyword If	'showMore' in '${attribute}'	Click Element	css=a[ng-click='model.shwFull = !model.shwFull']
-#	${attribute} =	Get Element Attribute			css=a[ng-click='model.shwFull = !model.shwFull'] span@id
-#
-#	Wait Until Element Is Visible		xpath=//div[@class='lot-head']/b	timeout=${COMMONWAIT}
-#	${current_lot} = 					Get Text	css=div.lot-head b
-#	${current_lot} = 					Get Regexp Matches	${current_lot}	№(\\d)	1
-#	${current_lot} = 					Convert To Integer	${current_lot[0]}
-#	${lot} = 							Evaluate	${lot}+1
-#
-#	#If current lot is that one we need, then just leave it
-#	Return From Keyword If	${lot} == ${current_lot}	True
-#	Wait For Element With Reload		css=div.lot-chooser	1
-#	Click Element						css=div.lot-chooser
-#	Wait Until Element Is Visible		xpath=(//div[@ng-repeat='lot in model.lotPortion'])[${lot}]	timeout=${COMMONWAIT}
-#	Click Element						xpath=(//div[@ng-repeat='lot in model.lotPortion'])[${lot}]
-#	Wait Until Element Is Not Visible	xpath=(//div[@ng-repeat='lot in model.lotPortion'])[${lot}]	timeout=${COMMONWAIT}
 
 
 Обрати потрібний лот за id
 	[Arguments]  ${lot_id}
 	Wait For Element With Reload	css=div.lot-chooser	1
 	Wait Until Element Is Visible		css=div.lot-chooser	timeout=${COMMONWAIT}
-	Click Element					css=div.lot-chooser
-	Wait Until Element Is Visible		xpath=//div[@ng-repeat='lot in model.lotPortion' and contains(., '${lot_id}')]	timeout=${COMMONWAIT}
-	Click Element					xpath=//div[@ng-repeat='lot in model.lotPortion' and contains(., '${lot_id}')]
+	Wait Visibulity And Click Element	css=div.lot-chooser
+	Wait Visibulity And Click Element	xpath=//div[@ng-repeat='lot in model.lotPortion' and contains(., '${lot_id}')]
 
 
 Отримати інформацію із тендера
 	[Arguments]  ${user_name}  ${element}
 	Switch To PMFrame
-	Wait Until Element Is Visible		xpath=//div[contains(@class,'title-div')]	timeout=${COMMONWAIT}
+	Wait Until Element Is Visible		${tender_data_title}	timeout=${COMMONWAIT}
 
 	#check tender type
 	${item} =	Run Keyword If	'multiItem' in '${SUITE_NAME}'	Отримати номер позиції	${element}	items\\[(\\d)\\]
@@ -634,6 +594,7 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 Отримати інформацію з cancellations[0].status
 	[Arguments]  ${element}  ${item}
 	${text} =	Отримати текст елемента  ${element}  ${item}
+#TODO проверка на текст. Необходимо проверить и заменить
 	${result} =	Set Variable If	'Отменено' in '${text}'	active
 	[return]  ${result}
 
@@ -688,24 +649,22 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 
 Внести зміни в тендер
 	[Arguments]  ${user_name}  ${tenderId}	${parameter}	${value}
-	Wait For Element With Reload	css=button[ng-click='commonActions.createAfp()']	1
+	Wait For Element With Reload	${locator_tenderClaim.buttonCreate}	1
 	Wait For Ajax
-	Wait Until Element Is Visible	css=button[ng-click='commonActions.createAfp()']	30s
-	Click Button	css=button[ng-click='commonActions.createAfp()']
+	Wait Visibulity And Click Element	${locator_tenderClaim.buttonCreate}
 	Wait For Ajax
 	Switch To PMFrame
 #	Wait Visibulity And Click Element	css=#tab_0 a
 	Wait Until Element Is Visible	css=textarea[data-id='procurementDescription']	30s
 	Input Text	css=textarea[data-id='procurementDescription']	${value}
 
-	Wait Until Element Is Visible	css=button[data-id='actSave']	30s
-	Click Button	css=button[data-id='actSave']
+	Wait Visibulity And Click Element	${locator_tenderAdding.btnSave}
 	Wait Until Element Is Visible	css=section[data-id="step2"]	30s
 	Wait Visibulity And Click Element	css=#tab_4 a
-	Wait Until Element Is Visible	css=button[data-id='actSend']	30s
-	Click Button	css=button[data-id='actSend']
+	Wait Visibulity And Click Element	${locator_tenderCreation.buttonSend}
 	#Дождемся подтверждения и обновим страницу, поскольку тут не выходит его закрыть
 	Wait Until Element Is Visible		css=div.modal-body.info-div	${COMMONWAIT}
+#TODO проверка на текст. Необходимо проверить и заменить
 	Wait Until Element Contains			css=div.modal-body.info-div	Закупка поставлена в очередь на отправку в ProZorro. Статус закупки Вы можете отслеживать в личном кабинете.	${COMMONWAIT}	Закупка поставлена в очередь на отправку в ProZorro. Статус закупки Вы можете отслеживать в личном кабинете.
 	Reload Page
 	Wait For Ajax
@@ -731,6 +690,7 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	Wait For Ajax
 	Wait Until Element Is Enabled		css=div.alert-info	timeout=${COMMONWAIT}
 	Wait Until Element Not Stale		css=div.alert-info	40
+#TODO проверка на текст. Необходимо проверить и заменить
 	Wait Until Element Contains			css=div.alert-info	Ваше требование успешно сохранено!	timeout=10
 	${claim_data} =	Create Dictionary	id=123
 	${claim_resp} =	Create Dictionary	data=${claim_data}
@@ -754,13 +714,15 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	Wait For Ajax
 	Wait Until Element Is Enabled		css=div.alert-info	timeout=${COMMONWAIT}
 	Wait Until Element Not Stale		css=div.alert-info	40
+#TODO проверка на текст. Необходимо проверить и заменить
 	Wait Until Element Contains			css=div.alert-info	Ваше требование успешно отправлено!	timeout=10
 	Wait For Ajax
 	sleep								3s
 	Wait Until Element Is Not Visible	xpath=//input[@ng-model="model.question.title"]	timeout=${COMMONWAIT}
 	Wait For Ajax
-	Wait Until Element Not Stale		css=span[ng-click='act.hideModal()']	40
-	Click Element						css=span[ng-click='act.hideModal()']
+#	Wait Until Element Not Stale		css=span[ng-click='act.hideModal()']	40
+	Wait Visibulity And Click Element	css=span[ng-click='act.hideModal()']
+#	Click Element						css=span[ng-click='act.hideModal()']
 	sleep								3s
 	Wait Until Element Is Not Visible	css=div.info-item-val textarea	timeout=30
 	Element Should Not Be Visible		css=div.error
@@ -768,9 +730,10 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 
 Скасувати вимогу
 	[Arguments]    ${user}  ${tender_id}  ${claim_data}  ${cancellation_data}
-	Wait Until Element Is Visible		css=a[ng-click='act.showCancelComplaintWnd(q)']	timeout=${COMMONWAIT}
-	Wait Until Element Is Enabled		css=a[ng-click='act.showCancelComplaintWnd(q)']	timeout=${COMMONWAIT}
-	Click element						css=a[ng-click='act.showCancelComplaintWnd(q)']
+#	Wait Until Element Is Visible		css=a[ng-click='act.showCancelComplaintWnd(q)']	timeout=${COMMONWAIT}
+#	Wait Until Element Is Enabled		css=a[ng-click='act.showCancelComplaintWnd(q)']	timeout=${COMMONWAIT}
+#	Click element						css=a[ng-click='act.showCancelComplaintWnd(q)']
+	Wait Visibulity And Click Element	css=a[ng-click='act.showCancelComplaintWnd(q)']
 
 	Wait Until Element Is Visible		xpath=//textarea[@ng-model='model.cancelComplaint.reason']	timeout=${COMMONWAIT}
 	Wait Until Element Is Enabled		xpath=//textarea[@ng-model='model.cancelComplaint.reason']	timeout=${COMMONWAIT}
@@ -780,6 +743,7 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	Click Button						css=button[ng-click='act.cancelComplaint()']
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=button[ng-click='act.cancelComplaint()']	timeout=${COMMONWAIT}
+#TODO проверка на текст. Необходимо проверить и заменить
 	Wait Until Element Contains			css=span#cmplStatus0	Отменено	timeout=${COMMONWAIT}
 
 
@@ -815,9 +779,10 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	Input text	id=addressStreet	${question.data.author.address.streetAddress}
 	Wait Until Element Is Visible	xpath=//button[@ng-click='act.sendQuestion()']				timeout=10
 	Click Button	xpath=//button[@ng-click='act.sendQuestion()']
+#TODO проверка на текст. Необходимо проверить и заменить
 	Wait For Notification	Ваше запитання успішно включено до черги на відправку. Дякуємо за звернення!
-	Wait Until Element Not Stale	css=span[ng-click='act.hideModal()']	40
-	Click Element	css=span[ng-click='act.hideModal()']
+#	Wait Until Element Not Stale	css=span[ng-click='act.hideModal()']	40
+	Wait Visibulity And Click Element	css=span[ng-click='act.hideModal()']
 	Wait Until Element Is Not Visible	xpath=//input[@ng-model='model.question.title']	timeout=20
 
 
@@ -838,14 +803,14 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 	Wait Until Element Is Visible	id=questionAnswer	15s
 	Input Text	id=questionAnswer	${answer_data.data.answer}
 	Sleep	2s
-	Wait Until Element Is Visible	id=btnSendAnswer	15s
-	Click Element	id=btnSendAnswer
+	Wait Visibulity And Click Element	id=btnSendAnswer
+#TODO проверка на текст. Необходимо проверить и заменить
 	Wait For Notification	Ваша відповідь успішно відправлена!
-	Wait Until Element Not Stale	css=span[ng-click='act.hideModal()']	40
-	Click Element	css=span[ng-click='act.hideModal()']
+#	Wait Until Element Not Stale	css=span[ng-click='act.hideModal()']	40
+	Wait Visibulity And Click Element	css=span[ng-click='act.hideModal()']
 	Wait Until Element Is Not Visible	id=questionAnswer	timeout=20
+#TODO проверить для чего тут слип и убрать его
 	Sleep	30s
-#	div.question-answer-send-status публікується
 
 
 Оновити сторінку з тендером
@@ -879,18 +844,17 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 		...  ELSE	Input Text	${locator_tenderClaim.fieldPrice}	${amount}
 
 	#go through 3 steps
-	wait until element is visible	css=button[ng-click='commonActions.goNext(1)']	15s
-	Click Element	css=button[ng-click='commonActions.goNext(1)']
-	Click If Visible	id=btnSaveComplaint
+	Wait Visibulity And Click Element	${locator_tender.bid.BtnNext}
+	Click If Visible	${locator_tender.complaint.btnSave}
 	Wait Until Element Contains	css=div.step-info-title	2/3	10s
-	wait until element is visible	css=button[ng-click='commonActions.goNext(1)']	15s
-	Click Element	css=button[ng-click='commonActions.goNext(1)']
-	Click If Visible	id=btnSaveComplaint
+	Wait Visibulity And Click Element	${locator_tender.bid.BtnNext}
+	Click If Visible	${locator_tender.complaint.btnSave}
 	Wait Until Element Contains	css=div.step-info-title	3/3	10s
 	Fill Adress	${ARGUMENTS[2]}
 	Fill Phone	${ARGUMENTS[2]}
 	Switch To PMFrame
 	Wait Enable And Click Element	${locator_tenderClaim.buttonSend}
+#TODO проверка на текст. Необходимо проверить и заменить
 	Close Confirmation	Ваша заявка була успішно включена до черги на відправку!
 	privatmarket.Оновити сторінку з тендером
 	[return]	${Arguments[2]}
@@ -898,16 +862,16 @@ ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 
 Fill Adress
 	[Arguments]  ${bid}
-	switch to pmframe
+	Switch To PMFrame
 	Wait Visibulity And Click Element	xpath=//a[contains(@ng-click, 'address')]
 	wait until element is visible	id=addressPostalCode
 	Input text	id=addressPostalCode	${bid.data.tenderers[0].address.postalCode}
 	Input text	id=addressRegion	${bid.data.tenderers[0].address.region}
 	Input text	id=addressLocality	${bid.data.tenderers[0].address.locality}
 	Input text	id=addressStreet	${bid.data.tenderers[0].address.streetAddress}
-	wait until element is visible	id=btnSaveComplaint	15s
-	Click Button	id=btnSaveComplaint
-	wait until element is not visible	id=addressPostalCode
+	wait until element is visible	${locator_tender.complaint.btnSave}	15s
+	Click Button	${locator_tender.complaint.btnSave}
+#	wait until element is not visible	id=addressPostalCode
 
 
 Fill Phone
@@ -916,9 +880,9 @@ Fill Phone
 	Wait Visibulity And Click Element	xpath=//a[contains(@ng-click, 'person')]
 	wait until element is visible	id=personPhone
 	Input Text	id=personPhone	${bid.data.tenderers[0].contactPoint.telephone}
-	wait until element is visible	id=btnSaveComplaint	15s
-	Click Button	id=btnSaveComplaint
-	wait until element is not visible	id=addressPostalCode
+	wait until element is visible	${locator_tender.complaint.btnSave}	15s
+	Click Button	${locator_tender.complaint.btnSave}
+#	wait until element is not visible	id=addressPostalCode
 
 Дочекатися статусу заявки
 	[Arguments]  ${status}
@@ -929,9 +893,9 @@ Fill Phone
 Відкрити заявку
 	Wait For Ajax
 	Switch To PMFrame
-	Wait Until Element Is Visible		css=div#tenderStatus	${COMMONWAIT}
+	Wait Until Element Is Visible	${tender_data_status}	${COMMONWAIT}
 
-	${tender_status} =					Get text	css=div#tenderStatus
+	${tender_status} =	Get text	${tender_data_status}
 	Run Keyword Unless	'до початку періоду подачі' in '${TEST_NAME}'	Run Keyword If	'${tender_status}' == 'Период уточнений завершен'	Wait For Element With Reload	${locator_tenderClaim.buttonCreate}	1
 
 	Wait Until Element Not Stale		${locator_tenderClaim.buttonCreate}	30
@@ -949,6 +913,7 @@ Fill Phone
 	Run Keyword 						Змінити ${fieldname}	${fieldvalue}
 	Switch To PMFrame
 	Wait Enable And Click Element	${locator_tenderClaim.buttonSend}
+#TODO проверка на текст. Необходимо проверить и заменить
 	Close Confirmation	Ваша заявка була успішно збережена!
 	[return]	${TRUE}
 
@@ -966,16 +931,14 @@ Fill Phone
 Змінити value.amount
 	[Arguments]  ${fieldvalue}
 	#get correct step
-	Wait Until Element Is Visible	css=button[ng-click='commonActions.goNext(1)']	15s
-	Click Element	css=button[ng-click='commonActions.goNext(1)']
-	Click If Visible  	id=btnSaveComplaint
+	Wait Visibulity And Click Element	${locator_tender.bid.BtnNext}
+	Click If Visible	${locator_tender.complaint.btnSave}
 	#input value
 	Wait Until Element Contains	css=div.step-info-title	2/3	10s
 	Input Text	${locator_tenderClaim.fieldPrice}	${fieldvalue}
 	#go to the exit
-	Wait Until Element Is Visible	css=button[ng-click='commonActions.goNext(1)']	15s
-	Click Element	css=button[ng-click='commonActions.goNext(1)']
-	Click If Visible  	id=btnSaveComplaint
+	Wait Visibulity And Click Element	${locator_tender.bid.BtnNext}
+	Click If Visible	${locator_tender.complaint.btnSave}
 	Wait Until Element Contains	css=div.step-info-title	3/3	10s
 
 
@@ -993,6 +956,7 @@ Fill Phone
 	Switch To PMFrame
 	Wait Enable And Click Element	${locator_tenderClaim.buttonCreate}
 	Wait Enable And Click Element	${locator_tenderClaim.buttonCancel}
+#TODO проверка на текст. Необходимо проверить и заменить
 	Close Confirmation	Вашау заявку успішно скасовано!
 	Switch To PMFrame
 	Wait Until Element Is Enabled	${locator_tenderClaim.buttonCreate}	${COMMONWAIT}
@@ -1035,21 +999,20 @@ Fill Phone
 
 	#go to the exit
 	Switch To PMFrame
-	Wait Until Element Is Visible	css=button[ng-click='commonActions.goNext(1)']	15s
-	Click Element	css=button[ng-click='commonActions.goNext(1)']
+	Wait Visibulity And Click Element	${locator_tender.bid.BtnNext}
 	Wait Until Element Contains	css=div.step-info-title	2/3	10s
-	Wait Until Element Is Visible	css=button[ng-click='commonActions.goNext(1)']	15s
-	Click Element	css=button[ng-click='commonActions.goNext(1)']
+	Wait Visibulity And Click Element	${locator_tender.bid.BtnNext}
 	Click If Visible	id=btnSaveComplaint
 	Wait Until Element Contains	css=div.step-info-title	3/3	10s
 
-	Click Button	${locator_tenderClaim.buttonSend}
+	Wait Visibulity And Click Element	${locator_tenderClaim.buttonSend}
+#TODO проверка на текст. Необходимо проверить и заменить
 	Close confirmation	Ваша заявка була успішно збережена!
 
 	#save file data
 	Wait For Ajax
 	Switch To PMFrame
-	Wait Until Element Is Visible	css=div#tenderStatus	${COMMONWAIT}
+	Wait Until Element Is Visible	${tender_data_status}	${COMMONWAIT}
 	Wait Visibulity And Click Element	xpath=//li[contains(@ng-class, 'lot-parts')]
 	Wait Until Element Is Visible	css=table.bids tr
 	#switch to correct tab and find element
@@ -1057,14 +1020,12 @@ Fill Phone
 	Wait For Element With Reload	xpath=//table[@class='bids']//tr[1]/td//span[contains(., 'Відправлена')]	6
 
 	#получим ссылку на файл, его id и дату
-	Wait Until Element Is Visible	css=a[ng-click='act.showDocWin(b)']	15s
-	Click Element	css=a[ng-click='act.showDocWin(b)']
+	Wait Visibulity And Click Element	css=a[ng-click='act.showDocWin(b)']
 	Wait For Ajax
 	Wait Until Element Is Enabled	xpath=(//div[@ng-click='openUrl(file.url)'])[last()]	5s
 	${dateModified} = 	Get text	xpath=(//span[contains(@class, 'file-tlm')])[last()]
 	${url} = 	Execute Javascript	var scope = angular.element($("div[ng-click='openUrl(file.url)']")).last().scope(); return scope.file.uploadUrl
-	Wait Until Element Is Visible	css=span[ng-click='act.hideModal()']	${COMMONWAIT}
-	Click Element	css=span[ng-click='act.hideModal()']
+	Wait Visibulity And Click Element	css=span[ng-click='act.hideModal()']
 	${uploaded_file_data} = 	fill_file_data  ${url}  ${filePath}  ${dateModified}  ${dateModified}
 	${upload_response} = 	Create Dictionary
 	Set To Dictionary	${upload_response}	upload_response	${uploaded_file_data}
@@ -1097,13 +1058,10 @@ Fill Phone
 
 Змінити buyerOnly для файлу
 	[Arguments]  ${bidid}
-	Wait Until Element Is Visible	xpath=(//div[@ng-if='model.canSecretFiles'])[last()]	${COMMONWAIT}
-	Click Element					xpath=(//div[@ng-if='model.canSecretFiles'])[last()]
-	Wait For Ajax
-	Wait Until Element Is Enabled	css=textarea[ng-model='model.fvHideReason']
-	Input Text						css=textarea[ng-model='model.fvHideReason']		${bidid.data.confidentialityRationale}
-	Wait Until Element Is Visible	xpath=//button[contains(@ng-click,'act.setFvHidden')]	${COMMONWAIT}
-	Click Button					xpath=//button[contains(@ng-click,'act.setFvHidden')]
+	Wait Visibulity And Click Element	xpath=(//div[@ng-if='model.canSecretFiles'])[last()]
+	Wait Element Visibulity And Imput Text	css=textarea[ng-model='model.fvHideReason']	${bidid.data.confidentialityRationale}
+	Wait Visibulity And Click Element	xpath=//button[contains(@ng-click,'act.setFvHidden')]
+	#TODO проверка на текст. Необходимо проверить и заменить
 	Wait For Notification			Файл был успешно скрыт!
 
 
@@ -1115,8 +1073,7 @@ Fill Phone
 Отримати посилання на аукціон для глядача
 	[Arguments]  ${user}  ${tenderId}
 	Wait For Element With Reload	css=button#takepartLink	1
-	Wait Until Element Is Visible	css=button#takepartLink	20s
-	Click Button	css=button#takepartLink
+	Wait Visibulity And Click Element	css=button#takepartLink
 	Wait Until Element Is Visible	xpath=//a[contains(@href, 'https://auction-sandbox.openprocurement.org/tenders/')]  timeout=30
 	${result} = 	Get Element Attribute	xpath=//a[contains(@href, 'https://auction-sandbox.openprocurement.org/tenders/')]@href
 	[return]  ${result}
@@ -1125,7 +1082,7 @@ Fill Phone
 Отримати посилання на аукціон для учасника
 	[Arguments]  ${user}  ${tenderId}
 	Wait For Element With Reload	css=button#takepartLink	1
-	Click Button	css=button#takepartLink
+	Wait Visibulity And Click Element	css=button#takepartLink
 	Wait Until Element Is Visible	css=div[ng-click='commonActions.sendRedir(bid.afpId)']	timeout=30
 	${request_string} =	Convert To String
 		...  return (function(){var link = angular.element($("div[ng-click='commonActions.sendRedir(bid.afpId)']")).last().scope().model.ad.auctionUrl; if(!link || link=='None'){return false;} else return true;})()
@@ -1137,12 +1094,12 @@ Fill Phone
 #Custom Keywords
 Login
 	[Arguments]  ${username}
-	Click Element	xpath=//span[.='Вход']
+	Wait Visibulity And Click Element	xpath=//span[.='Вход']
 	Wait Until Element Is Visible	id=p24__login__field	${COMMONWAIT}
 	Execute Javascript	$('#p24__login__field').val('+${USERS.users['${username}'].login}')
 	Check If Element Stale	xpath=//div[@id="login_modal" and @style='display: block;']//input[@type='password']
 	Input Text	xpath=//div[@id="login_modal" and @style='display: block;']//input[@type='password']	${USERS.users['${username}'].password}
-	Click Element	xpath=//div[@id="login_modal" and @style='display: block;']//button[@type='submit']
+	Wait Visibulity And Click Element	xpath=//div[@id="login_modal" and @style='display: block;']//button[@type='submit']
 	Wait Until Element Is Visible	css=ul.user-menu  timeout=30
 
 
@@ -1255,10 +1212,10 @@ Try Search Tender
 	Check Current Mode	${education_type}
 
 	#заполним поле поиска
-	${text_in_search} =	Get Value	css=input#search-query-input
-	Run Keyword Unless	'${tender_id}' == '${text_in_search}'	Run Keywords	Clear Element Text	css=input#search-query-input
+	${text_in_search} =	Get Value	${locator_tenderSearch.searchInput}
+	Run Keyword Unless	'${tender_id}' == '${text_in_search}'	Run Keywords	Clear Element Text	${locator_tenderSearch.searchInput}
 	...   AND   sleep	1s
-	...   AND   Input Text	css=input#search-query-input	${tender_id}
+	...   AND   Input Text	${locator_tenderSearch.searchInput}	${tender_id}
 
 	#выполним поиск
 	Click Element	css=button#search-query-button
@@ -1275,8 +1232,8 @@ Check Current Mode
 	${check_result} =	Run Keyword If	'Войти в демо-режим' in '${current_type}'	Set Variable  True
 	Run Keyword If	${check_result} and ${education_type}	Run Keywords	Switch To Education Mode
 	...   AND   Wait For Ajax
-	...   AND   Wait Until Element Not Stale	css=button[ng-click='template.newTender()']	40
-	...   AND   Wait Until Element Is Enabled	css=button[ng-click='template.newTender()']	timeout=${COMMONWAIT}
+	...   AND   Wait Until Element Not Stale	${locator_tenderSearch.addTender}	40
+	...   AND   Wait Until Element Is Enabled	${locator_tenderSearch.addTender}	timeout=${COMMONWAIT}
 
 
 Switch To Education Mode
@@ -1284,6 +1241,7 @@ Switch To Education Mode
 	Wait Until Element Is Enabled	css=a#test-model-switch	timeout=${COMMONWAIT}
 	Wait For Ajax
 	Click Element	css=a#test-model-switch
+#TODO проверка на текст. Необходимо проверить и заменить
 	Wait Until Element Contains	css=a#test-model-switch	Выйти из демо-режима	${COMMONWAIT}
 	Wait For Ajax Overflow Vanish
 
@@ -1319,9 +1277,9 @@ Wait For Ajax Overflow Vanish
 	Wait Until Element Is Not Visible	${locator_tender.ajax_overflow}	${COMMONWAIT}
 
 
-Click element by JS
-	[Arguments]	${locator}
-	Execute Javascript					window.$("${locator}").mouseup()
+#Click element by JS
+#	[Arguments]	${locator}
+#	Execute Javascript					window.$("${locator}").mouseup()
 
 
 Chose UK language
@@ -1361,19 +1319,18 @@ Search By Query
 	Wait Until Element Not Stale	xpath=//div[input[@id='found_${query}']]	5
 	Click Element	xpath=//div[input[@id='found_${query}']]
 
-
-Get Locator And Type
-	[Arguments]	${full_locator}
-	${temp_locator} = 	Replace String	${full_locator}	'	${EMPTY}
-	${locator} = 	Run Keyword If	'css' in '${temp_locator}'	Get Substring	${full_locator}	4
-		...   ELSE IF	'xpath' in '${temp_locator}'	Get Substring	${full_locator}	6
-		...   ELSE		${full_locator}
-
-	${type} =	Set Variable If	'css' in '${temp_locator}'	css
-		...  	'xpath' in '${temp_locator}'	xpath
-		...  	None
-	[return]  ${locator}  ${type}
-
+#//TODO - unused
+#Get Locator And Type
+#	[Arguments]	${full_locator}
+#	${temp_locator} = 	Replace String	${full_locator}	'	${EMPTY}
+#	${locator} = 	Run Keyword If	'css' in '${temp_locator}'	Get Substring	${full_locator}	4
+#		...   ELSE IF	'xpath' in '${temp_locator}'	Get Substring	${full_locator}	6
+#		...   ELSE		${full_locator}
+#
+#	${type} =	Set Variable If	'css' in '${temp_locator}'	css
+#		...  	'xpath' in '${temp_locator}'	xpath
+#		...  	None
+#	[return]  ${locator}  ${type}
 
 Set Date And Time
 	[Arguments]  ${element}  ${fild}  ${time_element}  ${date}
@@ -1405,6 +1362,6 @@ Set Time
 #	Wait Visibulity And Click Element	css=button[ng-click='close(true)']
 #	Wait Until Element Is Not Visible	css=button[ng-click='close(true)']
 #	Switch To PMFrame
-#	Wait Visibulity And Click Element	css=button[ng-click='template.newTender()']
+#	Wait Visibulity And Click Element	${locator_tenderSearch.addTender}
 #	Wait For Ajax
-#	Wait Visibulity And Click Element	xpath=(//div[@class='big-button-step'])[1]
+#	Wait Visibulity And Click Element	${locator_tenderAdding.tenderType}
