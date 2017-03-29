@@ -311,7 +311,7 @@ ${locator_tender.bid.BtnNext}	css=button[ng-click='commonActions.goNext(1)']
 	\    Wait Element Visibulity And Input Text	${locator_lotAdd.description}	${items[${index}].description}
 	\    Wait Element Visibulity And Input Text	${locator_lotAdd.quantity}	${items[${index}].quantity}
 #	debug
-	\    Wait Visibility And Click Element	xpath=//select[@data-id='unit']/option[@value='${items[${index}].unit.name}']
+	\    Wait Visibility And Click Element	xpath=//select[@data-id='unit']/option[text()='${items[${index}].unit.name}']
 	\    ${deliveryDate} =	Get Regexp Matches	${items[${index}].deliveryDate.endDate}	(\\d{4}-\\d{2}-\\d{2})
 	\    ${deliveryDate} =	Convert Date	${deliveryDate[0]}	result_format=%d-%m-%Y
 	\    Wait Visibility And Click Element	${locator_lotAdd.adressType}
