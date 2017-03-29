@@ -133,7 +133,6 @@ ${locator_tender.bid.BtnNext}	css=button[ng-click='commonActions.goNext(1)']
 	${tender_data.data} = 	Run Keyword If	'PrivatMarket_Owner' == '${username}'	modify_test_data	${tender_data.data}
 #	${tender_data.data} = 	modify_test_data	${tender_data.data}
 	[Return]  ${tender_data}
-#	[Return]	${tender_data}
 
 
 Підготувати клієнт для користувача
@@ -312,7 +311,7 @@ ${locator_tender.bid.BtnNext}	css=button[ng-click='commonActions.goNext(1)']
 	\    Wait Element Visibulity And Input Text	${locator_lotAdd.description}	${items[${index}].description}
 	\    Wait Element Visibulity And Input Text	${locator_lotAdd.quantity}	${items[${index}].quantity}
 #	debug
-	\    Wait Visibility And Click Element	xpath=//select[@data-id='unit']/option[text()='${items[${index}].unit.name}']
+	\    Wait Visibility And Click Element	xpath=//select[@data-id='unit']/option[@value='${items[${index}].unit.name}']
 	\    ${deliveryDate} =	Get Regexp Matches	${items[${index}].deliveryDate.endDate}	(\\d{4}-\\d{2}-\\d{2})
 	\    ${deliveryDate} =	Convert Date	${deliveryDate[0]}	result_format=%d-%m-%Y
 	\    Wait Visibility And Click Element	${locator_lotAdd.adressType}
@@ -342,6 +341,8 @@ ${locator_tender.bid.BtnNext}	css=button[ng-click='commonActions.goNext(1)']
 	Sleep	5s
 	Wait Visibility And Click Element	xpath=//a[contains(@ng-class, 'file.currFileVfvError')]
 	Wait Visibility And Click Element	xpath=//li[contains(@ng-click, 'setFileType')][1]
+#	todo временный шаг, пока не добавят автоскрытие дропбокса
+	Wait Visibility And Click Element	xpath=//a[contains(@ng-class, 'file.currFileVfvError')]
 	Wait Visibility And Click Element	xpath=//button[contains(@ng-click, 'addFileFunction')]
 	Wait Visibility And Click Element	${locator_tenderAdd.btnSave}
 	Wait Until Element Is Visible	css=section[data-id="step5"]	${COMMONWAIT}
@@ -1133,7 +1134,7 @@ Login
 Wait For Ajax
 	Get Location
 #	sleep				5s
-	Wait For Condition	return window.jQuery!=undefined && jQuery.active==0	60s
+#	Wait For Condition	return window.jQuery!=undefined && jQuery.active==0	60s
 
 
 Wait Until Element Not Stale
