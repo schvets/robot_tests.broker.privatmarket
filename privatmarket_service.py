@@ -5,7 +5,9 @@ from selenium.common.exceptions import StaleElementReferenceException
 from datetime import datetime, timedelta
 from pytz import timezone
 from dateutil import parser
-
+import os
+import urllib
+import re
 
 def get_month_number(month_name):
     monthes = [u"янв.", u"февр.", u"марта", u"апр.", u"мая", u"июня",
@@ -225,8 +227,8 @@ def modify_test_data(initial_data):
 
     # set other
     # initial_data['procuringEntity']['name'] = u'Товариство З Обмеженою Відповідальністю \'Мак Медіа Прінт\''
-    # initial_data['procuringEntity']['name'] = u'Товариство З Обмеженою Відповідальністю \'Сільськогосподарська Фірма \'Рубіжне\''
-    initial_data['procuringEntity']['name'] = u'Макстрой Діск, Товариство З Обмеженою Відповідальністю'
+    initial_data['procuringEntity']['name'] = u'Товариство З Обмеженою Відповідальністю \'Сільськогосподарська Фірма \'Рубіжне\''
+    # initial_data['procuringEntity']['name'] = u'Макстрой Діск, Товариство З Обмеженою Відповідальністю'
     initial_data['items'][0]['unit']['name'] = get_unit_ru_name(initial_data['items'][0]['unit']['name'])
     return initial_data
 
@@ -257,52 +259,56 @@ def get_unit_ru_name(name):
         return expected_name
     else:
         return name
+###################### NEW From keywords ######################
+def get_document_by_id(data, doc_id):
+    for document in data.get('documents', []):
+        if doc_id in document.get('title', ''):
+            return document
+    for complaint in data.get('complaints', []):
+        for document in complaint.get('documents', []):
+            if doc_id in document.get('title', ''):
+                return document
+    for award in data.get('awards', []):
+        for document in award.get('documents', []):
+            if doc_id in document.get('title', ''):
+                return document
+        for complaint in award.get('complaints', []):
+            for document in complaint.get('documents', []):
+                if doc_id in document.get('title', ''):
+                    return document
+    for cancellation in data.get('cancellations', []):
+        for document in cancellation.get('documents', []):
+            if doc_id in document.get('title', ''):
+                return document
+    for bid in data.get('bids', []):
+        for document in bid.get('documents', []):
+            if doc_id in document.get('title', ''):
+                return document
+    raise Exception('Document with id {} not found'.format(doc_id))
 
+# def download_file_from_url(url, path_to_save_file):
+#     f = open(path_to_save_file, 'wb')
+#     f.write(urllib.urlopen(url).read())
+#     f.close()
+#     return os.path.basename(f.name)
+#
+# def get_object_type_by_id(object_id):
+#     prefixes = {'q': 'questions', 'f': 'features', 'i': 'items', 'l': 'lots'}
+#     return prefixes.get(object_id[0])
 
-def get_unit_code_by_UaRuName(name):
-    dictionary = {
-        {u'кілограми', u'кілограмів', u'килограмм', u'килограмма', u'килограммов'}: u'6',
-        {u'кілометер', u'кілометери', u'кілометрів', u'километр', u'километров', u'километра'}: u'километр',
-        {u'пара'}: u'пара',
-        {u'літр'}: u'литр',
-        {u'набір'}: u'набор',
-        {u'пачок'}: u'пачка',
-        {u'метри'}: u'метр',
-        {u'послуга'}: u'услуга',
-        {u'метри кубічні'}: u'метр кубический',
-        {u'тони'}: u'тонна',
-        {u'метри квадратні'}: u'метр квадратный',
-        {u'кілометри'}: u'километр',
-        {u'штуки'}: u'штука',
-        {u'місяць'}: u'месяц',
-        {u'пачка'}: u'пачка',
-        {u'упаковка'}: u'упаковка',
-        {u'гектар'}: u'гектар',
-        {u'блок'}: u'блок'
-        # ,
-        # u'кілограми': {u'килограмм', u'килограмма', u'килограммов'},
-        # u'пара': {u'пара', u'пары', u'пар'},
-        # u'літр': {u'литр', u'литра', u'литров'},
-        # u'набір': {u'набор', u'набора', u'наборов'},
-        # u'пачок': {u'пачка', u'пачек', u'пачки'},
-        # u'метри': {u'метр', u'метра', u'метров'},
-        # u'лот': {u'лот', u'лоты', u'лотов'},
-        # u'послуга': {u'услуга', u'услуг', u'услуги'},
-        # u'метри кубічні': {u'метр кубический', u'метра кубического', u'метров кубических'},
-        # u'ящик': {u'ящик', u'ящика', u'ящиков'},
-        # u'рейс': {u'рейс', u'рейса', u'рейсов'},
-        # u'тони': {u'тонна', u'тонны', u'тонн'},
-        # u'метри квадратні': {u'метр квадратный', u'метра квадратного', u'метров квадратных'},
-        # u'кілометри': {u'километр', u'километров', u'километра'},
-        # u'штуки': {u'штука', u'штуки', u'штук'},
-        # u'місяць': {u'месяц', u'месяца', u'месяцев'},
-        # u'пачка': {u'пачка', u'пачек', u'пачкики'},
-        # u'упаковка': {u'упковка', u'упаковок', u'упаковки'},
-        # u'гектар': {u'гектар', u'гектара', u'гектаров'},
-        # u'блок': {u'блок', u'блока', u'блоков'}
-    }
-    expected_name = dictionary.get(name)
-    if expected_name:
-        return expected_name
-    else:
-        return name
+# def get_object_index_by_id(data, object_id):
+#     if not data:
+#         return 0
+#     for index, element in enumerate(data):
+#         element_id = get_id_from_object(element)
+#         if element_id == object_id:
+#             break
+#     else:
+#         index += 1
+#     return index
+#
+# def get_id_from_object(obj):
+#     obj_id = re.match(r'(^[filq]-[0-9a-fA-F]{8}): ', obj.get('title', ''))
+#     if not obj_id:
+#         obj_id = re.match(r'(^[filq]-[0-9a-fA-F]{8}): ', obj.get('description', ''))
+#     return obj_id.group(1)
