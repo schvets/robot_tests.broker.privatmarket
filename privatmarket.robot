@@ -1,5 +1,5 @@
 *** Settings ***
-Library  Selenium2Screenshots
+#Library  Selenium2Screenshots
 Library  String
 Library  DateTime
 Library  Selenium2Library
@@ -11,86 +11,86 @@ Library  privatmarket_service.py
 ${COMMONWAIT}	40s
 
 ${tender_data_title}	xpath=//div[contains(@class,'title-div')]
-#${tender_data_description}	id=tenderDescription
-#${tender_data_procurementMethodType}	id=tenderType
+${tender_data_description}	id=tenderDescription
+${tender_data_procurementMethodType}	id=tenderType
 ${tender_data_status}	id=tenderStatus
-#${tender_data_value.amount}	id=tenderBudget
-#${tender_data_value.currency}	id=tenderBudgetCcy
-#${tender_data_value.valueAddedTaxIncluded}	id=tenderBudgetTax
-#${tender_data_tenderID}	id=tenderId
-#${tender_data_procuringEntity.name}	css=a[ng-click='commonActions.openCard()']
-#${tender_data_enquiryPeriod.startDate}	xpath=(//span[@ng-if='p.bd'])[1]
-#${tender_data_enquiryPeriod.endDate}	xpath=(//span[contains(@ng-if, 'p.ed')])[1]
-#${tender_data_tenderPeriod.startDate}	xpath=(//span[@ng-if='p.bd'])[2]
-#${tender_data_tenderPeriod.endDate}	xpath=(//span[contains(@ng-if, 'p.ed')])[2]
-#${tender_data_auctionPeriod.startDate}	xpath=(//span[@ng-if='p.bd'])[3]
-#${tender_data_minimalStep.amount}	css=div#lotMinStepAmount
-${tender_data_items.description}	xpath=//a[contains(@ng-click, 'adb.showCl = !adb.showCl')]
-#${tender_data_items.deliveryDate.endDate}	xpath=//div[@ng-if='adb.deliveryDate.endDate']/div[2]
-#${tender_data_items.deliveryLocation.latitude}	css=span.latitude
-#${tender_data_items.deliveryLocation.longitude}	css=span.longitude
-#${tender_data_items.deliveryAddress.countryName}	css=span#countryName
-#${tender_data_items.deliveryAddress.postalCode}	css=span#postalCode
-#${tender_data_items.deliveryAddress.region}	css=span#region
-#${tender_data_items.deliveryAddress.locality}	css=span#locality
-#${tender_data_items.deliveryAddress.streetAddress}	css=span#streetAddress
+${tender_data_value.amount}	id=tenderBudget
+${tender_data_value.currency}	id=tenderBudgetCcy
+${tender_data_value.valueAddedTaxIncluded}	id=tenderBudgetTax
+${tender_data_tenderID}	id=tenderId
+${tender_data_procuringEntity.name}	css=a[ng-click='commonActions.openCard()']
+${tender_data_enquiryPeriod.startDate}	xpath=(//span[@ng-if='p.bd'])[1]
+${tender_data_enquiryPeriod.endDate}	xpath=(//span[contains(@ng-if, 'p.ed')])[1]
+${tender_data_tenderPeriod.startDate}	xpath=(//span[@ng-if='p.bd'])[2]
+${tender_data_tenderPeriod.endDate}	xpath=(//span[contains(@ng-if, 'p.ed')])[2]
+${tender_data_auctionPeriod.startDate}	xpath=(//span[@ng-if='p.bd'])[3]
+${tender_data_minimalStep.amount}	css=div#lotMinStepAmount
+${tender_data_items.description}	//div[@class="description"]//span
+${tender_data_items.deliveryDate.endDate}	xpath=//div[@ng-if='adb.deliveryDate.endDate']/div[2]
+${tender_data_items.deliveryLocation.latitude}	css=span.latitude
+${tender_data_items.deliveryLocation.longitude}	css=span.longitude
+${tender_data_items.deliveryAddress.countryName}	css=span#countryName
+${tender_data_items.deliveryAddress.postalCode}	css=span#postalCode
+${tender_data_items.deliveryAddress.region}	css=span#region
+${tender_data_items.deliveryAddress.locality}	css=span#locality
+${tender_data_items.deliveryAddress.streetAddress}	css=span#streetAddress
 #TODO - следующие 3 локатора одинаковые
-#${tender_data_items.classification.scheme}	xpath=//div[@ng-if="adb.classification"]
-#${tender_data_items.classification.id}	xpath=//div[@ng-if="adb.classification"]
-#${tender_data_items.classification.description}	xpath=//div[@ng-if="adb.classification"]
+${tender_data_items.classification.scheme}	xpath=//div[@ng-if="adb.classification"]
+${tender_data_items.classification.id}	xpath=//div[@ng-if="adb.classification"]
+${tender_data_items.classification.description}	xpath=//div[@ng-if="adb.classification"]
 #TODO - следующие 3 локатора одинаковые
-#${tender_data_items.additionalClassifications[0].scheme}	xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
-#${tender_data_items.additionalClassifications[0].id}	xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
-#${tender_data_items.additionalClassifications[0].description}	xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
+${tender_data_items.additionalClassifications[0].scheme}	xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
+${tender_data_items.additionalClassifications[0].id}	xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
+${tender_data_items.additionalClassifications[0].description}	xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
 #TODO - следующие 2 локатора одинаковые
-#${tender_data_items.unit.name}	xpath=//div[@ng-if='adb.quantity']/div[2]/span[2]
-#${tender_data_items.unit.code}	xpath=//div[@ng-if='adb.quantity']/div[2]/span[2]
-#${tender_data_items.quantity}	xpath=//div[@ng-if='adb.quantity']/div[2]/span
-#${tender_data_questions[0].description}	css=div.question-div
-#${tender_data_questions[0].date}	xpath=//div[@class = 'question-head title']/b[2]
-#${tender_data_questions[0].title}	css=div.question-head.title span
-#${tender_data_questions[0].answer}	xpath=//div[@ng-if='q.answer']//div[@class='ng-binding']
-#${tender_data_lots.title}	css=div.lot-head span.ng-binding
-#${tender_data_lots.description}	css=section.lot-description section.description
-#${tender_data_lots.value.amount}	css=section.lot-description div[ng-if='model.checkedLot.value'] div.info-item-val
-#${tender_data_bids}	xpath=(//table[@class='bids']//tr)[2]
-#${tender_data_cancellations[0].status}	xpath=//*[@id='nolotSection']/div[1]/div[1]
-#${tender_data_cancellations[0].reason}	xpath=//*[@id='nolotSection']/div[1]/div[2]
-#${tender_data_cancellations[0].documents[0].title}	css=.file-name.ng-binding
-#${tender_data_title_en}	css=.title-div.ng-binding
-#${tender_data_title_ru}	css=.title-div.ng-binding
-#${tender_data_description_en}	css=#tenderDescription
-#${tender_data_description_ru}	css=#tenderDescription
-#${tender_data_procuringEntity.address.countryName}	css=#procurerAddr #countryName
-#${tender_data_procuringEntity.address.locality}	css=#procurerAddr #locality
-#${tender_data_procuringEntity.address.postalCode}	css=#procurerAddr #postalCode
-#${tender_data_procuringEntity.address.region}	css=#procurerAddr #region
-#${tender_data_procuringEntity.address.streetAddress}	css=#procurerAddr #streetAddress
-#${tender_data_procuringEntity.contactPoint.name}	xpath=//div[@class='delivery-info']/div[2]/div[@class='info-item-val ng-binding']
-#${tender_data_procuringEntity.contactPoint.telephone}	xpath=//div[@class='delivery-info']/div[4]/div[@class='info-item-val ng-binding']
-#${tender_data_procuringEntity.contactPoint.url}	xpath=//div[@class='delivery-info']/div[5]/div[@class='info-item-val ng-binding']
-#${tender_data_procuringEntity.identifier.legalName}	xpath=//div[@id='procurerLegalName']/div[2]
-#${tender_data_procuringEntity.identifier.scheme}	xpath=//div[@id='procurerId']/div[1]
-#${tender_data_procuringEntity.identifier.id}	xpath=//div[@id='procurerId']/div[2]
-#${tender_data_causeDescription}	css=#tenderType>div
-#${complaints[0].title}	xpath=(//div[@class='title']/span)[1]
-#${complaints[0].description}	xpath=(//div[@ng-bind-html='q.description'])[1]
-#${complaints[0].documents.title}	xpath=(//span[@class='file-name'])[1]
-#${complaints[0].status}	xpath=(//div[contains(@ng-if,'q.status')])[1]
+${tender_data_items.unit.name}	xpath=//div[@ng-if='adb.quantity']/div[2]/span[2]
+${tender_data_items.unit.code}	xpath=//div[@ng-if='adb.quantity']/div[2]/span[2]
+${tender_data_items.quantity}	xpath=//div[@ng-if='adb.quantity']/div[2]/span
+${tender_data_questions[0].description}	css=div.question-div
+${tender_data_questions[0].date}	xpath=//div[@class = 'question-head title']/b[2]
+${tender_data_questions[0].title}	css=div.question-head.title span
+${tender_data_questions[0].answer}	xpath=//div[@ng-if='q.answer']//div[@class='ng-binding']
+${tender_data_lots.title}	css=div.lot-head span.ng-binding
+${tender_data_lots.description}	css=section.lot-description section.description
+${tender_data_lots.value.amount}	css=section.lot-description div[ng-if='model.checkedLot.value'] div.info-item-val
+${tender_data_bids}	xpath=(//table[@class='bids']//tr)[2]
+${tender_data_cancellations[0].status}	xpath=//*[@id='nolotSection']/div[1]/div[1]
+${tender_data_cancellations[0].reason}	xpath=//*[@id='nolotSection']/div[1]/div[2]
+${tender_data_cancellations[0].documents[0].title}	css=.file-name.ng-binding
+${tender_data_title_en}	css=.title-div.ng-binding
+${tender_data_title_ru}	css=.title-div.ng-binding
+${tender_data_description_en}	css=#tenderDescription
+${tender_data_description_ru}	css=#tenderDescription
+${tender_data_procuringEntity.address.countryName}	css=#procurerAddr #countryName
+${tender_data_procuringEntity.address.locality}	css=#procurerAddr #locality
+${tender_data_procuringEntity.address.postalCode}	css=#procurerAddr #postalCode
+${tender_data_procuringEntity.address.region}	css=#procurerAddr #region
+${tender_data_procuringEntity.address.streetAddress}	css=#procurerAddr #streetAddress
+${tender_data_procuringEntity.contactPoint.name}	xpath=//div[@class='delivery-info']/div[2]/div[@class='info-item-val ng-binding']
+${tender_data_procuringEntity.contactPoint.telephone}	xpath=//div[@class='delivery-info']/div[4]/div[@class='info-item-val ng-binding']
+${tender_data_procuringEntity.contactPoint.url}	xpath=//div[@class='delivery-info']/div[5]/div[@class='info-item-val ng-binding']
+${tender_data_procuringEntity.identifier.legalName}	xpath=//div[@id='procurerLegalName']/div[2]
+${tender_data_procuringEntity.identifier.scheme}	xpath=//div[@id='procurerId']/div[1]
+${tender_data_procuringEntity.identifier.id}	xpath=//div[@id='procurerId']/div[2]
+${tender_data_causeDescription}	css=#tenderType>div
+${complaints[0].title}	xpath=(//div[@class='title']/span)[1]
+${complaints[0].description}	xpath=(//div[@ng-bind-html='q.description'])[1]
+${complaints[0].documents.title}	xpath=(//span[@class='file-name'])[1]
+${complaints[0].status}	xpath=(//div[contains(@ng-if,'q.status')])[1]
 ${locator_tender.switchToDemo}	css=a#test-model-switch
 ${locator_tender.switchToDemo.message}	css=.test-mode-popup-content.ng-binding
-#${locator_tenderCreation.buttonEdit}	xpath=//button[@ng-click='act.createAfp()']
+${locator_tenderCreation.buttonEdit}	xpath=//button[@ng-click='act.createAfp()']
 ${locator_tenderCreation.buttonSend}	css=button[data-id='actSend']
-#${locator_tenderCreation.buttonSave}	css=button.btn.btn-success
-#${locator_tenderCreation.buttonBack}	xpath=//a[@ng-click='act.goBack()']
-#${locator_tenderCreation.description}	css=textarea[ng-model='model.filterData.adbName']
+${locator_tenderCreation.buttonSave}	css=button.btn.btn-success
+${locator_tenderCreation.buttonBack}	xpath=//a[@ng-click='act.goBack()']
+${locator_tenderCreation.description}	css=textarea[ng-model='model.filterData.adbName']
 ${locator_tenderClaim.buttonCreate}	css=button[ng-click='commonActions.createAfp()']
 ${locator_tenderClaim.fieldPrice}	css=input[ng-model='model.userPrice']
 ${locator_tenderClaim.checkedLot.fieldPrice}	xpath=//input[@ng-model='model.checkedLot.userPrice']
-#${locator_tenderClaim.fieldEmail}	css=input[ng-model='model.person.email']
+${locator_tenderClaim.fieldEmail}	css=input[ng-model='model.person.email']
 ${locator_tenderClaim.buttonSend}	css=button[ng-click='act.sendAfp()']
 ${locator_tenderClaim.buttonCancel}	css=a[ng-click='act.delAfp()']
-#${locator_tenderClaim.buttonGoBack}	css=a[ng-click='act.ret2Ad()']
+${locator_tenderClaim.buttonGoBack}	css=a[ng-click='act.ret2Ad()']
 ${locator_tender.ajax_overflow}	xpath=//div[@class='ajax_overflow']
 ${locator_tenderSearch.searchInput}	css=input#search-query-input
 ${locator_tenderSearch.tendersList}	css=tr[ng-repeat='t in model.tenderList']
@@ -129,7 +129,7 @@ ${locator_tender.bid.BtnNext}	css=button[ng-click='commonActions.goNext(1)']
 
 *** Keywords ***
 Підготувати дані для оголошення тендера
-	[Arguments]  ${username}  ${tender_data}
+	[Arguments]  ${username}  ${tender_data}  ${role_name}
 	${tender_data.data} = 	Run Keyword If	'PrivatMarket_Owner' == '${username}'	modify_test_data	${tender_data.data}
 #	${tender_data.data} = 	modify_test_data	${tender_data.data}
 	[Return]  ${tender_data}
@@ -331,6 +331,7 @@ ${locator_tender.bid.BtnNext}	css=button[ng-click='commonActions.goNext(1)']
 #	перейдем к редактированию
 	Wait For Element With Reload	${locator_tenderClaim.buttonCreate}	1
 #	Wait For Ajax
+    Wait For Element With Reload  ${locator_tenderClaim.buttonCreate} 1
 	Wait Visibility And Click Element	${locator_tenderClaim.buttonCreate}
 #	откроем нужную вкладку
 	Wait Visibility And Click Element	${locator_tenderAdd.thirdTab}
@@ -365,7 +366,8 @@ ${locator_tender.bid.BtnNext}	css=button[ng-click='commonActions.goNext(1)']
 	Run Keyword IF	'checked-nav' in '${element_class}'	Return From Keyword	True
 
 	Wait Visibility And Click Element	xpath=//li[contains(@ng-class, 'description')]
-	Wait Until Element Is Visible	xpath=//section[contains(@ng-if, "model.ad.showTab == 'description'")]
+
+	Wait Until Element Is Visible	xpath=//section[contains(@ng-if, "lot.showTab == 'description'")]
 #	Wait Until Element Not Stale	xpath=//section[contains(@ng-if, "model.ad.showTab == 'description'")]	40
 	Wait Visibility And Click Element	${tender_data_items.description}
 	Wait Until Element Is Visible	css=div[ng-if='adb.classification']
@@ -380,7 +382,7 @@ ${locator_tender.bid.BtnNext}	css=button[ng-click='commonActions.goNext(1)']
 
 
 Отримати інформацію із тендера
-	[Arguments]  ${user_name}  ${element}
+	[Arguments]  ${user_name}  ${tender_uaid}  ${element}
 	Switch To PMFrame
 	Wait Until Element Is Visible		${tender_data_title}	timeout=${COMMONWAIT}
 
@@ -459,6 +461,25 @@ ${locator_tender.bid.BtnNext}	css=button[ng-click='commonActions.goNext(1)']
 	${result_full} =				Get Text	${tender_data_${element}}
 	${result} =						Strip String	${result_full}
 	[return]	${result}
+
+
+Отримати інформацію із предмету
+	[Arguments]  ${username}  ${tender_uaid}  ${object_id}  ${field_name}
+    ${element} =  Set Variable  xpath=//section/div[contains(., '${object_id}') and contains(@class, 'lot-info')]${tender_data_items.${field_name}}
+
+	Wait Until Element Is Visible  ${element}  timeout=${COMMONWAIT}
+	${result_full} =  Get Text	${element}
+	${result} =  Strip String	${result_full}
+	[return]  ${result}
+
+
+Отримати інформацію із запитання
+	[Arguments]  ${username}  ${tender_uaid}  ${object_id}  ${field_name}
+    debug
+    ${element}=  Set Variable  xpath=//section/div[contains(., '${object_id}') and contains(@class, 'lot-info')]
+
+
+
 
 
 Отримати текст елемента
@@ -1354,14 +1375,8 @@ Switch To PMFrame
 Search By Query
 	[Arguments]  ${element}  ${query}
 	Wait Element Visibulity And Input Text	${element}	${query}
-#	Sleep	1s
-#	Wait Until Element Is Visible	css=div[data-id="foundItem"]
-#	Press Key	${element}	\\08
-	Wait For Ajax
-#	Wait Until Element Is Enabled	css=input[id='found_${query}']	${COMMONWAIT}
-#	Wait Until Element Not Stale	xpath=//div[input[@id='found_${query}']]	5
-	Wait Visibility And Click Element	xpath=//div[input[@id='found_${query}']]
-#	Click Element	xpath=//div[input[@id='found_${query}']]
+	Wait Visibility And Click Element	xpath=//div[@data-id='foundItem']//label[@for='found_${query}']
+
 
 #//TODO - unused
 #Get Locator And Type
