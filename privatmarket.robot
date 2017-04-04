@@ -46,6 +46,28 @@ ${tender_data_items.additionalClassifications[0].description}	xpath=//div[@ng-re
 ${tender_data_items.unit.name}	xpath=//div[@ng-if='adb.quantity']/div[2]/span[2]
 ${tender_data_items.unit.code}	xpath=//div[@ng-if='adb.quantity']/div[2]/span[2]
 ${tender_data_items.quantity}	xpath=//div[@ng-if='adb.quantity']/div[2]/span
+
+#############################################################
+${tender_data_item.description}	//div[@class="description"]//span
+${tender_data_item.deliveryDate.endDate}	xpath=//div[@ng-if='adb.deliveryDate.endDate']/div[2]
+${tender_data_item.deliveryLocation.latitude}	css=span.latitude
+${tender_data_item.deliveryLocation.longitude}	css=span.longitude
+${tender_data_item.deliveryAddress.countryName}	css=span#countryName
+${tender_data_item.deliveryAddress.postalCode}	css=span#postalCode
+${tender_data_item.deliveryAddress.region}	css=span#region
+${tender_data_item.deliveryAddress.locality}	css=span#locality
+${tender_data_item.deliveryAddress.streetAddress}	css=span#streetAddress
+${tender_data_item.classification.scheme}	xpath=//div[@ng-if="adb.classification"]
+${tender_data_item.classification.id}	xpath=//div[@ng-if="adb.classification"]
+${tender_data_item.classification.description}	xpath=//div[@ng-if="adb.classification"]
+${tender_data_item.additionalClassifications[0].scheme}	xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
+${tender_data_item.additionalClassifications[0].id}	xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
+${tender_data_item.additionalClassifications[0].description}	xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
+${tender_data_item.unit.name}	xpath=//div[@ng-if='adb.quantity']/div[2]/span[2]
+${tender_data_item.unit.code}	xpath=//div[@ng-if='adb.quantity']/div[2]/span[2]
+${tender_data_item.quantity}	xpath=//div[@ng-if='adb.quantity']/div[2]/span
+#############################################################
+
 ${tender_data_questions[0].description}	css=div.question-div
 ${tender_data_questions[0].date}	xpath=//div[@class = 'question-head title']/b[2]
 ${tender_data_questions[0].title}	css=div.question-head.title span
@@ -395,7 +417,8 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 
 Отримати інформацію із предмету
 	[Arguments]  ${username}  ${tender_uaid}  ${object_id}  ${field_name}
-    ${element} =  Set Variable  xpath=//section/div[contains(., '${object_id}') and contains(@class, 'lot-info')]${tender_data_items.${field_name}}
+#	//div[@class="description"]//span
+    ${element} =  Set Variable  xpath=//section/div[contains(., '${object_id}') and contains(@class, 'lot-info')]${tender_data_item.${field_name}}
 	Wait Until Element Is Visible  ${element}  timeout=${COMMONWAIT}
 	${result_full} =  Get Text	${element}
 	${result} =  Strip String	${result_full}
