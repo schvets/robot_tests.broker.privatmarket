@@ -213,8 +213,8 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	#we should add choosing of procurementMethodType
 #	Wait For Ajax
 	Switch To PMFrame
-	Wait Element Visibulity And Input Text	${locator_tenderAdd.procurementName}	${tender_data.data.title}
-	Wait Element Visibulity And Input Text	${locator_tenderAdd.procurementDescription}	${tender_data.data.description}
+	Wait Element Visibility And Input Text	${locator_tenderAdd.procurementName}	${tender_data.data.title}
+	Wait Element Visibility And Input Text	${locator_tenderAdd.procurementDescription}	${tender_data.data.description}
 
 	#CPV
 	Wait Visibility And Click Element	${locator_tenderAdd.procurementClassifications}
@@ -236,22 +236,22 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	Set Date And Time	tenderPeriod	endDate	css=span[data-id='ptrTenderPeriodEndDate'] input[ng-model='inputTime']	${tender_data.data.tenderPeriod.endDate}
 
 	#procuringEntityAddress
-	Wait Element Visibulity And Input Text	${locator_lotAdd.postalCode}	${tender_data.data.procuringEntity.address.postalCode}
-	Wait Element Visibulity And Input Text	${locator_lotAdd.countryName}	${tender_data.data.procuringEntity.address.countryName}
-	Wait Element Visibulity And Input Text	${locator_lotAdd.region}	${tender_data.data.procuringEntity.address.region}
-	Wait Element Visibulity And Input Text	${locator_lotAdd.locality}	${tender_data.data.procuringEntity.address.locality}
-	Wait Element Visibulity And Input Text	${locator_lotAdd.streetAddress}	${tender_data.data.procuringEntity.address.streetAddress}
+	Wait Element Visibility And Input Text	${locator_lotAdd.postalCode}	${tender_data.data.procuringEntity.address.postalCode}
+	Wait Element Visibility And Input Text	${locator_lotAdd.countryName}	${tender_data.data.procuringEntity.address.countryName}
+	Wait Element Visibility And Input Text	${locator_lotAdd.region}	${tender_data.data.procuringEntity.address.region}
+	Wait Element Visibility And Input Text	${locator_lotAdd.locality}	${tender_data.data.procuringEntity.address.locality}
+	Wait Element Visibility And Input Text	${locator_lotAdd.streetAddress}	${tender_data.data.procuringEntity.address.streetAddress}
 
 	#contactPoint
-	Wait Element Visibulity And Input Text	css=input[data-id='name']	${tender_data.data.procuringEntity.contactPoint.name}
+	Wait Element Visibility And Input Text	css=input[data-id='name']	${tender_data.data.procuringEntity.contactPoint.name}
 	${modified_phone} = 	Remove String	${tender_data.data.procuringEntity.contactPoint.telephone}	${SPACE}
 	${modified_phone} = 	Remove String	${modified_phone}	-
 	${modified_phone} = 	Remove String	${modified_phone}	(
 	${modified_phone} = 	Remove String	${modified_phone}	)
 	${modified_phone} = 	Set Variable If	'+38' in '${modified_phone}'	${modified_phone}	+38067${modified_phone}
 	${modified_phone} = 	Get Substring	${modified_phone}	0	13
-	Wait Element Visibulity And Input Text	css=input[data-id='telephone']	${modified_phone}
-	Wait Element Visibulity And Input Text	css=input[data-id='email']	${USERS.users['${username}'].email}
+	Wait Element Visibility And Input Text	css=input[data-id='telephone']	${modified_phone}
+	Wait Element Visibility And Input Text	css=input[data-id='email']	${USERS.users['${username}'].email}
 	Wait Visibility And Click Element	${locator_tenderAdd.btnSave}
 
 #step 1
@@ -294,17 +294,17 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	Switch To PMFrame
 
 	: FOR    ${index}    IN RANGE    0    ${lots_count}
-	\    Wait Element Visibulity And Input Text	css=input[data-id='title']	${lots[${index}].title}
-	\    Wait Element Visibulity And Input Text	css=textarea[data-id='description']	${lots[${index}].description}
+	\    Wait Element Visibility And Input Text	css=input[data-id='title']	${lots[${index}].title}
+	\    Wait Element Visibility And Input Text	css=textarea[data-id='description']	${lots[${index}].description}
 	\    ${value_amount} = 	Convert to String	${lots[${index}].value.amount}
 	\    ${minimalStep_amount} = 	Convert to String	${lots[${index}].minimalStep.amount}
-	\    Wait Element Visibulity And Input Text	css=input[data-id='valueAmount']	${value_amount}
+	\    Wait Element Visibility And Input Text	css=input[data-id='valueAmount']	${value_amount}
 	\    Sleep	3s
 #	\    Input Text		css=input[data-id='minimalStepAmount']	${minimalStep_amount}1
-	\    Wait Element Visibulity And Input Text	css=input[data-id='minimalStepAmount']	${minimalStep_amount}
+	\    Wait Element Visibility And Input Text	css=input[data-id='minimalStepAmount']	${minimalStep_amount}
 #	\    Sleep	1s
 	\    Wait Visibility And Click Element	css=div.lot-guarantee label
-	\    Wait Element Visibulity And Input Text	css=input[data-id='guaranteeAmount']	1
+	\    Wait Element Visibility And Input Text	css=input[data-id='guaranteeAmount']	1
 
 
 Додати items
@@ -313,8 +313,8 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	Switch To PMFrame
 	: FOR    ${index}    IN RANGE    0    ${items_count}
 #	todo: настроить тесты для нескольких предметов закупки по индексу
-	\    Wait Element Visibulity And Input Text	${locator_lotAdd.description}	${items[${index}].description}
-	\    Wait Element Visibulity And Input Text	${locator_lotAdd.quantity}	${items[${index}].quantity}
+	\    Wait Element Visibility And Input Text	${locator_lotAdd.description}	${items[${index}].description}
+	\    Wait Element Visibility And Input Text	${locator_lotAdd.quantity}	${items[${index}].quantity}
 #	debug
 #	\todo Раскомитить строку. Временная замена, пока вернут текстовую меру для закупок
 #	\    Wait Visibility And Click Element	xpath=//select[@data-id='unit']/option[text()='${items[${index}].unit.name}']
@@ -322,11 +322,11 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	\    ${deliveryDate} =	Get Regexp Matches	${items[${index}].deliveryDate.endDate}	(\\d{4}-\\d{2}-\\d{2})
 	\    ${deliveryDate} =	Convert Date	${deliveryDate[0]}	result_format=%d-%m-%Y
 	\    Wait Visibility And Click Element	${locator_lotAdd.adressType}
-	\    Wait Element Visibulity And Input Text	${locator_lotAdd.postalCode}	${items[${index}].deliveryAddress.postalCode}
-	\    Wait Element Visibulity And Input Text	${locator_lotAdd.countryName}	${items[${index}].deliveryAddress.countryName}
-	\    Wait Element Visibulity And Input Text	${locator_lotAdd.region}	${items[${index}].deliveryAddress.region}
-	\    Wait Element Visibulity And Input Text	${locator_lotAdd.locality}	${items[${index}].deliveryAddress.locality}
-	\    Wait Element Visibulity And Input Text	${locator_lotAdd.streetAddress}	${items[${index}].deliveryAddress.streetAddress}
+	\    Wait Element Visibility And Input Text	${locator_lotAdd.postalCode}	${items[${index}].deliveryAddress.postalCode}
+	\    Wait Element Visibility And Input Text	${locator_lotAdd.countryName}	${items[${index}].deliveryAddress.countryName}
+	\    Wait Element Visibility And Input Text	${locator_lotAdd.region}	${items[${index}].deliveryAddress.region}
+	\    Wait Element Visibility And Input Text	${locator_lotAdd.locality}	${items[${index}].deliveryAddress.locality}
+	\    Wait Element Visibility And Input Text	${locator_lotAdd.streetAddress}	${items[${index}].deliveryAddress.streetAddress}
 	\    Wait Until Element Is Visible	${locator_lotAdd.deliveryEndDate}	${COMMONWAIT}
 	\    Set Date In Item	${index}	deliveryDate	endDate	${items[${index}].deliveryDate.endDate}
 
@@ -387,36 +387,49 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 ##########################################################################################
 #           New Methods
 ##########################################################################################
+#Отримати інформацію із предмету
+#	[Arguments]  ${username}  ${tender_uaid}  ${item_id}  ${field_name}
+##	debug
+#	${field_name}=  Отримати шлях до поля об’єкта  ${username}  ${field_name}  ${item_id}
+#	Run Keyword And Return  Отримати інформацію із тендера  ${username}  ${tender_uaid}  ${field_name}
+
 Отримати інформацію із предмету
-  [Arguments]  ${username}  ${tender_uaid}  ${item_id}  ${field_name}
-  ${field_name}=  keywords.Отримати шлях до поля об’єкта  ${username}  ${field_name}  ${item_id}
-  Run Keyword And Return  privatmarket.Отримати інформацію із тендера  ${username}  ${tender_uaid}  ${field_name}
+	[Arguments]  ${username}  ${tender_uaid}  ${object_id}  ${field_name}
+    ${element} =  Set Variable  xpath=//section/div[contains(., '${object_id}') and contains(@class, 'lot-info')]${tender_data_items.${field_name}}
+	Wait Until Element Is Visible  ${element}  timeout=${COMMONWAIT}
+	${result_full} =  Get Text	${element}
+	${result} =  Strip String	${result_full}
+	[Return]  ${result}
 
-Отримати шлях до поля об’єкта
-  [Arguments]  ${username}  ${field_name}  ${object_id}
-  ${object_type}=  get_object_type_by_id  ${object_id}
-  ${objects}=  Get Variable Value  ${USERS.users['${username}'].tender_data.data['${object_type}']}  ${None}
-  ${object_index}=  get_object_index_by_id  ${objects}  ${object_id}
-  [Return]  ${object_type}[${object_index}].${field_name}
+#Отримати шлях до поля об’єкта
+#	[Arguments]  ${username}  ${field_name}  ${object_id}
+##	debug
+#	${object_type}=  get_object_type_by_id  ${object_id}
+#	${objects}=  Get Variable Value  ${tender_data.data['${object_type}']}  ${None}
+#	${object_index}=  get_object_index_by_id  ${objects}  ${object_id}
+#	[Return]  ${object_type}[${object_index}].${field_name}
 
-Отримати інформацію із запитання
-  [Arguments]  ${username}  ${tender_uaid}  ${question_id}  ${field_name}
-  ${field_name}=  Отримати шлях до поля об’єкта  ${username}  ${field_name}  ${question_id}
-  Run Keyword And Return  Отримати інформацію із тендера  ${username}  ${tender_uaid}  ${field_name}
+#Отримати інформацію із запитання
+#	[Arguments]  ${username}  ${tender_uaid}  ${question_id}  ${field_name}
+##	debug
+#	${field_name}=  Отримати шлях до поля об’єкта  ${username}  ${field_name}  ${question_id}
+#	Run Keyword And Return  Отримати інформацію із тендера  ${username}  ${tender_uaid}  ${field_name}
 
-Отримати інформацію із документа
-  [Arguments]  ${username}  ${tender_uaid}  ${doc_id}  ${field}
-  ${tender}=  Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
-  ${document}=  get_document_by_id  ${tender.data}  ${doc_id}
-  Log  ${document}
-  [Return]  ${document['${field}']}
-
-Отримати документ
-  [Arguments]  ${username}  ${tender_uaid}  ${doc_id}
-  ${tender}=  Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
-  ${document}=  get_document_by_id  ${tender.data}  ${doc_id}
-  ${filename}=  download_file_from_url  ${document.url}  ${OUTPUT_DIR}${/}${document.title}
-  [Return]  ${filename}
+#Отримати інформацію із документа
+#	[Arguments]  ${username}  ${tender_uaid}  ${doc_id}  ${field}
+##	debug
+#	${tender}=  Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
+#	${document}=  get_document_by_id  ${tender.data}  ${doc_id}
+#	Log  ${document}
+#	[Return]  ${document['${field}']}
+#
+#Отримати документ
+#	[Arguments]  ${username}  ${tender_uaid}  ${doc_id}
+##	debug
+#	${tender}=  Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
+#	${document}=  get_document_by_id  ${tender.data}  ${doc_id}
+#	${filename}=  download_file_from_url  ${document.url}  ${OUTPUT_DIR}${/}${document.title}
+#	[Return]  ${filename}
 
 ##########################################################################################
 
@@ -455,7 +468,7 @@ Covert Amount To Number
 	${text_new}=  Replace String	${text}	${SPACE}	${EMPTY}
 	${result}=	convert to number	${text_new}
 	[Return]	${result}
-	
+
 ######################### TMP #########################
 Currency Convert
 	[Arguments]  ${field_name}
@@ -753,7 +766,7 @@ Tax Convert
 	Wait For Ajax
 	Switch To PMFrame
 #	Wait Visibility And Click Element	css=#tab_0 a
-	Wait Element Visibulity And Input Text	css=textarea[data-id='procurementDescription']	${value}
+	Wait Element Visibility And Input Text	css=textarea[data-id='procurementDescription']	${value}
 
 	Wait Visibility And Click Element	${locator_tenderAdd.btnSave}
 	Wait Until Element Is Visible	css=section[data-id="step2"]	${COMMONWAIT}
@@ -776,8 +789,8 @@ Tax Convert
 	Wait For Element Value				css=input[ng-model='model.person.phone']
 #	Wait Until Element Is Visible		xpath=//input[@ng-model='model.complaint.user.title']	timeout=${COMMONWAIT}
 	Wait Until Element Is Enabled		xpath=//input[@ng-model='model.complaint.user.title']	timeout=${COMMONWAIT}
-	Wait Element Visibulity And Input Text	xpath=//input[@ng-model='model.complaint.user.title']	${complaints.data.title}
-	Wait Element Visibulity And Input Text	css=div.info-item-val textarea	${complaints.data.description}
+	Wait Element Visibility And Input Text	xpath=//input[@ng-model='model.complaint.user.title']	${complaints.data.title}
+	Wait Element Visibility And Input Text	css=div.info-item-val textarea	${complaints.data.description}
 	Wait Until Element Is Visible		xpath=//input[@ng-model='model.person.email']	timeout=${COMMONWAIT}
 	Scroll Page To Element				xpath=//input[@ng-model='model.person.email']
 	Input Text							xpath=//input[@ng-model='model.person.email']			${USERS.users['${user}'].email}
@@ -867,13 +880,13 @@ Tax Convert
 	Wait Until Element Is Visible	xpath=//input[@ng-model="model.question.title"]				timeout=10
 	Wait Until Element Is Enabled	xpath=//input[@ng-model="model.question.title"]				timeout=10
 	Input text	xpath=//input[@ng-model="model.question.title"]				${question.data.title}
-	Wait Element Visibulity And Input Text	xpath=//textarea[@ng-model='model.question.description']	${question.data.description}
-	Wait Element Visibulity And Input Text	xpath=//input[@ng-model='model.person.email']	${USERS.users['${provider}'].email}
+	Wait Element Visibility And Input Text	xpath=//textarea[@ng-model='model.question.description']	${question.data.description}
+	Wait Element Visibility And Input Text	xpath=//input[@ng-model='model.person.email']	${USERS.users['${provider}'].email}
 	Select From List By Value	id=addressCountry	UA
-	Wait Element Visibulity And Input Text	id=addressPostalCode	${question.data.author.address.postalCode}
-	Wait Element Visibulity And Input Text	id=addressRegion	${question.data.author.address.region}
-	Wait Element Visibulity And Input Text	id=addressLocality	${question.data.author.address.locality}
-	Wait Element Visibulity And Input Text	id=addressStreet	${question.data.author.address.streetAddress}
+	Wait Element Visibility And Input Text	id=addressPostalCode	${question.data.author.address.postalCode}
+	Wait Element Visibility And Input Text	id=addressRegion	${question.data.author.address.region}
+	Wait Element Visibility And Input Text	id=addressLocality	${question.data.author.address.locality}
+	Wait Element Visibility And Input Text	id=addressStreet	${question.data.author.address.streetAddress}
 	Wait Visibility And Click Element	xpath=//button[@ng-click='act.sendQuestion()']
 #TODO проверка на текст. Необходимо проверить и заменить
 #    log to console  TODO проверка на текст. Необходимо проверить и заменить
@@ -898,7 +911,7 @@ Tax Convert
 	Switch To Tab	2
 	Wait For Element With Reload	xpath=//button[contains(@ng-click, 'act.answerFaq')]	2
 	Wait Visibility And Click Element	xpath=//button[contains(@ng-click, 'act.answerFaq')]
-	Wait Element Visibulity And Input Text	id=questionAnswer	${answer_data.data.answer}
+	Wait Element Visibility And Input Text	id=questionAnswer	${answer_data.data.answer}
 	Sleep	2s
 	Wait Visibility And Click Element	id=btnSendAnswer
 #TODO проверка на текст. Необходимо проверить и заменить
@@ -965,10 +978,10 @@ Fill Adress
 	[Arguments]  ${bid}
 	Switch To PMFrame
 	Wait Visibility And Click Element	xpath=//a[contains(@ng-click, 'address')]
-	Wait Element Visibulity And Input Text	id=addressPostalCode	${bid.data.tenderers[0].address.postalCode}
-	Wait Element Visibulity And Input Text	id=addressRegion	${bid.data.tenderers[0].address.region}
-	Wait Element Visibulity And Input Text	id=addressLocality	${bid.data.tenderers[0].address.locality}
-	Wait Element Visibulity And Input Text	id=addressStreet	${bid.data.tenderers[0].address.streetAddress}
+	Wait Element Visibility And Input Text	id=addressPostalCode	${bid.data.tenderers[0].address.postalCode}
+	Wait Element Visibility And Input Text	id=addressRegion	${bid.data.tenderers[0].address.region}
+	Wait Element Visibility And Input Text	id=addressLocality	${bid.data.tenderers[0].address.locality}
+	Wait Element Visibility And Input Text	id=addressStreet	${bid.data.tenderers[0].address.streetAddress}
 	Wait Visibility And Click Element	${locator_tender.complaint.btnSave}
 #	wait until element is not visible	id=addressPostalCode
 
@@ -977,7 +990,7 @@ Fill Phone
 	[Arguments]  ${bid}
 	switch to pmframe
 	Wait Visibility And Click Element	xpath=//a[contains(@ng-click, 'person')]
-	Wait Element Visibulity And Input Text	id=personPhone	${bid.data.tenderers[0].contactPoint.telephone}
+	Wait Element Visibility And Input Text	id=personPhone	${bid.data.tenderers[0].contactPoint.telephone}
 	Wait Visibility And Click Element	${locator_tender.complaint.btnSave}
 #	wait until element is not visible	id=addressPostalCode
 
@@ -1024,7 +1037,7 @@ Fill Phone
 
 Змінити lotValues.0.value.amount
 	[Arguments]  ${fieldvalue}
-	Wait Element Visibulity And Input Text	${locator_tenderClaim.checkedLot.fieldPrice}	${fieldvalue}
+	Wait Element Visibility And Input Text	${locator_tenderClaim.checkedLot.fieldPrice}	${fieldvalue}
 
 
 Змінити value.amount
@@ -1162,7 +1175,7 @@ Fill Phone
 Змінити buyerOnly для файлу
 	[Arguments]  ${bidid}
 	Wait Visibility And Click Element	xpath=(//div[@ng-if='model.canSecretFiles'])[last()]
-	Wait Element Visibulity And Input Text	css=textarea[ng-model='model.fvHideReason']	${bidid.data.confidentialityRationale}
+	Wait Element Visibility And Input Text	css=textarea[ng-model='model.fvHideReason']	${bidid.data.confidentialityRationale}
 	Wait Visibility And Click Element	xpath=//button[contains(@ng-click,'act.setFvHidden')]
 	#TODO проверка на текст. Необходимо проверить и заменить
 #    log to console  TODO проверка на текст. Необходимо проверить и заменить
@@ -1247,10 +1260,10 @@ Wait Visibility And Click Element
 	Wait Until Element Is Visible	${elementLocator}	${COMMONWAIT}
 	Click Element					${elementLocator}
 
-Wait Element Visibulity And Input Text
-	[Arguments]  ${elementLocator}  ${imput}
+Wait Element Visibility And Input Text
+	[Arguments]  ${elementLocator}  ${input}
 	Wait Until Element Is Visible	${elementLocator}	${COMMONWAIT}
-	Input Text	${elementLocator}	${imput}
+	Input Text	${elementLocator}	${input}
 
 
 Close Confirmation
@@ -1429,7 +1442,7 @@ Switch To PMFrame
 
 Search By Query
 	[Arguments]  ${element}  ${query}
-	Wait Element Visibulity And Input Text	${element}	${query}
+	Wait Element Visibility And Input Text	${element}	${query}
 #	Sleep	1s
 #	Wait Until Element Is Visible	css=div[data-id="foundItem"]
 #	Press Key	${element}	\\08
