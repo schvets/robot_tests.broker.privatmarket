@@ -1466,14 +1466,7 @@ Switch To PMFrame
 Search By Query
 	[Arguments]  ${element}  ${query}
 	Wait Element Visibility And Input Text	${element}	${query}
-#	Sleep	1s
-#	Wait Until Element Is Visible	css=div[data-id="foundItem"]
-#	Press Key	${element}	\\08
-	Wait For Ajax
-#	Wait Until Element Is Enabled	css=input[id='found_${query}']	${COMMONWAIT}
-#	Wait Until Element Not Stale	xpath=//div[input[@id='found_${query}']]	5
-	Wait Visibility And Click Element	xpath=//div[input[@id='found_${query}']]
-#	Click Element	xpath=//div[input[@id='found_${query}']]
+	Wait Visibility And Click Element	xpath=//div[@data-id='foundItem']//label[@for='found_${query}']
 
 #//TODO - unused
 #Get Locator And Type
