@@ -59,8 +59,10 @@ ${tender_data_cancellations[0].reason}	xpath=//*[@id='nolotSection']/div[1]/div[
 ${tender_data_cancellations[0].documents[0].title}	css=.file-name.ng-binding
 ${tender_data_title_en}	css=.title-div.ng-binding
 ${tender_data_title_ru}	css=.title-div.ng-binding
+${tender_data_title_ua}	css=.title-div.ng-binding
 ${tender_data_description_en}	css=#tenderDescription
 ${tender_data_description_ru}	css=#tenderDescription
+${tender_data_description_ua}	css=#tenderDescription
 ${tender_data_procuringEntity.address.countryName}	css=#procurerAddr #countryName
 ${tender_data_procuringEntity.address.locality}	css=#procurerAddr #locality
 ${tender_data_procuringEntity.address.postalCode}	css=#procurerAddr #postalCode
@@ -119,8 +121,8 @@ ${locator_lotAdd.deliveryEndDate}	css=input[ng-model='item.deliveryDate.ed.d']
 
 
 
-
-
+${locator_tenderInfo.lotDescriptionBtn}	xpath=//li[contains(@ng-class, 'description')]
+${locator_tenderInfo.lotDescriptionBody}	xpath=//section[@class='description marged ng-binding']
 ${locator_tender.complaint.btnSave}	id=btnSaveComplaint
 
 
@@ -367,8 +369,8 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	${element_class} =	Get Element Attribute	xpath=//li[contains(@ng-class, 'description')]@class
 	Run Keyword IF	'checked-nav' in '${element_class}'	Return From Keyword	True
 
-	Wait Visibility And Click Element	xpath=//li[contains(@ng-class, 'description')]
-	Wait Until Element Is Visible	xpath=//section[@class='description marged ng-binding']	${COMMONWAIT}
+	Wait Visibility And Click Element	${locator_tenderInfo.lotDescriptionBtn}
+	Wait Until Element Is Visible	${locator_tenderInfo.lotDescriptionBody}	${COMMONWAIT}
 #	Wait Until Element Is Visible	xpath=//section[contains(@ng-if, "model.ad.showTab == 'description'")]	${COMMONWAIT}
 #	Wait Until Element Not Stale	xpath=//section[contains(@ng-if, "model.ad.showTab == 'description'")]	40
 	Wait Visibility And Click Element	${tender_data_items.description}
@@ -439,14 +441,7 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 
 	#show extra information if it need
 	Run Keyword If	${tab_num} == 1	Run Keywords	Відкрити детальну інформацию по позиціям
-#	log to console  \n ***************
-#	Log to console  ${tender_uaid}
-#	Log  ${tender_uaid}
-#	Log to console  ${user_name}
-#	Log  ${user_name}
-#	Log to console  ${field_name}
-#	Log  ${field_name}
-#	log to console  \n ***************
+
 	#get information
 	${result} =	Отримати інформацію зі сторінки	${item}	${tender_uaid}	${field_name}
 #	${result} =
@@ -454,58 +449,63 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 
 
 Covert Amount To Number
-	[Arguments]  ${text}
-#	${text}=
-	Replace String	${text}	${SPACE}	${EMPTY}
-	log to console  ${text}
-	log  ${text}
-	${result}=	convert to number	${text}
-	log to console  ${text}
-	log  ${text}
-	log to console  ${result}
-	log  ${result}
+	[Arguments]  ${field_name}
+	${result_full} =	Get Text	${tender_data_${field_name}}
+	${text} =	Strip String	${result_full}
+	${text_new}=  Replace String	${text}	${SPACE}	${EMPTY}
+	${result}=	convert to number	${text_new}
+	[Return]	${result}
+	
+######################### TMP #########################
+Currency Convert
+	[Arguments]  ${field_name}
+	${income_text} =	Get Text	${tender_data_${field_name}}
+	${text} =	Strip String	${income_text}
+	${result}=  Set Variable If	'${text}' == 'грн'	UAH
+	${result}=  Set Variable If	'${text}' == 'руб'	RUR
+	${result}=  Set Variable If	'${text}' == 'дол'	USD
+	${result}=  Set Variable If	'${text}' == 'фунт'	GBP
+#	${result}=  Run Keyword If	'${text}' == 'грн'	UAH
 	[Return]	${result}
 
-Currency Convert
-	[Arguments]  ${element}  ${item}
-	${result}=	Отримати текст елемента	${element}	${item}
-	Run Keyword If	${result} == грн	${result} == UAH
-	log to console  ${result}
+Tax Convert
+	[Arguments]  ${field_name}
+	${income_text} =	Get Text	${tender_data_${field_name}}
+	${text} =	Strip String	${income_text}
+	${result}=  Set Variable If	'${text}' == 'з ПДВ'	True
+	${result}=  Set Variable If	'${text}' == 'без ПДВ'	False
+	${result}=  Set Variable If	'${text}' == 'с НДС'	True
+	${result}=  Set Variable If	'${text}' == 'без НДС'	False
+	${result}=  Set Variable If	'${text}' == 'with VAT'	True
+	${result}=  Set Variable If	'${text}' == 'without VAT'	False
+#	${result}=  Run Keyword If	'${text}' == 'з ПДВ'	True
 	[Return]	${result}
+##################################################
 
 Отримати інформацію зі сторінки
 	[Arguments]  ${item}  ${base_tender_uaid}  ${field_name}
-	${element} = 	Replace String	${base_tender_uaid}	items[${item}]	items
+	${element} = 	Replace String	${field_name}	items[${item}]	items
 	${element} = 	Replace String	${element}	lots[${item}]	lots
-	################################ tmp #######################################
-#	log to console  \n +-+-+-+-+-+-
-#	log to console  ${item}
-#	log  ${item}
-#	log to console  ${base_tender_uaid}
-#	log  ${base_tender_uaid}
-#	log to console  ${field_name}
-#	log  ${field_name}
-#	log to console  ${element}
-#	log  ${element}
-#	log to console  \n -+-+-+-+-+-+-+
-	################################ tmp #######################################
 	Run Keyword And Return If	'${element}' == 'enquiryPeriod.startDate'		Отримати дату та час	${element}	1	${item}
 	Run Keyword And Return If	'${element}' == 'enquiryPeriod.endDate'			Отримати дату та час	${element}	1	${item}
 	Run Keyword And Return If	'${element}' == 'tenderPeriod.startDate'		Отримати дату та час	${element}	1	${item}
 	Run Keyword And Return If	'${element}' == 'tenderPeriod.endDate'			Отримати дату та час	${element}	1	${item}
 	Run Keyword And Return If	'${element}' == 'questions[0].date'				Отримати дату та час	${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'bids'							Перевірити присутність bids
-#	Run Keyword And Return If	'${element}' == 'value.amount'					Covert Amount To Number	${element}	${item}
-	Run Keyword And Return If	'${element}' == 'value.currency'				Currency Convert	${element}	${item}
-	Run Keyword And Return If	'${element}' == 'value.valueAddedTaxIncluded'	Отримати інформацію з ${element}	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'value.amount'	Covert Amount To Number	${element}
+#	Run Keyword And Return If	'${element}' == 'value.currency'	Currency Convert	${element}
+#	Run Keyword And Return If	'${element}' == 'value.valueAddedTaxIncluded'	Tax Convert	${element}
+	Run Keyword And Return If	'${element}' == 'value.currency'			Отримати інформацію з ${element}	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'value.valueAddedTaxIncluded'				Отримати інформацію з ${element}	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'status'						Отримати інформацію з ${element}	${element}
 	Run Keyword And Return If	'${element}' == 'documents[0].title'			Отримати інформацію з ${element}	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'causeDescription'				Отримати інформацію з ${element}	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'title_en'						Отримати текст елемента	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'title_ru'						Отримати текст елемента	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'title_ua'						Отримати текст елемента	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'description_en'				Отримати текст елемента	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'description_ru'				Отримати текст елемента	${element}	${item}
-
+	Run Keyword And Return If	'${element}' == 'description_ua'				Отримати текст елемента	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'items.classification.scheme'						Отримати інформацію з ${element}	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'items.classification.id'							Отримати строку		${element}	3	${item}
 	Run Keyword And Return If	'${element}' == 'items.description'									Отримати текст елемента	${element}	${item}
@@ -525,23 +525,16 @@ Currency Convert
 	Run Keyword And Return If	'${element}' == 'auctionPeriod.startDate'				Отримати інформацію з ${element}	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'procurementMethodType'					Отримати інформацію з ${element}	${element}
 
-	Run Keyword If	'${element}' == 'questions[0].title'		Wait For Element With Reload	${tender_data_${field_name}}	2
-	Run Keyword If	'${element}' == 'questions[0].answer'		Wait For Element With Reload	${tender_data_${field_name}}	2
+	Run Keyword If	'${element}' == 'questions[0].title'		Wait For Element With Reload	${tender_data_${element}}	2
+	Run Keyword If	'${element}' == 'questions[0].answer'		Wait For Element With Reload	${tender_data_${element}}	2
 
 	Run Keyword And Return If	'${element}' == 'cancellations[0].status'					Отримати інформацію з ${element}	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'cancellations[0].documents[0].title'		Отримати інформацію з ${element}	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'procuringEntity.identifier.scheme'			Отримати інформацію з ${element}	${element}	${item}
-###############################################
-#	Run Keyword If  ${element} == 'value.amount'	Covert Amount To Number	${element}	${item}
-#		...  ELSE IF  ${element} == 'value.currency'	Currency Convert	${element}	${item}
-#		...  ELSE  ${result} =	Отримати інформацію зі сторінки	${item}	${element}	${tender_uaid}
-###############################################
-	Wait Until Element Is Visible	${tender_data_${field_name}}	${COMMONWAIT}
-	${result_full} =	Get Text	${tender_data_${field_name}}
-	${result} =	Strip String	${result_full}
-#	${result} =	Set Variable If	'${field_name}' == 'value.amount'	Run Keyword And Return	Covert Amount To Number	${result}
-	Run Keyword And Return If	'${field_name}' == 'value.amount'	Covert Amount To Number	${result}
 
+	Wait Until Element Is Visible	${tender_data_${element}}	${COMMONWAIT}
+	${result_full} =	Get Text	${tender_data_${element}}
+	${result} =	Strip String	${result_full}
 	[Return]	${result}
 
 
@@ -562,14 +555,13 @@ Currency Convert
 	${values_list} =				Split String	${result}
 	${result} =						Strip String	${values_list[${position_number}]}	mode=both	characters=:
 	[Return]  ${result}
-#	[return]	${result}
 
 
 Отримати число
 	[Arguments]  ${element_name}  ${position_number}  ${item}
 	${value}=	Отримати строку		${element_name}	${position_number}	${item}
 	${result}=	Convert To Number	${value}
-	[return]	${result}
+	[Return]	${result}
 
 
 Отримати суму
@@ -578,14 +570,14 @@ Currency Convert
 	${result}=	Remove String	${result}	${SPACE}
 	${result} =	Replace String	${result}	,	.
 	${result}=	Convert To Number	${result}
-	[return]	${result}
+	[Return]	${result}
 
 
 Отримати ціле число
 	[Arguments]  ${element_name}  ${position_number}  ${item}
 	${value}=	Отримати строку		${element_name}	${position_number}	${item}
 	${result}=	Convert To Integer	${value}
-	[return]	${result}
+	[Return]	${result}
 
 
 Отримати дату та час
@@ -599,11 +591,7 @@ Currency Convert
 	${year} =			Convert To String	${values_list[2 + ${shift}]}
 	${time} =			Convert To String	${values_list[3 + ${shift}]}
 	${result}=			Convert To String	${year}-${month}-${day} ${time}
-#
-	log to console  ${result}
-	log  ${result}
-#
-	[return]	${result}
+	[Return]	${result}
 
 
 Отримати класифікацію
@@ -611,14 +599,14 @@ Currency Convert
 	${result_full} =	Отримати текст елемента	${element_name}	${item}
 	${reg_expresion} =	Set Variable	[0-9A-zА-Яа-яёЁЇїІіЄєҐґ\\s\\:]+\: \\w+[\\d\\.\\-]+ ([А-Яа-яёЁЇїІіЄєҐґ\\s;,\\"_\\(\\)\\.]+)
 	${result} =			Get Regexp Matches	${result_full}	${reg_expresion}	1
-	[return]	${result[0]}
+	[Return]	${result[0]}
 
 
 Отримати назву
 	[Arguments]  ${element_name}  ${position_number}  ${item}
 	${result_full} =	Отримати строку	${element_name}	${position_number}	${item}
 	${result} =			get_unit_name	${result_full}
-	[return]	${result}
+	[Return]	${result}
 
 
 Отримати код
@@ -626,7 +614,7 @@ Currency Convert
 	${result_full} =	Отримати строку	${element_name}	${position_number}	${item}
 	${unit_name} = 		get_unit_name	${result_full}
 	${result} =			get_unit_code	${unit_name}
-	[return]	${result}
+	[Return]	${result}
 
 
 Отримати номер позиції
@@ -635,12 +623,12 @@ Currency Convert
 	${length} =	Get Length	${item}
 	${result} =	Run Keyword If	'${length}' == '0'	Set Variable	0
 		...  ELSE	Convert To Integer	${item[0]}
-	[return]  ${result}
+	[Return]  ${result}
 
 
 Перевірити присутність bids
 	Element Should Not Be Visible	${tender_data_${element}}
-	[return]	${None}
+	[Return]	${None}
 
 
 Отримати інформацію з auctionPeriod.startDate
@@ -648,14 +636,14 @@ Currency Convert
 	Wait For Element With Reload	${tender_data_${element}}	1
 	${start_date} =					Отримати дату та час	${element}	1	${item}
 	${result} =	get_time_with_offset	${start_date}
-	[return]  ${result}
+	[Return]  ${result}
 
 
 Отримати інформацію з value.currency
 	[Arguments]    ${element_name}  ${item}
 	${currency} =	Отримати строку	${element_name}	0	${item}
 	${currency_type} =	get_currency_type	${currency}
-	[return]  ${currency_type}
+	[Return]  ${currency_type}
 
 
 Отримати інформацію з value.valueAddedTaxIncluded
@@ -663,7 +651,7 @@ Currency Convert
 	${value_added_tax_included} =	Get text	${tender_data_${element_name}}
 	${result} =	Set Variable If	'з ПДВ' in '${value_added_tax_included}'	True
 	${result} =	Convert To Boolean	${result}
-	[return]  ${result}
+	[Return]  ${result}
 
 
 Отримати інформацію з items.additionalClassifications[0].scheme
