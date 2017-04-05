@@ -230,7 +230,9 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	Check Current Mode New Realisation
 #go to form
 	Wait Visibility And Click Element	${locator_tenderSearch.addTender}
+	Switch To PMFrame
 #	Wait For Ajax
+#    Wait Until Element Is Visible  css=#sender-analytics  ${COMMONWAIT}
 	Wait Visibility And Click Element	${locator_tenderAdd.tenderType}
 #	Delete Draft
 #step 0
@@ -428,7 +430,7 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 Отримати інформацію із запитання
 	[Arguments]  ${username}  ${tender_uaid}  ${question_id}  ${field_name}
 	${element} =  Set Variable  xpath=//div[contains(@class, 'faq') and contains(., '${question_id}')]${tender_data_question.${field_name}}
-	Wait For Element With Reload  ${element}  1
+	Wait For Element With Reload  ${element}  2
 	${result_full} =  Get Text	${element}
 	${result} =  Strip String	${result_full}
 	[Return]  ${result}
@@ -438,14 +440,14 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	${bid}=  Отримати пропозицію  ${username}  ${tender_uaid}
 	[return]  ${bid.data.${field}}
 
-Отримати пропозицію
-	[Arguments]  ${username}  ${tender_uaid}
-#	${tender}=  Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
-	${bid_id}=  Get Variable Value  ${USERS.users['${username}'].bidresponses['bid'].data.id}
-	${token}=  Get Variable Value  ${USERS.users['${username}']['access_token']}
-	${reply}=  Call Method  ${USERS.users['${username}'].client}  get_bid  ${bid_id}  ${token}
-	${reply}=  munch_dict  arg=${reply}
-	[return]  ${reply}
+#Отримати пропозицію
+#	[Arguments]  ${username}  ${tender_uaid}
+##	${tender}=  Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
+#	${bid_id}=  Get Variable Value  ${USERS.users['${username}'].bidresponses['bid'].data.id}
+#	${token}=  Get Variable Value  ${USERS.users['${username}']['access_token']}
+#	${reply}=  Call Method  ${USERS.users['${username}'].client}  get_bid  ${bid_id}  ${token}
+#	${reply}=  munch_dict  arg=${reply}
+#	[return]  ${reply}
 
 #Отримати шлях до поля об’єкта
 #	[Arguments]  ${username}  ${field_name}  ${object_id}
@@ -653,9 +655,11 @@ Tax Convert
 	${values_list} =	Split String		${work_string}
 	${day} =			Convert To String	${values_list[0 + ${shift}]}
 	${month} =			get_month_number	${values_list[1 + ${shift}]}
+	${month} =  Set Variable If  ${month} < 10  0${month}
 	${year} =			Convert To String	${values_list[2 + ${shift}]}
 	${time} =			Convert To String	${values_list[3 + ${shift}]}
-	${result}=			Convert To String	${year}-${month}-${day} ${time}
+	${date}=			Convert To String	${year}-${month}-${day} ${time}
+	${result}=  get_time_with_offset  ${date}
 	[Return]	${result}
 
 
@@ -812,11 +816,11 @@ Tax Convert
 
 Внести зміни в тендер
 	[Arguments]  ${user_name}  ${tenderId}	${parameter}	${value}
-	debug
 	Wait For Element With Reload	${locator_tenderClaim.buttonCreate}	1
-	Wait For Ajax
+#	Wait For Ajax
+	Switch To PMFrame
 	Wait Visibility And Click Element	${locator_tenderClaim.buttonCreate}
-	Wait For Ajax
+#	Wait For Ajax
 	Switch To PMFrame
 #	Wait Visibility And Click Element	css=#tab_0 a
 	Wait Element Visibility And Input Text	css=textarea[data-id='procurementDescription']	${value}
@@ -1265,7 +1269,8 @@ Fill Phone
 #Custom Keywords
 Login
 	[Arguments]  ${username}
-	Wait Visibility And Click Element	xpath=//span[.='Вход']
+#	Wait Visibility And Click Element	xpath=//span[.='Вход']
+	Wait Visibility And Click Element	css=a[data-target="#login_modal"]
 	Wait Until Element Is Visible	id=p24__login__field	${COMMONWAIT}
 	Execute Javascript	$('#p24__login__field').val('+${USERS.users['${username}'].login}')
 #	Check If Element Stale	xpath=//div[@id="login_modal" and @style='display: block;']//input[@type='password']
@@ -1412,8 +1417,8 @@ Check Current Mode New Realisation
 	[Arguments]	${education_type}=${True}
 	privatmarket.Оновити сторінку з тендером
 	#проверим правильный ли режим
-	Wait Until Element Is Visible	${locator_tender.switchToDemo}
-	${check_result} =  Run Keyword And Ignore Error	Wait Until Element Is Visible	${locator_tender.switchToDemo.message}
+	Wait Until Element Is Visible	${locator_tender.switchToDemo}	${COMMONWAIT}
+	${check_result} =  Run Keyword And Ignore Error	Wait Until Element Is Visible	${locator_tender.switchToDemo.message}	${COMMONWAIT}
 	Run Keyword If	${check_result} != 'PASS'	Switch To Education Mode
 
 
@@ -1426,7 +1431,7 @@ Switch To Education Mode
 #TODO проверка на текст. Необходимо проверить и заменить/ Поправлено
 #	Wait Until Element Contains	${locator_tender.switchToDemo}	Выйти из демо-режима	${COMMONWAIT}
 #проверка, что вход в Деморежим осуществлен - отображение элемента "Выйти из демо-режима"
-	Wait Until Element Is Visible	${locator_tender.switchToDemo.message}
+	Wait Until Element Is Visible	${locator_tender.switchToDemo.message}	${COMMONWAIT}
 #	Wait For Ajax Overflow Vanish
 
 
@@ -1488,7 +1493,8 @@ Close notification
 
 
 Switch To PMFrame
-	${frame_visibility} = 	Run Keyword And Return Status	Wait Until Element Is Enabled	id=tenders	timeout=15s
+#	${frame_visibility} = 	Run Keyword And Return Status	Wait Until Element Is Enabled	id=tenders	timeout=30s
+	${frame_visibility} = 	Run Keyword And Return Status	Wait Until Element Is Visible	id=tenders	timeout=15s
 #	Wait For Ajax
 	Run Keyword If	${frame_visibility}	Switch To Frame	id=tenders
 
