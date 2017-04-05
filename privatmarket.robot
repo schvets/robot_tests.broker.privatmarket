@@ -25,8 +25,9 @@ ${tender_data_tenderPeriod.startDate}	xpath=(//span[@ng-if='p.bd'])[2]
 ${tender_data_tenderPeriod.endDate}	xpath=(//span[contains(@ng-if, 'p.ed')])[2]
 ${tender_data_auctionPeriod.startDate}	xpath=(//span[@ng-if='p.bd'])[3]
 ${tender_data_minimalStep.amount}	css=div#lotMinStepAmount
+${tender_data_documentation.title}	xpath=//div[@class="file-descriptor"]/span[1]
 ${tender_data_items.description}	xpath=//a[contains(@ng-click, 'adb.showCl = !adb.showCl')]
-${tender_data_items.deliveryDate.startDate}	//div[@ng-if='adb.deliveryDate.startDate']/div[2]
+${tender_data_items.deliveryDate.startDate}	xpath=//div[@ng-if='adb.deliveryDate.startDate']/div[2]
 ${tender_data_items.deliveryDate.endDate}	xpath=//div[@ng-if='adb.deliveryDate.endDate']/div[2]
 ${tender_data_items.deliveryLocation.latitude}	css=span.latitude
 ${tender_data_items.deliveryLocation.longitude}	css=span.longitude
@@ -35,15 +36,12 @@ ${tender_data_items.deliveryAddress.postalCode}	css=span#postalCode
 ${tender_data_items.deliveryAddress.region}	css=span#region
 ${tender_data_items.deliveryAddress.locality}	css=span#locality
 ${tender_data_items.deliveryAddress.streetAddress}	css=span#streetAddress
-#TODO - следующие 3 локатора одинаковые
 ${tender_data_items.classification.scheme}	xpath=//div[@ng-if="adb.classification"]
 ${tender_data_items.classification.id}	xpath=//div[@ng-if="adb.classification"]
 ${tender_data_items.classification.description}	xpath=//div[@ng-if="adb.classification"]
-#TODO - следующие 3 локатора одинаковые
 ${tender_data_items.additionalClassifications[0].scheme}	xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
 ${tender_data_items.additionalClassifications[0].id}	xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
 ${tender_data_items.additionalClassifications[0].description}	xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
-#TODO - следующие 2 локатора одинаковые
 ${tender_data_items.unit.name}	xpath=//div[@ng-if='adb.quantity']/div[2]/span[2]
 ${tender_data_items.unit.code}	xpath=//div[@ng-if='adb.quantity']/div[2]/span[2]
 ${tender_data_items.quantity}	xpath=//div[@ng-if='adb.quantity']/div[2]/span
@@ -169,6 +167,13 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	[Documentation]  Відкрити брaвзер, створити обєкт api wrapper, тощо
 	${service args}=	Create List	--ignore-ssl-errors=true	--ssl-protocol=tlsv1
 	${browser} =		Convert To Lowercase	${USERS.users['${username}'].browser}
+
+#	${prefs}			Create Dictionary		download.default_directory=${OUTPUT_DIR}	plugins.plugins_disabled=${disabled}
+#	${options}= 	Evaluate	sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
+#	Call Method	${options}		add_argument	--allow-running-insecure-content
+#	Call Method	${options}		add_argument	--disable-web-security
+#	Call Method	${options}		add_argument	--nativeEvents\=false
+#	Call Method	${options}		add_experimental_option	prefs	${prefs}
 
 	Open Browser	${USERS.users['${username}'].homepage}	ff	alias=${username}
 
@@ -436,16 +441,16 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 Отримати інформацію із пропозиції
 	[Arguments]  ${username}  ${tender_uaid}  ${field}
 	${bid}=  Отримати пропозицію  ${username}  ${tender_uaid}
-	[return]  ${bid.data.${field}}
+	[Return]  ${bid.data.${field}}
 
-Отримати пропозицію
-	[Arguments]  ${username}  ${tender_uaid}
-#	${tender}=  Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
-	${bid_id}=  Get Variable Value  ${USERS.users['${username}'].bidresponses['bid'].data.id}
-	${token}=  Get Variable Value  ${USERS.users['${username}']['access_token']}
-	${reply}=  Call Method  ${USERS.users['${username}'].client}  get_bid  ${bid_id}  ${token}
-	${reply}=  munch_dict  arg=${reply}
-	[return]  ${reply}
+#Отримати пропозицію
+#	[Arguments]  ${username}  ${tender_uaid}
+##	${tender}=  Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
+#	${bid_id}=  Get Variable Value  ${USERS.users['${username}'].bidresponses['bid'].data.id}
+#	${token}=  Get Variable Value  ${USERS.users['${username}']['access_token']}
+#	${reply}=  Call Method  ${USERS.users['${username}'].client}  get_bid  ${bid_id}  ${token}
+#	${reply}=  munch_dict  arg=${reply}
+#	[return]  ${reply}
 
 #Отримати шлях до поля об’єкта
 #	[Arguments]  ${username}  ${field_name}  ${object_id}
@@ -463,24 +468,40 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 
 Отримати інформацію із документа
 	[Arguments]  ${username}  ${tender_uaid}  ${doc_id}  ${field}
-#	${tender}=  Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
-#    log to console  **************************************
-#    log to console  ${username}
-#    log to console  ${tender_uaid}
-#    log to console  ${doc_id}
-#    log to console  ${field}
-#    debug
-	${document}=  get_doc_by_id  ${tender_data.data}  ${doc_id}
-	Log  ${document}
-	[Return]  ${document['${field}']}
+	privatmarket.Пошук тендера по ідентифікатору	${username}	${tender_uaid}
+	Wait Until Element Is Visible  ${tender_data_documentation.${field}}	${COMMONWAIT}
+	${result}=  get text  ${tender_data_documentation.${field}}
+	[Return]  ${result}
+
+
+Отримати документ
+	[Arguments]  ${username}  ${tender_uaid}  ${doc_id}
+#	log to console  ---Отримати документ
+	debug
+#	privatmarket.Пошук тендера по ідентифікатору	${username}	${tender_uaid}
+    Wait Visibility And Click Element  ${tender_data_documentation.title}
+#	${service_args} =	Create List	--ignore-ssl-errors=true	--ssl-protocol=tlsv1
+#	${browser} =		Convert To Lowercase	${USERS.users['${username}'].browser}
+#	${disabled}			Create List				Chrome PDF Viewer
+#	${prefs}			Create Dictionary		download.default_directory=${OUTPUT_DIR}	plugins.plugins_disabled=${disabled}
 #
-#Отримати документ
-#	[Arguments]  ${username}  ${tender_uaid}  ${doc_id}
-##	debug
-#	${tender}=  Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
-#	${document}=  get_document_by_id  ${tender.data}  ${doc_id}
-#	${filename}=  download_file_from_url  ${document.url}  ${OUTPUT_DIR}${/}${document.title}
+#	${options}= 	Evaluate	sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
+#	Call Method	${options}		add_argument	--allow-running-insecure-content
+#	Call Method	${options}		add_argument	--disable-web-security
+#	Call Method	${options}		add_argument	--nativeEvents\=false
+#	Call Method	${options}		add_experimental_option	prefs	${prefs}
+#
+#	Run Keyword If	'phantomjs' in '${browser}'	Create Webdriver	PhantomJS	${username}	service_args=${service_args}
+#	...   ELSE If	Create WebDriver	Chrome	chrome_options=${options}	alias=${username}
+#	...
+#    ${result}=  get text  ${tender_data_documentation.${field}}
 #	[Return]  ${filename}
+    sleep  10s
+
+Отримати інформацію із запитання
+    [Arguments]  ${username}  ${tender_uaid}  ${question_id}  ${field_name}
+	privatmarket.Пошук тендера по ідентифікатору	${username}	${tender_uaid}
+
 
 ##########################################################################################
 
@@ -653,9 +674,11 @@ Tax Convert
 	${values_list} =	Split String		${work_string}
 	${day} =			Convert To String	${values_list[0 + ${shift}]}
 	${month} =			get_month_number	${values_list[1 + ${shift}]}
+	${month} =  Set Variable If  ${month} < 10  0${month}
 	${year} =			Convert To String	${values_list[2 + ${shift}]}
 	${time} =			Convert To String	${values_list[3 + ${shift}]}
-	${result}=			Convert To String	${year}-${month}-${day} ${time}
+	${date}=			Convert To String	${year}-${month}-${day} ${time}
+	${result}=  get_time_with_offset  ${date}
 	[Return]	${result}
 
 

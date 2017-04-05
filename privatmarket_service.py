@@ -287,6 +287,12 @@ def get_doc_by_id(data, doc_id):
                 return document
     raise Exception('Document with id {} not found'.format(doc_id))
 
+    def download_file(url, path_to_save_file):
+        f = open(path_to_save_file, 'wb')
+        f.write(urllib.urlopen(url).read())
+        f.close()
+        return os.path.basename(f.name)
+
 # def download_file_from_url(url, path_to_save_file):
 #     f = open(path_to_save_file, 'wb')
 #     f.write(urllib.urlopen(url).read())
