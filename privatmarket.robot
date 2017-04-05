@@ -26,6 +26,7 @@ ${tender_data_tenderPeriod.endDate}	xpath=(//span[contains(@ng-if, 'p.ed')])[2]
 ${tender_data_auctionPeriod.startDate}	xpath=(//span[@ng-if='p.bd'])[3]
 ${tender_data_minimalStep.amount}	css=div#lotMinStepAmount
 ${tender_data_items.description}	xpath=//a[contains(@ng-click, 'adb.showCl = !adb.showCl')]
+${tender_data_items.deliveryDate.startDate}	//div[@ng-if='adb.deliveryDate.startDate']/div[2]
 ${tender_data_items.deliveryDate.endDate}	xpath=//div[@ng-if='adb.deliveryDate.endDate']/div[2]
 ${tender_data_items.deliveryLocation.latitude}	css=span.latitude
 ${tender_data_items.deliveryLocation.longitude}	css=span.longitude
@@ -229,7 +230,7 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	Check Current Mode New Realisation
 #go to form
 	Wait Visibility And Click Element	${locator_tenderSearch.addTender}
-	Wait For Ajax
+#	Wait For Ajax
 	Wait Visibility And Click Element	${locator_tenderAdd.tenderType}
 #	Delete Draft
 #step 0
@@ -247,7 +248,7 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	Wait Visibility And Click Element	css=button[data-id='actConfirm']
 
 	#date
-	Wait For Ajax
+#	Wait For Ajax
 	Switch To PMFrame
 	Wait Until Element Is Visible	css=input[ng-model='model.ptr.enquiryPeriod.sd.d']	${COMMONWAIT}
 	Set Date And Time	enquiryPeriod	startDate	css=span[data-id='ptrEnquiryPeriodStartDate'] input[ng-model='inputTime']	${tender_data.data.enquiryPeriod.startDate}
@@ -418,13 +419,11 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 
 Отримати інформацію із предмету
 	[Arguments]  ${username}  ${tender_uaid}  ${object_id}  ${field_name}
-#	//div[@class="description"]//span
     ${element} =  Set Variable  xpath=//section/div[contains(., '${object_id}') and contains(@class, 'lot-info')]${tender_data_item.${field_name}}
 	Wait Until Element Is Visible  ${element}  timeout=${COMMONWAIT}
 	${result_full} =  Get Text	${element}
 	${result} =  Strip String	${result_full}
 	[Return]  ${result}
-
 
 Отримати інформацію із запитання
 	[Arguments]  ${username}  ${tender_uaid}  ${question_id}  ${field_name}
@@ -433,10 +432,20 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	${result_full} =  Get Text	${element}
 	${result} =  Strip String	${result_full}
 	[Return]  ${result}
+  
+Отримати інформацію із пропозиції
+	[Arguments]  ${username}  ${tender_uaid}  ${field}
+	${bid}=  Отримати пропозицію  ${username}  ${tender_uaid}
+	[return]  ${bid.data.${field}}
 
-
-
-
+Отримати пропозицію
+	[Arguments]  ${username}  ${tender_uaid}
+#	${tender}=  Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
+	${bid_id}=  Get Variable Value  ${USERS.users['${username}'].bidresponses['bid'].data.id}
+	${token}=  Get Variable Value  ${USERS.users['${username}']['access_token']}
+	${reply}=  Call Method  ${USERS.users['${username}'].client}  get_bid  ${bid_id}  ${token}
+	${reply}=  munch_dict  arg=${reply}
+	[return]  ${reply}
 
 #Отримати шлях до поля об’єкта
 #	[Arguments]  ${username}  ${field_name}  ${object_id}
@@ -452,13 +461,18 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 #	${field_name}=  Отримати шлях до поля об’єкта  ${username}  ${field_name}  ${question_id}
 #	Run Keyword And Return  Отримати інформацію із тендера  ${username}  ${tender_uaid}  ${field_name}
 
-#Отримати інформацію із документа
-#	[Arguments]  ${username}  ${tender_uaid}  ${doc_id}  ${field}
-##	debug
+Отримати інформацію із документа
+	[Arguments]  ${username}  ${tender_uaid}  ${doc_id}  ${field}
 #	${tender}=  Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
-#	${document}=  get_document_by_id  ${tender.data}  ${doc_id}
-#	Log  ${document}
-#	[Return]  ${document['${field}']}
+#    log to console  **************************************
+#    log to console  ${username}
+#    log to console  ${tender_uaid}
+#    log to console  ${doc_id}
+#    log to console  ${field}
+#    debug
+	${document}=  get_doc_by_id  ${tender_data.data}  ${doc_id}
+	Log  ${document}
+	[Return]  ${document['${field}']}
 #
 #Отримати документ
 #	[Arguments]  ${username}  ${tender_uaid}  ${doc_id}
@@ -566,6 +580,7 @@ Tax Convert
 	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].description'	Отримати класифікацію	${element}	${item}
 	Run Keyword And Return If	'items.deliveryAddres' in '${element}'								Отримати текст елемента	${element}	${item}
 
+	Run Keyword And Return If	'${element}' == 'items.deliveryDate.startDate'			Отримати дату та час	${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'items.deliveryDate.endDate'			Отримати дату та час	${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'items.unit.name'						Отримати назву	${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'items.unit.code'						Отримати код	${element}	0	${item}
