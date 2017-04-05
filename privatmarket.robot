@@ -69,6 +69,7 @@ ${tender_data_item.unit.code}	xpath=//div[@ng-if='adb.quantity']/div[2]/span[2]
 ${tender_data_item.quantity}	xpath=//div[@ng-if='adb.quantity']/div[2]/span
 #############################################################
 
+${tender_data_question.title}	//span[contains(@class, 'question-title')]
 ${tender_data_questions[0].description}	css=div.question-div
 ${tender_data_questions[0].date}	xpath=//div[@class = 'question-head title']/b[2]
 ${tender_data_questions[0].title}	css=div.question-head.title span
@@ -424,6 +425,14 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	${result} =  Strip String	${result_full}
 	[Return]  ${result}
 
+Отримати інформацію із запитання
+	[Arguments]  ${username}  ${tender_uaid}  ${question_id}  ${field_name}
+	${element} =  Set Variable  xpath=//div[contains(@class, 'faq') and contains(., '${question_id}')]${tender_data_question.${field_name}}
+	Wait For Element With Reload  ${element}  1
+	${result_full} =  Get Text	${element}
+	${result} =  Strip String	${result_full}
+	[Return]  ${result}
+  
 Отримати інформацію із пропозиції
 	[Arguments]  ${username}  ${tender_uaid}  ${field}
 	${bid}=  Отримати пропозицію  ${username}  ${tender_uaid}
@@ -803,6 +812,7 @@ Tax Convert
 
 Внести зміни в тендер
 	[Arguments]  ${user_name}  ${tenderId}	${parameter}	${value}
+	debug
 	Wait For Element With Reload	${locator_tenderClaim.buttonCreate}	1
 	Wait For Ajax
 	Wait Visibility And Click Element	${locator_tenderClaim.buttonCreate}
@@ -948,8 +958,8 @@ Tax Convert
 	[return]  True
 
 
-Відповісти на питання
-	[Arguments]  ${username}  ${tender_uaid}  ${question}  ${answer_data}  ${question_id}
+Відповісти на запитання
+	[Arguments]  ${username}  ${tender_uaid}  ${answer_data}  ${question_id}
 	Switch To PMFrame
 	Switch To Tab	2
 	Wait For Element With Reload	xpath=//button[contains(@ng-click, 'act.answerFaq')]	2
@@ -1478,7 +1488,7 @@ Close notification
 
 
 Switch To PMFrame
-	${frame_visibility} = 	Run Keyword And Return Status	Wait Until Element Is Enabled	id=tenders	timeout=30s
+	${frame_visibility} = 	Run Keyword And Return Status	Wait Until Element Is Enabled	id=tenders	timeout=15s
 #	Wait For Ajax
 	Run Keyword If	${frame_visibility}	Switch To Frame	id=tenders
 

@@ -260,6 +260,7 @@ def get_unit_ru_name(name):
     else:
         return name
 ###################### NEW From keywords ######################
+
 def get_doc_by_id(data, doc_id):
     for document in data.get('documents', []):
         if doc_id in document.get('title', ''):
