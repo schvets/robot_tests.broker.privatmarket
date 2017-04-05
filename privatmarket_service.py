@@ -260,31 +260,31 @@ def get_unit_ru_name(name):
     else:
         return name
 ###################### NEW From keywords ######################
-def get_document_by_id(data, doc_id):
-    for document in data.get('documents', []):
-        if doc_id in document.get('title', ''):
-            return document
-    for complaint in data.get('complaints', []):
-        for document in complaint.get('documents', []):
-            if doc_id in document.get('title', ''):
-                return document
-    for award in data.get('awards', []):
-        for document in award.get('documents', []):
-            if doc_id in document.get('title', ''):
-                return document
-        for complaint in award.get('complaints', []):
-            for document in complaint.get('documents', []):
-                if doc_id in document.get('title', ''):
-                    return document
-    for cancellation in data.get('cancellations', []):
-        for document in cancellation.get('documents', []):
-            if doc_id in document.get('title', ''):
-                return document
-    for bid in data.get('bids', []):
-        for document in bid.get('documents', []):
-            if doc_id in document.get('title', ''):
-                return document
-    raise Exception('Document with id {} not found'.format(doc_id))
+# def get_document_by_id(data, doc_id):
+#     for document in data.get('documents', []):
+#         if doc_id in document.get('title', ''):
+#             return document
+#     for complaint in data.get('complaints', []):
+#         for document in complaint.get('documents', []):
+#             if doc_id in document.get('title', ''):
+#                 return document
+#     for award in data.get('awards', []):
+#         for document in award.get('documents', []):
+#             if doc_id in document.get('title', ''):
+#                 return document
+#         for complaint in award.get('complaints', []):
+#             for document in complaint.get('documents', []):
+#                 if doc_id in document.get('title', ''):
+#                     return document
+#     for cancellation in data.get('cancellations', []):
+#         for document in cancellation.get('documents', []):
+#             if doc_id in document.get('title', ''):
+#                 return document
+#     for bid in data.get('bids', []):
+#         for document in bid.get('documents', []):
+#             if doc_id in document.get('title', ''):
+#                 return document
+#     raise Exception('Document with id {} not found'.format(doc_id))
 
 # def download_file_from_url(url, path_to_save_file):
 #     f = open(path_to_save_file, 'wb')

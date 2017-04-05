@@ -228,7 +228,7 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	Check Current Mode New Realisation
 #go to form
 	Wait Visibility And Click Element	${locator_tenderSearch.addTender}
-	Wait For Ajax
+#	Wait For Ajax
 	Wait Visibility And Click Element	${locator_tenderAdd.tenderType}
 #	Delete Draft
 #step 0
@@ -246,7 +246,7 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	Wait Visibility And Click Element	css=button[data-id='actConfirm']
 
 	#date
-	Wait For Ajax
+#	Wait For Ajax
 	Switch To PMFrame
 	Wait Until Element Is Visible	css=input[ng-model='model.ptr.enquiryPeriod.sd.d']	${COMMONWAIT}
 	Set Date And Time	enquiryPeriod	startDate	css=span[data-id='ptrEnquiryPeriodStartDate'] input[ng-model='inputTime']	${tender_data.data.enquiryPeriod.startDate}
