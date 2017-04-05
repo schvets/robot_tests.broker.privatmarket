@@ -167,14 +167,14 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	[Documentation]  Відкрити брaвзер, створити обєкт api wrapper, тощо
 	${service args}=	Create List	--ignore-ssl-errors=true	--ssl-protocol=tlsv1
 	${browser} =		Convert To Lowercase	${USERS.users['${username}'].browser}
-
+####################TMP#########################
 #	${prefs}			Create Dictionary		download.default_directory=${OUTPUT_DIR}	plugins.plugins_disabled=${disabled}
 #	${options}= 	Evaluate	sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
 #	Call Method	${options}		add_argument	--allow-running-insecure-content
 #	Call Method	${options}		add_argument	--disable-web-security
 #	Call Method	${options}		add_argument	--nativeEvents\=false
 #	Call Method	${options}		add_experimental_option	prefs	${prefs}
-
+#################################################################
 	Open Browser	${USERS.users['${username}'].homepage}	ff	alias=${username}
 
 	Set Window Position	@{USERS.users['${username}'].position}
