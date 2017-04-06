@@ -5,6 +5,7 @@ from selenium.common.exceptions import StaleElementReferenceException
 from datetime import datetime, timedelta
 from pytz import timezone
 from dateutil import parser
+from selenium import webdriver
 
 def get_month_number(month_name):
     monthes = [u"янв.", u"февр.", u"марта", u"апр.", u"мая", u"июня",
