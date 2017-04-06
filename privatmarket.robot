@@ -170,6 +170,7 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	[Documentation]  Відкрити брaвзер, створити обєкт api wrapper, тощо
 	${service args}=	Create List	--ignore-ssl-errors=true	--ssl-protocol=tlsv1
 	${browser} =		Convert To Lowercase	${USERS.users['${username}'].browser}
+
     #Chrome Browser ->
 	${disabled}			Create List				Chrome PDF Viewer
 	${prefs}			Create Dictionary		download.default_directory=${OUTPUT_DIR}	plugins.plugins_disabled=${disabled}
@@ -184,6 +185,7 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	Go To	${USERS.users['${username}'].homepage}
     # <-
 #	Open Browser	${USERS.users['${username}'].homepage}	${browser}	alias=${username}
+
 	Set Window Position	@{USERS.users['${username}'].position}
 	Set Window Size	@{USERS.users['${username}'].size}
 	Set Selenium Implicit Wait	10s
@@ -238,9 +240,11 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	Check Current Mode New Realisation
 #go to form
 	Wait Visibility And Click Element	${locator_tenderSearch.addTender}
-	Switch To PMFrame
 #	Wait For Ajax
 #    Wait Until Element Is Visible  css=#sender-analytics  ${COMMONWAIT}
+    Unselect Frame
+    Wait Until Page Contains Element  id=sender-analytics  ${COMMONWAIT}
+    Switch To PMFrame
 	Wait Visibility And Click Element	${locator_tenderAdd.tenderType}
 #	Delete Draft
 #step 0
@@ -311,6 +315,7 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 
 #step 5
 	Wait Until Element Is Visible	css=section[data-id="step5"]	${COMMONWAIT}
+	Wait Until Element Is Enabled	${locator_tenderCreation.buttonSend}	${COMMONWAIT}
 	Wait Visibility And Click Element	${locator_tenderCreation.buttonSend}
 #TODO проверка на текст. Необходимо проверить и заменить
 	Close Confirmation In Editor	Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.
@@ -349,12 +354,14 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 #	todo: настроить тесты для нескольких предметов закупки по индексу
 	\    Wait Element Visibility And Input Text	${locator_lotAdd.description}	${items[${index}].description}
 	\    Wait Element Visibility And Input Text	${locator_lotAdd.quantity}	${items[${index}].quantity}
-#	debug
 #	\todo Раскомитить строку. Временная замена, пока вернут текстовую меру для закупок
-#	\    Wait Visibility And Click Element	xpath=//select[@data-id='unit']/option[text()='${items[${index}].unit.name}']
-	\    Wait Visibility And Click Element	xpath=//select[@data-id='unit']/option[@value='6']
-	\    ${deliveryDate} =	Get Regexp Matches	${items[${index}].deliveryDate.endDate}	(\\d{4}-\\d{2}-\\d{2})
-	\    ${deliveryDate} =	Convert Date	${deliveryDate[0]}	result_format=%d-%m-%Y
+    \    ${unitName} =  get_unit_name  ${items[${index}].unit.name}
+	\    Wait Visibility And Click Element	xpath=//select[@data-id='unit']/option[text()='${unitName}']
+#	\    Wait Visibility And Click Element	xpath=//select[@data-id='unit']/option[@value='6']
+	\    ${deliveryStartDate} =	Get Regexp Matches	${items[${index}].deliveryDate.startDate}	(\\d{4}-\\d{2}-\\d{2})
+	\    ${deliveryStartDate} =	Convert Date	${deliveryStartDate[0]}	result_format=%d-%m-%Y
+	\    ${deliveryEndDate} =	Get Regexp Matches	${items[${index}].deliveryDate.endDate}	(\\d{4}-\\d{2}-\\d{2})
+	\    ${deliveryEndDate} =	Convert Date	${deliveryEndDate[0]}	result_format=%d-%m-%Y
 	\    Wait Visibility And Click Element	${locator_lotAdd.adressType}
 	\    Wait Element Visibility And Input Text	${locator_lotAdd.postalCode}	${items[${index}].deliveryAddress.postalCode}
 	\    Wait Element Visibility And Input Text	${locator_lotAdd.countryName}	${items[${index}].deliveryAddress.countryName}
@@ -362,6 +369,7 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	\    Wait Element Visibility And Input Text	${locator_lotAdd.locality}	${items[${index}].deliveryAddress.locality}
 	\    Wait Element Visibility And Input Text	${locator_lotAdd.streetAddress}	${items[${index}].deliveryAddress.streetAddress}
 	\    Wait Until Element Is Visible	${locator_lotAdd.deliveryEndDate}	${COMMONWAIT}
+	\    Set Date In Item	${index}	deliveryDate	startDate	${items[${index}].deliveryDate.startDate}
 	\    Set Date In Item	${index}	deliveryDate	endDate	${items[${index}].deliveryDate.endDate}
 
 
@@ -1339,12 +1347,10 @@ Close Confirmation
 
 Close Confirmation In Editor
 	[Arguments]	${confirmation_text}
-	Wait For Ajax
 	Wait Until Element Is Visible		css=div.modal-body.info-div	${COMMONWAIT}
 	Wait Until Element Contains			css=div.modal-body.info-div	${confirmation_text}	${COMMONWAIT}
 	Wait Visibility And Click Element	css=button[ng-click='close()']
 	Wait Until Element Is Not Visible	css=div.modal-body.info-div	${COMMONWAIT}
-	Wait For Ajax
 
 
 Wait For Notification
@@ -1496,15 +1502,16 @@ Close notification
 
 
 Switch To PMFrame
-#	${frame_visibility} = 	Run Keyword And Return Status	Wait Until Element Is Enabled	id=tenders	timeout=30s
-	${frame_visibility} = 	Run Keyword And Return Status	Wait Until Element Is Visible	id=tenders	timeout=15s
-#	Wait For Ajax
-	Run Keyword If	${frame_visibility}	Switch To Frame	id=tenders
+    Unselect Frame
+    Wait Until Page Contains Element  id=tenders  ${COMMONWAIT}
+	Switch To Frame	id=tenders
 
 
 Search By Query
 	[Arguments]  ${element}  ${query}
 	Wait Element Visibility And Input Text	${element}	${query}
+	Wait Until Element Is Not Visible  css=.modal-body.tree.pm-tree
+	Wait Until Element Is Enabled  xpath=//div[@data-id='foundItem']//label[@for='found_${query}']
 	Wait Visibility And Click Element	xpath=//div[@data-id='foundItem']//label[@for='found_${query}']
 
 #//TODO - unused
