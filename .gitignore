@@ -7,9 +7,6 @@ __pycache__/
 /[bs]dist/
 /*.egg-info/
 *.egg
-.idea/vcs.xml
-.idea/misc.xml
-.idea/modules.xml
-.idea/robot_tests.broker.privatmarket.iml
-.idea/workspace.xml
+.idea
 privatmarket_service.pyc
+
