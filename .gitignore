@@ -12,3 +12,4 @@ __pycache__/
 .idea/modules.xml
 .idea/robot_tests.broker.privatmarket.iml
 .idea/workspace.xml
+privatmarket_service.pyc
