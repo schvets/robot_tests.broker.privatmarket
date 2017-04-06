@@ -170,27 +170,24 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	[Documentation]  Відкрити брaвзер, створити обєкт api wrapper, тощо
 	${service args}=	Create List	--ignore-ssl-errors=true	--ssl-protocol=tlsv1
 	${browser} =		Convert To Lowercase	${USERS.users['${username}'].browser}
-#	FireFoxProfile .native_events_enabled = True
-#    ${profile} =  privatmarket_service.create_ff_profile  ${OUTPUT_DIR}
-####################TMP#########################
-    ${profile}=  create_profile  ${OUTPUT_DIR}
-#	${prefs}			Create Dictionary		download.default_directory=${OUTPUT_DIR}	plugins.plugins_disabled=${disabled}
-#	${options}= 	Evaluate	sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
-#	Call Method	${options}		add_argument	--allow-running-insecure-content
-#	Call Method	${options}		add_argument	--disable-web-security
-#	Call Method	${options}		add_argument	--nativeEvents\=false
-#	Call Method	${options}		add_experimental_option	prefs	${prefs}
+#################### Chrome Browser #########################
+	${disabled}			Create List				Chrome PDF Viewer
+	${prefs}			Create Dictionary		download.default_directory=${OUTPUT_DIR}	plugins.plugins_disabled=${disabled}
+	${options}= 	Evaluate	sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
+	Call Method	${options}		add_argument	--allow-running-insecure-content
+	Call Method	${options}		add_argument	--disable-web-security
+	Call Method	${options}		add_argument	--nativeEvents\=false
+	Call Method	${options}		add_experimental_option	prefs	${prefs}
+	Run Keyword If	'phantomjs' in '${browser}'	Create Webdriver	PhantomJS	${username}	service_args=${service_args}
+	...   ELSE	Create WebDriver	Chrome	chrome_options=${options}	alias=${username}
+	Go To	${USERS.users['${username}'].homepage}
 #################################################################
-	Open Browser	${USERS.users['${username}'].homepage}	ff	ff_profile_dir=${profile}	alias=${username}
-
+#	Open Browser	${USERS.users['${username}'].homepage}	${browser}	alias=${username}
 	Set Window Position	@{USERS.users['${username}'].position}
 	Set Window Size	@{USERS.users['${username}'].size}
 	Set Selenium Implicit Wait	10s
 	Login	${username}
-	#Close message notification
-#	Wait For Ajax
 	Switch To PMFrame
-	#Close notification
 
 
 Пошук тендера по ідентифікатору
@@ -440,8 +437,6 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 Отримати інформацію із запитання
 	[Arguments]  ${username}  ${tender_uaid}  ${question_id}  ${field_name}
 	${element} =  Set Variable  xpath=//div[contains(@class, 'faq') and contains(., '${question_id}')]${tender_data_question.${field_name}}
-#	privatmarket.Пошук тендера по ідентифікатору	${username}	${tender_uaid}
-#	Switch To Tab  2
 	Wait For Element With Reload  ${element}  2
 	${result_full} =  Get Text	${element}
 	${result} =  Strip String	${result_full}
@@ -471,7 +466,8 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 
 Отримати інформацію із документа
 	[Arguments]  ${username}  ${tender_uaid}  ${doc_id}  ${field}
-	privatmarket.Пошук тендера по ідентифікатору	${username}	${tender_uaid}
+	Wait For Element With Reload  ${tender_data_documentation.${field}}  1
+#	privatmarket.Пошук тендера по ідентифікатору	${username}	${tender_uaid}
 	Wait Until Element Is Visible  ${tender_data_documentation.${field}}	${COMMONWAIT}
 	${result}=  get text  ${tender_data_documentation.${field}}
 	[Return]  ${result}
@@ -482,10 +478,16 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 #	log to console  ---Отримати документ
 #	debug
 #	privatmarket.Пошук тендера по ідентифікатору	${username}	${tender_uaid}
-#    Wait Visibility And Click Element  ${tender_data_documentation.title}
-    wait until element is visible  ${tender_data_documentation.title}
-    sleep  10s
-
+	Wait For Element With Reload  ${tender_data_documentation.title}  1
+    Wait Visibility And Click Element  ${tender_data_documentation.title}
+    ${file_name_full} =  Get Text  ${tender_data_documentation.title}
+    ${file_name} =  Strip String  ${file_name_full}
+#    wait until element is visible  ${tender_data_documentation.title}
+    [Return]  ${file_name}
+#    ${url} =  get element attribute  //div[@ng-click="openUrl(file.url)"]@tooltip
+#    ${url} =  set variable  https://docs.google.com/document/d/1IB-nfk7geC6mfDl9eRw3BUTYoECZ_RuIFm7lHbvDfEc/edit?usp=sharing
+#    privatmarket_service.download_doc  fv-url  ${OUTPUT_DIR}
+#    sleep  20s
 
 ##########################################################################################
 
