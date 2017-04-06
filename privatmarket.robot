@@ -173,6 +173,8 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 Підготувати клієнт для користувача
 	[Arguments]  ${username}
 	[Documentation]  Відкрити брaвзер, створити обєкт api wrapper, тощо
+	log to console  +-+-+-+-+
+	log to console  ${username}
 	${service args}=	Create List	--ignore-ssl-errors=true	--ssl-protocol=tlsv1
 	${browser} =		Convert To Lowercase	${USERS.users['${username}'].browser}
 
@@ -185,13 +187,18 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	Call Method	${chrome_options}		add_argument	--nativeEvents\=false
 	Call Method	${chrome_options}		add_experimental_option	prefs	${prefs}
 	${ff_options}= 	create_profile  ${OUTPUT_DIR}
-	Run Keyword If	'phantomjs' in '${browser}'	Create Webdriver	PhantomJS	${username}	service_args=${service_args}
-	...   ELSE If	Create WebDriver	Chrome	chrome_options=${chrome_options}	alias=${username}
-	...   ELSE	Create WebDriver	Firefox	firefox_options=${ff_options}	alias=${username}
+
+    #Для Viewer'а нужен хром, т.к. на хром настроена автоматическая закачка файлов
+	Run Keyword If  '${username}' == 'PrivatMarket_Viewer'	Create WebDriver	Chrome	chrome_options=${chrome_options}	alias=${username}
+    Run Keyword If  '${username}' == 'PrivatMarket_Owner'	Create WebDriver	Firefox	firefox_options=${ff_options}	alias=${username}
+    Run Keyword If  '${username}' == 'PrivatMarket_Provider'	Create WebDriver	Chrome	chrome_options=${chrome_options}	alias=${username}
+
+#	Run Keyword If	'phantomjs' in '${browser}'	Create Webdriver	PhantomJS	${username}	service_args=${service_args}
+#	...   ELSE	Create WebDriver	Chrome	chrome_options=${chrome_options}	alias=${username}
+#	...   ELSE	Create WebDriver	Firefox	firefox_options=${ff_options}	alias=${username}
 	Go To	${USERS.users['${username}'].homepage}
     # <-
 #	Open Browser	${USERS.users['${username}'].homepage}	${browser}	alias=${username}
-
 	Set Window Position	@{USERS.users['${username}'].position}
 	Set Window Size	@{USERS.users['${username}'].size}
 	Set Selenium Implicit Wait	10s
@@ -204,8 +211,6 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	Go To	${USERS.users['${username}'].homepage}
 	Close notification
 #	Chose UK language
-	Close notification
-#	Sleep	3s
 #	Wait Until Element Not Stale	${locator_tenderSearch.searchInput}	${COMMONWAIT}
 	Wait Until Element Is Visible	${locator_tenderSearch.searchInput}	timeout=${COMMONWAIT}
 #	Wait Until Element Is Enabled	${locator_tenderSearch.tendersList}	timeout=${COMMONWAIT}
@@ -471,6 +476,8 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	[Arguments]  ${username}  ${tender_uaid}  ${doc_id}
 	Wait For Element With Reload  ${tender_data_documentation.title}  1
     Wait Visibility And Click Element  ${tender_data_documentation.title}
+    # Добален слип, т.к. док не успевал загрузиться
+    sleep  20s
     ${file_name_full} =  Get Text  ${tender_data_documentation.title}
     ${file_name} =  Strip String  ${file_name_full}
     [Return]  ${file_name}
@@ -560,8 +567,7 @@ Covert Amount To Number
 	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].id'				Отримати строку	${element}	3	${item}
 	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].description'	Отримати класифікацію	${element}	${item}
 	Run Keyword And Return If	'items.deliveryAddres' in '${element}'								Отримати текст елемента	${element}	${item}
-#    log to console  ${element}
-#    debug
+
 	Run Keyword And Return If	'${element}' == 'items.deliveryDate.startDate'			Отримати дату та час	${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'items.deliveryDate.endDate'			Отримати дату та час	${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'items.unit.name'						Отримати назву	${element}	0	${item}
@@ -740,8 +746,6 @@ Covert Amount To Number
 	[Arguments]  ${element}  ${item}
 	${text} =	Отримати текст елемента  ${element}  ${item}
 #TODO проверка на текст. Необходимо проверить и заменить
-#    log to console  TODO проверка на текст. Необходимо проверить и заменить
-#    debug
 	${result} =	Set Variable If	'Отменено' in '${text}'	active
 	[return]  ${result}
 
@@ -814,7 +818,6 @@ Covert Amount To Number
 #TODO проверка на текст. Необходимо проверить и заменить. PopUp. Закупка поставлена в очередь на отправку в ProZorro. Статус закупки Вы можете отслеживать в личном кабинете.
 	Wait Until Element Contains	css=div.modal-body.info-div	Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.	${COMMONWAIT}
 	Reload Page
-#	Wait For Ajax
 
 
 Створити вимогу
