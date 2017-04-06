@@ -173,8 +173,7 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 Підготувати клієнт для користувача
 	[Arguments]  ${username}
 	[Documentation]  Відкрити брaвзер, створити обєкт api wrapper, тощо
-	log to console  +-+-+-+-+
-	log to console  ${username}
+
 	${service args}=	Create List	--ignore-ssl-errors=true	--ssl-protocol=tlsv1
 	${browser} =		Convert To Lowercase	${USERS.users['${username}'].browser}
 
@@ -189,17 +188,17 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	${ff_options}= 	create_profile  ${OUTPUT_DIR}
 
     #Для Viewer'а нужен хром, т.к. на хром настроена автоматическая закачка файлов
-	Run Keyword If  '${username}' == 'PrivatMarket_Viewer'	Create WebDriver	Chrome	chrome_options=${chrome_options}	alias=${username}
-    Run Keyword If  '${username}' == 'PrivatMarket_Owner'	Create WebDriver	Firefox	firefox_options=${ff_options}	alias=${username}
-    Run Keyword If  '${username}' == 'PrivatMarket_Provider'	Create WebDriver	Chrome	chrome_options=${chrome_options}	alias=${username}
+#	Run Keyword If  '${username}' == 'PrivatMarket_Viewer'	Create WebDriver	Chrome	chrome_options=${chrome_options}	alias=${username}
+#    Run Keyword If  '${username}' == 'PrivatMarket_Owner'	Create WebDriver	Firefox	firefox_options=${ff_options}	alias=${username}
+#    Run Keyword If  '${username}' == 'PrivatMarket_Provider'	Create WebDriver	Chrome	chrome_options=${chrome_options}	alias=${username}
 
-#	Run Keyword If	'phantomjs' in '${browser}'	Create Webdriver	PhantomJS	${username}	service_args=${service_args}
+	Run Keyword If	'phantomjs' in '${browser}'	Create Webdriver	PhantomJS	${username}	service_args=${service_args}
 #	...   ELSE	Create WebDriver	Chrome	chrome_options=${chrome_options}	alias=${username}
-#	...   ELSE	Create WebDriver	Firefox	firefox_options=${ff_options}	alias=${username}
-	Go To	${USERS.users['${username}'].homepage}
+	...   ELSE	Create WebDriver	Firefox	firefox_options=${ff_options}	alias=${username}
+#	Go To	${USERS.users['${username}'].homepage}
     # <-
-#	Open Browser	${USERS.users['${username}'].homepage}	${browser}	alias=${username}
-	Set Window Position	@{USERS.users['${username}'].position}
+	Open Browser	${USERS.users['${username}'].homepage}	${browser}	alias=${username}
+#	Set Window Position	@{USERS.users['${username}'].position}
 	Set Window Size	@{USERS.users['${username}'].size}
 	Set Selenium Implicit Wait	10s
 	Login	${username}
