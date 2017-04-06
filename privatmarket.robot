@@ -160,8 +160,8 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 *** Keywords ***
 Підготувати дані для оголошення тендера
 	[Arguments]  ${username}  ${tender_data}  ${role_name}
-	${tender_data.data} = 	Run Keyword If	'PrivatMarket_Owner' == '${username}'	modify_test_data	${tender_data.data}
-	${adapted.data} = 	modify_test_data	${tender_data.data}
+#	${tender_data.data} = 	Run Keyword If	'PrivatMarket_Owner' == '${username}'	modify_test_data	${tender_data.data}
+#	${adapted.data} = 	modify_test_data	${tender_data.data}
 	[Return]  ${tender_data}
 
 
@@ -455,6 +455,13 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	[Arguments]  ${username}  ${tender_uaid}  ${field}
 	${bid}=  Отримати пропозицію  ${username}  ${tender_uaid}
 	[Return]  ${bid.data.${field}}
+
+
+Отримати інформацію із лоту
+	[Arguments]  ${username}  ${tender_uaid}  ${object_id}  ${field_name}
+
+
+
 
 #Отримати пропозицію
 #	[Arguments]  ${username}  ${tender_uaid}
