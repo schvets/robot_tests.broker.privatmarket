@@ -68,6 +68,9 @@ ${tender_data_item.quantity}	xpath=//div[@ng-if='adb.quantity']/div[2]/span
 #############################################################
 
 ${tender_data_question.title}	//span[contains(@class, 'question-title')]
+${tender_data_question.description}	//div[@class='question-div']/div[1]
+${tender_data_question.answer}	//div[@class='question-div question-expanded']/div[1]
+
 ${tender_data_questions[0].description}	css=div.question-div
 ${tender_data_questions[0].date}	xpath=//div[@class = 'question-head title']/b[2]
 ${tender_data_questions[0].title}	css=div.question-head.title span
@@ -167,7 +170,10 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	[Documentation]  Відкрити брaвзер, створити обєкт api wrapper, тощо
 	${service args}=	Create List	--ignore-ssl-errors=true	--ssl-protocol=tlsv1
 	${browser} =		Convert To Lowercase	${USERS.users['${username}'].browser}
+#	FireFoxProfile .native_events_enabled = True
+#    ${profile} =  privatmarket_service.create_ff_profile  ${OUTPUT_DIR}
 ####################TMP#########################
+    ${profile}=  create_profile  ${OUTPUT_DIR}
 #	${prefs}			Create Dictionary		download.default_directory=${OUTPUT_DIR}	plugins.plugins_disabled=${disabled}
 #	${options}= 	Evaluate	sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
 #	Call Method	${options}		add_argument	--allow-running-insecure-content
@@ -175,7 +181,7 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 #	Call Method	${options}		add_argument	--nativeEvents\=false
 #	Call Method	${options}		add_experimental_option	prefs	${prefs}
 #################################################################
-	Open Browser	${USERS.users['${username}'].homepage}	ff	alias=${username}
+	Open Browser	${USERS.users['${username}'].homepage}	ff	ff_profile_dir=${profile}	alias=${username}
 
 	Set Window Position	@{USERS.users['${username}'].position}
 	Set Window Size	@{USERS.users['${username}'].size}
@@ -190,7 +196,6 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 Пошук тендера по ідентифікатору
 	[Arguments]  ${username}  ${tenderId}
 	Go To	${USERS.users['${username}'].homepage}
-	Wait For Ajax
 	Close notification
 #	Chose UK language
 	Close notification
@@ -435,6 +440,8 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 Отримати інформацію із запитання
 	[Arguments]  ${username}  ${tender_uaid}  ${question_id}  ${field_name}
 	${element} =  Set Variable  xpath=//div[contains(@class, 'faq') and contains(., '${question_id}')]${tender_data_question.${field_name}}
+#	privatmarket.Пошук тендера по ідентифікатору	${username}	${tender_uaid}
+#	Switch To Tab  2
 	Wait For Element With Reload  ${element}  2
 	${result_full} =  Get Text	${element}
 	${result} =  Strip String	${result_full}
@@ -462,12 +469,6 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 #	${object_index}=  get_object_index_by_id  ${objects}  ${object_id}
 #	[Return]  ${object_type}[${object_index}].${field_name}
 
-#Отримати інформацію із запитання
-#	[Arguments]  ${username}  ${tender_uaid}  ${question_id}  ${field_name}
-##	debug
-#	${field_name}=  Отримати шлях до поля об’єкта  ${username}  ${field_name}  ${question_id}
-#	Run Keyword And Return  Отримати інформацію із тендера  ${username}  ${tender_uaid}  ${field_name}
-
 Отримати інформацію із документа
 	[Arguments]  ${username}  ${tender_uaid}  ${doc_id}  ${field}
 	privatmarket.Пошук тендера по ідентифікатору	${username}	${tender_uaid}
@@ -479,30 +480,11 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 Отримати документ
 	[Arguments]  ${username}  ${tender_uaid}  ${doc_id}
 #	log to console  ---Отримати документ
-	debug
+#	debug
 #	privatmarket.Пошук тендера по ідентифікатору	${username}	${tender_uaid}
-    Wait Visibility And Click Element  ${tender_data_documentation.title}
-#	${service_args} =	Create List	--ignore-ssl-errors=true	--ssl-protocol=tlsv1
-#	${browser} =		Convert To Lowercase	${USERS.users['${username}'].browser}
-#	${disabled}			Create List				Chrome PDF Viewer
-#	${prefs}			Create Dictionary		download.default_directory=${OUTPUT_DIR}	plugins.plugins_disabled=${disabled}
-#
-#	${options}= 	Evaluate	sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
-#	Call Method	${options}		add_argument	--allow-running-insecure-content
-#	Call Method	${options}		add_argument	--disable-web-security
-#	Call Method	${options}		add_argument	--nativeEvents\=false
-#	Call Method	${options}		add_experimental_option	prefs	${prefs}
-#
-#	Run Keyword If	'phantomjs' in '${browser}'	Create Webdriver	PhantomJS	${username}	service_args=${service_args}
-#	...   ELSE If	Create WebDriver	Chrome	chrome_options=${options}	alias=${username}
-#	...
-#    ${result}=  get text  ${tender_data_documentation.${field}}
-#	[Return]  ${filename}
+#    Wait Visibility And Click Element  ${tender_data_documentation.title}
+    wait until element is visible  ${tender_data_documentation.title}
     sleep  10s
-
-Отримати інформацію із запитання
-    [Arguments]  ${username}  ${tender_uaid}  ${question_id}  ${field_name}
-	privatmarket.Пошук тендера по ідентифікатору	${username}	${tender_uaid}
 
 
 ##########################################################################################
@@ -580,8 +562,6 @@ Tax Convert
 	Run Keyword And Return If	'${element}' == 'questions[0].date'				Отримати дату та час	${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'bids'							Перевірити присутність bids
 	Run Keyword And Return If	'${element}' == 'value.amount'	Covert Amount To Number	${element}
-#	Run Keyword And Return If	'${element}' == 'value.currency'	Currency Convert	${element}
-#	Run Keyword And Return If	'${element}' == 'value.valueAddedTaxIncluded'	Tax Convert	${element}
 	Run Keyword And Return If	'${element}' == 'value.currency'			Отримати інформацію з ${element}	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'value.valueAddedTaxIncluded'				Отримати інформацію з ${element}	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'status'						Отримати інформацію з ${element}	${element}
@@ -602,7 +582,8 @@ Tax Convert
 	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].id'				Отримати строку	${element}	3	${item}
 	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].description'	Отримати класифікацію	${element}	${item}
 	Run Keyword And Return If	'items.deliveryAddres' in '${element}'								Отримати текст елемента	${element}	${item}
-
+#    log to console  ${element}
+#    debug
 	Run Keyword And Return If	'${element}' == 'items.deliveryDate.startDate'			Отримати дату та час	${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'items.deliveryDate.endDate'			Отримати дату та час	${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'items.unit.name'						Отримати назву	${element}	0	${item}
@@ -855,7 +836,7 @@ Tax Convert
 #TODO проверка на текст. Необходимо проверить и заменить. PopUp. Закупка поставлена в очередь на отправку в ProZorro. Статус закупки Вы можете отслеживать в личном кабинете.
 	Wait Until Element Contains	css=div.modal-body.info-div	Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.	${COMMONWAIT}
 	Reload Page
-	Wait For Ajax
+#	Wait For Ajax
 
 
 Створити вимогу
@@ -1479,7 +1460,7 @@ Try Search Element
 	[Arguments]	${locator}  ${tab_number}
 	Reload And Switch To Tab			${tab_number}
 	Wait For Ajax
-	Wait Until Element Is Enabled		${locator}	3
+	Wait Until Element Is Enabled		${locator}	10
 	[Return]	True
 
 
