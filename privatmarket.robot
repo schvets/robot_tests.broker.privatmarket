@@ -46,9 +46,11 @@ ${tender_data_items.unit.name}	xpath=//div[@ng-if='adb.quantity']/div[2]/span[2]
 ${tender_data_items.unit.code}	xpath=//div[@ng-if='adb.quantity']/div[2]/span[2]
 ${tender_data_items.quantity}	xpath=//div[@ng-if='adb.quantity']/div[2]/span
 
+
+#/section/div[contains(., 'i-4fe53361') and contains(@class, 'lot-info')]//div[@ng-repeat='cl in adb.additionalClassifications'][1]
 #############################################################
 ${tender_data_item.description}	//div[@class="description"]//span
-${tender_data_item.deliveryDate.endDate}	xpath=//div[@ng-if='adb.deliveryDate.endDate']/div[2]
+${tender_data_item.deliveryDate.endDate}	div[@ng-if='adb.deliveryDate.endDate']/div[2]
 ${tender_data_item.deliveryLocation.latitude}	css=span.latitude
 ${tender_data_item.deliveryLocation.longitude}	css=span.longitude
 ${tender_data_item.deliveryAddress.countryName}	css=span#countryName
@@ -56,15 +58,15 @@ ${tender_data_item.deliveryAddress.postalCode}	css=span#postalCode
 ${tender_data_item.deliveryAddress.region}	css=span#region
 ${tender_data_item.deliveryAddress.locality}	css=span#locality
 ${tender_data_item.deliveryAddress.streetAddress}	css=span#streetAddress
-${tender_data_item.classification.scheme}	xpath=//div[@ng-if="adb.classification"]
-${tender_data_item.classification.id}	xpath=//div[@ng-if="adb.classification"]
-${tender_data_item.classification.description}	xpath=//div[@ng-if="adb.classification"]
-${tender_data_item.additionalClassifications[0].scheme}	xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
-${tender_data_item.additionalClassifications[0].id}	xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
-${tender_data_item.additionalClassifications[0].description}	xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
-${tender_data_item.unit.name}	xpath=//div[@ng-if='adb.quantity']/div[2]/span[2]
-${tender_data_item.unit.code}	xpath=//div[@ng-if='adb.quantity']/div[2]/span[2]
-${tender_data_item.quantity}	xpath=//div[@ng-if='adb.quantity']/div[2]/span
+${tender_data_item.classification.scheme}	//div[@ng-if="adb.classification"]
+${tender_data_item.classification.id}	//div[@ng-if="adb.classification"]
+${tender_data_item.classification.description}	//div[@ng-if="adb.classification"]
+${tender_data_item.additionalClassifications[0].scheme}	//div[@ng-repeat='cl in adb.additionalClassifications'][1]
+${tender_data_item.additionalClassifications[0].id}	//div[@ng-repeat='cl in adb.additionalClassifications'][1]
+${tender_data_item.additionalClassifications[0].description}	//div[@ng-repeat='cl in adb.additionalClassifications'][1]
+${tender_data_item.unit.name}	//div[@ng-if='adb.quantity']/div[2]/span[2]
+${tender_data_item.unit.code}	//div[@ng-if='adb.quantity']/div[2]/span[2]
+${tender_data_item.quantity}	//div[@ng-if='adb.quantity']/div[2]/span
 #############################################################
 
 ${tender_data_question.title}	//span[contains(@class, 'question-title')]
@@ -83,6 +85,10 @@ ${tender_data_lots.title}	css=div.lot-head span.ng-binding
 ${tender_data_lots.description}	css=section.lot-description section.description
 ${tender_data_lots.value.amount}	css=section.lot-description div[ng-if='model.checkedLot.value'] div.info-item-val
 ${tender_data_lots.value.lotMinStepAmount}	.//*[@id='lotMinStepAmount']
+${tender_data_lots.lots.title}	css=div.lot-head span.ng-binding
+${tender_data_lots.lots.description}	css=section.lot-description section.description
+${tender_data_lots.lots.value.amount}	css=section.lot-description div[ng-if='model.checkedLot.value'] div.info-item-val
+${tender_data_lots.lots.value.lotMinStepAmount}	.//*[@id='lotMinStepAmount']
 ${tender_data_bids}	xpath=(//table[@class='bids']//tr)[2]
 ${tender_data_cancellations[0].status}	xpath=//*[@id='nolotSection']/div[1]/div[1]
 ${tender_data_cancellations[0].reason}	xpath=//*[@id='nolotSection']/div[1]/div[2]
@@ -132,8 +138,8 @@ ${locator_tenderAdd.procurementName}	css=input[data-id='procurementName']
 ${locator_tenderAdd.procurementDescription}	css=textarea[data-id='procurementDescription']
 ${locator_tenderAdd.procurementClassifications}	xpath=(//span[@data-id='actChoose'])[1]
 ${locator_tenderAdd.btnSave}	css=button[data-id='actSave']
-${locator_tenderAdd.firstTab}
-${locator_tenderAdd.firstTab}
+${locator_tenderAdd.firstTab}	css=#tab_1 a
+${locator_tenderAdd.firstTab}	css=#tab_2 a
 ${locator_tenderAdd.thirdTab}	css=#tab_3 a
 ${locator_tenderAdd.docs.yes}	css=label[for='documentation_tender_yes']
 ${locator_tenderAdd.docs.loader}	css=div.file-loader a
@@ -149,16 +155,23 @@ ${locator_lotAdd.locality}	css=input[data-id='locality']
 ${locator_lotAdd.streetAddress}	css=input[data-id='streetAddress']
 ${locator_lotAdd.deliveryEndDate}	css=input[ng-model='item.deliveryDate.ed.d']
 
-
-
 ${locator_tenderInfo.lotDescriptionBtn}	xpath=//li[contains(@ng-class, 'description')]
 ${locator_tenderInfo.lotDescriptionBody}	xpath=//section[@class='description marged ng-binding']
 ${locator_tender.complaint.btnSave}	id=btnSaveComplaint
 
-
+${locator_question.create}	xpath=//div[@class='delivery-info ng-scope']/div/a[@ng-click='act.sendEnquiry()']
+${locator_question.title}	xpath=//input[@ng-model="model.question.title"]
+${locator_question.description}	xpath=//textarea[@ng-model='model.question.description']
+${locator_question.usersEmail}	id=personEmail
+${locator_question.country}	id=addressCountry
+${locator_question.postalCode}	id=addressPostalCode
+${locator_question.region}	id=addressRegion
+${locator_question.locality}	id=addressLocality
+${locator_question.street}	id=addressStreet
+${locator_question.sendQuestion}	xpath=//button[@ng-click='act.sendQuestion()']
+${locator_question.hideModal}	css=span[ng-click='act.hideModal()']
 
 ${locator_tender.bid.BtnNext}	css=button[ng-click='commonActions.goNext(1)']
-
 
 ${keywords}  /op_robot_tests/tests_files/keywords
 
@@ -177,7 +190,6 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	${service args}=	Create List	--ignore-ssl-errors=true	--ssl-protocol=tlsv1
 	${browser} =		Convert To Lowercase	${USERS.users['${username}'].browser}
 
-    #Chrome Browser ->
 	${disabled}			Create List				Chrome PDF Viewer
 	${prefs}			Create Dictionary		download.default_directory=${OUTPUT_DIR}	plugins.plugins_disabled=${disabled}
 	${chrome_options}= 	Evaluate	sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
@@ -185,20 +197,14 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	Call Method	${chrome_options}		add_argument	--disable-web-security
 	Call Method	${chrome_options}		add_argument	--nativeEvents\=false
 	Call Method	${chrome_options}		add_experimental_option	prefs	${prefs}
-	${ff_options}= 	create_profile  ${OUTPUT_DIR}
 
     #Для Viewer'а нужен хром, т.к. на хром настроена автоматическая закачка файлов
 #	Run Keyword If  '${username}' == 'PrivatMarket_Viewer'	Create WebDriver	Chrome	chrome_options=${chrome_options}	alias=${username}
-#	Run Keyword If  '${username}' == 'PrivatMarket_Owner'	Create WebDriver	Firefox	firefox_options=${ff_options}	alias=${username}
+#	Run Keyword If  '${username}' == 'PrivatMarket_Owner'	Create WebDriver	Firefox	alias=${username}
 #	Run Keyword If  '${username}' == 'PrivatMarket_Provider'	Create WebDriver	Chrome	chrome_options=${chrome_options}	alias=${username}
-
-#	Run Keyword If	'phantomjs' in '${browser}'	Create Webdriver	PhantomJS	${username}	service_args=${service_args}
-#	...   ELSE	Create WebDriver	Chrome	chrome_options=${chrome_options}	alias=${username}
-#	...   ELSE	Create WebDriver	Firefox	firefox_options=${ff_options}	alias=${username}
 #	Go To	${USERS.users['${username}'].homepage}
-    # <-
+
 	Open Browser	${USERS.users['${username}'].homepage}	${browser}	alias=${username}
-#	Set Window Position	@{USERS.users['${username}'].position}
 	Set Window Size	@{USERS.users['${username}'].size}
 	Set Selenium Implicit Wait	10s
 	Login	${username}
@@ -226,7 +232,7 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 #	Wait For Ajax
 	Switch To PMFrame
 #	Wait Until Element Is Not Visible	${locator_tenderSearch.searchInput}	${COMMONWAIT}
-	Wait Until Element Is Visible	${tender_data_status}	${COMMONWAIT}
+	Wait Until Element Is Visible	${tender_data_title}	${COMMONWAIT}
 #	Wait Until Element Not Stale	${tender_data_title}	${COMMONWAIT}
 
 
@@ -331,7 +337,7 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	Close Confirmation In Editor	Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.
 	Switch To PMFrame
 #	Wait Until Element Not Stale	${tender_data_title}	40
-	Wait For Element With Reload	xpath=//div[@id='tenderStatus' and contains(., 'Период уточнений')]	1
+	Wait For Element With Reload	xpath=//div[@id='tenderStatus' and contains(., 'Період уточнень')]	1
 	${tender_id} = 	Get Text	css=div#tenderId
 	[Return]  ${tender_id}
 #	[return]  ${tender_id}
@@ -483,13 +489,25 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 
 Задати запитання на тендер
     [Arguments]  ${username}  ${tender_uaid}  ${question}
-    [Return]  ${question}
-
-Отримати інформацію із лоту
-    [Arguments]  ${username}  ${tender_uaid}  ${lot_id}  ${field_name}
-    ${result}=  get text  ${tender_data_documentation.${field}}
-    [Return]  ${result}
-
+	Switch To PMFrame
+	Wait Visibility And Click Element	${locator_question.create}
+	sleep	4s
+	Wait Until Element Is Visible	${locator_question.title}	${COMMONWAIT}
+	Wait Until Element Is Enabled	${locator_question.title}	${COMMONWAIT}
+	Input text	${locator_question.title}				${question.data.title}
+	Wait Element Visibility And Input Text	${locator_question.description}	${question.data.description}
+	Wait Element Visibility And Input Text	${locator_question.usersEmail}	${USERS.users['${provider}'].email}
+	Select From List By Value	${locator_question.country}	UA
+	Wait Element Visibility And Input Text	${locator_question.postalCode}	${question.data.author.address.postalCode}
+	Wait Element Visibility And Input Text	${locator_question.region}	${question.data.author.address.region}
+	Wait Element Visibility And Input Text	${locator_question.locality}	${question.data.author.address.locality}
+	Wait Element Visibility And Input Text	${locator_question.street}	${question.data.author.address.streetAddress}
+	Wait Visibility And Click Element	${locator_question.sendQuestion}
+	Wait For Notification	Ваше запитання успішно включено до черги на відправку. Дякуємо за звернення!
+#	Wait Until Element Not Stale	${locator_question.hideModal}	40
+	Wait Visibility And Click Element	${locator_question.hideModal}
+	Wait Until Element Is Not Visible	${locator_question.title}	${COMMONWAIT}
+#    [Return]  ${question}
 
 ##########################################################################################
 ##########################################################################################
@@ -1045,7 +1063,7 @@ Fill Phone
 	Wait Until Element Is Visible	${tender_data_status}	${COMMONWAIT}
 
 	${tender_status} =	Get text	${tender_data_status}
-	Run Keyword Unless	'до початку періоду подачі' in '${TEST_NAME}'	Run Keyword If	'${tender_status}' == 'Период уточнений завершен'	Wait For Element With Reload	${locator_tenderClaim.buttonCreate}	1
+	Run Keyword Unless	'до початку періоду подачі' in '${TEST_NAME}'	Run Keyword If	'${tender_status}' == 'Період уточнень завершено'	Wait For Element With Reload	${locator_tenderClaim.buttonCreate}	1
 
 #	Wait Until Element Not Stale		${locator_tenderClaim.buttonCreate}	30
 	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}
@@ -1169,7 +1187,7 @@ Fill Phone
 	Switch To PMFrame
 	Wait Until Element Is Visible	${tender_data_status}	${COMMONWAIT}
 	Wait Visibility And Click Element	xpath=//li[contains(@ng-class, 'lot-parts')]
-	Wait Until Element Is Visible	css=table.bids tr
+	Wait Until Element Is Visible	css=table.bids tr	${COMMONWAIT}
 	#switch to correct tab and find element
 	Wait For Element With Reload	xpath=//table[@class='bids']//tr[1]/td//img[contains(@src,'clip_icon.png')]	6
 	Wait For Element With Reload	xpath=//table[@class='bids']//tr[1]/td//span[contains(., 'Відправлена')]	6
