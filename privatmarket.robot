@@ -189,12 +189,12 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 
     #Для Viewer'а нужен хром, т.к. на хром настроена автоматическая закачка файлов
 #	Run Keyword If  '${username}' == 'PrivatMarket_Viewer'	Create WebDriver	Chrome	chrome_options=${chrome_options}	alias=${username}
-#    Run Keyword If  '${username}' == 'PrivatMarket_Owner'	Create WebDriver	Firefox	firefox_options=${ff_options}	alias=${username}
-#    Run Keyword If  '${username}' == 'PrivatMarket_Provider'	Create WebDriver	Chrome	chrome_options=${chrome_options}	alias=${username}
+#	Run Keyword If  '${username}' == 'PrivatMarket_Owner'	Create WebDriver	Firefox	firefox_options=${ff_options}	alias=${username}
+#	Run Keyword If  '${username}' == 'PrivatMarket_Provider'	Create WebDriver	Chrome	chrome_options=${chrome_options}	alias=${username}
 
-	Run Keyword If	'phantomjs' in '${browser}'	Create Webdriver	PhantomJS	${username}	service_args=${service_args}
+#	Run Keyword If	'phantomjs' in '${browser}'	Create Webdriver	PhantomJS	${username}	service_args=${service_args}
 #	...   ELSE	Create WebDriver	Chrome	chrome_options=${chrome_options}	alias=${username}
-	...   ELSE	Create WebDriver	Firefox	firefox_options=${ff_options}	alias=${username}
+#	...   ELSE	Create WebDriver	Firefox	firefox_options=${ff_options}	alias=${username}
 #	Go To	${USERS.users['${username}'].homepage}
     # <-
 	Open Browser	${USERS.users['${username}'].homepage}	${browser}	alias=${username}
