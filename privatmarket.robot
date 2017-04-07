@@ -222,9 +222,11 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 #	Wait Until Element Not Stale	css=tr#${tenderId}	${COMMONWAIT}
 	Wait Visibility And Click Element	css=tr#${tenderId}
 
+	Switch To PMFrame
+
 	Wait Until Element Is Visible	${tender_data_title}	${COMMONWAIT}
 
-	Switch To PMFrame
+
 #	Wait Until Element Not Stale	${tender_data_title}	${COMMONWAIT}
 
 
