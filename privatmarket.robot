@@ -184,8 +184,9 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 *** Keywords ***
 Підготувати дані для оголошення тендера
 	[Arguments]  ${username}  ${tender_data}  ${role_name}
-	${tender_data.data} = 	Run Keyword If	'PrivatMarket_Owner' == '${username}'	modify_test_data	${tender_data.data}
-	${adapted.data} = 	modify_test_data	${tender_data.data}
+	#${tender_data.data} = 	Run Keyword If	'PrivatMarket_Owner' == '${username}'	modify_test_data	${tender_data.data}
+	${tender_data} = 	Run Keyword If	'PrivatMarket_Owner' == '${username}'	modify_test_data	${tender_data}
+	#${adapted.data} = 	modify_test_data	${tender_data.data}
 	[Return]  ${tender_data}
 
 
@@ -251,6 +252,9 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	@{items} = 		Run Keyword If	${presence}		Get From Dictionary	${tender_data.data}	items
 	${presence} = 	Run Keyword And Return Status	List Should Contain Value	${tender_data.data}	features
 	@{features} = 	Run Keyword If	${presence}		Get From Dictionary	${tender_data.data}	features
+
+	${presence} = 	Run Keyword And Return Status	List Should Contain Value	${tender_data.data}	features
+	@{features} = 	Run Keyword If	${presence}		Get From Dictionary	${tender_data.data}	features
 	Switch To PMFrame
 #	Wait For Ajax
 	Close notification
@@ -282,9 +286,8 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	Wait Until Element Is Visible	css=section[data-id='classificationTreeModal']	${COMMONWAIT}
 	Wait Until Element Is Visible	css=input[data-id='query']	${COMMONWAIT}
 	Search By Query	css=input[data-id='query']	${items[0].classification.id}
-	#Run Keyword If  '${items[0].classification.id}' == '99999999-9'  Обрати додаткові класифікатори  a  b
-
 	Wait Visibility And Click Element	css=button[data-id='actConfirm']
+	Run Keyword If  '${items[0].classification.id}' == '99999999-9'  Обрати додаткові класифікатори   ${items[0].additionalClassifications[0].scheme}   ${items[0].additionalClassifications[0].id}
 
 	#date
 #	Wait For Ajax
@@ -425,6 +428,7 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	Wait Until Element Is Visible		css=div.modal-body.info-div	${COMMONWAIT}
 #TODO проверка на текст. Необходимо проверить и заменить. PopUp
 	Close Confirmation In Editor	Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.
+	Sleep 180
 #	Wait Until Element Contains			css=div.modal-body.info-div	Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.	${COMMONWAIT}
 #	Reload Page
 #	Wait For Ajax
@@ -1305,19 +1309,29 @@ Fill Phone
 
 Обрати додаткові класифікатори
     [Arguments]  ${scheme}  ${classificationId}
-    Wait Visibility And Click Element  css=[data-id='additionalClassifications'] .content-caption-info  ${COMMONWAIT}
-    Wait Until Element Is Enabled  xpath=//section[@data-id='schemeCheckModal']//label[@for='scheme_${scheme}']
-    Wait Visibility And Click Element  xpath=//section[@data-id='schemeCheckModal']//label[@for='scheme_${scheme}']
-    Wait Visibility And Click Element  xpath=//section[@data-id='schemeCheckModal']//button[@data-id='actConfirm']
-    Wait Until Element Is Not Visible  xpath=//section[@data-id='schemeCheckModal']//button[@data-id='actConfirm']
+    Обрати схему  ${scheme}
+    Обрати класифікатори  ${classificationId}
+
+
+Обрати класифікатори
+    [Arguments]  ${classificationId}
     Wait Visibility And Click Element  xpath=//section[@data-id='additionalClassifications']//span[@data-id='actChoose']
 	Wait Until Element Is Visible	css=section[data-id='classificationTreeModal']	${COMMONWAIT}
 	Wait Until Element Is Visible	css=input[data-id='query']	${COMMONWAIT}
 	Wait Element Visibility And Input Text	css=input[data-id='query']	${classificationId}
 	Wait Until Element Is Not Visible  css=.modal-body.tree.pm-tree
-	Wait Until Element Is Enabled  xpath=//div[@data-id='foundItem']//label[@for='found_${classificationId}']
+	Sleep  1
 	Wait Visibility And Click Element	xpath=//div[@data-id='foundItem']//label[@for='found_${classificationId}']
 	Wait Visibility And Click Element	css=[data-id='actConfirm']
+
+
+Обрати схему
+    [Arguments]  ${scheme}
+    Wait Visibility And Click Element  css=[data-id='additionalClassifications'] .content-caption-info
+    Sleep  1
+    Wait Visibility And Click Element  xpath=//section[@data-id='schemeCheckModal']//label[@for='scheme_${scheme}']
+    Wait Visibility And Click Element  xpath=//section[@data-id='schemeCheckModal']//button[@data-id='actConfirm']
+    Sleep  1
 
 
 #Custom Keywords
