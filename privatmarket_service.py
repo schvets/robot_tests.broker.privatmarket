@@ -201,33 +201,33 @@ def get_status_type(status_name):
 
 def modify_test_data(initial_data):
     # set enquiryPeriod.startDate
-    enquiryPeriod_startDate = parser.parse(initial_data['enquiryPeriod']['startDate'])
-    enquiryPeriod_startDate = enquiryPeriod_startDate + timedelta(minutes=6)
-    initial_data["enquiryPeriod"]["startDate"] = enquiryPeriod_startDate.strftime('%Y-%m-%dT%H:%M:%S.%f%z')
-
-    # set lots
-    initial_data['lots'] = [privatmarket_munchify(
-    {
-        "description": u'Тестовий лот',
-        "title": initial_data['title'],
-        "value": {
-            "currency": "UAH",
-            "amount": initial_data['value']['amount'],
-            "valueAddedTaxIncluded": True
-        },
-        "minimalStep": {
-            "currency": "UAH",
-            "amount": initial_data['minimalStep']['amount'],
-            "valueAddedTaxIncluded": True
-        },
-        "status": "active"
-    })]
+    # enquiryPeriod_startDate = parser.parse(initial_data['enquiryPeriod']['startDate'])
+    # enquiryPeriod_startDate = enquiryPeriod_startDate + timedelta(minutes=6)
+    # initial_data["enquiryPeriod"]["startDate"] = enquiryPeriod_startDate.strftime('%Y-%m-%dT%H:%M:%S.%f%z')
+    #
+    # # set lots
+    # initial_data['lots'] = [privatmarket_munchify(
+    # {
+    #     "description": u'Тестовий лот',
+    #     "title": initial_data['title'],
+    #     "value": {
+    #         "currency": "UAH",
+    #         "amount": initial_data['value']['amount'],
+    #         "valueAddedTaxIncluded": True
+    #     },
+    #     "minimalStep": {
+    #         "currency": "UAH",
+    #         "amount": initial_data['minimalStep']['amount'],
+    #         "valueAddedTaxIncluded": True
+    #     },
+    #     "status": "active"
+    # })]
 
     # set other
     # initial_data['procuringEntity']['name'] = u'Товариство З Обмеженою Відповідальністю \'Мак Медіа Прінт\''
     initial_data['procuringEntity']['name'] = u'Товариство З Обмеженою Відповідальністю \'Сільськогосподарська Фірма \'Рубіжне\''
     # initial_data['procuringEntity']['name'] = u'Макстрой Діск, Товариство З Обмеженою Відповідальністю'
-    initial_data['items'][0]['unit']['name'] = get_unit_ru_name(initial_data['items'][0]['unit']['name'])
+    #initial_data['items'][0]['unit']['name'] = get_unit_ru_name(initial_data['items'][0]['unit']['name'])
     return initial_data
 
 

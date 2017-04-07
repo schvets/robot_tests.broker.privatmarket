@@ -76,6 +76,8 @@ ${tender_data_questions[0].date}	xpath=//div[@class = 'question-head title']/b[2
 ${tender_data_questions[0].title}	css=div.question-head.title span
 ${tender_data_questions[0].answer}	xpath=//div[@ng-if='q.answer']//div[@class='ng-binding']
 ${tender_data_lots.title}	css=div.lot-head span.ng-binding
+${tender_data_lot.title}  //div[@id='lot-title']
+${tender_data_lot.minimalStep.amount}  //div[@id='lotMinStepAmount']
 ${tender_data_lots.description}	css=section.lot-description section.description
 ${tender_data_lots.value.amount}	css=section.lot-description div[ng-if='model.checkedLot.value'] div.info-item-val
 ${tender_data_bids}	xpath=(//table[@class='bids']//tr)[2]
@@ -160,33 +162,40 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 *** Keywords ***
 Підготувати дані для оголошення тендера
 	[Arguments]  ${username}  ${tender_data}  ${role_name}
-#	${tender_data.data} = 	Run Keyword If	'PrivatMarket_Owner' == '${username}'	modify_test_data	${tender_data.data}
-#	${adapted.data} = 	modify_test_data	${tender_data.data}
+	${tender_data.data} = 	Run Keyword If	'PrivatMarket_Owner' == '${username}'	modify_test_data	${tender_data.data}
+	${adapted.data} = 	modify_test_data	${tender_data.data}
 	[Return]  ${tender_data}
 
 
 Підготувати клієнт для користувача
 	[Arguments]  ${username}
 	[Documentation]  Відкрити брaвзер, створити обєкт api wrapper, тощо
+
 	${service args}=	Create List	--ignore-ssl-errors=true	--ssl-protocol=tlsv1
 	${browser} =		Convert To Lowercase	${USERS.users['${username}'].browser}
 
     #Chrome Browser ->
 	${disabled}			Create List				Chrome PDF Viewer
 	${prefs}			Create Dictionary		download.default_directory=${OUTPUT_DIR}	plugins.plugins_disabled=${disabled}
-	${options}= 	Evaluate	sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
-	Call Method	${options}		add_argument	--allow-running-insecure-content
-	Call Method	${options}		add_argument	--disable-web-security
-	Call Method	${options}		add_argument	--nativeEvents\=false
-	Call Method	${options}		add_experimental_option	prefs	${prefs}
-	Run Keyword If	'phantomjs' in '${browser}'	Create Webdriver	PhantomJS	${username}	service_args=${service_args}
-	...   ELSE If	Create WebDriver	Chrome	chrome_options=${options}	alias=${username}
-	...   ELSE	Create WebDriver	Firefox	firefox_options=${options}	alias=${username}
-	Go To	${USERS.users['${username}'].homepage}
-    # <-
-#	Open Browser	${USERS.users['${username}'].homepage}	${browser}	alias=${username}
+	${chrome_options}= 	Evaluate	sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
+	Call Method	${chrome_options}		add_argument	--allow-running-insecure-content
+	Call Method	${chrome_options}		add_argument	--disable-web-security
+	Call Method	${chrome_options}		add_argument	--nativeEvents\=false
+	Call Method	${chrome_options}		add_experimental_option	prefs	${prefs}
+#	${ff_options}= 	create_profile  ${OUTPUT_DIR}
 
-	Set Window Position	@{USERS.users['${username}'].position}
+    #Для Viewer'а нужен хром, т.к. на хром настроена автоматическая закачка файлов
+#	Run Keyword If  '${username}' == 'PrivatMarket_Viewer'	Create WebDriver	Chrome	chrome_options=${chrome_options}	alias=${username}
+#	Run Keyword If  '${username}' == 'PrivatMarket_Owner'	Create WebDriver	Firefox	firefox_options=${ff_options}	alias=${username}
+#	Run Keyword If  '${username}' == 'PrivatMarket_Provider'	Create WebDriver	Firefox	chrome_options=${chrome_options}	alias=${username}
+
+#	Run Keyword If	'phantomjs' in '${browser}'	Create Webdriver	PhantomJS	${username}	service_args=${service_args}
+#	...   ELSE	Create WebDriver	Chrome	chrome_options=${chrome_options}	alias=${username}
+#	...   ELSE	Create WebDriver	Firefox	firefox_options=${ff_options}	alias=${username}
+#	Go To	${USERS.users['${username}'].homepage}
+    # <-
+	Open Browser	${USERS.users['${username}'].homepage}	${browser}	alias=${username}
+#	Set Window Position	@{USERS.users['${username}'].position}
 	Set Window Size	@{USERS.users['${username}'].size}
 	Set Selenium Implicit Wait	10s
 	Login	${username}
@@ -213,10 +222,9 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 #	Wait Until Element Not Stale	css=tr#${tenderId}	${COMMONWAIT}
 	Wait Visibility And Click Element	css=tr#${tenderId}
 
-#	Wait For Ajax
+	Wait Until Element Is Visible	${tender_data_title}	${COMMONWAIT}
+
 	Switch To PMFrame
-#	Wait Until Element Is Not Visible	${locator_tenderSearch.searchInput}	${COMMONWAIT}
-	Wait Until Element Is Visible	${tender_data_status}	${COMMONWAIT}
 #	Wait Until Element Not Stale	${tender_data_title}	${COMMONWAIT}
 
 
@@ -259,6 +267,8 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	Wait Until Element Is Visible	css=section[data-id='classificationTreeModal']	${COMMONWAIT}
 	Wait Until Element Is Visible	css=input[data-id='query']	${COMMONWAIT}
 	Search By Query	css=input[data-id='query']	${items[0].classification.id}
+	#Run Keyword If  '${items[0].classification.id}' == '99999999-9'  Обрати додаткові класифікатори  a  b
+
 	Wait Visibility And Click Element	css=button[data-id='actConfirm']
 
 	#date
@@ -321,7 +331,7 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	Close Confirmation In Editor	Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.
 	Switch To PMFrame
 #	Wait Until Element Not Stale	${tender_data_title}	40
-	Wait For Element With Reload	xpath=//div[@id='tenderStatus' and contains(., 'Период уточнений')]	1
+	Wait For Element With Reload	xpath=//div[@id='tenderStatus' and contains(., 'Період уточнень')]	1
 	${tender_id} = 	Get Text	css=div#tenderId
 	[Return]  ${tender_id}
 #	[return]  ${tender_id}
@@ -459,15 +469,16 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 
 Отримати інформацію із лоту
 	[Arguments]  ${username}  ${tender_uaid}  ${object_id}  ${field_name}
+	${className} =  Get Element Attribute  xpath=//section[@id='lotSection']/section[contains(., '${object_id}')]//li[1]@class
+	Run Keyword If  '${className}' == 'simple-nav_item active'  Wait Visibility And Click Element  //section[@id='lotSection']/section[contains(., '${object_id}')]//li[1]/a
 
+	${element} =  Set Variable  xpath=//section[@id='lotSection']/section[contains(., '${object_id}')]${tender_data_lot.${field_name}}
 
+	Run Keyword And Return If	'${element}' == 'minimalStep.amount'					Отримати суму	${element}	${item}
 
-
-
-Отримати інформацію із лоту
-	[Arguments]  ${username}  ${tender_uaid}  ${object_id}  ${field_name}
-
-
+	${result_full} =  Get Text	${element}
+	${result} =  Strip String	${result_full}
+	[Return]  ${result}
 
 
 #Отримати пропозицію
@@ -1088,7 +1099,7 @@ Fill Phone
 	Wait Until Element Is Visible	${tender_data_status}	${COMMONWAIT}
 
 	${tender_status} =	Get text	${tender_data_status}
-	Run Keyword Unless	'до початку періоду подачі' in '${TEST_NAME}'	Run Keyword If	'${tender_status}' == 'Период уточнений завершен'	Wait For Element With Reload	${locator_tenderClaim.buttonCreate}	1
+	Run Keyword Unless	'до початку періоду подачі' in '${TEST_NAME}'	Run Keyword If	'${tender_status}' == 'Період уточнень завершено'	Wait For Element With Reload	${locator_tenderClaim.buttonCreate}	1
 
 #	Wait Until Element Not Stale		${locator_tenderClaim.buttonCreate}	30
 	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}	${COMMONWAIT}
@@ -1289,6 +1300,22 @@ Fill Phone
 	Wait For Condition	${request_string}	${COMMONWAIT}
 	${result} =	Execute Javascript	return angular.element($("div[ng-click='commonActions.sendRedir(bid.afpId)']")).last().scope().model.ad.auctionUrl
 	[return]  ${result}
+
+Обрати додаткові класифікатори
+    [Arguments]  ${scheme}  ${classificationId}
+    Wait Visibility And Click Element  css=[data-id='additionalClassifications'] .content-caption-info  ${COMMONWAIT}
+    Wait Until Element Is Enabled  xpath=//section[@data-id='schemeCheckModal']//label[@for='scheme_${scheme}']
+    Wait Visibility And Click Element  xpath=//section[@data-id='schemeCheckModal']//label[@for='scheme_${scheme}']
+    Wait Visibility And Click Element  xpath=//section[@data-id='schemeCheckModal']//button[@data-id='actConfirm']
+    Wait Until Element Is Not Visible  xpath=//section[@data-id='schemeCheckModal']//button[@data-id='actConfirm']
+    Wait Visibility And Click Element  xpath=//section[@data-id='additionalClassifications']//span[@data-id='actChoose']
+	Wait Until Element Is Visible	css=section[data-id='classificationTreeModal']	${COMMONWAIT}
+	Wait Until Element Is Visible	css=input[data-id='query']	${COMMONWAIT}
+	Wait Element Visibility And Input Text	css=input[data-id='query']	${classificationId}
+	Wait Until Element Is Not Visible  css=.modal-body.tree.pm-tree
+	Wait Until Element Is Enabled  xpath=//div[@data-id='foundItem']//label[@for='found_${classificationId}']
+	Wait Visibility And Click Element	xpath=//div[@data-id='foundItem']//label[@for='found_${classificationId}']
+	Wait Visibility And Click Element	css=[data-id='actConfirm']
 
 
 #Custom Keywords
