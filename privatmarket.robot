@@ -356,7 +356,7 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	: FOR    ${index}    IN RANGE    0    ${lots_count}
 	\    Wait Element Visibility And Input Text	css=input[data-id='title']	${lots[${index}].title}
 	\    Wait Element Visibility And Input Text	css=textarea[data-id='description']	${lots[${index}].description}
-	\    ${value_amount} = 	Convert to String	${lots[${index}].value.amount}
+	\    ${value_amount} = 	privatmarket_service.convert_float_to_string	${lots[${index}].value.amount}
 	\    ${minimalStep_amount} = 	Convert to String	${lots[${index}].minimalStep.amount}
 	\    Wait Element Visibility And Input Text	css=input[data-id='valueAmount']	${value_amount}
 	\    Sleep	3s
