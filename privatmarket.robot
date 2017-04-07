@@ -185,7 +185,7 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 Підготувати дані для оголошення тендера
 	[Arguments]  ${username}  ${tender_data}  ${role_name}
 	${tender_data.data} = 	Run Keyword If	'PrivatMarket_Owner' == '${username}'	modify_test_data	${tender_data.data}
-#	${tender_data} = 	Run Keyword If	'PrivatMarket_Owner' == '${username}'	modify_test_data	${tender_data}
+	#${tender_data} = 	Run Keyword If	'PrivatMarket_Owner' == '${username}'	modify_test_data	${tender_data}
 	${adapted.data} = 	modify_test_data	${tender_data.data}
 	[Return]  ${tender_data}
 
@@ -251,7 +251,6 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	@{items} = 		Run Keyword If	${presence}		Get From Dictionary	${tender_data.data}	items
 	${presence} = 	Run Keyword And Return Status	List Should Contain Value	${tender_data.data}	features
 	@{features} = 	Run Keyword If	${presence}		Get From Dictionary	${tender_data.data}	features
-
 	Switch To PMFrame
 #	Wait For Ajax
 	Close notification
@@ -360,7 +359,7 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	: FOR    ${index}    IN RANGE    0    ${lots_count}
 	\    Wait Element Visibility And Input Text	css=input[data-id='title']	${lots[${index}].title}
 	\    Wait Element Visibility And Input Text	css=textarea[data-id='description']	${lots[${index}].description}
-	\    ${value_amount} = 	Convert to String	${lots[${index}].value.amount}
+	\    ${value_amount} = 	privatmarket_service.convert_float_to_string	${lots[${index}].value.amount}
 	\    ${minimalStep_amount} = 	Convert to String	${lots[${index}].minimalStep.amount}
 	\    Wait Element Visibility And Input Text	css=input[data-id='valueAmount']	${value_amount}
 	\    Sleep	3s

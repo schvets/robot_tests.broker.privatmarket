@@ -264,3 +264,7 @@ def get_unit_ru_name(name):
         return expected_name
     else:
         return name
+
+
+def convert_float_to_string(number):
+    return format(number, '.2f')
