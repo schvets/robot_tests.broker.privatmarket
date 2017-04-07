@@ -25,8 +25,9 @@ ${tender_data_tenderPeriod.startDate}	xpath=(//span[@ng-if='p.bd'])[2]
 ${tender_data_tenderPeriod.endDate}	xpath=(//span[contains(@ng-if, 'p.ed')])[2]
 ${tender_data_auctionPeriod.startDate}	xpath=(//span[@ng-if='p.bd'])[3]
 ${tender_data_minimalStep.amount}	css=div#lotMinStepAmount
+${tender_data_documentation.title}	xpath=//div[@class="file-descriptor"]/span[1]
 ${tender_data_items.description}	xpath=//a[contains(@ng-click, 'adb.showCl = !adb.showCl')]
-${tender_data_items.deliveryDate.startDate}	//div[@ng-if='adb.deliveryDate.startDate']/div[2]
+${tender_data_items.deliveryDate.startDate}	xpath=//div[@ng-if='adb.deliveryDate.startDate']/div[2]
 ${tender_data_items.deliveryDate.endDate}	xpath=//div[@ng-if='adb.deliveryDate.endDate']/div[2]
 ${tender_data_items.deliveryLocation.latitude}	css=span.latitude
 ${tender_data_items.deliveryLocation.longitude}	css=span.longitude
@@ -35,15 +36,12 @@ ${tender_data_items.deliveryAddress.postalCode}	css=span#postalCode
 ${tender_data_items.deliveryAddress.region}	css=span#region
 ${tender_data_items.deliveryAddress.locality}	css=span#locality
 ${tender_data_items.deliveryAddress.streetAddress}	css=span#streetAddress
-#TODO - следующие 3 локатора одинаковые
 ${tender_data_items.classification.scheme}	xpath=//div[@ng-if="adb.classification"]
 ${tender_data_items.classification.id}	xpath=//div[@ng-if="adb.classification"]
 ${tender_data_items.classification.description}	xpath=//div[@ng-if="adb.classification"]
-#TODO - следующие 3 локатора одинаковые
 ${tender_data_items.additionalClassifications[0].scheme}	xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
 ${tender_data_items.additionalClassifications[0].id}	xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
 ${tender_data_items.additionalClassifications[0].description}	xpath=//div[@ng-repeat='cl in adb.additionalClassifications'][1]
-#TODO - следующие 2 локатора одинаковые
 ${tender_data_items.unit.name}	xpath=//div[@ng-if='adb.quantity']/div[2]/span[2]
 ${tender_data_items.unit.code}	xpath=//div[@ng-if='adb.quantity']/div[2]/span[2]
 ${tender_data_items.quantity}	xpath=//div[@ng-if='adb.quantity']/div[2]/span
@@ -70,6 +68,13 @@ ${tender_data_item.quantity}	xpath=//div[@ng-if='adb.quantity']/div[2]/span
 #############################################################
 
 ${tender_data_question.title}	//span[contains(@class, 'question-title')]
+${tender_data_question.description}	//div[@class='question-div']/div[1]
+${tender_data_question.answer}	//div[@class='question-div question-expanded']/div[1]
+${tender_data_question.questions[0].description}	css=div.question-div
+${tender_data_question.questions[0].date}	xpath=//div[@class = 'question-head title']/b[2]
+${tender_data_question.questions[0].title}	css=div.question-head.title span
+${tender_data_question.questions[0].answer}	xpath=//div[@ng-if='q.answer']//div[@class='ng-binding']
+
 ${tender_data_questions[0].description}	css=div.question-div
 ${tender_data_questions[0].date}	xpath=//div[@class = 'question-head title']/b[2]
 ${tender_data_questions[0].title}	css=div.question-head.title span
@@ -77,6 +82,7 @@ ${tender_data_questions[0].answer}	xpath=//div[@ng-if='q.answer']//div[@class='n
 ${tender_data_lots.title}	css=div.lot-head span.ng-binding
 ${tender_data_lots.description}	css=section.lot-description section.description
 ${tender_data_lots.value.amount}	css=section.lot-description div[ng-if='model.checkedLot.value'] div.info-item-val
+${tender_data_lots.value.lotMinStepAmount}	.//*[@id='lotMinStepAmount']
 ${tender_data_bids}	xpath=(//table[@class='bids']//tr)[2]
 ${tender_data_cancellations[0].status}	xpath=//*[@id='nolotSection']/div[1]/div[1]
 ${tender_data_cancellations[0].reason}	xpath=//*[@id='nolotSection']/div[1]/div[2]
@@ -170,33 +176,32 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	${service args}=	Create List	--ignore-ssl-errors=true	--ssl-protocol=tlsv1
 	${browser} =		Convert To Lowercase	${USERS.users['${username}'].browser}
 
-	Open Browser	${USERS.users['${username}'].homepage}	ff	alias=${username}
-
-#	${disabled}			Create List				Chrome PDF Viewer
-#	${prefs}			Create Dictionary		download.default_directory=${OUTPUT_DIR}	plugins.plugins_disabled=${disabled}
-#	${options}= 	Evaluate	sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
-#	Call Method	${options}		add_argument	--allow-running-insecure-content
-#	Call Method	${options}		add_argument	--disable-web-security
-#	Call Method	${options}		add_argument	--nativeEvents\=false
-#	Call Method	${options}		add_experimental_option	prefs	${prefs}
-#	Run Keyword If	'phantomjs' in '${browser}'	Create Webdriver	PhantomJS	${username}	service_args=${service_args}
-#	...   ELSE	Create WebDriver	Chrome	chrome_options=${options}	alias=${username}
+    #Chrome Browser ->
+	${disabled}			Create List				Chrome PDF Viewer
+	${prefs}			Create Dictionary		download.default_directory=${OUTPUT_DIR}	plugins.plugins_disabled=${disabled}
+	${chrome_options}= 	Evaluate	sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
+	Call Method	${chrome_options}		add_argument	--allow-running-insecure-content
+	Call Method	${chrome_options}		add_argument	--disable-web-security
+	Call Method	${chrome_options}		add_argument	--nativeEvents\=false
+	Call Method	${chrome_options}		add_experimental_option	prefs	${prefs}
+	${ff_options}= 	create_profile  ${OUTPUT_DIR}
+	Run Keyword If	'phantomjs' in '${browser}'	Create Webdriver	PhantomJS	${username}	service_args=${service_args}
+	...   ELSE If	Create WebDriver	Chrome	chrome_options=${chrome_options}	alias=${username}
+	...   ELSE	Create WebDriver	Firefox	firefox_options=${ff_options}	alias=${username}
 	Go To	${USERS.users['${username}'].homepage}
+    # <-
+#	Open Browser	${USERS.users['${username}'].homepage}	${browser}	alias=${username}
 
 	Set Window Position	@{USERS.users['${username}'].position}
 	Set Window Size	@{USERS.users['${username}'].size}
 	Set Selenium Implicit Wait	10s
 	Login	${username}
-	#Close message notification
-#	Wait For Ajax
 	Switch To PMFrame
-	#Close notification
 
 
 Пошук тендера по ідентифікатору
 	[Arguments]  ${username}  ${tenderId}
 	Go To	${USERS.users['${username}'].homepage}
-	Wait For Ajax
 	Close notification
 #	Chose UK language
 	Close notification
@@ -430,12 +435,10 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 ##########################################################################################
 #           New Methods
 ##########################################################################################
-#Отримати інформацію із предмету
-#	[Arguments]  ${username}  ${tender_uaid}  ${item_id}  ${field_name}
-##	debug
-#	${field_name}=  Отримати шлях до поля об’єкта  ${username}  ${field_name}  ${item_id}
-#	Run Keyword And Return  Отримати інформацію із тендера  ${username}  ${tender_uaid}  ${field_name}
-
+##########################################################################################
+##########################################################################################
+##########################################################################################
+##########################################################################################
 Отримати інформацію із предмету
 	[Arguments]  ${username}  ${tender_uaid}  ${object_id}  ${field_name}
     ${element} =  Set Variable  xpath=//section/div[contains(., '${object_id}') and contains(@class, 'lot-info')]${tender_data_item.${field_name}}
@@ -451,63 +454,42 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	${result_full} =  Get Text	${element}
 	${result} =  Strip String	${result_full}
 	[Return]  ${result}
-  
+
 Отримати інформацію із пропозиції
 	[Arguments]  ${username}  ${tender_uaid}  ${field}
-	${bid}=  Отримати пропозицію  ${username}  ${tender_uaid}
-	[return]  ${bid.data.${field}}
-
-
-Отримати інформацію із лоту
-	[Arguments]  ${username}  ${tender_uaid}  ${object_id}  ${field_name}
-
-
-
-
-#Отримати пропозицію
-#	[Arguments]  ${username}  ${tender_uaid}
-##	${tender}=  Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
-#	${bid_id}=  Get Variable Value  ${USERS.users['${username}'].bidresponses['bid'].data.id}
-#	${token}=  Get Variable Value  ${USERS.users['${username}']['access_token']}
-#	${reply}=  Call Method  ${USERS.users['${username}'].client}  get_bid  ${bid_id}  ${token}
-#	${reply}=  munch_dict  arg=${reply}
-#	[return]  ${reply}
-
-#Отримати шлях до поля об’єкта
-#	[Arguments]  ${username}  ${field_name}  ${object_id}
-##	debug
-#	${object_type}=  get_object_type_by_id  ${object_id}
-#	${objects}=  Get Variable Value  ${tender_data.data['${object_type}']}  ${None}
-#	${object_index}=  get_object_index_by_id  ${objects}  ${object_id}
-#	[Return]  ${object_type}[${object_index}].${field_name}
-
-#Отримати інформацію із запитання
-#	[Arguments]  ${username}  ${tender_uaid}  ${question_id}  ${field_name}
-##	debug
-#	${field_name}=  Отримати шлях до поля об’єкта  ${username}  ${field_name}  ${question_id}
-#	Run Keyword And Return  Отримати інформацію із тендера  ${username}  ${tender_uaid}  ${field_name}
+	${bid}=  privatmarket.Отримати пропозицію  ${username}  ${tender_uaid}
+	[Return]  ${bid.data.${field}}
 
 Отримати інформацію із документа
 	[Arguments]  ${username}  ${tender_uaid}  ${doc_id}  ${field}
-#	${tender}=  Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
-#    log to console  **************************************
-#    log to console  ${username}
-#    log to console  ${tender_uaid}
-#    log to console  ${doc_id}
-#    log to console  ${field}
-#    debug
-	${document}=  get_doc_by_id  ${tender_data.data}  ${doc_id}
-	Log  ${document}
-	[Return]  ${document['${field}']}
-#
-#Отримати документ
-#	[Arguments]  ${username}  ${tender_uaid}  ${doc_id}
-##	debug
-#	${tender}=  Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
-#	${document}=  get_document_by_id  ${tender.data}  ${doc_id}
-#	${filename}=  download_file_from_url  ${document.url}  ${OUTPUT_DIR}${/}${document.title}
-#	[Return]  ${filename}
+	Wait For Element With Reload  ${tender_data_documentation.${field}}  1
+	Wait Until Element Is Visible  ${tender_data_documentation.${field}}	${COMMONWAIT}
+	${result}=  get text  ${tender_data_documentation.${field}}
+	[Return]  ${result}
 
+Отримати документ
+	[Arguments]  ${username}  ${tender_uaid}  ${doc_id}
+	Wait For Element With Reload  ${tender_data_documentation.title}  1
+    Wait Visibility And Click Element  ${tender_data_documentation.title}
+    ${file_name_full} =  Get Text  ${tender_data_documentation.title}
+    ${file_name} =  Strip String  ${file_name_full}
+    [Return]  ${file_name}
+
+Задати запитання на тендер
+    [Arguments]  ${username}  ${tender_uaid}  ${question}
+    [Return]  ${question}
+
+Отримати інформацію із лоту
+    [Arguments]  ${username}  ${tender_uaid}  ${lot_id}  ${field_name}
+    ${result}=  get text  ${tender_data_documentation.${field}}
+    [Return]  ${result}
+
+
+##########################################################################################
+##########################################################################################
+##########################################################################################
+##########################################################################################
+##########################################################################################
 ##########################################################################################
 
 Отримати інформацію із тендера
@@ -546,31 +528,6 @@ Covert Amount To Number
 	${result}=	convert to number	${text_new}
 	[Return]	${result}
 
-######################### TMP #########################
-Currency Convert
-	[Arguments]  ${field_name}
-	${income_text} =	Get Text	${tender_data_${field_name}}
-	${text} =	Strip String	${income_text}
-	${result}=  Set Variable If	'${text}' == 'грн'	UAH
-	${result}=  Set Variable If	'${text}' == 'руб'	RUR
-	${result}=  Set Variable If	'${text}' == 'дол'	USD
-	${result}=  Set Variable If	'${text}' == 'фунт'	GBP
-#	${result}=  Run Keyword If	'${text}' == 'грн'	UAH
-	[Return]	${result}
-
-Tax Convert
-	[Arguments]  ${field_name}
-	${income_text} =	Get Text	${tender_data_${field_name}}
-	${text} =	Strip String	${income_text}
-	${result}=  Set Variable If	'${text}' == 'з ПДВ'	True
-	${result}=  Set Variable If	'${text}' == 'без ПДВ'	False
-	${result}=  Set Variable If	'${text}' == 'с НДС'	True
-	${result}=  Set Variable If	'${text}' == 'без НДС'	False
-	${result}=  Set Variable If	'${text}' == 'with VAT'	True
-	${result}=  Set Variable If	'${text}' == 'without VAT'	False
-#	${result}=  Run Keyword If	'${text}' == 'з ПДВ'	True
-	[Return]	${result}
-##################################################
 
 Отримати інформацію зі сторінки
 	[Arguments]  ${item}  ${base_tender_uaid}  ${field_name}
@@ -583,8 +540,6 @@ Tax Convert
 	Run Keyword And Return If	'${element}' == 'questions[0].date'				Отримати дату та час	${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'bids'							Перевірити присутність bids
 	Run Keyword And Return If	'${element}' == 'value.amount'	Covert Amount To Number	${element}
-#	Run Keyword And Return If	'${element}' == 'value.currency'	Currency Convert	${element}
-#	Run Keyword And Return If	'${element}' == 'value.valueAddedTaxIncluded'	Tax Convert	${element}
 	Run Keyword And Return If	'${element}' == 'value.currency'			Отримати інформацію з ${element}	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'value.valueAddedTaxIncluded'				Отримати інформацію з ${element}	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'status'						Отримати інформацію з ${element}	${element}
@@ -605,7 +560,8 @@ Tax Convert
 	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].id'				Отримати строку	${element}	3	${item}
 	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].description'	Отримати класифікацію	${element}	${item}
 	Run Keyword And Return If	'items.deliveryAddres' in '${element}'								Отримати текст елемента	${element}	${item}
-
+#    log to console  ${element}
+#    debug
 	Run Keyword And Return If	'${element}' == 'items.deliveryDate.startDate'			Отримати дату та час	${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'items.deliveryDate.endDate'			Отримати дату та час	${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'items.unit.name'						Отримати назву	${element}	0	${item}
@@ -858,7 +814,7 @@ Tax Convert
 #TODO проверка на текст. Необходимо проверить и заменить. PopUp. Закупка поставлена в очередь на отправку в ProZorro. Статус закупки Вы можете отслеживать в личном кабинете.
 	Wait Until Element Contains	css=div.modal-body.info-div	Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.	${COMMONWAIT}
 	Reload Page
-	Wait For Ajax
+#	Wait For Ajax
 
 
 Створити вимогу
@@ -1090,7 +1046,7 @@ Fill Phone
 	Run Keyword Unless	'до початку періоду подачі' in '${TEST_NAME}'	Run Keyword If	'${tender_status}' == 'Период уточнений завершен'	Wait For Element With Reload	${locator_tenderClaim.buttonCreate}	1
 
 #	Wait Until Element Not Stale		${locator_tenderClaim.buttonCreate}	30
-	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}	${COMMONWAIT}
+	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}
 #	Wait For Ajax
 	Wait Until Element Is Not Visible	${locator_tenderClaim.buttonCreate}	${COMMONWAIT}
 	Switch To PMFrame
@@ -1480,7 +1436,7 @@ Try Search Element
 	[Arguments]	${locator}  ${tab_number}
 	Reload And Switch To Tab			${tab_number}
 	Wait For Ajax
-	Wait Until Element Is Enabled		${locator}	3
+	Wait Until Element Is Enabled		${locator}	10
 	[Return]	True
 
 

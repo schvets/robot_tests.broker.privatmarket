@@ -5,9 +5,7 @@ from selenium.common.exceptions import StaleElementReferenceException
 from datetime import datetime, timedelta
 from pytz import timezone
 from dateutil import parser
-import os
-import urllib
-import re
+from selenium import webdriver
 
 def get_month_number(month_name):
     monthes = [u"янв.", u"февр.", u"марта", u"апр.", u"мая", u"июня",
@@ -259,57 +257,12 @@ def get_unit_ru_name(name):
         return expected_name
     else:
         return name
-###################### NEW From keywords ######################
 
-def get_doc_by_id(data, doc_id):
-    for document in data.get('documents', []):
-        if doc_id in document.get('title', ''):
-            return document
-    for complaint in data.get('complaints', []):
-        for document in complaint.get('documents', []):
-            if doc_id in document.get('title', ''):
-                return document
-    for award in data.get('awards', []):
-        for document in award.get('documents', []):
-            if doc_id in document.get('title', ''):
-                return document
-        for complaint in award.get('complaints', []):
-            for document in complaint.get('documents', []):
-                if doc_id in document.get('title', ''):
-                    return document
-    for cancellation in data.get('cancellations', []):
-        for document in cancellation.get('documents', []):
-            if doc_id in document.get('title', ''):
-                return document
-    for bid in data.get('bids', []):
-        for document in bid.get('documents', []):
-            if doc_id in document.get('title', ''):
-                return document
-    raise Exception('Document with id {} not found'.format(doc_id))
-
-# def download_file_from_url(url, path_to_save_file):
-#     f = open(path_to_save_file, 'wb')
-#     f.write(urllib.urlopen(url).read())
-#     f.close()
-#     return os.path.basename(f.name)
-#
-# def get_object_type_by_id(object_id):
-#     prefixes = {'q': 'questions', 'f': 'features', 'i': 'items', 'l': 'lots'}
-#     return prefixes.get(object_id[0])
-
-# def get_object_index_by_id(data, object_id):
-#     if not data:
-#         return 0
-#     for index, element in enumerate(data):
-#         element_id = get_id_from_object(element)
-#         if element_id == object_id:
-#             break
-#     else:
-#         index += 1
-#     return index
-#
-# def get_id_from_object(obj):
-#     obj_id = re.match(r'(^[filq]-[0-9a-fA-F]{8}): ', obj.get('title', ''))
-#     if not obj_id:
-#         obj_id = re.match(r'(^[filq]-[0-9a-fA-F]{8}): ', obj.get('description', ''))
-#     return obj_id.group(1)
+def create_profile(path):
+    from selenium import webdriver
+    fp =webdriver.FirefoxProfile()
+    fp.set_preference("browser.download.folderList",2)
+    fp.set_preference("browser.download.manager.showWhenStarting",False)
+    fp.set_preference("browser.download.dir",path)
+    fp.set_preference("browser.helperApps.neverAsk.saveToDisk",'application/csv')
+    fp.update_preferences()
