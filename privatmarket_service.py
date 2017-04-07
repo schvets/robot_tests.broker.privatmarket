@@ -185,15 +185,22 @@ def get_unit_code(name):
 
 def get_status_type(status_name):
     type_dictionary = {
-                       u'Период уточнений': 'active.enquiries',
-                       u'Период уточнений завершен': 'active.enquiries.ended',
-                       u'Подача предложений': 'active.tendering',
-                       u'Торги': 'active.auction',
-                       u'Квалификация победителя': 'active.qualification',
-                       u'Предложения рассмотрены': 'active.awarded',
-                       u'Закупка не состоялась': 'unsuccessful',
-                       u'Завершено': 'complete',
-                       u'Отменено': 'cancelled'
+        u'Период уточнений': 'active.enquiries',
+        u'Період уточнень': 'active.enquiries',
+        u'Период уточнений завершен': 'active.enquiries.ended',
+        u'Період уточнень завершено': 'active.enquiries.ended',
+        u'Подача предложений': 'active.tendering',
+        u'Подача пропозицій': 'active.tendering',
+        u'Торги': 'active.auction',
+        u'Квалификация победителя': 'active.qualification',
+        u'Квалификація переможця': 'active.qualification',
+        u'Предложения рассмотрены': 'active.awarded',
+        u'Пропозиції розглянуті': 'active.awarded',
+        u'Закупка не состоялась': 'unsuccessful',
+        u'Закупівля не відбулась': 'unsuccessful',
+        u'Завершено': 'complete',
+        u'Отменено': 'cancelled',
+        u'Відмінено': 'cancelled'
                        }
     type_name = type_dictionary.get(status_name)
     return type_name
@@ -257,12 +264,3 @@ def get_unit_ru_name(name):
         return expected_name
     else:
         return name
-
-def create_profile(path):
-    from selenium import webdriver
-    fp =webdriver.FirefoxProfile()
-    fp.set_preference("browser.download.folderList",2)
-    fp.set_preference("browser.download.manager.showWhenStarting",False)
-    fp.set_preference("browser.download.dir",path)
-    fp.set_preference("browser.helperApps.neverAsk.saveToDisk",'application/csv')
-    fp.update_preferences()
