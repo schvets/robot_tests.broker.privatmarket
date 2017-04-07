@@ -80,6 +80,8 @@ ${tender_data_questions[0].date}	xpath=//div[@class = 'question-head title']/b[2
 ${tender_data_questions[0].title}	css=div.question-head.title span
 ${tender_data_questions[0].answer}	xpath=//div[@ng-if='q.answer']//div[@class='ng-binding']
 ${tender_data_lots.title}	css=div.lot-head span.ng-binding
+${tender_data_lot.title}  //div[@id='lot-title']
+${tender_data_lot.minimalStep.amount}  //div[@id='lotMinStepAmount']
 ${tender_data_lots.description}	css=section.lot-description section.description
 ${tender_data_lots.value.amount}	css=section.lot-description div[ng-if='model.checkedLot.value'] div.info-item-val
 ${tender_data_lots.value.lotMinStepAmount}	.//*[@id='lotMinStepAmount']
@@ -165,14 +167,15 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 *** Keywords ***
 Підготувати дані для оголошення тендера
 	[Arguments]  ${username}  ${tender_data}  ${role_name}
-#	${tender_data.data} = 	Run Keyword If	'PrivatMarket_Owner' == '${username}'	modify_test_data	${tender_data.data}
-#	${adapted.data} = 	modify_test_data	${tender_data.data}
+	${tender_data.data} = 	Run Keyword If	'PrivatMarket_Owner' == '${username}'	modify_test_data	${tender_data.data}
+	${adapted.data} = 	modify_test_data	${tender_data.data}
 	[Return]  ${tender_data}
 
 
 Підготувати клієнт для користувача
 	[Arguments]  ${username}
 	[Documentation]  Відкрити брaвзер, створити обєкт api wrapper, тощо
+
 	${service args}=	Create List	--ignore-ssl-errors=true	--ssl-protocol=tlsv1
 	${browser} =		Convert To Lowercase	${USERS.users['${username}'].browser}
 
@@ -219,7 +222,8 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 #	Wait Until Element Not Stale	css=tr#${tenderId}	${COMMONWAIT}
 	Wait Visibility And Click Element	css=tr#${tenderId}
 
-#	Wait For Ajax
+	Wait Until Element Is Visible	${tender_data_title}	${COMMONWAIT}
+
 	Switch To PMFrame
 #	Wait Until Element Is Not Visible	${locator_tenderSearch.searchInput}	${COMMONWAIT}
 	Wait Until Element Is Visible	${tender_data_status}	${COMMONWAIT}
@@ -479,17 +483,10 @@ ${keywords}  /op_robot_tests/tests_files/keywords
     [Arguments]  ${username}  ${tender_uaid}  ${question}
     [Return]  ${question}
 
-Отримати інформацію із лоту
-    [Arguments]  ${username}  ${tender_uaid}  ${lot_id}  ${field_name}
-    ${result}=  get text  ${tender_data_documentation.${field}}
-    [Return]  ${result}
 
 
-##########################################################################################
-##########################################################################################
-##########################################################################################
-##########################################################################################
-##########################################################################################
+
+
 ##########################################################################################
 
 Отримати інформацію із тендера
@@ -1043,10 +1040,10 @@ Fill Phone
 	Wait Until Element Is Visible	${tender_data_status}	${COMMONWAIT}
 
 	${tender_status} =	Get text	${tender_data_status}
-	Run Keyword Unless	'до початку періоду подачі' in '${TEST_NAME}'	Run Keyword If	'${tender_status}' == 'Период уточнений завершен'	Wait For Element With Reload	${locator_tenderClaim.buttonCreate}	1
+	Run Keyword Unless	'до початку періоду подачі' in '${TEST_NAME}'	Run Keyword If	'${tender_status}' == 'Період уточнень завершено'	Wait For Element With Reload	${locator_tenderClaim.buttonCreate}	1
 
 #	Wait Until Element Not Stale		${locator_tenderClaim.buttonCreate}	30
-	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}
+	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}	${COMMONWAIT}
 #	Wait For Ajax
 	Wait Until Element Is Not Visible	${locator_tenderClaim.buttonCreate}	${COMMONWAIT}
 	Switch To PMFrame
