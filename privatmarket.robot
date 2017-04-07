@@ -180,9 +180,9 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 *** Keywords ***
 Підготувати дані для оголошення тендера
 	[Arguments]  ${username}  ${tender_data}  ${role_name}
-	#${tender_data.data} = 	Run Keyword If	'PrivatMarket_Owner' == '${username}'	modify_test_data	${tender_data.data}
-	${tender_data} = 	Run Keyword If	'PrivatMarket_Owner' == '${username}'	modify_test_data	${tender_data}
-	#${adapted.data} = 	modify_test_data	${tender_data.data}
+	${tender_data.data} = 	Run Keyword If	'PrivatMarket_Owner' == '${username}'	modify_test_data	${tender_data.data}
+	#${tender_data} = 	Run Keyword If	'PrivatMarket_Owner' == '${username}'	modify_test_data	${tender_data}
+	${adapted.data} = 	modify_test_data	${tender_data.data}
 	[Return]  ${tender_data}
 
 
@@ -233,7 +233,7 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 #	sleep	3s
 #	Wait Until Element Not Stale	css=tr#${tenderId}	${COMMONWAIT}
 	Wait Visibility And Click Element	css=tr#${tenderId}
-
+    Sleep  5
 	Switch To PMFrame
 #	Wait Until Element Is Not Visible	${locator_tenderSearch.searchInput}	${COMMONWAIT}
 	Wait Until Element Is Visible	${tender_data_title}	${COMMONWAIT}
@@ -246,9 +246,6 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	@{lots} = 		Run Keyword If	${presence}		Get From Dictionary	${tender_data.data}	lots
 	${presence} = 	Run Keyword And Return Status	List Should Contain Value	${tender_data.data}	items
 	@{items} = 		Run Keyword If	${presence}		Get From Dictionary	${tender_data.data}	items
-	${presence} = 	Run Keyword And Return Status	List Should Contain Value	${tender_data.data}	features
-	@{features} = 	Run Keyword If	${presence}		Get From Dictionary	${tender_data.data}	features
-
 	${presence} = 	Run Keyword And Return Status	List Should Contain Value	${tender_data.data}	features
 	@{features} = 	Run Keyword If	${presence}		Get From Dictionary	${tender_data.data}	features
 	Switch To PMFrame
@@ -424,7 +421,7 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	Wait Until Element Is Visible		css=div.modal-body.info-div	${COMMONWAIT}
 #TODO проверка на текст. Необходимо проверить и заменить. PopUp
 	Close Confirmation In Editor	Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.
-	Sleep 180
+	Sleep  180
 #	Wait Until Element Contains			css=div.modal-body.info-div	Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.	${COMMONWAIT}
 #	Reload Page
 #	Wait For Ajax
