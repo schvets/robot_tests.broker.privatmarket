@@ -46,9 +46,6 @@ ${tender_data_items.unit.name}	xpath=//div[@ng-if='adb.quantity']/div[2]/span[2]
 ${tender_data_items.unit.code}	xpath=//div[@ng-if='adb.quantity']/div[2]/span[2]
 ${tender_data_items.quantity}	xpath=//div[@ng-if='adb.quantity']/div[2]/span
 
-
-#/section/div[contains(., 'i-4fe53361') and contains(@class, 'lot-info')]//div[@ng-repeat='cl in adb.additionalClassifications'][1]
-#############################################################
 ${tender_data_item.description}	//div[@class="description"]//span
 ${tender_data_item.deliveryDate.endDate}	div[@ng-if='adb.deliveryDate.endDate']/div[2]
 ${tender_data_item.deliveryLocation.latitude}	css=span.latitude
@@ -67,7 +64,6 @@ ${tender_data_item.additionalClassifications[0].description}	//div[@ng-repeat='c
 ${tender_data_item.unit.name}	//div[@ng-if='adb.quantity']/div[2]/span[2]
 ${tender_data_item.unit.code}	//div[@ng-if='adb.quantity']/div[2]/span[2]
 ${tender_data_item.quantity}	//div[@ng-if='adb.quantity']/div[2]/span
-#############################################################
 
 ${tender_data_question.title}	//span[contains(@class, 'question-title')]
 ${tender_data_question.description}	//div[@class='question-div']/div[1]
@@ -184,9 +180,9 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 *** Keywords ***
 Підготувати дані для оголошення тендера
 	[Arguments]  ${username}  ${tender_data}  ${role_name}
-	#${tender_data.data} = 	Run Keyword If	'PrivatMarket_Owner' == '${username}'	modify_test_data	${tender_data.data}
-	${tender_data} = 	Run Keyword If	'PrivatMarket_Owner' == '${username}'	modify_test_data	${tender_data}
-	#${adapted.data} = 	modify_test_data	${tender_data.data}
+	${tender_data.data} = 	Run Keyword If	'PrivatMarket_Owner' == '${username}'	modify_test_data	${tender_data.data}
+#	${tender_data} = 	Run Keyword If	'PrivatMarket_Owner' == '${username}'	modify_test_data	${tender_data}
+	${adapted.data} = 	modify_test_data	${tender_data.data}
 	[Return]  ${tender_data}
 
 
@@ -206,13 +202,12 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	Call Method	${chrome_options}		add_experimental_option	prefs	${prefs}
 
     #Для Viewer'а нужен хром, т.к. на хром настроена автоматическая закачка файлов
+	Run Keyword If  '${username}' == 'PrivatMarket_Viewer'	Create WebDriver	Chrome	chrome_options=${chrome_options}	alias=${username}
+	Run Keyword If  '${username}' == 'PrivatMarket_Owner'	Create WebDriver	Firefox	alias=${username}
+	Run Keyword If  '${username}' == 'PrivatMarket_Provider'	Create WebDriver	Firefox	chrome_options=${chrome_options}	alias=${username}
+	Go To	${USERS.users['${username}'].homepage}
 
-#	Run Keyword If  '${username}' == 'PrivatMarket_Viewer'	Create WebDriver	Chrome	chrome_options=${chrome_options}	alias=${username}
-#	Run Keyword If  '${username}' == 'PrivatMarket_Owner'	Create WebDriver	Firefox	alias=${username}
-#	Run Keyword If  '${username}' == 'PrivatMarket_Provider'	Create WebDriver	Chrome	chrome_options=${chrome_options}	alias=${username}
-#	Go To	${USERS.users['${username}'].homepage}
-#TEST
-	Open Browser	${USERS.users['${username}'].homepage}	${browser}	alias=${username}
+#	Open Browser	${USERS.users['${username}'].homepage}	${browser}	alias=${username}
 
 	Set Window Size	@{USERS.users['${username}'].size}
 	Set Selenium Implicit Wait	10s
@@ -428,7 +423,7 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	Wait Until Element Is Visible		css=div.modal-body.info-div	${COMMONWAIT}
 #TODO проверка на текст. Необходимо проверить и заменить. PopUp
 	Close Confirmation In Editor	Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.
-	Sleep 180
+	Sleep  180s
 #	Wait Until Element Contains			css=div.modal-body.info-div	Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.	${COMMONWAIT}
 #	Reload Page
 #	Wait For Ajax
@@ -455,13 +450,7 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	Wait Visibility And Click Element	css=div.lot-chooser
 	Wait Visibility And Click Element	xpath=//div[@ng-repeat='lot in model.lotPortion' and contains(., '${lot_id}')]
 
-##########################################################################################
-#           New Methods
-##########################################################################################
-##########################################################################################
-##########################################################################################
-##########################################################################################
-##########################################################################################
+
 Отримати інформацію із предмету
 	[Arguments]  ${username}  ${tender_uaid}  ${object_id}  ${field_name}
     ${element} =  Set Variable  xpath=//section/div[contains(., '${object_id}') and contains(@class, 'lot-info')]${tender_data_item.${field_name}}
@@ -470,6 +459,7 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	${result} =  Strip String	${result_full}
 	[Return]  ${result}
 
+
 Отримати інформацію із запитання
 	[Arguments]  ${username}  ${tender_uaid}  ${question_id}  ${field_name}
 	${element} =  Set Variable  xpath=//div[contains(@class, 'faq') and contains(., '${question_id}')]${tender_data_question.${field_name}}
@@ -477,6 +467,7 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	${result_full} =  Get Text	${element}
 	${result} =  Strip String	${result_full}
 	[Return]  ${result}
+
 
 Отримати інформацію із пропозиції
 	[Arguments]  ${username}  ${tender_uaid}  ${field}
@@ -498,29 +489,13 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	[Return]  ${result}
 
 
-#Отримати пропозицію
-#	[Arguments]  ${username}  ${tender_uaid}
-##	${tender}=  Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
-#	${bid_id}=  Get Variable Value  ${USERS.users['${username}'].bidresponses['bid'].data.id}
-#	${token}=  Get Variable Value  ${USERS.users['${username}']['access_token']}
-#	${reply}=  Call Method  ${USERS.users['${username}'].client}  get_bid  ${bid_id}  ${token}
-#	${reply}=  munch_dict  arg=${reply}
-#	[return]  ${reply}
-
-#Отримати шлях до поля об’єкта
-#	[Arguments]  ${username}  ${field_name}  ${object_id}
-##	debug
-#	${object_type}=  get_object_type_by_id  ${object_id}
-#	${objects}=  Get Variable Value  ${tender_data.data['${object_type}']}  ${None}
-#	${object_index}=  get_object_index_by_id  ${objects}  ${object_id}
-#	[Return]  ${object_type}[${object_index}].${field_name}
-
 Отримати інформацію із документа
 	[Arguments]  ${username}  ${tender_uaid}  ${doc_id}  ${field}
 	Wait For Element With Reload  ${tender_data_documentation.${field}}  1
 	Wait Until Element Is Visible  ${tender_data_documentation.${field}}	${COMMONWAIT}
 	${result}=  get text  ${tender_data_documentation.${field}}
 	[Return]  ${result}
+
 
 Отримати документ
 	[Arguments]  ${username}  ${tender_uaid}  ${doc_id}
@@ -532,31 +507,27 @@ ${keywords}  /op_robot_tests/tests_files/keywords
     ${file_name} =  Strip String  ${file_name_full}
     [Return]  ${file_name}
 
+
 Задати запитання на тендер
-    [Arguments]  ${username}  ${tender_uaid}  ${question}
-	  Switch To PMFrame
-  	Wait Visibility And Click Element	${locator_question.create}
-  	sleep	4s
-  	Wait Until Element Is Visible	${locator_question.title}	${COMMONWAIT}
-  	Wait Until Element Is Enabled	${locator_question.title}	${COMMONWAIT}
-  	Input text	${locator_question.title}				${question.data.title}
-  	Wait Element Visibility And Input Text	${locator_question.description}	${question.data.description}
-	  Wait Element Visibility And Input Text	${locator_question.usersEmail}	${USERS.users['${provider}'].email}
-	  Select From List By Value	${locator_question.country}	UA
-  	Wait Element Visibility And Input Text	${locator_question.postalCode}	${question.data.author.address.postalCode}
-  	Wait Element Visibility And Input Text	${locator_question.region}	${question.data.author.address.region}
-	  Wait Element Visibility And Input Text	${locator_question.locality}	${question.data.author.address.locality}
-  	Wait Element Visibility And Input Text	${locator_question.street}	${question.data.author.address.streetAddress}
-  	Wait Visibility And Click Element	${locator_question.sendQuestion}
-  	Wait For Notification	Ваше запитання успішно включено до черги на відправку. Дякуємо за звернення!
-  #	Wait Until Element Not Stale	${locator_question.hideModal}	40
-  	Wait Visibility And Click Element	${locator_question.hideModal}
-  	Wait Until Element Is Not Visible	${locator_question.title}	${COMMONWAIT}
-#    [Return]  ${question}
+	[Arguments]  ${username}  ${tender_uaid}  ${question}
+	Switch To PMFrame
+	Wait Visibility And Click Element	${locator_question.create}
+	sleep	4s
+	Wait Until Element Is Visible	${locator_question.title}	${COMMONWAIT}
+	Wait Until Element Is Enabled	${locator_question.title}	${COMMONWAIT}
+	Input text	${locator_question.title}				${question.data.title}
+	Wait Element Visibility And Input Text	${locator_question.description}	${question.data.description}
+	Wait Element Visibility And Input Text	${locator_question.usersEmail}	${USERS.users['${provider}'].email}
+	Select From List By Value	${locator_question.country}	UA
+	Wait Element Visibility And Input Text	${locator_question.postalCode}	${question.data.author.address.postalCode}
+	Wait Element Visibility And Input Text	${locator_question.region}	${question.data.author.address.region}
+	Wait Element Visibility And Input Text	${locator_question.locality}	${question.data.author.address.locality}
+	Wait Element Visibility And Input Text	${locator_question.street}	${question.data.author.address.streetAddress}
+	Wait Visibility And Click Element	${locator_question.sendQuestion}
+	Wait For Notification	Ваше запитання успішно включено до черги на відправку. Дякуємо за звернення!
+	Wait Visibility And Click Element	${locator_question.hideModal}
+	Wait Until Element Is Not Visible	${locator_question.title}	${COMMONWAIT}
 
-
-
-##########################################################################################
 
 Отримати інформацію із тендера
 	[Arguments]  ${user_name}  ${tender_uaid}  ${field_name}
@@ -582,7 +553,6 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 
 	#get information
 	${result} =	Отримати інформацію зі сторінки	${item}	${tender_uaid}	${field_name}
-#	${result} =
 	[Return]  ${result}
 
 
@@ -774,7 +744,7 @@ Covert Amount To Number
 	${second_part} =	Отримати строку	${element}	2	${item}
 	${result} =			Set Variable	${first_part} ${second_part}
 	${currency_type} =	get_classification_type	${result}
-	[return]  ${currency_type}
+	[Return]  ${currency_type}
 
 
 Отримати інформацію з items.classification.scheme
@@ -783,14 +753,14 @@ Covert Amount To Number
 	${second_part} =	Отримати строку	${element}	2	${item}
 	${result} =			Set Variable	${first_part} ${second_part}
 	${currency_type} =	get_classification_type	${result}
-	[return]  ${currency_type}
+	[Return]  ${currency_type}
 
 
 Отримати інформацію з procurementMethodType
 	[Arguments]  ${element_name}
 	${method_name} =	Get text	${tender_data_${element_name}}
 	${method_type} =	get_procurement_method_type	${method_name}
-	[return]  ${method_type}
+	[Return]  ${method_type}
 
 
 Отримати інформацію з status
@@ -798,7 +768,7 @@ Covert Amount To Number
 	privatmarket.Оновити сторінку з тендером
 	${status_name} =	Get text	${tender_data_${element_name}}
 	${status_type} =	get_status_type	${status_name}
-	[return]  ${status_type}
+	[Return]  ${status_type}
 
 
 Отримати інформацію з cancellations[0].status
@@ -806,34 +776,34 @@ Covert Amount To Number
 	${text} =	Отримати текст елемента  ${element}  ${item}
 #TODO проверка на текст. Необходимо проверить и заменить
 	${result} =	Set Variable If	'Отменено' in '${text}'	active
-	[return]  ${result}
+	[Return]  ${result}
 
 
 Отримати інформацію з cancellations[0].documents[0].title
 	[Arguments]  ${element}  ${item}
 	${text} =		Отримати текст елемента  ${element}  ${item}
 	${newText} =	Replace String	${text}	\\	\\\\
-	[return]	${newText}
+	[Return]	${newText}
 
 Отримати інформацію з documents[0].title
 	[Arguments]  ${element}  ${item}
 	${text} =		Отримати текст елемента  ${element}  ${item}
 	${newText} =	Replace String		${text}	\\	\\\\
-	[return]	${newText}
+	[Return]	${newText}
 
 Отримати інформацію з items.additionalClassifications.[0].description
 	[Arguments]  ${element}  ${item}
 	${text} =		Отримати текст елемента  ${element}  ${item}
 	${newText} =	Replace String Using Regexp		${text}	.*\\d	${EMPTY}
 	${result} =		Strip String	${newText}
-	[return]	${result}
+	[Return]	${result}
 
 Отримати інформацію з items.additionalClassifications.[0].id
 	[Arguments]  ${element}  ${item}
 	${text} =		Отримати текст елемента  ${element}  ${item}
 	${newText} =	Get Regexp Matches		${text}	: (\\d.*\\d)	1
 	${result} = 	Convert To String  ${newText[0]}
-	[return]	${result}
+	[Return]	${result}
 
 Отримати інформацію з items.additionalClassifications.[0].scheme
 	[Arguments]  ${element}  ${item}
@@ -841,20 +811,20 @@ Covert Amount To Number
 	${newText} =		Get Regexp Matches		${text}	Классификатор (.*):	1
 	${convertText} = 	Convert To String  ${newText[0]}
 	${result} =			get_classification_type	${convertText}
-	[return]	${result}
+	[Return]	${result}
 
 Отримати інформацію з causeDescription
 	[Arguments]  ${element}  ${item}
 	Wait Enable And Click Element		css=#tenderType>span
 	${text} =	Отримати текст елемента  ${element}  ${item}
-	[return]	${text}
+	[Return]	${text}
 
 Отримати інформацію з procuringEntity.identifier.scheme
 	[Arguments]  ${element}  ${item}
 	${text} =		Отримати текст елемента  ${element}  ${item}
 	${newText} =	Replace String		${text}	:	${EMPTY}
 	${result} =		get_identification_scheme	${newText}
-	[return]	${result}
+	[Return]	${result}
 
 
 Внести зміни в тендер
@@ -903,7 +873,7 @@ Covert Amount To Number
 	Wait Until Element Contains			css=div.alert-info	Ваше требование успешно сохранено!	${COMMONWAIT}
 	${claim_data} =	Create Dictionary	id=123
 	${claim_resp} =	Create Dictionary	data=${claim_data}
-	[return]  ${claim_resp}
+	[Return]  ${claim_resp}
 
 
 Завантажити документацію до вимоги
@@ -913,7 +883,7 @@ Covert Amount To Number
 	Choose File							css=input#fileToUpload	${correctFilePath}
 	sleep								5s
 	Wait Until Element Is Visible		css=div.file-item
-	[return]  ${document}
+	[Return]  ${document}
 
 
 Подати вимогу
@@ -968,7 +938,7 @@ Covert Amount To Number
 	Click Button	xpath=//button[@ng-click='act.sendEnquiry()']
 	Заповнити форму питання	${provider}	${tender_id}	${question}
 	Sleep	30s
-	[return]  True
+	[Return]  True
 
 
 Заповнити форму питання
@@ -1001,7 +971,7 @@ Covert Amount To Number
 	Обрати потрібний лот за id	${lot_id}
 	Wait Enable And Click Element	css=a[ng-click='act.sendLotEnquiry()']
 	Заповнити форму питання			${question.data.title}	${question.data.description}	${USERS.users['${provider}'].email}
-	[return]  True
+	[Return]  True
 
 
 Відповісти на запитання
@@ -1070,7 +1040,7 @@ Covert Amount To Number
 #    debug
 	Close Confirmation	Ваша заявка була успішно включена до черги на відправку!
 	privatmarket.Оновити сторінку з тендером
-	[return]	${Arguments[2]}
+	[Return]	${Arguments[2]}
 
 
 Fill Adress
@@ -1126,7 +1096,7 @@ Fill Phone
 #    log to console  TODO проверка на текст. Необходимо проверить и заменить
 #    debug
 	Close Confirmation	Ваша заявка була успішно збережена!
-	[return]	${TRUE}
+	[Return]	${TRUE}
 
 
 Змінити parameters.0.value
@@ -1155,7 +1125,7 @@ Fill Phone
 
 Змінити status
 	[Arguments]  ${fieldvalue}
-	[return]  True
+	[Return]  True
 #	лише клікаємо зберегти, нічого не змінюючи
 
 
@@ -1173,7 +1143,7 @@ Fill Phone
 	Close Confirmation	Вашау заявку успішно скасовано!
 	Switch To PMFrame
 	Wait Until Element Is Enabled	${locator_tenderClaim.buttonCreate}	${COMMONWAIT}
-	[return]	${ARGUMENTS[1]}
+	[Return]	${ARGUMENTS[1]}
 
 
 Отримати пропозицію
@@ -1182,7 +1152,7 @@ Fill Phone
 	${button_of_send_claim_text} =	Get text	${locator_tenderClaim.buttonCreate}
 	${status} =						Set Variable	invalid
 	${bid} =						get_bid_data	${status}
-	[return]	${bid}
+	[Return]	${bid}
 
 
 Завантажити документ в ставку
@@ -1190,7 +1160,7 @@ Fill Phone
 	Відкрити заявку
 	Додати документ в ставку	${filePath}
 	${upload_response} =	Зберегти доданий файл	${filePath}
-	[return]	${upload_response}
+	[Return]	${upload_response}
 
 
 Додати документ в ставку
@@ -1244,7 +1214,7 @@ Fill Phone
 	${uploaded_file_data} = 	fill_file_data  ${url}  ${filePath}  ${dateModified}  ${dateModified}
 	${upload_response} = 	Create Dictionary
 	Set To Dictionary	${upload_response}	upload_response	${uploaded_file_data}
-	[return]	${upload_response}
+	[Return]	${upload_response}
 
 
 Змінити документ в ставці
@@ -1257,7 +1227,7 @@ Fill Phone
 	Wait Visibility And Click Element	xpath=//a[contains(@ng-class, 'lang')]
 	Wait Visibility And Click Element	xpath=//li[contains(@class, 'lang')][2]
 	${uploaded_file_data} =				Зберегти доданий файл	${filePath}
-	[return]  ${uploaded_file_data}
+	[Return]  ${uploaded_file_data}
 
 
 Змінити документацію в ставці
@@ -1268,7 +1238,7 @@ Fill Phone
 	Run Keyword					Змінити ${bidid.data.confidentiality} для файлу	${bidid}
 	${file_name} =				Get text	xpath=(//span[@class='file-name ng-binding'])[last()]
 	${uploaded_file_data} =		Зберегти доданий файл	${file_name}
-	[return]  ${uploaded_file_data}
+	[Return]  ${uploaded_file_data}
 
 
 Змінити buyerOnly для файлу
@@ -1293,7 +1263,7 @@ Fill Phone
 	Wait Visibility And Click Element	css=button#takepartLink
 	Wait Until Element Is Visible	xpath=//a[contains(@href, 'https://auction-sandbox.openprocurement.org/tenders/')]  timeout=30
 	${result} = 	Get Element Attribute	xpath=//a[contains(@href, 'https://auction-sandbox.openprocurement.org/tenders/')]@href
-	[return]  ${result}
+	[Return]  ${result}
 
 
 Отримати посилання на аукціон для учасника
@@ -1305,7 +1275,7 @@ Fill Phone
 		...  return (function(){var link = angular.element($("div[ng-click='commonActions.sendRedir(bid.afpId)']")).last().scope().model.ad.auctionUrl; if(!link || link=='None'){return false;} else return true;})()
 	Wait For Condition	${request_string}	${COMMONWAIT}
 	${result} =	Execute Javascript	return angular.element($("div[ng-click='commonActions.sendRedir(bid.afpId)']")).last().scope().model.ad.auctionUrl
-	[return]  ${result}
+	[Return]  ${result}
 
 Обрати додаткові класифікатори
     [Arguments]  ${scheme}  ${classificationId}
@@ -1365,7 +1335,7 @@ Check If Element Stale
 	[Arguments]  ${locator}
 	${element} =	Get Webelement	${locator}
 	${element_state} =	is_element_not_stale	${element}
-	[return]  ${element_state}
+	[Return]  ${element_state}
 
 
 Switch To Frame
@@ -1394,12 +1364,10 @@ Wait Element Visibility And Input Text
 
 Close Confirmation
 	[Arguments]	${confirmation_text}
-	Wait For Ajax
 	Wait Until Element Is Visible		css=div.modal-body.info-div	${COMMONWAIT}
 	Wait Until Element Contains			css=div.modal-body.info-div	${confirmation_text}	${COMMONWAIT}
 	Wait Visibility And Click Element	css=button#btnClose
 	Wait Until Element Is Not Visible	css=div.modal-body.info-div	${COMMONWAIT}
-	Wait For Ajax
 
 
 Close Confirmation In Editor
@@ -1412,15 +1380,12 @@ Close Confirmation In Editor
 
 Wait For Notification
 	[Arguments]	${message_text}
-	Wait For Ajax
 	Wait Until Element Is Enabled		xpath=//div[@class='alert-info ng-scope ng-binding']	timeout=${COMMONWAIT}
 	Wait Until Element Contains			xpath=//div[@class='alert-info ng-scope ng-binding']	${message_text}	timeout=10
-	Wait For Ajax
 
 
 Wait For Element Value
 	[Arguments]	${locator}
-	Wait For Ajax
 	${cssLocator} =	Get Substring	${locator}	4
 	Wait For Condition				return window.$($("${cssLocator}")).val()!='' && window.$($("${cssLocator}")).val()!='None'	${COMMONWAIT}
 	${value}=	get value			${locator}
@@ -1428,7 +1393,6 @@ Wait For Element Value
 
 Wait For Sspecific Element Value
 	[Arguments]	${locator}  ${value}
-	Wait For Ajax
 	${cssLocator} =	Get Substring	${locator}	4
 	Wait For Condition				return window.$($("${cssLocator}")).val()=='${value}'	${COMMONWAIT}
 	${value}=	get value			${locator}
@@ -1464,7 +1428,7 @@ Try Search Tender
 	Click Element	css=button#search-query-button
 	Wait For Ajax Overflow Vanish
 	Wait Until Element Is Enabled	id=${tender_id}	timeout=10
-	[return]	True
+	[Return]	True
 
 
 Check Current Mode
@@ -1490,15 +1454,8 @@ Check Current Mode New Realisation
 
 Switch To Education Mode
 	[Arguments]	${education_type}=${True}
-#	Wait Until Element Is Enabled	${locator_tender.switchToDemo}	timeout=${COMMONWAIT}
-#	Wait For Ajax
-#	Click Element	${locator_tender.switchToDemo}
 	Wait Visibility And Click Element	${locator_tender.switchToDemo}
-#TODO проверка на текст. Необходимо проверить и заменить/ Поправлено
-#	Wait Until Element Contains	${locator_tender.switchToDemo}	Выйти из демо-режима	${COMMONWAIT}
-#проверка, что вход в Деморежим осуществлен - отображение элемента "Выйти из демо-режима"
 	Wait Until Element Is Visible	${locator_tender.switchToDemo.message}	${COMMONWAIT}
-#	Wait For Ajax Overflow Vanish
 
 
 Reload And Switch To Tab
@@ -1530,11 +1487,6 @@ Try Search Element
 
 Wait For Ajax Overflow Vanish
 	Wait Until Element Is Not Visible	${locator_tender.ajax_overflow}	${COMMONWAIT}
-
-
-#Click element by JS
-#	[Arguments]	${locator}
-#	Execute Javascript					window.$("${locator}").mouseup()
 
 
 Chose UK language
@@ -1571,18 +1523,6 @@ Search By Query
 	Wait Until Element Is Enabled  xpath=//div[@data-id='foundItem']//label[@for='found_${query}']
 	Wait Visibility And Click Element	xpath=//div[@data-id='foundItem']//label[@for='found_${query}']
 
-#//TODO - unused
-#Get Locator And Type
-#	[Arguments]	${full_locator}
-#	${temp_locator} = 	Replace String	${full_locator}	'	${EMPTY}
-#	${locator} = 	Run Keyword If	'css' in '${temp_locator}'	Get Substring	${full_locator}	4
-#		...   ELSE IF	'xpath' in '${temp_locator}'	Get Substring	${full_locator}	6
-#		...   ELSE		${full_locator}
-#
-#	${type} =	Set Variable If	'css' in '${temp_locator}'	css
-#		...  	'xpath' in '${temp_locator}'	xpath
-#		...  	None
-#	[return]  ${locator}  ${type}
 
 Set Date And Time
 	[Arguments]  ${element}  ${fild}  ${time_element}  ${date}
@@ -1604,16 +1544,3 @@ Set Time
 	[Arguments]  ${element}  ${date}
 	${time} =	Get Regexp Matches	${date}	T(\\d{2}:\\d{2})	1
 	Input Text	${element}	${time[0]}
-
-
-#Delete Draft
-#	Switch To PMFrame
-#	${visibility} = 	Run Keyword And Return Status	Wait Until Element Is Visible	css=button[data-id='actDeleteDraft']	${COMMONWAIT}
-#	Run Keyword Unless	${visibility}	Return From Keyword	${False}
-#	Wait Visibility And Click Element	css=button[data-id='actDeleteDraft']
-#	Wait Visibility And Click Element	css=button[ng-click='close(true)']
-#	Wait Until Element Is Not Visible	css=button[ng-click='close(true)']
-#	Switch To PMFrame
-#	Wait Visibility And Click Element	${locator_tenderSearch.addTender}
-#	Wait For Ajax
-#	Wait Visibility And Click Element	${locator_tenderAdd.tenderType}
