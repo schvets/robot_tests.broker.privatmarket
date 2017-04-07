@@ -75,7 +75,11 @@ ${tender_data_question.answer}	//div[@class='question-div question-expanded']/di
 ${tender_data_question.questions[0].description}	css=div.question-div
 ${tender_data_question.questions[0].date}	xpath=//div[@class = 'question-head title']/b[2]
 ${tender_data_question.questions[0].title}	css=div.question-head.title span
-${tender_data_question.questions[0].answer}	xpath=//div[@ng-if='q.answer']//div[@class='ng-binding']
+${tender_data_question.questions.questions[0].answer}	xpath=//div[@ng-if='q.answer']//div[@class='ng-binding']
+${tender_data_question.questions.questions[0].description}	css=div.question-div
+${tender_data_question.questions.questions[0].date}	xpath=//div[@class = 'question-head title']/b[2]
+${tender_data_question.questions.questions[0].title}	css=div.question-head.title span
+${tender_data_question.questions.questions[0].answer}	xpath=//div[@ng-if='q.answer']//div[@class='ng-binding']
 
 ${tender_data_questions[0].description}	css=div.question-div
 ${tender_data_questions[0].date}	xpath=//div[@class = 'question-head title']/b[2]
@@ -1542,7 +1546,7 @@ Close notification
 
 Switch To PMFrame
     Unselect Frame
-    Wait Until Page Contains Element  id=tenders  ${COMMONWAIT}
+    Wait Until Element Is Visible  id=tenders  ${COMMONWAIT}
 	Switch To Frame	id=tenders
 
 
