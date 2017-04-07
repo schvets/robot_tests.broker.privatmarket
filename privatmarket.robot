@@ -205,7 +205,7 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 #	Run Keyword If  '${username}' == 'PrivatMarket_Owner'	Create WebDriver	Firefox	alias=${username}
 #	Run Keyword If  '${username}' == 'PrivatMarket_Provider'	Create WebDriver	Chrome	chrome_options=${chrome_options}	alias=${username}
 #	Go To	${USERS.users['${username}'].homepage}
-
+#TEST
 	Open Browser	${USERS.users['${username}'].homepage}	${browser}	alias=${username}
 	Set Window Size	@{USERS.users['${username}'].size}
 	Set Selenium Implicit Wait	10s
