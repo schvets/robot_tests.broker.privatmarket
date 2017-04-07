@@ -81,16 +81,18 @@ ${tender_data_questions[0].description}	css=div.question-div
 ${tender_data_questions[0].date}	xpath=//div[@class = 'question-head title']/b[2]
 ${tender_data_questions[0].title}	css=div.question-head.title span
 ${tender_data_questions[0].answer}	xpath=//div[@ng-if='q.answer']//div[@class='ng-binding']
-${tender_data_lots.title}	css=div.lot-head span.ng-binding
 ${tender_data_lot.title}  //div[@id='lot-title']
 ${tender_data_lot.minimalStep.amount}  //div[@id='lotMinStepAmount']
-${tender_data_lots.description}	css=section.lot-description section.description
-${tender_data_lots.value.amount}	css=section.lot-description div[ng-if='model.checkedLot.value'] div.info-item-val
-${tender_data_lots.value.lotMinStepAmount}	.//*[@id='lotMinStepAmount']
-${tender_data_lots.lots.title}	css=div.lot-head span.ng-binding
-${tender_data_lots.lots.description}	css=section.lot-description section.description
-${tender_data_lots.lots.value.amount}	css=section.lot-description div[ng-if='model.checkedLot.value'] div.info-item-val
-${tender_data_lots.lots.value.lotMinStepAmount}	.//*[@id='lotMinStepAmount']
+${tender_data_lots.title}	css=#lot-title
+${tender_data_lots.description}	css=.description.marged.ng-binding
+${tender_data_lots.value.amount}	css=#lotAmount
+${tender_data_lots.minimalStep}	css=#lotMinStepAmount
+${tender_data_lots.minimalStep.currency}	css=#lotMinStepCcy
+${tender_data_lots.minimalStep.valueAddedTaxIncluded}	css=#lotMinStepTax
+${tender_data_lots.lots.title}	css=#lot-title
+${tender_data_lots.lots.description}	css=.description.marged.ng-binding
+${tender_data_lots.lots.value.amount}	css=#lotAmount
+${tender_data_lots.lots.value.lotMinStepAmount}	css=#lotMinStepAmount
 ${tender_data_bids}	xpath=(//table[@class='bids']//tr)[2]
 ${tender_data_cancellations[0].status}	xpath=//*[@id='nolotSection']/div[1]/div[1]
 ${tender_data_cancellations[0].reason}	xpath=//*[@id='nolotSection']/div[1]/div[2]
@@ -248,8 +250,6 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	${presence} = 	Run Keyword And Return Status	List Should Contain Value	${tender_data.data}	features
 	@{features} = 	Run Keyword If	${presence}		Get From Dictionary	${tender_data.data}	features
 
-	${presence} = 	Run Keyword And Return Status	List Should Contain Value	${tender_data.data}	features
-	@{features} = 	Run Keyword If	${presence}		Get From Dictionary	${tender_data.data}	features
 	Switch To PMFrame
 #	Wait For Ajax
 	Close notification
@@ -607,6 +607,14 @@ Covert Amount To Number
 	Run Keyword And Return If	'${element}' == 'auctionPeriod.startDate'				Отримати інформацію з ${element}	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'procurementMethodType'					Отримати інформацію з ${element}	${element}
 
+	Run Keyword And Return If	'${element}' == 'lots.value.amount'	Отримати суму  ${element}	${item}
+	Run Keyword And Return If	'${element}' == 'lots.value.lotMinStepAmount'	Отримати суму  ${element}	${item}
+	Run Keyword And Return If	'${element}' == 'lots.value.amount'	Covert Amount To Number	${element}
+	Run Keyword And Return If	'${element}' == 'lots.value.currency'  Отримати інформацію з ${element}	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'lots.value.valueAddedTaxIncluded'  Отримати інформацію з ${element}	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'minimalStep.currency'  Отримати інформацію з ${element}	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'minimalStep.valueAddedTaxIncluded'  Отримати інформацію з ${element}	${element}	${item}
+
 	Run Keyword If	'${element}' == 'questions[0].title'		Wait For Element With Reload	${tender_data_${element}}	2
 	Run Keyword If	'${element}' == 'questions[0].answer'		Wait For Element With Reload	${tender_data_${element}}	2
 
@@ -730,7 +738,33 @@ Covert Amount To Number
 	[Return]  ${currency_type}
 
 
+Отримати інформацію з lots.value.currency
+	[Arguments]    ${element_name}  ${item}
+	${currency} =	Отримати строку	${element_name}	0	${item}
+	${currency_type} =	get_currency_type	${currency}
+	[Return]  ${currency_type}
+
+Отримати інформацію з minimalStep.currency
+	[Arguments]    ${element_name}  ${item}
+	${currency} =	Отримати строку	${element_name}	0	${item}
+	${currency_type} =	get_currency_type	${currency}
+	[Return]  ${currency_type}
+
 Отримати інформацію з value.valueAddedTaxIncluded
+	[Arguments]  ${element_name}  ${item}
+	${value_added_tax_included} =	Get text	${tender_data_${element_name}}
+	${result} =	Set Variable If	'з ПДВ' in '${value_added_tax_included}'	True
+	${result} =	Convert To Boolean	${result}
+	[Return]  ${result}
+
+Отримати інформацію з minimalStep.valueAddedTaxIncluded
+	[Arguments]  ${element_name}  ${item}
+	${value_added_tax_included} =	Get text	${tender_data_${element_name}}
+	${result} =	Set Variable If	'з ПДВ' in '${value_added_tax_included}'	True
+	${result} =	Convert To Boolean	${result}
+	[Return]  ${result}
+
+Отримати інформацію з lots.value.valueAddedTaxIncluded
 	[Arguments]  ${element_name}  ${item}
 	${value_added_tax_included} =	Get text	${tender_data_${element_name}}
 	${result} =	Set Variable If	'з ПДВ' in '${value_added_tax_included}'	True
