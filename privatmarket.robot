@@ -201,12 +201,14 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	Call Method	${chrome_options}		add_experimental_option	prefs	${prefs}
 
     #Для Viewer'а нужен хром, т.к. на хром настроена автоматическая закачка файлов
-	Run Keyword If  '${username}' == 'PrivatMarket_Viewer'	Create WebDriver	Chrome	chrome_options=${chrome_options}	alias=${username}
-	Run Keyword If  '${username}' == 'PrivatMarket_Owner'	Create WebDriver	Firefox	alias=${username}
-	Run Keyword If  '${username}' == 'PrivatMarket_Provider'	Create WebDriver	Chrome	chrome_options=${chrome_options}	alias=${username}
-	Go To	${USERS.users['${username}'].homepage}
 
-#	Open Browser	${USERS.users['${username}'].homepage}	${browser}	alias=${username}
+#	Run Keyword If  '${username}' == 'PrivatMarket_Viewer'	Create WebDriver	Chrome	chrome_options=${chrome_options}	alias=${username}
+#	Run Keyword If  '${username}' == 'PrivatMarket_Owner'	Create WebDriver	Firefox	alias=${username}
+#	Run Keyword If  '${username}' == 'PrivatMarket_Provider'	Create WebDriver	Chrome	chrome_options=${chrome_options}	alias=${username}
+#	Go To	${USERS.users['${username}'].homepage}
+#TEST
+	Open Browser	${USERS.users['${username}'].homepage}	${browser}	alias=${username}
+
 	Set Window Size	@{USERS.users['${username}'].size}
 	Set Selenium Implicit Wait	10s
 	Login	${username}
@@ -230,8 +232,6 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 #	sleep	3s
 #	Wait Until Element Not Stale	css=tr#${tenderId}	${COMMONWAIT}
 	Wait Visibility And Click Element	css=tr#${tenderId}
-
-	Wait Until Element Is Visible	${tender_data_title}	${COMMONWAIT}
 
 	Switch To PMFrame
 #	Wait Until Element Is Not Visible	${locator_tenderSearch.searchInput}	${COMMONWAIT}
@@ -278,6 +278,8 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	Wait Until Element Is Visible	css=section[data-id='classificationTreeModal']	${COMMONWAIT}
 	Wait Until Element Is Visible	css=input[data-id='query']	${COMMONWAIT}
 	Search By Query	css=input[data-id='query']	${items[0].classification.id}
+	#Run Keyword If  '${items[0].classification.id}' == '99999999-9'  Обрати додаткові класифікатори  a  b
+
 	Wait Visibility And Click Element	css=button[data-id='actConfirm']
 
 	#date
@@ -472,6 +474,38 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	[Arguments]  ${username}  ${tender_uaid}  ${field}
 	${bid}=  privatmarket.Отримати пропозицію  ${username}  ${tender_uaid}
 	[Return]  ${bid.data.${field}}
+
+
+Отримати інформацію із лоту
+	[Arguments]  ${username}  ${tender_uaid}  ${object_id}  ${field_name}
+	${className} =  Get Element Attribute  xpath=//section[@id='lotSection']/section[contains(., '${object_id}')]//li[1]@class
+	Run Keyword If  '${className}' == 'simple-nav_item active'  Wait Visibility And Click Element  //section[@id='lotSection']/section[contains(., '${object_id}')]//li[1]/a
+
+	${element} =  Set Variable  xpath=//section[@id='lotSection']/section[contains(., '${object_id}')]${tender_data_lot.${field_name}}
+
+	Run Keyword And Return If	'${element}' == 'minimalStep.amount'					Отримати суму	${element}	${item}
+
+	${result_full} =  Get Text	${element}
+	${result} =  Strip String	${result_full}
+	[Return]  ${result}
+
+
+#Отримати пропозицію
+#	[Arguments]  ${username}  ${tender_uaid}
+##	${tender}=  Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
+#	${bid_id}=  Get Variable Value  ${USERS.users['${username}'].bidresponses['bid'].data.id}
+#	${token}=  Get Variable Value  ${USERS.users['${username}']['access_token']}
+#	${reply}=  Call Method  ${USERS.users['${username}'].client}  get_bid  ${bid_id}  ${token}
+#	${reply}=  munch_dict  arg=${reply}
+#	[return]  ${reply}
+
+#Отримати шлях до поля об’єкта
+#	[Arguments]  ${username}  ${field_name}  ${object_id}
+##	debug
+#	${object_type}=  get_object_type_by_id  ${object_id}
+#	${objects}=  Get Variable Value  ${tender_data.data['${object_type}']}  ${None}
+#	${object_index}=  get_object_index_by_id  ${objects}  ${object_id}
+#	[Return]  ${object_type}[${object_index}].${field_name}
 
 Отримати інформацію із документа
 	[Arguments]  ${username}  ${tender_uaid}  ${doc_id}  ${field}
@@ -1264,6 +1298,22 @@ Fill Phone
 	Wait For Condition	${request_string}	${COMMONWAIT}
 	${result} =	Execute Javascript	return angular.element($("div[ng-click='commonActions.sendRedir(bid.afpId)']")).last().scope().model.ad.auctionUrl
 	[return]  ${result}
+
+Обрати додаткові класифікатори
+    [Arguments]  ${scheme}  ${classificationId}
+    Wait Visibility And Click Element  css=[data-id='additionalClassifications'] .content-caption-info  ${COMMONWAIT}
+    Wait Until Element Is Enabled  xpath=//section[@data-id='schemeCheckModal']//label[@for='scheme_${scheme}']
+    Wait Visibility And Click Element  xpath=//section[@data-id='schemeCheckModal']//label[@for='scheme_${scheme}']
+    Wait Visibility And Click Element  xpath=//section[@data-id='schemeCheckModal']//button[@data-id='actConfirm']
+    Wait Until Element Is Not Visible  xpath=//section[@data-id='schemeCheckModal']//button[@data-id='actConfirm']
+    Wait Visibility And Click Element  xpath=//section[@data-id='additionalClassifications']//span[@data-id='actChoose']
+	Wait Until Element Is Visible	css=section[data-id='classificationTreeModal']	${COMMONWAIT}
+	Wait Until Element Is Visible	css=input[data-id='query']	${COMMONWAIT}
+	Wait Element Visibility And Input Text	css=input[data-id='query']	${classificationId}
+	Wait Until Element Is Not Visible  css=.modal-body.tree.pm-tree
+	Wait Until Element Is Enabled  xpath=//div[@data-id='foundItem']//label[@for='found_${classificationId}']
+	Wait Visibility And Click Element	xpath=//div[@data-id='foundItem']//label[@for='found_${classificationId}']
+	Wait Visibility And Click Element	css=[data-id='actConfirm']
 
 
 #Custom Keywords
