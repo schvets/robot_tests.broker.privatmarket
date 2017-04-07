@@ -82,6 +82,8 @@ ${tender_data_questions[0].date}	xpath=//div[@class = 'question-head title']/b[2
 ${tender_data_questions[0].title}	css=div.question-head.title span
 ${tender_data_questions[0].answer}	xpath=//div[@ng-if='q.answer']//div[@class='ng-binding']
 ${tender_data_lots.title}	css=div.lot-head span.ng-binding
+${tender_data_lot.title}  //div[@id='lot-title']
+${tender_data_lot.minimalStep.amount}  //div[@id='lotMinStepAmount']
 ${tender_data_lots.description}	css=section.lot-description section.description
 ${tender_data_lots.value.amount}	css=section.lot-description div[ng-if='model.checkedLot.value'] div.info-item-val
 ${tender_data_lots.value.lotMinStepAmount}	.//*[@id='lotMinStepAmount']
@@ -178,8 +180,8 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 *** Keywords ***
 Підготувати дані для оголошення тендера
 	[Arguments]  ${username}  ${tender_data}  ${role_name}
-#	${tender_data.data} = 	Run Keyword If	'PrivatMarket_Owner' == '${username}'	modify_test_data	${tender_data.data}
-#	${adapted.data} = 	modify_test_data	${tender_data.data}
+	${tender_data.data} = 	Run Keyword If	'PrivatMarket_Owner' == '${username}'	modify_test_data	${tender_data.data}
+	${adapted.data} = 	modify_test_data	${tender_data.data}
 	[Return]  ${tender_data}
 
 
@@ -229,7 +231,8 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 #	Wait Until Element Not Stale	css=tr#${tenderId}	${COMMONWAIT}
 	Wait Visibility And Click Element	css=tr#${tenderId}
 
-#	Wait For Ajax
+	Wait Until Element Is Visible	${tender_data_title}	${COMMONWAIT}
+
 	Switch To PMFrame
 #	Wait Until Element Is Not Visible	${locator_tenderSearch.searchInput}	${COMMONWAIT}
 	Wait Until Element Is Visible	${tender_data_title}	${COMMONWAIT}
@@ -489,31 +492,28 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 
 Задати запитання на тендер
     [Arguments]  ${username}  ${tender_uaid}  ${question}
-	Switch To PMFrame
-	Wait Visibility And Click Element	${locator_question.create}
-	sleep	4s
-	Wait Until Element Is Visible	${locator_question.title}	${COMMONWAIT}
-	Wait Until Element Is Enabled	${locator_question.title}	${COMMONWAIT}
-	Input text	${locator_question.title}				${question.data.title}
-	Wait Element Visibility And Input Text	${locator_question.description}	${question.data.description}
-	Wait Element Visibility And Input Text	${locator_question.usersEmail}	${USERS.users['${provider}'].email}
-	Select From List By Value	${locator_question.country}	UA
-	Wait Element Visibility And Input Text	${locator_question.postalCode}	${question.data.author.address.postalCode}
-	Wait Element Visibility And Input Text	${locator_question.region}	${question.data.author.address.region}
-	Wait Element Visibility And Input Text	${locator_question.locality}	${question.data.author.address.locality}
-	Wait Element Visibility And Input Text	${locator_question.street}	${question.data.author.address.streetAddress}
-	Wait Visibility And Click Element	${locator_question.sendQuestion}
-	Wait For Notification	Ваше запитання успішно включено до черги на відправку. Дякуємо за звернення!
-#	Wait Until Element Not Stale	${locator_question.hideModal}	40
-	Wait Visibility And Click Element	${locator_question.hideModal}
-	Wait Until Element Is Not Visible	${locator_question.title}	${COMMONWAIT}
+	  Switch To PMFrame
+  	Wait Visibility And Click Element	${locator_question.create}
+  	sleep	4s
+  	Wait Until Element Is Visible	${locator_question.title}	${COMMONWAIT}
+  	Wait Until Element Is Enabled	${locator_question.title}	${COMMONWAIT}
+  	Input text	${locator_question.title}				${question.data.title}
+  	Wait Element Visibility And Input Text	${locator_question.description}	${question.data.description}
+	  Wait Element Visibility And Input Text	${locator_question.usersEmail}	${USERS.users['${provider}'].email}
+	  Select From List By Value	${locator_question.country}	UA
+  	Wait Element Visibility And Input Text	${locator_question.postalCode}	${question.data.author.address.postalCode}
+  	Wait Element Visibility And Input Text	${locator_question.region}	${question.data.author.address.region}
+	  Wait Element Visibility And Input Text	${locator_question.locality}	${question.data.author.address.locality}
+  	Wait Element Visibility And Input Text	${locator_question.street}	${question.data.author.address.streetAddress}
+  	Wait Visibility And Click Element	${locator_question.sendQuestion}
+  	Wait For Notification	Ваше запитання успішно включено до черги на відправку. Дякуємо за звернення!
+  #	Wait Until Element Not Stale	${locator_question.hideModal}	40
+  	Wait Visibility And Click Element	${locator_question.hideModal}
+  	Wait Until Element Is Not Visible	${locator_question.title}	${COMMONWAIT}
 #    [Return]  ${question}
 
-##########################################################################################
-##########################################################################################
-##########################################################################################
-##########################################################################################
-##########################################################################################
+
+
 ##########################################################################################
 
 Отримати інформацію із тендера
@@ -1066,7 +1066,7 @@ Fill Phone
 	Run Keyword Unless	'до початку періоду подачі' in '${TEST_NAME}'	Run Keyword If	'${tender_status}' == 'Період уточнень завершено'	Wait For Element With Reload	${locator_tenderClaim.buttonCreate}	1
 
 #	Wait Until Element Not Stale		${locator_tenderClaim.buttonCreate}	30
-	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}
+	Wait Enable And Click Element		${locator_tenderClaim.buttonCreate}	${COMMONWAIT}
 #	Wait For Ajax
 	Wait Until Element Is Not Visible	${locator_tenderClaim.buttonCreate}	${COMMONWAIT}
 	Switch To PMFrame
