@@ -228,7 +228,6 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	Go To	${USERS.users['${username}'].homepage}
 	Close notification
 #	Chose UK language
-#	Wait Until Element Not Stale	${locator_tenderSearch.searchInput}	${COMMONWAIT}
 	Wait Until Element Is Visible	${locator_tenderSearch.searchInput}	timeout=${COMMONWAIT}
 #	Wait Until Element Is Enabled	${locator_tenderSearch.tendersList}	timeout=${COMMONWAIT}
 
@@ -237,14 +236,11 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 		...  ELSE	Set Variable	True
 
 	Wait For Tender	${tenderId}	${education_type}
-#	sleep	3s
-#	Wait Until Element Not Stale	css=tr#${tenderId}	${COMMONWAIT}
 	Wait Visibility And Click Element	css=tr#${tenderId}
 	Sleep  5s
 	Switch To PMFrame
 #	Wait Until Element Is Not Visible	${locator_tenderSearch.searchInput}	${COMMONWAIT}
 	Wait Until Element Is Visible	${tender_data_title}	${COMMONWAIT}
-#	Wait Until Element Not Stale	${tender_data_title}	${COMMONWAIT}
 
 
 Створити тендер
@@ -256,18 +252,14 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	${presence} = 	Run Keyword And Return Status	List Should Contain Value	${tender_data.data}	features
 	@{features} = 	Run Keyword If	${presence}		Get From Dictionary	${tender_data.data}	features
 	Switch To PMFrame
-#	Wait For Ajax
 	Close notification
 #	Chose UK language
-#	Wait For Ajax
-#	Wait Until Element Not Stale	${locator_tenderSearch.searchInput}	${COMMONWAIT}
 	Wait Until Element Is Visible	${locator_tenderSearch.searchInput}	${COMMONWAIT}
 #	Wait Until Element Is Enabled	${locator_tenderSearch.tendersList}	${COMMONWAIT}
 #	Check Current Mode
 	Check Current Mode New Realisation
 #go to form
 	Wait Visibility And Click Element	${locator_tenderSearch.addTender}
-#	Wait For Ajax
 #    Wait Until Element Is Visible  css=#sender-analytics  ${COMMONWAIT}
     Unselect Frame
     Wait Until Page Contains Element  id=sender-analytics  ${COMMONWAIT}
@@ -276,7 +268,6 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 #	Delete Draft
 #step 0
 	#we should add choosing of procurementMethodType
-#	Wait For Ajax
 	Switch To PMFrame
 	Wait Element Visibility And Input Text	${locator_tenderAdd.procurementName}	${tender_data.data.title}
 	Wait Element Visibility And Input Text	${locator_tenderAdd.procurementDescription}	${tender_data.data.description}
@@ -290,7 +281,6 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	Run Keyword If  '${items[0].classification.id}' == '99999999-9'  Обрати додаткові класифікатори   ${items[0].additionalClassifications[0].scheme}   ${items[0].additionalClassifications[0].id}
 
 	#date
-#	Wait For Ajax
 	Switch To PMFrame
 	Wait Until Element Is Visible	css=input[ng-model='model.ptr.enquiryPeriod.sd.d']	${COMMONWAIT}
 	Set Date And Time	enquiryPeriod	startDate	css=span[data-id='ptrEnquiryPeriodStartDate'] input[ng-model='inputTime']	${tender_data.data.enquiryPeriod.startDate}
@@ -405,7 +395,6 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	[Arguments]  ${user_name}  ${filepath}  ${tenderId}
 #	перейдем к редактированию
 	Wait For Element With Reload	${locator_tenderClaim.buttonCreate}	1
-#	Wait For Ajax
 	Wait Visibility And Click Element	${locator_tenderClaim.buttonCreate}
 #	откроем нужную вкладку
 	Wait Visibility And Click Element	${locator_tenderAdd.thirdTab}
@@ -431,8 +420,6 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	Sleep  180s
 #	Wait Until Element Contains			css=div.modal-body.info-div	Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.	${COMMONWAIT}
 #	Reload Page
-#	Wait For Ajax
-
 
 
 Відкрити детальну інформацию по позиціям
@@ -443,7 +430,6 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	Wait Visibility And Click Element	${locator_tenderInfo.lotDescriptionBtn}
 	Wait Until Element Is Visible	${locator_tenderInfo.lotDescriptionBody}	${COMMONWAIT}
 #	Wait Until Element Is Visible	xpath=//section[contains(@ng-if, "model.ad.showTab == 'description'")]	${COMMONWAIT}
-#	Wait Until Element Not Stale	xpath=//section[contains(@ng-if, "model.ad.showTab == 'description'")]	40
 	Wait Visibility And Click Element	${tender_data_items.description}
 	Wait Until Element Is Visible	css=div[ng-if='adb.classification']	${COMMONWAIT}
 
@@ -885,7 +871,6 @@ Covert Amount To Number
 	Wait Visibility And Click Element	${locator_tenderCreation.buttonSend}
 	#Дождемся подтверждения и обновим страницу, поскольку тут не выходит его закрыть
 	Wait Until Element Is Visible	css=div.modal-body.info-div	${COMMONWAIT}
-#TODO проверка на текст. Необходимо проверить и заменить. PopUp. Закупка поставлена в очередь на отправку в ProZorro. Статус закупки Вы можете отслеживать в личном кабинете.
 	Wait Until Element Contains	css=div.modal-body.info-div	Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.	${COMMONWAIT}
 	Reload Page
 
@@ -907,10 +892,6 @@ Covert Amount To Number
 	Wait Visibility And Click Element	css=button[ng-click='act.saveComplaint()']
 	Wait For Ajax
 	Wait Until Element Is Enabled		css=div.alert-info	${COMMONWAIT}
-#	Wait Until Element Not Stale		css=div.alert-info	40
-#TODO проверка на текст. Необходимо проверить и заменить
-#    log to console  TODO проверка на текст. Необходимо проверить и заменить
-#    debug
 	Wait Until Element Contains			css=div.alert-info	Ваше требование успешно сохранено!	${COMMONWAIT}
 	${claim_data} =	Create Dictionary	id=123
 	${claim_resp} =	Create Dictionary	data=${claim_data}
@@ -932,16 +913,9 @@ Covert Amount To Number
 	Wait Visibility And Click Element	xpath=//button[@ng-click='act.sendComplaint()']
 	Wait For Ajax
 	Wait Until Element Is Enabled		css=div.alert-info	${COMMONWAIT}
-#	Wait Until Element Not Stale		css=div.alert-info	40
-#TODO проверка на текст. Необходимо проверить и заменить
-#    log to console  TODO проверка на текст. Необходимо проверить и заменить
-#    debug
 	Wait Until Element Contains			css=div.alert-info	Ваше требование успешно отправлено!	${COMMONWAIT}
-	Wait For Ajax
 	sleep								3s
 	Wait Until Element Is Not Visible	xpath=//input[@ng-model="model.question.title"]	timeout=${COMMONWAIT}
-	Wait For Ajax
-#	Wait Until Element Not Stale		css=span[ng-click='act.hideModal()']	40
 	Wait Visibility And Click Element	css=span[ng-click='act.hideModal()']
 #	Click Element						css=span[ng-click='act.hideModal()']
 	sleep								3s
@@ -958,14 +932,10 @@ Covert Amount To Number
 
 	Wait Until Element Is Visible		xpath=//textarea[@ng-model='model.cancelComplaint.reason']	timeout=${COMMONWAIT}
 	Wait Until Element Is Enabled		xpath=//textarea[@ng-model='model.cancelComplaint.reason']	timeout=${COMMONWAIT}
-#	Wait Until Element Not Stale		xpath=//textarea[@ng-model='model.cancelComplaint.reason']	${COMMONWAIT}
 	Input Text							xpath=//textarea[@ng-model='model.cancelComplaint.reason']	${cancellation_data.data.cancellationReason}
 	Wait Visibility And Click Element	css=button[ng-click='act.cancelComplaint()']
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=button[ng-click='act.cancelComplaint()']	timeout=${COMMONWAIT}
-#TODO проверка на текст. Необходимо проверить и заменить
-#    log to console  TODO проверка на текст. Необходимо проверить и заменить
-#    debug
 	Wait Until Element Contains			css=span#cmplStatus0	Отменено	timeout=${COMMONWAIT}
 
 
@@ -998,11 +968,7 @@ Covert Amount To Number
 	Wait Element Visibility And Input Text	id=addressLocality	${question.data.author.address.locality}
 	Wait Element Visibility And Input Text	id=addressStreet	${question.data.author.address.streetAddress}
 	Wait Visibility And Click Element	xpath=//button[@ng-click='act.sendQuestion()']
-#TODO проверка на текст. Необходимо проверить и заменить
-#    log to console  TODO проверка на текст. Необходимо проверить и заменить
-#    debug
 	Wait For Notification	Ваше запитання успішно включено до черги на відправку. Дякуємо за звернення!
-#	Wait Until Element Not Stale	css=span[ng-click='act.hideModal()']	40
 	Wait Visibility And Click Element	css=span[ng-click='act.hideModal()']
 	Wait Until Element Is Not Visible	xpath=//input[@ng-model='model.question.title']	timeout=20
 
@@ -1025,7 +991,6 @@ Covert Amount To Number
 	Sleep	2s
 	Wait Visibility And Click Element	id=btnSendAnswer
 	Wait For Notification	Ваша відповідь успішно відправлена!
-#	Wait Until Element Not Stale	css=span[ng-click='act.hideModal()']	40
 	Wait Visibility And Click Element	css=span[ng-click='act.hideModal()']
 	Wait Until Element Is Not Visible	id=questionAnswer	timeout=20
 #этот слип нужен, т.к. нет синхронизации и квинта ищет ответ в следующем тесте... а его нет пока не синхранизируемся
@@ -1073,9 +1038,6 @@ Covert Amount To Number
 	Fill Phone	${ARGUMENTS[2]}
 	Switch To PMFrame
 	Wait Enable And Click Element	${locator_tenderClaim.buttonSend}
-#TODO проверка на текст. Необходимо проверить и заменить
-#    log to console  TODO проверка на текст. Необходимо проверить и заменить
-#    debug
 	Close Confirmation	Ваша заявка була успішно включена до черги на відправку!
 	privatmarket.Оновити сторінку з тендером
 	[Return]	${Arguments[2]}
