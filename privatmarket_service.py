@@ -118,6 +118,8 @@ def get_doc_identifier(doc_type_name):
 
 
 def get_unit_name(current_name):
+    if isinstance(current_name, str):
+        current_name = current_name.decode("utf-8")
     dictionary = {
         u'кілограми': {u'килограмм', u'килограмма', u'килограммов'},
         u'пара': {u'пара', u'пары', u'пар'},

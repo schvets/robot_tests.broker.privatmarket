@@ -71,6 +71,7 @@ ${tender_data_question.answer}	//div[@class='question-div question-expanded']/di
 ${tender_data_question.questions[0].description}	css=div.question-div
 ${tender_data_question.questions[0].date}	xpath=//div[@class = 'question-head title']/b[2]
 ${tender_data_question.questions[0].title}	css=div.question-head.title span
+${tender_data_question.questions[0].answer}	xpath=//div[@ng-if='q.answer']//div[@class='ng-binding']
 ${tender_data_question.questions.questions[0].answer}	xpath=//div[@ng-if='q.answer']//div[@class='ng-binding']
 ${tender_data_question.questions.questions[0].description}	css=div.question-div
 ${tender_data_question.questions.questions[0].date}	xpath=//div[@class = 'question-head title']/b[2]
@@ -95,6 +96,9 @@ ${tender_data_lots.lots.title}	css=#lot-title
 ${tender_data_lots.lots.description}	css=.description.marged.ng-binding
 ${tender_data_lots.lots.value.amount}	css=#lotAmount
 ${tender_data_lots.lots.value.lotMinStepAmount}	css=#lotMinStepAmount
+${tender_data_lots.lots[0].minimalStep.amount}	css=#lotMinStepAmount
+${tender_data_lots.lots[0].minimalStep.currency}	css=#lotMinStepCcy
+${tender_data_lots.lots[0].minimalStep.valueAddedTaxIncluded}	css=#lotMinStepTax
 ${tender_data_bids}	xpath=(//table[@class='bids']//tr)[2]
 ${tender_data_cancellations[0].status}	xpath=//*[@id='nolotSection']/div[1]/div[1]
 ${tender_data_cancellations[0].reason}	xpath=//*[@id='nolotSection']/div[1]/div[2]
@@ -602,7 +606,7 @@ Covert Amount To Number
 	Run Keyword And Return If	'${element}' == 'items.deliveryDate.endDate'			Отримати дату та час	${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'items.unit.name'						Отримати назву	${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'items.unit.code'						Отримати код	${element}	0	${item}
-	Run Keyword And Return If	'${element}' == 'minimalStep.amount'					Covert Amount To Number	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'minimalStep.amount'					Covert Amount To Number	${element}
 	Run Keyword And Return If	'${element}' == 'items.deliveryLocation.latitude'		Отримати число	${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'items.deliveryLocation.longitude'		Отримати число	${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'auctionPeriod.startDate'				Отримати інформацію з ${element}	${element}	${item}
@@ -612,9 +616,13 @@ Covert Amount To Number
 	Run Keyword And Return If	'${element}' == 'lots.value.lotMinStepAmount'	Отримати суму  ${element}	${item}
 	Run Keyword And Return If	'${element}' == 'lots.value.amount'	Covert Amount To Number	${element}
 	Run Keyword And Return If	'${element}' == 'lots.value.currency'  Отримати інформацію з ${element}	${element}	${item}
-	Run Keyword And Return If	'${element}' == 'lots.value.valueAddedTaxIncluded'  Отримати інформацію з ${element}	${element}	${item}
-	Run Keyword And Return If	'${element}' == 'minimalStep.currency'  Отримати інформацію з ${element}	${element}	${item}
-	Run Keyword And Return If	'${element}' == 'minimalStep.valueAddedTaxIncluded'  Отримати інформацію з ${element}	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'lots.value.valueAddedTaxIncluded'	Отримати інформацію з ${element}	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'minimalStep.currency'	Отримати інформацію з валюти	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'minimalStep.valueAddedTaxIncluded'	Отримати інформацію з типу податку	${element}	${item}
+
+	Run Keyword And Return If	'${element}' == 'lots[0].minimalStep.amount'	Covert Amount To Number	${element}
+	Run Keyword And Return If	'${element}' == 'lots[0].minimalStep.currency'	Отримати інформацію з валюти	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'lots[0].minimalStep.valueAddedTaxIncluded'  Отримати інформацію з типу податку	${element}	${item}
 
 	Run Keyword If	'${element}' == 'questions[0].title'		Wait For Element With Reload	${tender_data_${element}}	2
 	Run Keyword If	'${element}' == 'questions[0].answer'		Wait For Element With Reload	${tender_data_${element}}	2
@@ -745,7 +753,7 @@ Covert Amount To Number
 	${currency_type} =	get_currency_type	${currency}
 	[Return]  ${currency_type}
 
-Отримати інформацію з minimalStep.currency
+Отримати інформацію з валюти
 	[Arguments]    ${element_name}  ${item}
 	${currency} =	Отримати строку	${element_name}	0	${item}
 	${currency_type} =	get_currency_type	${currency}
@@ -758,14 +766,14 @@ Covert Amount To Number
 	${result} =	Convert To Boolean	${result}
 	[Return]  ${result}
 
-Отримати інформацію з minimalStep.valueAddedTaxIncluded
+Отримати інформацію з lots.value.valueAddedTaxIncluded
 	[Arguments]  ${element_name}  ${item}
 	${value_added_tax_included} =	Get text	${tender_data_${element_name}}
 	${result} =	Set Variable If	'з ПДВ' in '${value_added_tax_included}'	True
 	${result} =	Convert To Boolean	${result}
 	[Return]  ${result}
 
-Отримати інформацію з lots.value.valueAddedTaxIncluded
+Отримати інформацію з типу податку
 	[Arguments]  ${element_name}  ${item}
 	${value_added_tax_included} =	Get text	${tender_data_${element_name}}
 	${result} =	Set Variable If	'з ПДВ' in '${value_added_tax_included}'	True
@@ -809,8 +817,8 @@ Covert Amount To Number
 Отримати інформацію з cancellations[0].status
 	[Arguments]  ${element}  ${item}
 	${text} =	Отримати текст елемента  ${element}  ${item}
-#TODO проверка на текст. Необходимо проверить и заменить
 	${result} =	Set Variable If	'Отменено' in '${text}'	active
+	${result} =	Set Variable If	'Відмінено' in '${text}'	active
 	[Return]  ${result}
 
 
@@ -865,10 +873,8 @@ Covert Amount To Number
 Внести зміни в тендер
 	[Arguments]  ${user_name}  ${tenderId}	${parameter}	${value}
 	Wait For Element With Reload	${locator_tenderClaim.buttonCreate}	1
-#	Wait For Ajax
 	Switch To PMFrame
 	Wait Visibility And Click Element	${locator_tenderClaim.buttonCreate}
-#	Wait For Ajax
 	Switch To PMFrame
 #	Wait Visibility And Click Element	css=#tab_0 a
 	Wait Element Visibility And Input Text	css=textarea[data-id='procurementDescription']	${value}
@@ -1018,15 +1024,12 @@ Covert Amount To Number
 	Wait Element Visibility And Input Text	id=questionAnswer	${answer_data.data.answer}
 	Sleep	2s
 	Wait Visibility And Click Element	id=btnSendAnswer
-#TODO проверка на текст. Необходимо проверить и заменить
-#    log to console  TODO проверка на текст. Необходимо проверить и заменить
-#    debug
 	Wait For Notification	Ваша відповідь успішно відправлена!
 #	Wait Until Element Not Stale	css=span[ng-click='act.hideModal()']	40
 	Wait Visibility And Click Element	css=span[ng-click='act.hideModal()']
 	Wait Until Element Is Not Visible	id=questionAnswer	timeout=20
-#TODO проверить для чего тут слип и убрать его
-	Sleep	30s
+#этот слип нужен, т.к. нет синхронизации и квинта ищет ответ в следующем тесте... а его нет пока не синхранизируемся
+	Sleep	90s
 
 
 Оновити сторінку з тендером
