@@ -5,7 +5,7 @@ from selenium.common.exceptions import StaleElementReferenceException
 from datetime import datetime, timedelta
 from pytz import timezone
 from dateutil import parser
-
+from selenium import webdriver
 
 def get_month_number(month_name):
     monthes = [u"янв.", u"февр.", u"марта", u"апр.", u"мая", u"июня",
@@ -118,6 +118,8 @@ def get_doc_identifier(doc_type_name):
 
 
 def get_unit_name(current_name):
+    if isinstance(current_name, str):
+        current_name = current_name.decode("utf-8")
     dictionary = {
         u'кілограми': {u'килограмм', u'килограмма', u'килограммов'},
         u'пара': {u'пара', u'пары', u'пар'},
@@ -185,15 +187,22 @@ def get_unit_code(name):
 
 def get_status_type(status_name):
     type_dictionary = {
-                       u'Период уточнений': 'active.enquiries',
-                       u'Период уточнений завершен': 'active.enquiries.ended',
-                       u'Подача предложений': 'active.tendering',
-                       u'Торги': 'active.auction',
-                       u'Квалификация победителя': 'active.qualification',
-                       u'Предложения рассмотрены': 'active.awarded',
-                       u'Закупка не состоялась': 'unsuccessful',
-                       u'Завершено': 'complete',
-                       u'Отменено': 'cancelled'
+        u'Период уточнений': 'active.enquiries',
+        u'Період уточнень': 'active.enquiries',
+        u'Период уточнений завершен': 'active.enquiries.ended',
+        u'Період уточнень завершено': 'active.enquiries.ended',
+        u'Подача предложений': 'active.tendering',
+        u'Подача пропозицій': 'active.tendering',
+        u'Торги': 'active.auction',
+        u'Квалификация победителя': 'active.qualification',
+        u'Квалификація переможця': 'active.qualification',
+        u'Предложения рассмотрены': 'active.awarded',
+        u'Пропозиції розглянуті': 'active.awarded',
+        u'Закупка не состоялась': 'unsuccessful',
+        u'Закупівля не відбулась': 'unsuccessful',
+        u'Завершено': 'complete',
+        u'Отменено': 'cancelled',
+        u'Відмінено': 'cancelled'
                        }
     type_name = type_dictionary.get(status_name)
     return type_name
@@ -201,33 +210,33 @@ def get_status_type(status_name):
 
 def modify_test_data(initial_data):
     # set enquiryPeriod.startDate
-    enquiryPeriod_startDate = parser.parse(initial_data['enquiryPeriod']['startDate'])
-    enquiryPeriod_startDate = enquiryPeriod_startDate + timedelta(minutes=6)
-    initial_data["enquiryPeriod"]["startDate"] = enquiryPeriod_startDate.strftime('%Y-%m-%dT%H:%M:%S.%f%z')
-
-    # set lots
-    initial_data['lots'] = [privatmarket_munchify(
-    {
-        "description": u'Тестовий лот',
-        "title": initial_data['title'],
-        "value": {
-            "currency": "UAH",
-            "amount": initial_data['value']['amount'],
-            "valueAddedTaxIncluded": True
-        },
-        "minimalStep": {
-            "currency": "UAH",
-            "amount": initial_data['minimalStep']['amount'],
-            "valueAddedTaxIncluded": True
-        },
-        "status": "active"
-    })]
+    # enquiryPeriod_startDate = parser.parse(initial_data['enquiryPeriod']['startDate'])
+    # enquiryPeriod_startDate = enquiryPeriod_startDate + timedelta(minutes=6)
+    # initial_data["enquiryPeriod"]["startDate"] = enquiryPeriod_startDate.strftime('%Y-%m-%dT%H:%M:%S.%f%z')
+    #
+    # # set lots
+    # initial_data['lots'] = [privatmarket_munchify(
+    # {
+    #     "description": u'Тестовий лот',
+    #     "title": initial_data['title'],
+    #     "value": {
+    #         "currency": "UAH",
+    #         "amount": initial_data['value']['amount'],
+    #         "valueAddedTaxIncluded": True
+    #     },
+    #     "minimalStep": {
+    #         "currency": "UAH",
+    #         "amount": initial_data['minimalStep']['amount'],
+    #         "valueAddedTaxIncluded": True
+    #     },
+    #     "status": "active"
+    # })]
 
     # set other
     # initial_data['procuringEntity']['name'] = u'Товариство З Обмеженою Відповідальністю \'Мак Медіа Прінт\''
     initial_data['procuringEntity']['name'] = u'Товариство З Обмеженою Відповідальністю \'Сільськогосподарська Фірма \'Рубіжне\''
-    #initial_data['procuringEntity']['name'] = u'Макстрой Діск, Товариство З Обмеженою Відповідальністю'
-    initial_data['items'][0]['unit']['name'] = get_unit_ru_name(initial_data['items'][0]['unit']['name'])
+    # initial_data['procuringEntity']['name'] = u'Макстрой Діск, Товариство З Обмеженою Відповідальністю'
+    #initial_data['items'][0]['unit']['name'] = get_unit_ru_name(initial_data['items'][0]['unit']['name'])
     return initial_data
 
 
@@ -259,50 +268,5 @@ def get_unit_ru_name(name):
         return name
 
 
-def get_unit_code_by_UaRuName(name):
-    dictionary = {
-        {u'кілограми', u'кілограмів', u'килограмм', u'килограмма', u'килограммов'}: u'6',
-        {u'кілометер', u'кілометери', u'кілометрів', u'километр', u'километров', u'километра'}: u'километр',
-        {u'пара'}: u'пара',
-        {u'літр'}: u'литр',
-        {u'набір'}: u'набор',
-        {u'пачок'}: u'пачка',
-        {u'метри'}: u'метр',
-        {u'послуга'}: u'услуга',
-        {u'метри кубічні'}: u'метр кубический',
-        {u'тони'}: u'тонна',
-        {u'метри квадратні'}: u'метр квадратный',
-        {u'кілометри'}: u'километр',
-        {u'штуки'}: u'штука',
-        {u'місяць'}: u'месяц',
-        {u'пачка'}: u'пачка',
-        {u'упаковка'}: u'упаковка',
-        {u'гектар'}: u'гектар',
-        {u'блок'}: u'блок'
-        # ,
-        # u'кілограми': {u'килограмм', u'килограмма', u'килограммов'},
-        # u'пара': {u'пара', u'пары', u'пар'},
-        # u'літр': {u'литр', u'литра', u'литров'},
-        # u'набір': {u'набор', u'набора', u'наборов'},
-        # u'пачок': {u'пачка', u'пачек', u'пачки'},
-        # u'метри': {u'метр', u'метра', u'метров'},
-        # u'лот': {u'лот', u'лоты', u'лотов'},
-        # u'послуга': {u'услуга', u'услуг', u'услуги'},
-        # u'метри кубічні': {u'метр кубический', u'метра кубического', u'метров кубических'},
-        # u'ящик': {u'ящик', u'ящика', u'ящиков'},
-        # u'рейс': {u'рейс', u'рейса', u'рейсов'},
-        # u'тони': {u'тонна', u'тонны', u'тонн'},
-        # u'метри квадратні': {u'метр квадратный', u'метра квадратного', u'метров квадратных'},
-        # u'кілометри': {u'километр', u'километров', u'километра'},
-        # u'штуки': {u'штука', u'штуки', u'штук'},
-        # u'місяць': {u'месяц', u'месяца', u'месяцев'},
-        # u'пачка': {u'пачка', u'пачек', u'пачкики'},
-        # u'упаковка': {u'упковка', u'упаковок', u'упаковки'},
-        # u'гектар': {u'гектар', u'гектара', u'гектаров'},
-        # u'блок': {u'блок', u'блока', u'блоков'}
-    }
-    expected_name = dictionary.get(name)
-    if expected_name:
-        return expected_name
-    else:
-        return name
+def convert_float_to_string(number):
+    return format(number, '.2f')

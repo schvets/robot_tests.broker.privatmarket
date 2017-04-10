@@ -1,6 +1,5 @@
 # Byte-compiled / optimized files
 __pycache__/
-*.py[cod]
 
 # Distribution / packaging
 /build/
@@ -8,3 +7,6 @@ __pycache__/
 /[bs]dist/
 /*.egg-info/
 *.egg
+.idea
+privatmarket_service.pyc
+
