@@ -210,12 +210,12 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	Call Method	${chrome_options}		add_experimental_option	prefs	${prefs}
 
     #Для Viewer'а нужен хром, т.к. на хром настроена автоматическая закачка файлов
-	Run Keyword If  '${username}' == 'PrivatMarket_Viewer'	Create WebDriver	Chrome	chrome_options=${chrome_options}	alias=${username}
-	Run Keyword If  '${username}' == 'PrivatMarket_Owner'	Create WebDriver	Firefox	alias=${username}
-	Run Keyword If  '${username}' == 'PrivatMarket_Provider'	Create WebDriver	Firefox	chrome_options=${chrome_options}	alias=${username}
-	Go To	${USERS.users['${username}'].homepage}
+#	Run Keyword If  '${username}' == 'PrivatMarket_Viewer'	Create WebDriver	Chrome	chrome_options=${chrome_options}	alias=${username}
+#	Run Keyword If  '${username}' == 'PrivatMarket_Owner'	Create WebDriver	Firefox	alias=${username}
+#	Run Keyword If  '${username}' == 'PrivatMarket_Provider'	Create WebDriver	Firefox	chrome_options=${chrome_options}	alias=${username}
+#	Go To	${USERS.users['${username}'].homepage}
 
-#	Open Browser	${USERS.users['${username}'].homepage}	${browser}	alias=${username}
+	Open Browser	${USERS.users['${username}'].homepage}	${browser}	alias=${username}
 
 	Set Window Size	@{USERS.users['${username}'].size}
 	Set Selenium Implicit Wait	10s
@@ -473,7 +473,7 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 
 	${element} =  Set Variable  xpath=//section[@id='lotSection']/section[contains(., '${object_id}')]${tender_data_lot.${field_name}}
 
-	Run Keyword And Return If	'${element}' == 'minimalStep.amount'					Отримати суму	${element}	${item}
+	Run Keyword And Return If	'${field_name}' == 'minimalStep.amount'					Отримати суму	${element}	0
 
 	${result_full} =  Get Text	${element}
 	${result} =  Strip String	${result_full}
@@ -625,8 +625,14 @@ Covert Amount To Number
 
 Отримати текст елемента
 	[Arguments]  ${element_name}  ${item}
-	Wait Until Element Is Visible	${tender_data_${element_name}}
-	@{itemsList}=					Get Webelements	${tender_data_${element_name}}
+	${temp_name} = 					Remove String	${element_name}	'
+	${element} = 	Set Variable If
+        ...  'css=' in '${temp_name}' or 'xpath=' in '${temp_name}'  ${element_name}
+        ...  ${tender_data_${element_name}}
+
+
+	Wait Until Element Is Visible	${element}
+	@{itemsList}=					Get Webelements	${element}
 	${num} =						Set Variable	${item}
 	${result_full} =				Get Text		${itemsList[${num}]}
 	[Return]  ${result_full}
@@ -650,7 +656,7 @@ Covert Amount To Number
 
 
 Отримати суму
-	[Arguments]  ${element_name}  ${item}
+	[Arguments]  ${element_name}  ${item}=0
 	${result}=	Отримати текст елемента	${element_name}	${item}
 	${result}=	Remove String	${result}	${SPACE}
 	${result} =	Replace String	${result}	,	.
@@ -1003,7 +1009,6 @@ Covert Amount To Number
 	...	${ARGUMENTS[0]} ==  username
 	...	${ARGUMENTS[1]} ==  tenderId
 	Reload Page
-	Wait For Ajax
 	Switch To PMFrame
 
 
@@ -1448,7 +1453,7 @@ Check Current Mode New Realisation
 	privatmarket.Оновити сторінку з тендером
 	#проверим правильный ли режим
 	Wait Until Element Is Visible	${locator_tender.switchToDemo}	${COMMONWAIT}
-	${check_result} =  Run Keyword And Ignore Error	Wait Until Element Is Visible	${locator_tender.switchToDemo.message}	${COMMONWAIT}
+	${check_result} =  Run Keyword And Ignore Error	Wait Until Element Is Visible	${locator_tender.switchToDemo.message}
 	Run Keyword If	${check_result} != 'PASS'	Switch To Education Mode
 
 
@@ -1504,8 +1509,9 @@ Click If Visible
 
 
 Close notification
+    Sleep  3s
 	Switch To PMFrame
-	${notification_visibility} = 	Run Keyword And Return Status	Wait Until Element Is Visible	css=section[data-id='popupHelloModal'] span[data-id='actClose']	${COMMONWAIT}
+	${notification_visibility} = 	Run Keyword And Return Status	Wait Until Element Is Visible	css=section[data-id='popupHelloModal'] span[data-id='actClose']
 	Run Keyword If	${notification_visibility}	Click Element	css=section[data-id='popupHelloModal'] span[data-id='actClose']
 #	Wait Until Element Is Not Visible	css=section[data-id='popupHelloModal'] span[data-id='actClose']
 
