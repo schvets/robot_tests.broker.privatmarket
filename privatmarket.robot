@@ -447,7 +447,6 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 
 	Wait Visibility And Click Element	${locator_tenderInfo.lotDescriptionBtn}
 	Wait Until Element Is Visible	${locator_tenderInfo.lotDescriptionBody}	${COMMONWAIT}
-#	Wait Until Element Is Visible	xpath=//section[contains(@ng-if, "model.ad.showTab == 'description'")]	${COMMONWAIT}
 	Wait Visibility And Click Element	${tender_data_items.description}
 	Wait Until Element Is Visible	css=div[ng-if='adb.classification']	${COMMONWAIT}
 
