@@ -883,6 +883,8 @@ Covert Amount To Number
 	[Arguments]  ${element_name}
 	privatmarket.Оновити сторінку з тендером
 	Wait Until Element Is Visible	${tender_data_${element_name}}	${COMMONWAIT}
+	#Added sleep, becource we taketext in status bar
+	Sleep  5s
 	${status_name} =	Get text	${tender_data_${element_name}}
 	${status_type} =	get_status_type	${status_name}
 	[Return]  ${status_type}
