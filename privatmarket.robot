@@ -78,27 +78,47 @@ ${tender_data_question.questions.questions[0].date}	xpath=//div[@class = 'questi
 ${tender_data_question.questions.questions[0].title}	css=div.question-head.title span
 ${tender_data_question.questions.questions[0].answer}	xpath=//div[@ng-if='q.answer']//div[@class='ng-binding']
 
+${tender_data_lots.classification.scheme}	css=.cl-scheme.ng-binding
+${tender_data_lots.classification.id}	css=.cl-id.ng-binding
+${tender_data_lots.classification.description}	css=.cl-name.ng-binding
+${tender_data_lots.additionalClassifications[0].scheme}	css=.cl-scheme.ng-binding
+${tender_data_lots.additionalClassifications[0].id}	css=.cl-id.ng-binding
+${tender_data_lots.additionalClassifications[0].description}	css=.cl-name.ng-binding
+${tender_data_lots.quantity}	css=.item-count.ng-binding
+
 ${tender_data_questions[0].description}	css=div.question-div
 ${tender_data_questions[0].date}	xpath=//div[@class = 'question-head title']/b[2]
 ${tender_data_questions[0].title}	css=div.question-head.title span
 ${tender_data_questions[0].answer}	xpath=//div[@ng-if='q.answer']//div[@class='ng-binding']
 ${tender_data_lot.title}  //div[@id='lot-title']
-${tender_data_lot.minimalStep.amount}  //div[@id='lotMinStepAmount']
-${tender_data_lots.title}	css=#lot-title
-${tender_data_lots.description}	css=.description.marged.ng-binding
-${tender_data_lots.value.amount}	css=#lotAmount
-${tender_data_lots.value.currency}	css=#lotCcy
-${tender_data_lots.value.valueAddedTaxIncluded}	css=#lotTax
+#${tender_data_lot.minimalStep.amount}  //div[@id='lotMinStepAmount']
+#${tender_data_lot.minimalStep.currency}	css=#lotMinStepCcy
+#${tender_data_lot.minimalStep.valueAddedTaxIncluded}	css=#lotMinStepCcy
 ${tender_data_lots.minimalStep.amount}	css=#lotMinStepAmount
 ${tender_data_lots.minimalStep.currency}	css=#lotMinStepCcy
 ${tender_data_lots.minimalStep.valueAddedTaxIncluded}	css=#lotMinStepTax
-${tender_data_lots.lots.title}	css=#lot-title
-${tender_data_lots.lots.description}	css=.description.marged.ng-binding
-${tender_data_lots.lots.value.amount}	css=#lotAmount
-${tender_data_lots.lots.value.lotMinStepAmount}	css=#lotMinStepAmount
-${tender_data_lots.lots[0].minimalStep.amount}	css=#lotMinStepAmount
-${tender_data_lots.lots[0].minimalStep.currency}	css=#lotMinStepCcy
-${tender_data_lots.lots[0].minimalStep.valueAddedTaxIncluded}	css=#lotMinStepTax
+#${tender_data_lot.lots.minimalStep.amount}	css=#lotMinStepAmount
+#${tender_data_lot.lots.minimalStep.currency}	css=#lotMinStepCcy
+#${tender_data_lot.lots.minimalStep.valueAddedTaxIncluded}	css=#lotMinStepTax
+
+${tender_data_lots.title}	css=#lot-title
+${tender_data_lots.description}	css=.description.marged.ng-binding
+
+${tender_data_lots.value.amount}	css=#lotAmount
+${tender_data_lots.value.currency}	css=#lotCcy
+${tender_data_lots.value.valueAddedTaxIncluded}	css=#lotTax
+#${tender_data_lots.lots.minimalStep.amount}	css=#lotMinStepAmount
+#${tender_data_lots.lots.minimalStep.currency}	css=#lotMinStepCcy
+#${tender_data_lots.lots.minimalStep.valueAddedTaxIncluded}	css=#lotMinStepTax
+#${tender_data_lots.lots.title}	css=#lot-title
+#${tender_data_lots.lots.description}	css=.description.marged.ng-binding
+#${tender_data_lots.lots.value.amount}	css=#lotAmount
+#${tender_data_lots.lots.lotMinStepAmount}	css=#lotMinStepAmount
+#${tender_data_lots.lots.lotMinStepCurrency}	css=#lotMinStepCcy
+#${tender_data_lots.lots.lotMinStepAddedTaxIncluded}	css=#lotMinStepTax
+#${tender_data_lots.lots[0].minimalStep.amount}	css=#lotMinStepAmount
+#${tender_data_lots.lots[0].minimalStep.currency}	css=#lotMinStepCcy
+#${tender_data_lots.lots[0].minimalStep.valueAddedTaxIncluded}	css=#lotMinStepTax
 ${tender_data_bids}	xpath=(//table[@class='bids']//tr)[2]
 ${tender_data_cancellations[0].status}	xpath=//*[@id='nolotSection']/div[1]/div[1]
 ${tender_data_cancellations[0].reason}	xpath=//*[@id='nolotSection']/div[1]/div[2]
@@ -239,7 +259,6 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	Wait Visibility And Click Element	css=tr#${tenderId}
 	Sleep  5s
 	Switch To PMFrame
-#	Wait Until Element Is Not Visible	${locator_tenderSearch.searchInput}	${COMMONWAIT}
 	Wait Until Element Is Visible	${tender_data_title}	${COMMONWAIT}
 
 
@@ -265,7 +284,6 @@ ${keywords}  /op_robot_tests/tests_files/keywords
     Wait Until Page Contains Element  id=sender-analytics  ${COMMONWAIT}
     Switch To PMFrame
 	Wait Visibility And Click Element	${locator_tenderAdd.tenderType}
-#	Delete Draft
 #step 0
 	#we should add choosing of procurementMethodType
 	Switch To PMFrame
@@ -429,7 +447,6 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 
 	Wait Visibility And Click Element	${locator_tenderInfo.lotDescriptionBtn}
 	Wait Until Element Is Visible	${locator_tenderInfo.lotDescriptionBody}	${COMMONWAIT}
-#	Wait Until Element Is Visible	xpath=//section[contains(@ng-if, "model.ad.showTab == 'description'")]	${COMMONWAIT}
 	Wait Visibility And Click Element	${tender_data_items.description}
 	Wait Until Element Is Visible	css=div[ng-if='adb.classification']	${COMMONWAIT}
 
@@ -444,6 +461,14 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 
 Отримати інформацію із предмету
 	[Arguments]  ${username}  ${tender_uaid}  ${object_id}  ${field_name}
+	Run Keyword And Return If	'${field_name}' == 'classification.scheme'			Отримати текст елемента ${field_name}	${field_name}
+	Run Keyword And Return If	'${field_name}' == 'classification.id'				Отримати текст елемента ${field_name}	${field_name}
+	Run Keyword And Return If	'${field_name}' == 'classification.description'	Отримати текст елемента ${field_name}	${field_name}
+	Run Keyword And Return If	'${field_name}' == 'unit.code'	Отримати текст елемента ${field_name}	${field_name}
+	Run Keyword And Return If	'${field_name}' == 'additionalClassification[0].scheme'			Отримати текст елемента ${field_name}	${field_name}
+	Run Keyword And Return If	'${field_name}' == 'additionalClassification[0].id'				Отримати текст елемента ${field_name}	${field_name}
+	Run Keyword And Return If	'${field_name}' == 'additionalClassifications[0].description'	Отримати текст елемента ${field_name}	${field_name}
+	Run Keyword And Return If	'${field_name}' == 'quantity'	Отримати строку quantity	${field_name}
     ${element} =  Set Variable  xpath=//section/div[contains(., '${object_id}') and contains(@class, 'lot-info')]${tender_data_item.${field_name}}
 	Wait Until Element Is Visible  ${element}  timeout=${COMMONWAIT}
 	${result_full} =  Get Text	${element}
@@ -560,6 +585,7 @@ Covert Amount To Number
 	[Arguments]  ${item}  ${base_tender_uaid}  ${field_name}
 	${element} = 	Replace String	${field_name}	items[${item}]	items
 	${element} = 	Replace String	${element}	lots[${item}]	lots
+
 	Run Keyword And Return If	'${element}' == 'enquiryPeriod.startDate'		Отримати дату та час	${element}	1	${item}
 	Run Keyword And Return If	'${element}' == 'enquiryPeriod.endDate'			Отримати дату та час	${element}	1	${item}
 	Run Keyword And Return If	'${element}' == 'tenderPeriod.startDate'		Отримати дату та час	${element}	1	${item}
@@ -588,6 +614,10 @@ Covert Amount To Number
 	Run Keyword And Return If	'${element}' == 'items.additionalClassifications[0].description'	Отримати класифікацію	${element}	${item}
 	Run Keyword And Return If	'items.deliveryAddres' in '${element}'								Отримати текст елемента	${element}	${item}
 
+	Run Keyword And Return If	'${element}' == 'items[0].classification.scheme'			Отримати текст елемента	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'items[0].classification.id'				Отримати текст елемента	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'items[0].classification.description'	Отримати текст елемента	${element}	${item}
+
 	Run Keyword And Return If	'${element}' == 'items.deliveryDate.startDate'			Отримати дату та час	${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'items.deliveryDate.endDate'			Отримати дату та час	${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'items.unit.name'						Отримати назву	${element}	0	${item}
@@ -597,18 +627,20 @@ Covert Amount To Number
 	Run Keyword And Return If	'${element}' == 'items.deliveryLocation.longitude'		Отримати число	${element}	0	${item}
 	Run Keyword And Return If	'${element}' == 'auctionPeriod.startDate'				Отримати інформацію з ${element}	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'procurementMethodType'					Отримати інформацію з ${element}	${element}
-
-	Run Keyword And Return If	'${element}' == 'lots.value.amount'	Отримати суму  ${element}	${item}
-	Run Keyword And Return If	'${element}' == 'lots.value.lotMinStepAmount'	Отримати суму  ${element}	${item}
+#	Run Keyword And Return If	'${element}' == 'lots.value.lotMinStepAmount'	Отримати суму  Covert Amount To Number	${element}
 	Run Keyword And Return If	'${element}' == 'lots.value.amount'	Covert Amount To Number	${element}
-	Run Keyword And Return If	'${element}' == 'lots.value.currency'  Отримати інформацію з ${element}	${element}	${item}
-	Run Keyword And Return If	'${element}' == 'lots.value.valueAddedTaxIncluded'	Отримати інформацію з ${element}	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'lots.value.currency'	Отримати інформацію з валюти	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'lots.value.valueAddedTaxIncluded'	Отримати інформацію з типу податку	${element}	${item}
+#	Run Keyword And Return If	'${element}' == 'minimalStep.currency'	Отримати інформацію з валюти	${element}	${item}
+#	Run Keyword And Return If	'${element}' == 'minimalStep.valueAddedTaxIncluded'	Отримати інформацію з типу податку	${element}	${item}
+
+	Run Keyword And Return If	'${element}' == 'minimalStep.amount'	Covert Amount To Number	${element}
 	Run Keyword And Return If	'${element}' == 'minimalStep.currency'	Отримати інформацію з валюти	${element}	${item}
 	Run Keyword And Return If	'${element}' == 'minimalStep.valueAddedTaxIncluded'	Отримати інформацію з типу податку	${element}	${item}
 
-	Run Keyword And Return If	'${element}' == 'lots[0].minimalStep.amount'	Covert Amount To Number	${element}
-	Run Keyword And Return If	'${element}' == 'lots[0].minimalStep.currency'	Отримати інформацію з валюти	${element}	${item}
-	Run Keyword And Return If	'${element}' == 'lots[0].minimalStep.valueAddedTaxIncluded'  Отримати інформацію з типу податку	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'lots.minimalStep.amount'	Covert Amount To Number	${element}
+	Run Keyword And Return If	'${element}' == 'lots.minimalStep.currency'	Отримати інформацію з валюти	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'lots.minimalStep.valueAddedTaxIncluded'	Отримати інформацію з типу податку	${element}	${item}
 
 	Run Keyword If	'${element}' == 'questions[0].title'		Wait For Element With Reload	${tender_data_${element}}	2
 	Run Keyword If	'${element}' == 'questions[0].answer'		Wait For Element With Reload	${tender_data_${element}}	2
@@ -637,6 +669,54 @@ Covert Amount To Number
 	${result_full} =				Get Text		${itemsList[${num}]}
 	[Return]  ${result_full}
 
+Отримати текст елемента classification.scheme
+	[Arguments]  ${element}
+	Wait Until Element Is Visible	${tender_data_lots.${element}}
+	${result_full} =	Get Text	${tender_data_lots.${element}}
+	${result} =  get_classification_type  ${result_full}
+	[Return]  ${result}
+
+Отримати текст елемента additionalClassification[0].scheme
+	[Arguments]  ${element}
+	Wait Until Element Is Visible	${tender_data_lots.${element}}
+	${result_full} =	Get Text	${tender_data_lots.${element}}
+	${result} =  get_classification_type  ${result_full}
+	[Return]  ${result}
+
+Отримати текст елемента classification.id
+	[Arguments]  ${element}
+	Wait Until Element Is Visible	${tender_data_lots.${element}}
+	${result} =	Get Text	${tender_data_lots.${element}}
+#	${result} =  get_classification_type  ${result_full}
+	[Return]  ${result}
+
+Отримати текст елемента additionalClassification[0].id
+	[Arguments]  ${element}
+	Wait Until Element Is Visible	${tender_data_lots.${element}}
+	${result} =	Get Text	${tender_data_lots.${element}}
+#	${result} =  get_classification_type  ${result_full}
+	[Return]  ${result}
+
+Отримати текст елемента classification.description
+	[Arguments]  ${element}
+	Wait Until Element Is Visible	${tender_data_lots.${element}}
+	${result_full} =	Get Text	${tender_data_lots.${element}}
+	${result} =  strip string  ${result_full}
+	[Return]  ${result}
+
+Отримати текст елемента additionalClassifications[0].description
+	[Arguments]  ${element}
+	Wait Until Element Is Visible	${tender_data_lots.${element}}
+	${result_full} =	Get Text	${tender_data_lots.${element}}
+	${result} =  strip string  ${result_full}
+	[Return]  ${result}
+
+Отримати текст елемента unit.code
+	[Arguments]  ${element}
+	Wait Until Element Is Visible	${tender_data_lots.${element}}
+	${result_full} =	Get Text	${tender_data_lots.${element}}
+	${result} =  get_unit_code  ${result_full}
+	[Return]  ${result}
 
 Отримати строку
 	[Arguments]  ${element_name}  ${position_number}  ${item}
@@ -647,6 +727,13 @@ Covert Amount To Number
 	${result} =						Strip String	${values_list[${position_number}]}	mode=both	characters=:
 	[Return]  ${result}
 
+Отримати строку quantity
+	[Arguments]  ${element_name}
+	${result_full} =	Get Text	${element_name}
+	${result} =	Strip String	${result_full}
+	${result} =	Replace String	${result}	.00	${EMPTY}
+	${result} =	Strip String	${result}
+	[Return]  ${result}
 
 Отримати число
 	[Arguments]  ${element_name}  ${position_number}  ${item}
@@ -801,6 +888,9 @@ Covert Amount To Number
 Отримати інформацію з status
 	[Arguments]  ${element_name}
 	privatmarket.Оновити сторінку з тендером
+	Wait Until Element Is Visible	${tender_data_${element_name}}	${COMMONWAIT}
+	#Added sleep, becource we taketext in status bar
+	Sleep  5s
 	${status_name} =	Get text	${tender_data_${element_name}}
 	${status_type} =	get_status_type	${status_name}
 	[Return]  ${status_type}

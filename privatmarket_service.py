@@ -51,6 +51,8 @@ def is_element_not_stale(web_element):
 
 
 def get_currency_type(currency):
+    if isinstance(currency, str):
+        currency = currency.decode("utf-8")
     currency_dictionary = {
         u'грн': 'UAH'
     }
