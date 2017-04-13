@@ -146,3 +146,7 @@ def get_status_type(status_name):
                        }
     type_name = type_dictionary.get(status_name)
     return type_name
+
+
+def convert_float_to_string(number):
+    return format(number, '.2f')
