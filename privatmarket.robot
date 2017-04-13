@@ -46,6 +46,18 @@ ${tender_data_items.unit.name}	xpath=//div[@ng-if='adb.quantity']/div[2]/span[2]
 ${tender_data_items.unit.code}	xpath=//div[@ng-if='adb.quantity']/div[2]/span[2]
 ${tender_data_items.quantity}	xpath=//div[@ng-if='adb.quantity']/div[2]/span
 
+${tender_data_features[0].title}  xpath=//section[@id='commonInfoDiv']//div[@class='no-price ng-scope']/h4
+${tender_data_features[0].description}  xpath=//section[@id="commonInfoDiv"]//div[@class="feature name ng-scope ng-binding"]
+${tender_data_features[0].featureOf}  xpath=//section[@id='commonInfoDiv']//div[@ng-repeat='enum in feature.enumList']
+${title}  div[@class='feature name ng-scope ng-binding']
+${description}  div[@class='feature name ng-scope ng-binding']/div
+${featureOf}  div[@class='feature descript ng-scope']/div[1]/div[2]
+
+${features[0].title}  div[@class='feature name ng-scope ng-binding']
+${features[0].description}  div[@class='feature name ng-scope ng-binding']/div
+${features[0].featureOf}  div[@class='feature descript ng-scope']/div[1]/div[2]
+
+
 ${tender_data_item.description}	//div[@class="description"]//span
 ${tender_data_item.deliveryDate.endDate}	div[@ng-if='adb.deliveryDate.endDate']/div[2]
 ${tender_data_item.deliveryLocation.latitude}	css=span.latitude
@@ -198,6 +210,7 @@ ${locator_question.postalCode}	id=addressPostalCode
 ${locator_question.region}	id=addressRegion
 ${locator_question.locality}	id=addressLocality
 ${locator_question.street}	id=addressStreet
+${locator_question.tel}  id=personPhone
 ${locator_question.sendQuestion}	xpath=//button[@ng-click='act.sendQuestion()']
 ${locator_question.hideModal}	css=span[ng-click='act.hideModal()']
 
@@ -230,12 +243,12 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	Call Method	${chrome_options}		add_experimental_option	prefs	${prefs}
 
     #Для Viewer'а нужен хром, т.к. на хром настроена автоматическая закачка файлов
-	Run Keyword If  '${username}' == 'PrivatMarket_Viewer'	Create WebDriver	Chrome	chrome_options=${chrome_options}	alias=${username}
-	Run Keyword If  '${username}' == 'PrivatMarket_Owner'	Create WebDriver	Firefox	alias=${username}
-	Run Keyword If  '${username}' == 'PrivatMarket_Provider'	Create WebDriver	Firefox	chrome_options=${chrome_options}	alias=${username}
-	Go To	${USERS.users['${username}'].homepage}
+#	Run Keyword If  '${username}' == 'PrivatMarket_Viewer'	Create WebDriver	Chrome	chrome_options=${chrome_options}	alias=${username}
+#	Run Keyword If  '${username}' == 'PrivatMarket_Owner'	Create WebDriver	Firefox	alias=${username}
+#	Run Keyword If  '${username}' == 'PrivatMarket_Provider'	Create WebDriver	Firefox	chrome_options=${chrome_options}	alias=${username}
+#	Go To	${USERS.users['${username}'].homepage}
 
-#	Open Browser	${USERS.users['${username}'].homepage}	${browser}	alias=${username}
+	Open Browser	${USERS.users['${username}'].homepage}	${browser}	alias=${username}
 
 	Set Window Size	@{USERS.users['${username}'].size}
 	Set Selenium Implicit Wait	10s
@@ -475,6 +488,27 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	${result} =  Strip String	${result_full}
 	[Return]  ${result}
 
+Отримати інформацію із нецінового показника
+    [Arguments]  ${username}  ${tender_uaid}  ${feature_id}  ${field_name}
+#    Run Keyword And Return If	'${field_name}' == 'title'	Отримати текст елемента  features[0]${field_name}  0
+#    Run Keyword And Return If	'${field_name}' == 'description'	Отримати текст елемента  features[0]${field_name}  0
+#    Run Keyword And Return If	'${field_name}' == 'featureOf'	get matching xpath count  ${tender_data_features[0].featureOf}
+#    ${element} =  Set Variable  xpath=//section/div[contains(., '${feature_id}') and contains(@class, 'lot-info')]${tender_data_item.${field_name}}
+    ${element} =  Set Variable  xpath=//div[@class='no-price']//${field_name}
+	Wait Until Element Is Visible  ${element}  timeout=${COMMONWAIT}
+	${result_full} =  Get Text	${element}
+	${result} =  Strip String	${result_full}
+	[Return]  ${result}
+#
+#Отримати Документ
+##    Данный метод задублирован. Вызывался ранее "Отримати документ"
+#    [Arguments]  ${username}  ${tender_uaid}  ${doc_id}
+#	Wait For Element With Reload  ${tender_data_documentation.title}  1
+#    Wait Visibility And Click Element  ${tender_data_documentation.title}
+#    sleep  20s
+#    ${file_name_full} =  Get Text  ${tender_data_documentation.title}
+#    ${file_name} =  Strip String  ${file_name_full}
+#    [Return]  ${file_name}
 
 Отримати інформацію із запитання
 	[Arguments]  ${username}  ${tender_uaid}  ${question_id}  ${field_name}
@@ -498,7 +532,7 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 
 	${element} =  Set Variable  xpath=//section[@id='lotSection']/section[contains(., '${object_id}')]${tender_data_lot.${field_name}}
 
-	Run Keyword And Return If	'${element}' == 'minimalStep.amount'					Отримати суму	${element}	${item}
+	Run Keyword And Return If	'${element}' == 'minimalStep.amount'  Отримати суму	${element}	0
 
 	${result_full} =  Get Text	${element}
 	${result} =  Strip String	${result_full}
@@ -512,6 +546,9 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	${result}=  get text  ${tender_data_documentation.${field}}
 	[Return]  ${result}
 
+Отримати документ до лоту
+    [Arguments]  ${username}  ${tender_uaid}  ${lot_id}  ${doc_id}
+    Run Keyword And Return  privatmarket.Отримати документ  ${username}  ${tender_uaid}  ${doc_id}
 
 Отримати документ
 	[Arguments]  ${username}  ${tender_uaid}  ${doc_id}
@@ -539,6 +576,7 @@ ${keywords}  /op_robot_tests/tests_files/keywords
 	Wait Element Visibility And Input Text	${locator_question.region}	${question.data.author.address.region}
 	Wait Element Visibility And Input Text	${locator_question.locality}	${question.data.author.address.locality}
 	Wait Element Visibility And Input Text	${locator_question.street}	${question.data.author.address.streetAddress}
+	Wait Element Visibility And Input Text	${locator_question.tel}  ${USERS.users['${provider}'].login}
 	Wait Visibility And Click Element	${locator_question.sendQuestion}
 	Wait For Notification	Ваше запитання успішно включено до черги на відправку. Дякуємо за звернення!
 	Wait Visibility And Click Element	${locator_question.hideModal}
@@ -883,7 +921,7 @@ Covert Amount To Number
 	[Arguments]  ${element_name}
 	privatmarket.Оновити сторінку з тендером
 	Wait Until Element Is Visible	${tender_data_${element_name}}	${COMMONWAIT}
-	#Added sleep, becource we taketext in status bar
+	#Added sleep, becource we taketext in status bar, without it when status loading we took "-"
 	Sleep  5s
 	${status_name} =	Get text	${tender_data_${element_name}}
 	${status_type} =	get_status_type	${status_name}
@@ -1470,7 +1508,7 @@ Close Confirmation In Editor
 Wait For Notification
 	[Arguments]	${message_text}
 	Wait Until Element Is Enabled		xpath=//div[@class='alert-info ng-scope ng-binding']	timeout=${COMMONWAIT}
-	Wait Until Element Contains			xpath=//div[@class='alert-info ng-scope ng-binding']	${message_text}	timeout=10
+	Wait Until Element Contains			xpath=//div[@class='alert-info ng-scope ng-binding']	${message_text}	${COMMONWAIT}
 
 
 Wait For Element Value
