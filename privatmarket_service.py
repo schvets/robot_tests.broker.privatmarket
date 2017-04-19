@@ -28,8 +28,8 @@ def get_currency_type(currency):
 
 
 def get_month_number(month_name):
-    monthes = [u"янв.", u"февр.", u"марта", u"апр.", u"мая", u"июня",
-               u"июля", u"авг.", u"сент.", u"окт.", u"нояб.", u"дек.",
+    monthes = [u"января", u"февраля", u"марта", u"апреля", u"мая", u"июня",
+               u"июля", u"августа", u"сентября", u"октября", u"ноября", u"декабря",
                u"січ.", u"лют.", u"бер.", u"квіт.", u"трав.", u"черв.",
                u"лип.", u"серп.", u"вер.", u"жовт.", u"лист.", u"груд.",
                u"січня", u"лютого", u"березня", u"квітня", u"травня", u"червня",
@@ -143,10 +143,16 @@ def get_status_type(status_name):
         u'Завершено': 'complete',
         u'Отменено': 'cancelled',
         u'Відмінено': 'cancelled'
-                       }
+    }
     type_name = type_dictionary.get(status_name)
     return type_name
 
 
 def convert_float_to_string(number):
     return format(number, '.2f')
+
+
+def sum_of_numbers(number, value):
+    number = int(number) + int(value)
+    return number
+
