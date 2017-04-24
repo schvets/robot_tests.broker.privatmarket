@@ -76,8 +76,10 @@ ${tender_data_lot_question.title}  //span[contains(@class, 'question-title')]
 ${tender_data_lot_question.description}  //div[@class='question-div']/div[1]
 ${tender_data_lot_question.answer}  //div[@class='question-div question-expanded']/div[1]
 
-
 ${tender_data_feature.featureOf}  /../../../*[1]
+
+${tender_data_complaint.title}  //span[contains(@class, 'claimHead')]
+${tender_data_complaint.description}  //div[@class='question-div']
 
 
 *** Keywords ***
@@ -100,7 +102,7 @@ ${tender_data_feature.featureOf}  /../../../*[1]
     Call Method  ${chrome_options}  add_argument  --disable-web-security
     Call Method  ${chrome_options}  add_argument  --nativeEvents\=false
     Call Method  ${chrome_options}  add_experimental_option  prefs  ${prefs}
-    #Call Method  ${chrome_options}  add_argument  --user-data-dir\=/home/lugovskoy/.config/google-chrome/Default
+    Call Method  ${chrome_options}  add_argument  --user-data-dir\=/home/lugovskoy/.config/google-chrome/Default
 
     #Для Viewer'а нужен хром, т.к. на хром настроена автоматическая закачка файлов
     Run Keyword If  '${username}' == 'PrivatMarket_Viewer'  Create WebDriver  Chrome  chrome_options=${chrome_options}  alias=${username}
@@ -359,6 +361,14 @@ ${tender_data_feature.featureOf}  /../../../*[1]
     \  Run Keyword If  'відповіді на запитання' in '${TEST_NAME}'  Wait Visibility And Click Element  xpath=(//div[contains(@class, 'question-answer')]//div[contains(@class, 'question-expand-div')]/a[1])[${item}]
 
 
+Відкрити інформацію про вкладені файли вимоги
+    ${elements}=  Get Webelements  xpath=//a[contains(., 'Показати вкладені файли')]
+    ${count}=  Get_Length  ${elements}
+    :FOR  ${item}  In Range  0  ${count}
+    \  ${item}=  privatmarket_service.sum_of_numbers  ${item}  1
+    \  Click Element  xpath=(xpath=//a[contains(., 'Показати вкладені файли')])[${item}]
+
+
 Відкрити детальну інформацію по лотам
     #check if extra information is already opened
     ${element_class}=  Get Element Attribute  xpath=//li[contains(@ng-class, 'description')]@class
@@ -469,6 +479,24 @@ ${tender_data_feature.featureOf}  /../../../*[1]
     ${result_full}=  Get Text  ${element}
     ${result}=  Strip String  ${result_full}
     [Return]  ${result}
+
+
+Отримати інформацію із скарги
+    [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${field_name}  ${award_index}
+    ${element}=  Set Variable  xpath=//div[contains(@class, 'faq') and contains(., '${complaintID}')]${tender_data_complaint.${field_name}}
+    Wait For Element With Reload  ${element}  3
+    Wait Until Element Is Visible  ${element}  timeout=${COMMONWAIT}
+    ${result_full}=  Get Text  ${element}
+    ${result}=  Strip String  ${result_full}
+    [Return]  ${result}
+
+
+Отримати інформацію із документа до скарги
+    [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${doc_id}  ${field}
+
+
+
+
 
 
 Отримати документ до лоту
@@ -833,6 +861,7 @@ Try Search Element
     ...  '${tab_number}' == '1' and 'запитання на всі лоти' in '${TEST_NAME}'  Відкрити інформацію по запитанням на всі лоти
     ...  ELSE IF  '${tab_number}' == '1'  Відкрити детальну інформацію по позиціям
     ...  ELSE IF  '${tab_number}' == '2' and 'відповіді на запитання' in '${TEST_NAME}'  Wait Visibility And Click Element  css=.question-answer .question-expand-div>a:nth-of-type(1)
+    ...  ELSE IF  '${tab_number}' == '3' and 'заголовку документації' in '${TEST_NAME}'  Відкрити інформацію про вкладені файли вимоги
     Wait Until Element Is Enabled  ${locator}  10
     [Return]  True
 
