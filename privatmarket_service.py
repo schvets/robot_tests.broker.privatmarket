@@ -28,8 +28,8 @@ def get_currency_type(currency):
 
 
 def get_month_number(month_name):
-    monthes = [u"янв.", u"февр.", u"марта", u"апр.", u"мая", u"июня",
-               u"июля", u"авг.", u"сент.", u"окт.", u"нояб.", u"дек.",
+    monthes = [u"января", u"февраля", u"марта", u"апреля", u"мая", u"июня",
+               u"июля", u"августа", u"сентября", u"октября", u"ноября", u"декабря",
                u"січ.", u"лют.", u"бер.", u"квіт.", u"трав.", u"черв.",
                u"лип.", u"серп.", u"вер.", u"жовт.", u"лист.", u"груд.",
                u"січня", u"лютого", u"березня", u"квітня", u"травня", u"червня",
@@ -116,7 +116,8 @@ def get_classification_type(classifications):
     classifications_dictionary = {
         u'ДК 016:2010': u'ДКПП',
         u'ДК 021:2015': u'CPV',
-        u'ДК 18-2000': u'ДК018'
+        u'ДК 18-2000': u'ДК018',
+        u'ДК003: 2010': u'ДК003'
     }
     classifications_type = classifications_dictionary.get(classifications)
     if classifications_type:
@@ -143,10 +144,16 @@ def get_status_type(status_name):
         u'Завершено': 'complete',
         u'Отменено': 'cancelled',
         u'Відмінено': 'cancelled'
-                       }
+    }
     type_name = type_dictionary.get(status_name)
     return type_name
 
 
 def convert_float_to_string(number):
     return format(number, '.2f')
+
+
+def sum_of_numbers(number, value):
+    number = int(number) + int(value)
+    return number
+

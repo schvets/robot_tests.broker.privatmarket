@@ -37,6 +37,7 @@ ${tender_data_tenderPeriod.endDate}  xpath=(//span[contains(@ng-if, 'p.ed')])[2]
 ${tender_data_auctionPeriod.startDate}  xpath=(//span[@ng-if='p.bd'])[3]
 ${tender_data_minimalStep.amount}  css=div#lotMinStepAmount
 ${tender_data_documentation.title}  xpath=//div[@class='file-descriptor']/span[1]
+${tender_data_qualificationPeriod.endDate}  xpath=(//span[contains(@ng-if, 'p.ed')])[4]
 
 ${tender_data_item.description}  //div[@class='description']//span)
 ${tender_data_item.deliveryDate.startDate}  //div[@ng-if='adb.deliveryDate.startDate']/div[2])
@@ -71,10 +72,20 @@ ${tender_data_question.title}  //span[contains(@class, 'question-title')])
 ${tender_data_question.description}  //div[@class='question-div']/div[1])
 ${tender_data_question.answer}  //div[@class='question-div question-expanded']/div[1])
 
+${tender_data_lot_question.title}  //span[contains(@class, 'question-title')]
+${tender_data_lot_question.description}  //div[@class='question-div']/div[1]
+${tender_data_lot_question.answer}  //div[@class='question-div question-expanded']/div[1]
+
+${tender_data_feature.featureOf}  /../../../*[1]
+
+${tender_data_complaint.title}  //span[contains(@class, 'claimHead')]
+${tender_data_complaint.description}  //div[@class='question-div']
+
+
 *** Keywords ***
 Підготувати дані для оголошення тендера
     [Arguments]  ${username}  ${tender_data}  ${role_name}
-    ${tender_data.data}= 	Run Keyword If  'PrivatMarket_Owner' == '${username}'  privatmarket_service.modify_test_data  ${tender_data.data}
+    ${tender_data.data}=  Run Keyword If  'PrivatMarket_Owner' == '${username}'  privatmarket_service.modify_test_data  ${tender_data.data}
     ${adapted.data}=  privatmarket_service.modify_test_data  ${tender_data.data}
     [Return]  ${tender_data}
 
@@ -92,14 +103,14 @@ ${tender_data_question.answer}  //div[@class='question-div question-expanded']/d
     Call Method  ${chrome_options}  add_argument  --nativeEvents\=false
     Call Method  ${chrome_options}  add_experimental_option  prefs  ${prefs}
     Call Method  ${chrome_options}  add_argument  --user-data-dir\=/home/lugovskoy/.config/google-chrome/Default
-    #chrome://version
-    #Для Viewer'а нужен хром, т.к. на хром настроена автоматическая закачка файлов
-#   Run Keyword If  '${username}' == 'PrivatMarket_Viewer'  Create WebDriver  Chrome  chrome_options=${chrome_options}  alias=${username}
-#   Run Keyword If  '${username}' == 'PrivatMarket_Owner'  Create WebDriver  Firefox	alias=${username}
-#   Run Keyword If  '${username}' == 'PrivatMarket_Provider'  Create WebDriver  Firefox  chrome_options=${chrome_options}  alias=${username}
-#   Go To  ${USERS.users['${username}'].homepage}
 
-    Open Browser  ${USERS.users['${username}'].homepage}  ${browser}  alias=${username}
+    #Для Viewer'а нужен хром, т.к. на хром настроена автоматическая закачка файлов
+    Run Keyword If  '${username}' == 'PrivatMarket_Viewer'  Create WebDriver  Chrome  chrome_options=${chrome_options}  alias=${username}
+    Run Keyword If  '${username}' == 'PrivatMarket_Owner'  Create WebDriver  Chrome  chrome_options=${chrome_options}  alias=${username}
+    Run Keyword If  '${username}' == 'PrivatMarket_Provider'  Create WebDriver  Firefox  chrome_options=${chrome_options}  alias=${username}
+    Go To  ${USERS.users['${username}'].homepage}
+
+    #Open Browser  ${USERS.users['${username}'].homepage}  ${browser}  alias=${username}
     Set Window Size  @{USERS.users['${username}'].size}
     Set Selenium Implicit Wait  10s
     Login  ${username}
@@ -176,8 +187,8 @@ ${tender_data_question.answer}  //div[@class='question-div question-expanded']/d
     Wait Element Visibility And Input Text  ${locator_lotAdd.streetAddress}  ${tender_data.data.procuringEntity.address.streetAddress}
 
     #contactPoint
-    Wait Element Visibility And Input Text	css=input[data-id='name']	${tender_data.data.procuringEntity.contactPoint.name}
-    ${modified_phone}=  Remove String  ${tender_data.data.procuringEntity.contactPoint.telephone}	${SPACE}
+    Wait Element Visibility And Input Text  css=input[data-id='name']  ${tender_data.data.procuringEntity.contactPoint.name}
+    ${modified_phone}=  Remove String  ${tender_data.data.procuringEntity.contactPoint.telephone}  ${SPACE}
     ${modified_phone}=  Remove String  ${modified_phone}  -
     ${modified_phone}=  Remove String  ${modified_phone}  (
     ${modified_phone}=  Remove String  ${modified_phone}  )
@@ -206,7 +217,7 @@ ${tender_data_question.answer}  //div[@class='question-div question-expanded']/d
 
 #step 5
     Wait Until Element Is Visible  css=section[data-id='step5']  ${COMMONWAIT}
-    Wait Until Element Is Enabled  ${locator_tenderCreation.buttonSend}  ${COMMONWAIT}
+    Sleep  3s
     Wait Visibility And Click Element  ${locator_tenderCreation.buttonSend}
     Close Confirmation In Editor  Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.
     Switch To PMFrame
@@ -221,13 +232,13 @@ ${tender_data_question.answer}  //div[@class='question-div question-expanded']/d
     Switch To PMFrame
 
     : FOR    ${index}    IN RANGE    0    ${lots_count}
-    \    Wait Element Visibility And Input Text	css=input[data-id='title']  ${lots[${index}].title}
-    \    Wait Element Visibility And Input Text	css=textarea[data-id='description']  ${lots[${index}].description}
+    \    Wait Element Visibility And Input Text  css=input[data-id='title']  ${lots[${index}].title}
+    \    Wait Element Visibility And Input Text  css=textarea[data-id='description']  ${lots[${index}].description}
     \    ${value_amount}=  privatmarket_service.convert_float_to_string  ${lots[${index}].value.amount}
     \    ${minimalStep_amount}=  Convert to String  ${lots[${index}].minimalStep.amount}
     \    Wait Element Visibility And Input Text  css=input[data-id='valueAmount']  ${value_amount}
     \    Sleep  3s
-    \    Wait Element Visibility And Input Text	css=input[data-id='minimalStepAmount']  ${minimalStep_amount}
+    \    Wait Element Visibility And Input Text  css=input[data-id='minimalStepAmount']  ${minimalStep_amount}
     \    Wait Visibility And Click Element  css=div.lot-guarantee label
     \    Wait Element Visibility And Input Text  css=input[data-id='guaranteeAmount']  1
 
@@ -244,7 +255,7 @@ ${tender_data_question.answer}  //div[@class='question-div question-expanded']/d
     \    ${deliveryStartDate}=  Get Regexp Matches  ${items[${index}].deliveryDate.startDate}  (\\d{4}-\\d{2}-\\d{2})
     \    ${deliveryStartDate}=  Convert Date  ${deliveryStartDate[0]}  result_format=%d-%m-%Y
     \    ${deliveryEndDate}=  Get Regexp Matches  ${items[${index}].deliveryDate.endDate}  (\\d{4}-\\d{2}-\\d{2})
-    \    ${deliveryEndDate}=  Convert Date	${deliveryEndDate[0]}  result_format=%d-%m-%Y
+    \    ${deliveryEndDate}=  Convert Date  ${deliveryEndDate[0]}  result_format=%d-%m-%Y
     \    Wait Visibility And Click Element  xpath=//input[contains(@ng-model, 'item.adressTypeMode')][1]
     \    Wait Element Visibility And Input Text  ${locator_lotAdd.postalCode}  ${items[${index}].deliveryAddress.postalCode}
     \    Wait Element Visibility And Input Text  ${locator_lotAdd.countryName}  ${items[${index}].deliveryAddress.countryName}
@@ -271,6 +282,10 @@ ${tender_data_question.answer}  //div[@class='question-div question-expanded']/d
     Wait For Element With Reload  ${locator_tenderClaim.buttonCreate}  1
     Switch To PMFrame
     Wait Visibility And Click Element  ${locator_tenderClaim.buttonCreate}
+    #Switch To PMFrame
+    Sleep  4s
+    Unselect Frame
+    Wait Visibility And Click Element  css=.modal.in .popup-close
     Switch To PMFrame
     Wait Element Visibility And Input Text  css=textarea[data-id='procurementDescription']  ${value}
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
@@ -279,15 +294,15 @@ ${tender_data_question.answer}  //div[@class='question-div question-expanded']/d
     Wait Visibility And Click Element  ${locator_tenderCreation.buttonSend}
 
     #Дождемся подтверждения и обновим страницу, поскольку тут не выходит его закрыть
-    Wait Until Element Is Visible	css=div.modal-body.info-div	${COMMONWAIT}
-    Wait Until Element Contains	css=div.modal-body.info-div  Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.  ${COMMONWAIT}
+    Wait Until Element Is Visible  css=div.modal-body.info-div  ${COMMONWAIT}
+    Wait Until Element Contains  css=div.modal-body.info-div  Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.  ${COMMONWAIT}
     Reload Page
 
 
 Завантажити документ
     [Arguments]  ${user_name}  ${filepath}  ${tenderId}
     #перейдем к редактированию
-    Wait For Element With Reload  ${locator_tenderClaim.buttonCreate}	1
+    Wait For Element With Reload  ${locator_tenderClaim.buttonCreate}  1
     Wait Visibility And Click Element  ${locator_tenderClaim.buttonCreate}
 
     #откроем нужную вкладку
@@ -319,18 +334,45 @@ ${tender_data_question.answer}  //div[@class='question-div question-expanded']/d
     Switch To PMFrame
     Wait Until Element Is Visible  ${tender_data_title}  ${COMMONWAIT}
 
-    Відкрити детальну інформацию по позиціям
+    Відкрити детальну інформацію по позиціям
 
     #get information
     ${result}=  Отримати інформацію зі сторінки  ${tender_uaid}  ${field_name}
     [Return]  ${result}
 
 
-Відкрити детальну інформацию по позиціям
+Відкрити детальну інформацію по позиціям
+    Відкрити детальну інформацію по лотам
+    ${elements}=  Get Webelements  css=.lot-info .description a
+    ${count}=  Get_Length  ${elements}
+    :FOR  ${item}  In Range  0  ${count}
+    \  ${item}=  privatmarket_service.sum_of_numbers  ${item}  1
+    \  ${class}=  Get Element Attribute  xpath=(//div[@class='lot-info']//div[@class='description']/a)[${item}]@class
+    \  Run Keyword Unless  'checked-item' in '${class}'  Click Element  xpath=(//div[@class='lot-info']//div[@class='description']/a)[${item}]
+
+
+Відкрити інформацію по запитанням на всі лоти
+    ${elements}=  Get Webelements  xpath=//li[contains(@ng-class, 'lot-faq')]
+    ${count}=  Get_Length  ${elements}
+    :FOR  ${item}  In Range  0  ${count}
+    \  ${item}=  privatmarket_service.sum_of_numbers  ${item}  1
+    \  ${class}=  Get Element Attribute  xpath=(//li[contains(@ng-class, 'lot-faq')])[${item}]@class
+    \  Run Keyword Unless  'checked-item' in '${class}'  Click Element  xpath=(//li[contains(@ng-class, 'lot-faq')])[${item}]
+    \  Run Keyword If  'відповіді на запитання' in '${TEST_NAME}'  Wait Visibility And Click Element  xpath=(//div[contains(@class, 'question-answer')]//div[contains(@class, 'question-expand-div')]/a[1])[${item}]
+
+
+Відкрити інформацію про вкладені файли вимоги
+    ${elements}=  Get Webelements  xpath=//a[contains(., 'Показати вкладені файли')]
+    ${count}=  Get_Length  ${elements}
+    :FOR  ${item}  In Range  0  ${count}
+    \  ${item}=  privatmarket_service.sum_of_numbers  ${item}  1
+    \  Click Element  xpath=(xpath=//a[contains(., 'Показати вкладені файли')])[${item}]
+
+
+Відкрити детальну інформацію по лотам
     #check if extra information is already opened
     ${element_class}=  Get Element Attribute  xpath=//li[contains(@ng-class, 'description')]@class
     Run Keyword IF  'checked-nav' in '${element_class}'  Return From Keyword  True
-
     Wait Visibility And Click Element  xpath=//li[contains(@ng-class, 'description')]
     Wait Until Element Is Visible  xpath=//section[@class='description marged ng-binding']  ${COMMONWAIT}
 
@@ -343,9 +385,10 @@ ${tender_data_question.answer}  //div[@class='question-div question-expanded']/d
     Run Keyword And Return If  '${field_name}' == 'enquiryPeriod.startDate'  Отримати дату та час  ${field_name}  1
     Run Keyword And Return If  '${field_name}' == 'enquiryPeriod.endDate'  Отримати дату та час  ${field_name}  1
     Run Keyword And Return If  '${field_name}' == 'tenderPeriod.startDate'  Отримати дату та час  ${field_name}  1
-    Run Keyword And Return If  '${field_name}' == 'tenderPeriod.endDate'  Отримати дату та час	${field_name}  1
+    Run Keyword And Return If  '${field_name}' == 'tenderPeriod.endDate'  Отримати дату та час  ${field_name}  1
     Run Keyword And Return If  '${field_name}' == 'minimalStep.amount'  Convert Amount To Number  ${field_name}
-    Run Keyword And Return If  '${field_name}' == 'status'  Отримати інформацію з ${field_name}	${field_name}
+    Run Keyword And Return If  '${field_name}' == 'status'  Отримати інформацію з ${field_name}  ${field_name}
+    Run Keyword And Return If  '${field_name}' == 'qualificationPeriod.endDate'  Отримати дату та час  ${field_name}  1
 
     Wait Until Element Is Visible  ${tender_data_${field_name}}  ${COMMONWAIT}
     ${result_full}=  Get Text  ${tender_data_${field_name}}
@@ -398,8 +441,15 @@ ${tender_data_question.answer}  //div[@class='question-div question-expanded']/d
 
 Отримати інформацію із запитання
     [Arguments]  ${username}  ${tender_uaid}  ${question_id}  ${field_name}
-    ${element}=  Set Variable  xpath=(//div[contains(@class, 'faq') and contains(., '${question_id}')]${tender_data_question.${field_name}}
-    Wait For Element With Reload  ${element}  2
+
+    ${element}=  Set Variable If
+    ...  'запитання на тендер' in '${TEST_NAME}'  xpath=(//div[contains(@class, 'faq') and contains(., '${question_id}')]${tender_data_question.${field_name}}
+    ...  'запитання на всі лоти' in '${TEST_NAME}'  xpath=//div[contains(@class, 'lot-info') and contains(., '${question_id}')]${tender_data_lot_question.${field_name}}
+
+    Run Keyword If
+    ...  'запитання на тендер' in '${TEST_NAME}'  Wait For Element With Reload  ${element}  2
+    ...  ELSE  Wait For Element With Reload  ${element}  1
+
     ${result_full}=  Get Text  ${element}
     ${result}=  Strip String  ${result_full}
     [Return]  ${result}
@@ -407,19 +457,61 @@ ${tender_data_question.answer}  //div[@class='question-div question-expanded']/d
 
 Отримати інформацію із документа
     [Arguments]  ${username}  ${tender_uaid}  ${doc_id}  ${field}
-    Wait For Element With Reload  ${tender_data_documentation.${field}}  1
-    Wait Until Element Is Visible  ${tender_data_documentation.${field}}  ${COMMONWAIT}
-    ${result}=  Get Text  ${tender_data_documentation.${field}}
+    Wait For Element With Reload  xpath=//div[@class='file-descriptor']/span[contains(., '${doc_id}')]  1
+    Wait Until Element Is Visible  xpath=//div[@class='file-descriptor']/span[contains(., '${doc_id}')]  ${COMMONWAIT}
+    ${result}=  Get Text  xpath=//div[@class='file-descriptor']/span[contains(., '${doc_id}')]
     [Return]  ${result}
 
 
+Отримати інформацію із нецінового показника
+    [Arguments]  ${username}  ${tender_uaid}  ${object_id}  ${field_name}
+    Відкрити детальну інформацію по позиціям
+
+    ${element}=  Set Variable IF
+        ...  '${field_name}' == 'featureOf'  xpath=//div[contains(@class, 'feature name') and contains(., '${object_id}')]${tender_data_feature.${field_name}}
+        ...  xpath=//div[contains(@class, 'feature name') and contains(., '${object_id}')]
+
+    Run Keyword And Return If  '${field_name}' == 'title'  Отримати інформацію з feature  ${element}  0
+    Run Keyword And Return If  '${field_name}' == 'description'  Отримати інформацію з feature  ${element}  1
+    Run Keyword And Return If  '${field_name}' == 'featureOf'  Отримати інформацію з ${field_name}  ${element}
+
+    Wait Until Element Is Visible  ${element}  timeout=${COMMONWAIT}
+    ${result_full}=  Get Text  ${element}
+    ${result}=  Strip String  ${result_full}
+    [Return]  ${result}
+
+
+Отримати інформацію із скарги
+    [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${field_name}  ${award_index}
+    ${element}=  Set Variable  xpath=//div[contains(@class, 'faq') and contains(., '${complaintID}')]${tender_data_complaint.${field_name}}
+    Wait For Element With Reload  ${element}  3
+    Wait Until Element Is Visible  ${element}  timeout=${COMMONWAIT}
+    ${result_full}=  Get Text  ${element}
+    ${result}=  Strip String  ${result_full}
+    [Return]  ${result}
+
+
+Отримати інформацію із документа до скарги
+    [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${doc_id}  ${field}
+
+
+
+
+
+
+Отримати документ до лоту
+    [Arguments]  ${username}  ${tender_uaid}  ${lot_id}  ${doc_id}
+    ${file_name}=  privatmarket.Отримати документ  ${username}  ${tender_uaid}  ${doc_id}
+    [Return]  ${file_name}
+
 Отримати документ
     [Arguments]  ${username}  ${tender_uaid}  ${doc_id}
-    Wait For Element With Reload  ${tender_data_documentation.title}  1
-    Wait Visibility And Click Element  ${tender_data_documentation.title}
+    Wait For Element With Reload  xpath=//div[@class='file-descriptor']/span[contains(., '${doc_id}')]  1
+    Scroll Page To Element  xpath=//div[@class='file-descriptor']/span[contains(., '${doc_id}')]
+    Wait Visibility And Click Element  xpath=//div[@class='file-descriptor']/span[contains(., '${doc_id}')]
     # Добален слип, т.к. док не успевал загрузиться
     sleep  20s
-    ${file_name_full}=  Get Text  ${tender_data_documentation.title}
+    ${file_name_full}=  Get Text  xpath=//div[@class='file-descriptor']/span[contains(., '${doc_id}')]
     ${file_name}=  Strip String  ${file_name_full}
     [Return]  ${file_name}
 
@@ -444,9 +536,9 @@ ${tender_data_question.answer}  //div[@class='question-div question-expanded']/d
     Wait Visibility And Click Element  id=btnSendAnswer
     Wait For Notification  Ваша відповідь успішно відправлена!
     Wait Visibility And Click Element  css=span[ng-click='act.hideModal()']
-    Wait Until Element Is Not Visible  id=questionAnswer	timeout=20
+    Wait Until Element Is Not Visible  id=questionAnswer  timeout=20
     #этот слип нужен, т.к. нет синхронизации и квинта ищет ответ в следующем тесте... а его нет пока не синхранизируемся
-    Sleep	90s
+    Sleep  90s
 
 
 Отримати інформацію з value.currency
@@ -465,7 +557,7 @@ ${tender_data_question.answer}  //div[@class='question-div question-expanded']/d
         ...  ${tender_data_${element_name}}
 
     ${value_added_tax_included}=  Get text  ${element}
-    ${result}=	Set Variable If  'з ПДВ' in '${value_added_tax_included}'  True
+    ${result}=  Set Variable If  'з ПДВ' in '${value_added_tax_included}'  True
     ${result}=  Convert To Boolean  ${result}
     [Return]  ${result}
 
@@ -486,7 +578,7 @@ ${tender_data_question.answer}  //div[@class='question-div question-expanded']/d
         ...  ${tender_data_${element_name}}
 
     ${value_added_tax_included}=  Get text  ${element}
-    ${result}=	Set Variable If  'з ПДВ' in '${value_added_tax_included}'  True
+    ${result}=  Set Variable If  'з ПДВ' in '${value_added_tax_included}'  True
     ${result}=  Convert To Boolean  ${result}
     [Return]  ${result}
 
@@ -543,6 +635,28 @@ ${tender_data_question.answer}  //div[@class='question-div question-expanded']/d
     [Return]  ${status_type}
 
 
+Отримати інформацію з feature
+    [Arguments]  ${element}  ${id}
+    Wait For Element With Reload  ${element}  1
+    ${result_full}=  Отримати текст елемента  ${element}
+    ${result_full}=  Strip String  ${result_full}
+    ${values_list}=  Split String  ${result_full}  \n
+    ${result}=  Set Variable  ${values_list[${id}]}
+    [Return]  ${result}
+
+
+Отримати інформацію з featureOf
+    [Arguments]  ${element}
+    ${text}=  Отримати текст елемента  ${element}
+    ${result}=  Set Variable If
+    ...  'по закупівлі' in '${text}'  tenderer
+    ...  'по позиції' in '${text}'  item
+    ...  'по лоту' in '${text}'  lot
+    [Return]  ${result}
+
+
+
+
 Отримати строку
     [Arguments]  ${element_name}  ${position_number}
     ${result_full}=  Отримати текст елемента  ${element_name}
@@ -561,13 +675,14 @@ ${tender_data_question.answer}  //div[@class='question-div question-expanded']/d
         ...  'css=' in '${temp_name}' or 'xpath=' in '${temp_name}'  ${element_name}
         ...  ${tender_data_${element_name}}
 
-    Wait Until Element Is Visible  ${element}
+    Wait Until Element Is Visible  ${element}  ${COMMONWAIT}
     ${result_full}=  Get Text  ${element}
     [Return]  ${result_full}
 
 
 Отримати дату та час
     [Arguments]  ${element_name}  ${shift}
+    Run Keyword If  'періоду блокування' in '${TEST_NAME}'  Wait For Element With Reload  ${tender_data_${element_name}}  1
     ${result_full}=  Отримати текст елемента  ${element_name}
     ${work_string}=  Replace String  ${result_full}  ${SPACE},${SPACE}  ${SPACE}
     ${work_string}=  Replace String  ${result_full}  ,${SPACE}  ${SPACE}
@@ -600,9 +715,9 @@ ${tender_data_question.answer}  //div[@class='question-div question-expanded']/d
 
 Отримати класифікацію
     [Arguments]  ${element_name}
-    ${result_full} =  Отримати текст елемента	${element_name}
+    ${result_full} =  Отримати текст елемента  ${element_name}
     ${reg_expresion} =  Set Variable  [0-9A-zА-Яа-яёЁЇїІіЄєҐґ\\s\\:]+\: \\w+[\\d\\.\\-]+ ([А-Яа-яёЁЇїІіЄєҐґ\\s;,\\"_\\(\\)\\.]+)
-    ${result} =  Get Regexp Matches	${result_full}	${reg_expresion}  1
+    ${result} =  Get Regexp Matches  ${result_full}  ${reg_expresion}  1
     [Return]  ${result[0]}
 
 
@@ -647,7 +762,7 @@ Close notification
 
 
 Switch To PMFrame
-    Sleep  4s
+    Sleep  5s
     Unselect Frame
     Wait Until Element Is Visible  id=tenders  ${COMMONWAIT}
     Switch To Frame  id=tenders
@@ -682,7 +797,7 @@ Wait Element Visibility And Input Text
 
 
 Wait For Tender
-    [Arguments]	${tender_id}  ${education_type}
+    [Arguments]  ${tender_id}  ${education_type}
     Wait Until Keyword Succeeds  10min  5s  Try Search Tender  ${tender_id}  ${education_type}
 
 
@@ -697,10 +812,10 @@ Try Search Tender
     Input Text  ${locator_tenderSearch.searchInput}  ${tender_id}
 
     #выполним поиск
-    Click Element	css=button#search-query-button
+    Click Element  css=button#search-query-button
     Wait Until Element Is Not Visible  xpath=//div[@class='ajax_overflow']  ${COMMONWAIT}
-    Wait Until Element Is Enabled	id=${tender_id}	timeout=10
-    [Return]	True
+    Wait Until Element Is Enabled  id=${tender_id}  timeout=10
+    [Return]  True
 
 
 Check Current Mode New Realisation
@@ -710,7 +825,7 @@ Check Current Mode New Realisation
     #проверим правильный ли режим
     Wait Until Element Is Visible  ${locator_tender.switchToDemo}  ${COMMONWAIT}
     ${check_result}=  Get Text  ${locator_tender.switchToDemo}
-    Run Keyword If  '${check_result}' == 'Увійти в демо-режим'  Switch To Education Mode
+    Run Keyword If  '${check_result}' == 'Увійти в демо-режим' or '${check_result}' == 'Войти в демо-режим'  Switch To Education Mode
 
 
 Switch To Education Mode
@@ -742,7 +857,11 @@ Wait For Element With Reload
 Try Search Element
     [Arguments]  ${locator}  ${tab_number}
     Reload And Switch To Tab  ${tab_number}
-    Run Keyword If  'відповіді на запитання' in '${TEST_NAME}' and '${tab_number}' == '2'  Wait Visibility And Click Element  css=.question-answer .question-expand-div>a:nth-of-type(1)
+    Run Keyword If
+    ...  '${tab_number}' == '1' and 'запитання на всі лоти' in '${TEST_NAME}'  Відкрити інформацію по запитанням на всі лоти
+    ...  ELSE IF  '${tab_number}' == '1'  Відкрити детальну інформацію по позиціям
+    ...  ELSE IF  '${tab_number}' == '2' and 'відповіді на запитання' in '${TEST_NAME}'  Wait Visibility And Click Element  css=.question-answer .question-expand-div>a:nth-of-type(1)
+    ...  ELSE IF  '${tab_number}' == '3' and 'заголовку документації' in '${TEST_NAME}'  Відкрити інформацію про вкладені файли вимоги
     Wait Until Element Is Enabled  ${locator}  10
     [Return]  True
 
@@ -794,6 +913,7 @@ Close Confirmation In Editor
     [Arguments]  ${confirmation_text}
     Wait Until Element Is Visible  css=div.modal-body.info-div  ${COMMONWAIT}
     Wait Until Element Contains  css=div.modal-body.info-div  ${confirmation_text}  ${COMMONWAIT}
+    Sleep  2s
     Wait Visibility And Click Element  css=button[ng-click='close()']
     Wait Until Element Is Not Visible  css=div.modal-body.info-div  ${COMMONWAIT}
 
@@ -803,3 +923,12 @@ Wait For Notification
     Wait Until Element Is Enabled  xpath=//div[@class='alert-info ng-scope ng-binding']  timeout=${COMMONWAIT}
     Wait Until Element Contains  xpath=//div[@class='alert-info ng-scope ng-binding']  ${message_text}  timeout=10
 
+
+Scroll Page To Element
+    [Arguments]  ${locator}
+    ${temp}=  Remove String  ${locator}  '
+    ${cssLocator}=  Run Keyword If  'css' in '${temp}'  Get Substring  ${locator}  4
+    ...  ELSE  Get Substring  ${locator}  6
+    ${js_expresion}=  Run Keyword If  'css' in '${temp}'  Convert To String  return window.$("${cssLocator}")[0].scrollIntoView()
+    ...  ELSE  Convert To String  return window.$x("${cssLocator}")[0].scrollIntoView()
+    Sleep  2s
