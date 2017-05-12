@@ -45,3 +45,16 @@ def get_month_number(month_name):
                u"July", u"August", u"September", u"October", u"November", u"December"]
     return monthes.index(month_name) % 12 + 1
 
+def get_status_type(status_name):
+    type_dictionary = {
+        u'Період уточнень та пропозицій': 'active.enquiries',
+        u'Період уточнень та пропозицій завершено': 'active.enquiries.ended',
+        u'Аукіон': 'active.auction',
+        u'Визначення переможця': 'active.qualification',
+        u'Пропозиції розглянуті': 'active.awarded',
+        u'Закупівля не відбулась': 'unsuccessful',
+        u'Завершено': 'complete',
+        u'Відмінено': 'cancelled',
+    }
+    type_name = type_dictionary.get(status_name)
+    return type_name
