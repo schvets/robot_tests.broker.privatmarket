@@ -9,8 +9,9 @@ from pytz import timezone
 def modify_test_data(initial_data):
     #set user name
     # initial_data['procuringEntity']['name'] = u'Товариство З Обмеженою Відповідальністю \'Мак Медіа Прінт\''
-    initial_data['procuringEntity']['name'] = u'Товариство З Обмеженою Відповідальністю \'Сільськогосподарська Фірма \'Рубіжне\''
+    #initial_data['procuringEntity']['name'] = u'Товариство З Обмеженою Відповідальністю \'Сільськогосподарська Фірма \'Рубіжне\''
     # initial_data['procuringEntity']['name'] = u'Макстрой Діск, Товариство З Обмеженою Відповідальністю'
+    initial_data['procuringEntity']['name'] = u'ФОП Оганін Олександр Петрович'
     return initial_data
 
 
@@ -100,6 +101,34 @@ def get_unit_name(current_name):
         u'блок': {u'блок', u'блока', u'блоков'}
     }
 
+
+def get_unit_name_ru(current_name):
+    if isinstance(current_name, str):
+        current_name = current_name.decode("utf-8")
+    dictionary = {
+        u'килограмм': {u'килограмм', u'килограмма', u'килограммов', u'кілограми'},
+        u'пара': {u'пара', u'пары', u'пар'},
+        u'литр': {u'литр', u'литра', u'литров'},
+        u'набор': {u'набір', u'набора', u'наборов'},
+        u'пачек': {u'пачка', u'пачек', u'пачки'},
+        u'метр': {u'метр', u'метра', u'метров'},
+        u'лот': {u'лот', u'лоты', u'лотов'},
+        u'услуга': {u'услуга', u'услуг', u'услуги'},
+        u'метр .куб.': {u'метр кубический', u'метра кубического', u'метров кубических'},
+        u'ящик': {u'ящик', u'ящика', u'ящиков'},
+        u'рейс': {u'рейс', u'рейса', u'рейсов'},
+        u'тонны': {u'тонна', u'тонны', u'тонн'},
+        u'метр квадратный': {u'метр квадратный', u'метра квадратного', u'метров квадратных'},
+        u'километры': {u'километр', u'километров', u'километра'},
+        u'штука': {u'штука', u'штуки', u'штук'},
+        u'месяц': {u'месяц', u'месяца', u'месяцев'},
+        u'пачка': {u'пачка', u'пачек', u'пачкики'},
+        u'упаковка': {u'упаковка', u'упаковок', u'упаковки'},
+        u'гектар': {u'гектар', u'гектара', u'гектаров'},
+        u'блок': {u'блок', u'блока', u'блоков'}
+    }
+
+
     expected_name = None
     dictionary.get(current_name)
     for name, variants in dictionary.iteritems():
@@ -143,7 +172,9 @@ def get_status_type(status_name):
         u'Закупівля не відбулась': 'unsuccessful',
         u'Завершено': 'complete',
         u'Отменено': 'cancelled',
-        u'Відмінено': 'cancelled'
+        u'Відмінено': 'cancelled',
+        u'Розглядається': 'pending',
+        u'Кваліфікація учасника': 'active.pre-qualification'
     }
     type_name = type_dictionary.get(status_name)
     return type_name
@@ -157,3 +188,7 @@ def sum_of_numbers(number, value):
     number = int(number) + int(value)
     return number
 
+
+def get_percent(value):
+    value = value * 100
+    return format(value, '.0f')
