@@ -369,19 +369,14 @@ ${tender_data_complaint.description}  //div[@class='question-div']
     Wait For Element With Reload  ${locator_tenderClaim.buttonCreate}  1
     Switch To PMFrame
     Wait Visibility And Click Element  ${locator_tenderClaim.buttonCreate}
-    #Switch To PMFrame
     Switch To PMFrame
     Wait Element Visibility And Input Text  css=textarea[data-id='procurementDescription']  ${value}
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
     Wait Until Element Is Visible  css=section[data-id='step2']  ${COMMONWAIT}
     Wait Visibility And Click Element  css=#tab_4 a
     Wait Visibility And Click Element  ${locator_tenderCreation.buttonSend}
-#    Sleep  4s
-#    Wait Until Element Is Visible  css=div.modal-body.info-div  ${COMMONWAIT}
-#    Wait Until Element Contains  css=div.modal-body.info-div  Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.  ${COMMONWAIT}
-#    Wait For Ajax
-#    Reload Page
     Close Confirmation In Editor  Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.
+#    Sleep  120s
 
 
 Змінити лот
@@ -394,7 +389,8 @@ ${tender_data_complaint.description}  //div[@class='question-div']
     Wait Visibility And Click Element  ${locator_tenderClaim.buttonCreate}
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
-    Wait Until Element Is Visible  css=section[data-id='step3']  ${COMMONWAIT}
+    Wait For Ajax
+    Sleep  1s
     Wait Visibility And Click Element  css=#tab_4 a
     Wait Visibility And Click Element  ${locator_tenderCreation.buttonSend}
 #    Sleep  4s
@@ -549,6 +545,34 @@ ${tender_data_complaint.description}  //div[@class='question-div']
     Sleep  180s
 
 
+Завантажити документ у кваліфікацію
+    [Arguments]  ${user_name}  ${filepath}  ${tenderId}  ${bid_index}
+    Wait Until Element Is Visible  xpath=//li[contains(@ng-class, 'lot-parts')]
+    ${class}=  Get Element Attribute  xpath=//li[contains(@ng-class, 'lot-parts')]@class
+    Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=//li[contains(@ng-class, 'lot-parts')]
+
+    ${index}=  privatmarket_service.sum_of_numbers  ${bid_index}  1
+    Wait Visibility And Click Element  xpath=(//a[@ng-click='act.openQualification(q)'])[${index}]
+    Wait For Ajax
+    Sleep  1s
+    #Wait Visibility And Click Element  xpath=//form[@name='fileForm']/select[1]/option[text()='Отчет об оценке']
+    Wait Visibility And Click Element  xpath=//form[@name='fileForm']/select[1]/option[text()='Уведомления о решении']
+    Sleep  1s
+    Wait Visibility And Click Element  xpath=//form[@name='fileForm']/select[2]/option[@value='en']
+    Sleep  1s
+    Choose File  css=#inputFile  ${filePath}
+    Sleep  5s
+
+
+Підтвердити кваліфікацію
+    [Arguments]  ${user_name}  ${tenderId}  ${bid_index}
+    Wait Visibility And Click Element  css=#chkSelfQualified
+    Wait Visibility And Click Element  css=#chkSelfEligible
+    Wait Until Element Is Enabled  xpath=//button[@ng-click="act.setQualificationStatus('active')"]
+    Wait Visibility And Click Element  xpath=//button[@ng-click="act.setQualificationStatus('active')"]
+    Wait Until Element Is Visible  css=.notify
+
+
 Отримати інформацію із тендера
     [Arguments]  ${user_name}  ${tender_uaid}  ${field_name}
     Switch To PMFrame
@@ -599,6 +623,8 @@ ${tender_data_complaint.description}  //div[@class='question-div']
 
 Отримати інформацію зі сторінки
     [Arguments]  ${base_tender_uaid}  ${field_name}
+    Run Keyword And Return If  'статусу першої пропозиції кваліфікації' in '${TEST_NAME}'  Отримати статус пропозиції кваліфікації  1
+    Run Keyword And Return If  'статусу другої пропозиції кваліфікації' in '${TEST_NAME}'  Отримати статус пропозиції кваліфікації  2
     Run Keyword And Return If  '${field_name}' == 'value.amount'  Convert Amount To Number  ${field_name}
     Run Keyword And Return If  '${field_name}' == 'value.currency'  Отримати інформацію з ${field_name}  ${field_name}
     Run Keyword And Return If  '${field_name}' == 'value.valueAddedTaxIncluded'  Отримати інформацію з ${field_name}  ${field_name}
@@ -715,8 +741,15 @@ ${tender_data_complaint.description}  //div[@class='question-div']
     [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${doc_id}  ${field}
 
 
-
-
+Отримати статус пропозиції кваліфікації
+    [Arguments]  ${item}
+    Wait Until Element Is Visible  xpath=//li[contains(@ng-class, 'lot-parts')]
+    ${class}=  Get Element Attribute  xpath=//li[contains(@ng-class, 'lot-parts')]@class
+    Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=//li[contains(@ng-class, 'lot-parts')]
+    Wait Until Element Is Visible  css=.bids>tbody>tr:nth-of-type(${item})>td:nth-of-type(3)  timeout=${COMMONWAIT}
+    ${result_full}=  Get Text  css=.bids>tbody>tr:nth-of-type(${item})>td:nth-of-type(3)
+    ${result}=  Strip String  ${result_full}
+    [Return]  ${result}
 
 
 Отримати документ до лоту
@@ -1154,6 +1187,7 @@ Close Confirmation In Editor
     Wait Until Element Contains  css=div.modal-body.info-div  ${confirmation_text}  ${COMMONWAIT}
     Sleep  2s
     Wait Visibility And Click Element  css=button[ng-click='close()']
+    Sleep  1s
     Wait Until Element Is Not Visible  css=div.modal-body.info-div  ${COMMONWAIT}
 
 

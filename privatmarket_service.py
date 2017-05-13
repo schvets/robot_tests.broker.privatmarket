@@ -172,7 +172,9 @@ def get_status_type(status_name):
         u'Закупівля не відбулась': 'unsuccessful',
         u'Завершено': 'complete',
         u'Отменено': 'cancelled',
-        u'Відмінено': 'cancelled'
+        u'Відмінено': 'cancelled',
+        u'Розглядається': 'pending',
+        u'Кваліфікація учасника': 'active.pre-qualification'
     }
     type_name = type_dictionary.get(status_name)
     return type_name
