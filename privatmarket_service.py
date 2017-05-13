@@ -52,7 +52,7 @@ def get_status_type(status_name):
         u'Період прийому пропозицій': 'active.tendering',
         u'Період уточнень та пропозицій завершено': 'active.enquiries.ended',
         u'Аукіон': 'active.auction',
-        u'Кваліфікація': 'ctive.qualification',
+        u'Кваліфікація': 'active.qualification',
         u'Визначення переможця': 'active.qualification',
         u'Пропозиції розглянуті': 'active.awarded',
         u'Оплачено, очікується підписання договору': 'active.awarded',
