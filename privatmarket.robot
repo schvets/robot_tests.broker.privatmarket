@@ -69,7 +69,7 @@ ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 	[Arguments]  ${username}  ${tender_data}  ${role_name}
 	Run Keyword If	'${role_name}' != 'tender_owner'	Return From Keyword	${tender_data}
 	${tender_data.data} = 	modify_test_data	${tender_data.data}
-	[return]	${tender_data}
+	[Return]	${tender_data}
 
 
 Підготувати клієнт для користувача
@@ -288,7 +288,8 @@ ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 
 Отримати інформацію із тендера
 	[Arguments]  ${user_name}  ${tender_id}  ${element}
-	Run Keyword And Return If	'${element}' == 'status'								Отримати status аукціону					${element}
+#	Run Keyword And Return If	'${element}' == 'status'  Отримати status аукціону  ${element}
+	Run Keyword And Return If  '${element}' == 'status'  Отримати інформацію з status  ${element}
 	Run Keyword And Return If	'${element}' == 'value.amount'							Отримати число								${element}
 	Run Keyword And Return If	'${element}' == 'value.valueAddedTaxIncluded'			Отримати інформацію про включення ПДВ		${element}
 	Run Keyword And Return If	'${element}' == 'minimalStep.amount'					Отримати число								${element}
@@ -392,7 +393,7 @@ Wait for question
 	Wait Until Element Is Visible	${selector}
 	${result_full} =				Get Text		${selector}
 	${result_full} =				Strip String	${result_full}
-	[return]	${result_full}
+	[Return]	${result_full}
 
 
 Отримати документ
@@ -402,28 +403,28 @@ Wait for question
 	${file_url} =	Get Element Attribute	${doc}@url
 	download_file_from_url  ${file_url}  ${OUTPUT_DIR}${/}${file_name}
 	Sleep	5s
-	[return]	${file_name}
+	[Return]	${file_name}
 
 
 Отримати текст
 	[Arguments]  ${element_name}
 	${result_full} =				Get Text		${tender_data.${element_name}}
 	${result} =						Strip String	${result_full}
-	[return]	${result}
+	[Return]	${result}
 
 
 Отримати число
 	[Arguments]  ${element_name}
 	${value}=	Отримати текст елемента		${element_name}
 	${result}=	Convert To Number	${value}
-	[return]	${result}
+	[Return]	${result}
 
 
 Отримати значення поля Лоти виставляються
 	[Arguments]  ${element_name}
 	${result}=	Get Element Attribute	css=span[tid='data.tenderAttempts']@tidvalue
 	${result}=	Convert To Integer	${result}
-	[return]	${result}
+	[Return]	${result}
 
 
 Отримати дату та час
@@ -437,14 +438,14 @@ Wait for question
 	${year} =	get_current_year
 	${result_full} =	Set Variable	${day}-${month}-${year} ${result_full[2]}
 	${result} = 		get_time_with_offset	${result_full}
-	[return]	${result}
+	[Return]	${result}
 
 
 Отримати інформацію про включення ПДВ
 	[Arguments]  ${element_name}
 	${value_added_tax_included} =	Отримати текст елемента	${element_name}
 	${result} =	Set Variable If	'з ПДВ' in '${value_added_tax_included}'	${True}	${False}
-	[return]  ${result}
+	[Return]  ${result}
 
 
 Отримати status аукціону
@@ -467,8 +468,17 @@ Wait for question
 	...  '${text}' == 'Не поступила оплата'	nopayment
 	...  '${text}' == 'Не опубліковано у ЦБД'	draft
 	...  ${element}
-	[return]  ${result}
+	[Return]  ${result}
 
+Отримати інформацію з status
+    [Arguments]  ${element_name}
+    privatmarket.Оновити сторінку з тендером
+    Wait Until Element Is Visible  ${tender_data_${element_name}}  ${COMMONWAIT}
+    #Added sleep, becource we taketext in status bar
+    Sleep  5s
+    ${status_name}=  Get text  ${tender_data_${element_name}}
+    ${status_type}=  privatmarket_service.get_status_type  ${status_name}
+    [Return]  ${status_type}
 
 Отримати інформацію із пропозиції
 	[Arguments]  ${user_name}  ${tender_id}  ${field}
@@ -507,7 +517,7 @@ Check If Question Is Uploaded
 	Wait For Ajax
 	@{subtitle} = 	Split String	${title}	'
 	Wait Until Element Is Enabled	xpath=//div[@ng-repeat='question in data.questions']//span[@tid='data.question.title' and contains(., '${subtitle[0]}')]	3
-	[return]	True
+	[Return]	True
 
 
 Задати запитання на тендер
@@ -713,8 +723,8 @@ Check If Question Is Uploaded
 Підтвердити постачальника
 	[Arguments]  ${user_name}  ${tender_id}  ${award_num}
 	Wait For Ajax
-	Wait For Element With Reload  css=button[tid='btn.award.active']
-	${buttons_list} = 	Get Webelements  css=button[tid='btn.award.active']
+	Wait For Element With Reload  css=button[tid='btn.award.active']  4
+	${buttons_list} =  Get Webelements  css=button[tid='btn.award.active']
 	Click Button  ${buttons_list[${award_num}]}
 	Wait For Ajax
 
@@ -779,6 +789,8 @@ Check If Question Is Uploaded
 Завантажити документ рішення кваліфікаційної комісії
 	[Arguments]  ${username}  ${file_path}  ${tender_id}  ${award_num}
 	Wait For Ajax
+	Wait Until Element Is Visible  css=button[tid='btn.award.disqualify']	${COMMONWAIT}
+	Click Element  css=button[tid='btn.award.disqualify']
 	Wait Until Element Is Visible	css=button[tid='btn.award.addDocForCancel']	${COMMONWAIT}
 	${file_input_path} = 	Set Variable	//button[@tid='btn.award.addDocForCancel']/following-sibling::input
 	Execute Javascript	document.evaluate("${file_input_path}", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.className = ''
@@ -797,12 +809,14 @@ Check If Question Is Uploaded
 Завантажити протокол аукціону
 	[Arguments]  ${username}  ${tender_id}  ${file_path}  ${bid_index}
 	privatmarket.Пошук тендера по ідентифікатору	${username}	${tender_id}
+#	wait until element is visible  xpath=//*[@tid='createBid']  ${COMMONWAIT}
+#	click element  xpath=//*[@tid='createBid']
 	Wait Until Element Is Visible	xpath=//*[@tid='docProtocol']	${COMMONWAIT}
 	Execute Javascript	document.querySelector("input[id='docsProtocolI']").className = ''
 	Sleep	2s
 	Choose File		css=input[id='docsProtocolI']	${file_path}
 	Wait For Ajax
-	Wait Until Element Is Not Visible		css=div.progress.progress-bar	${COMMONWAIT}
+#	Wait Until Element Is Not Visible		css=div.progress.progress-bar	${COMMONWAIT}
 	Wait Until Element Is Enabled	xpath=//*[@tid='confirmProtocol']	${COMMONWAIT}
 	Click Element	xpath=//*[@tid='confirmProtocol']
 	Sleep	20s
@@ -810,7 +824,7 @@ Check If Question Is Uploaded
 
 Скасування рішення кваліфікаційної комісії
 	[Arguments]  ${username}  ${tender_uaid}  ${award_num}
-	Wait For Element With Reload	css=button[tid='btn.award.cancelled']
+	Wait For Element With Reload	css=button[tid='btn.award.cancelled']  4
 	Wait Until Element Is Visible	css=button[tid='btn.award.cancelled']	${COMMONWAIT}
 	${buttons_list} = 	Get Webelements	css=button[tid='btn.award.cancelled']
 	Click Button	${buttons_list[${award_num}]}
@@ -824,21 +838,21 @@ Check If Question Is Uploaded
 	Wait For Element With Any Text	${tender_data.${element}}
 	${result} =	Get Element Attribute	css=div[tid='data.procurementMethodType']@tidvalue
 #	${result} =	Execute Javascript	return document.querySelector("div[tid='data.procurementMethodType']").innerHTML
-	[return]	${result}
+	[Return]	${result}
 
 
 Отримати кількість документів в тендері
 	[Arguments]  ${user_name}  ${tender_id}
 	Wait Until Element Is Visible	css=#fileitem	${COMMONWAIT}
 	${result} = 	Get Matching Xpath Count	//div[@id='fileitem']
-	[return]  ${result}
+	[Return]  ${result}
 
 
 Отримати кількість предметів в тендері
 	[Arguments]  ${user_name}  ${tender_id}
 	Wait Until Element Is Visible	css=span[tid='item.classification.description']	${COMMONWAIT}
 	${result} = 	Get Matching Xpath Count	//span[@tid='item.classification.description']
-	[return]  ${result}
+	[Return]  ${result}
 
 #Custom Keywords
 Login
@@ -978,7 +992,7 @@ Try Search Element
 	Wait For Ajax
 	Wait Until Element Is Visible	${locator}	3
 	Wait Until Element Is Enabled	${locator}	3
-	[return]	True
+	[Return]	True
 
 
 Try Search Element With Text
@@ -986,11 +1000,11 @@ Try Search Element With Text
 	Reload Page
 	Wait For Ajax
 	Wait Until Element Contains		${locator}	${text}	3s
-	[return]	True
+	[Return]	True
 
 
 Wait For Element With Reload
-	[Arguments]  ${locator}  ${time_to_wait}=2
+	[Arguments]  ${locator}  ${time_to_wait}=4
 	Wait Until Keyword Succeeds			${time_to_wait}min	3s	Try Search Element	${locator}
 
 
@@ -1024,7 +1038,7 @@ Get Index Number
 	${elementByIndex} = 	Get From List	${elementsList}	${element_index}
 	${index} = 	Get Index From List	${elementsList}	${elementByIndex}
 	${index} = 	sum_of_numbers	${index}	1
-	[return]	${index}
+	[Return]	${index}
 
 
 Wait For Element With Any Text

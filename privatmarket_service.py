@@ -48,11 +48,22 @@ def get_month_number(month_name):
 def get_status_type(status_name):
     type_dictionary = {
         u'Період уточнень та пропозицій': 'active.enquiries',
+        u'Період уточнень': 'active.enquiries',
+        u'Період прийому пропозицій': 'active.tendering',
         u'Період уточнень та пропозицій завершено': 'active.enquiries.ended',
         u'Аукіон': 'active.auction',
+        u'Кваліфікація': 'ctive.qualification',
         u'Визначення переможця': 'active.qualification',
         u'Пропозиції розглянуті': 'active.awarded',
+        u'Оплачено, очікується підписання договору': 'active.awarded',
+        u'Активний лот': 'active',
+        u'Торги не відбулися': 'unsuccessful',
         u'Закупівля не відбулась': 'unsuccessful',
+        u'Торги відмінено': 'cancelled',
+        u'Очікується протокол': 'pending',
+        u'Очікується оплата': 'validation',
+        u'Не поступила оплата': 'nopayment',
+        u'Не опубліковано у ЦБД': 'draft',
         u'Завершено': 'complete',
         u'Відмінено': 'cancelled',
     }
