@@ -471,12 +471,13 @@ Wait for question
 	[Return]  ${result}
 
 Отримати інформацію з status
-    [Arguments]  ${element_name}
+    [Arguments]  ${element}
     Reload Page
-    Wait Until Element Is Visible  ${tender_data_${element_name}}  ${COMMONWAIT}
+    Sleep  3s
+    Wait Until Element Is Visible  ${tender_data.${element}}  ${COMMONWAIT}
     #Added sleep, becource we taketext in status bar
-    Sleep  5s
-    ${status_name}=  Get text  ${tender_data_${element_name}}
+    Sleep  3s
+    ${status_name}=  Get text  ${tender_data.${element}}
     ${status_type}=  privatmarket_service.get_status_type  ${status_name}
     [Return]  ${status_type}
 
