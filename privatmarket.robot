@@ -449,6 +449,7 @@ Wait for question
 
 Отримати status аукціону
 	[Arguments]  ${element}
+	Log  ${element}
 #	Wait For Element With Reload	${tender_data.${element}}
 #	Wait For Element With Any Text	${tender_data.${element}}
 #	${text} =	Отримати текст елемента	${element}
@@ -456,6 +457,7 @@ Wait for question
     Sleep  5s
     ${element_text} =  Get Text  xpath=//span[@tid='data.statusName']/span[1]
     ${text} =  Strip String  ${element_text}
+    Log  ${text}
 	${result} =	Set Variable If
 	...  '${text}' == 'Період уточнень'	active.enquiries
 	...  '${text}' == 'Період прийому пропозицій'	active.tendering
@@ -984,8 +986,8 @@ Try Search Element
 	[Arguments]	${locator}
 	Reload Page
 	Wait For Ajax
-	Wait Until Element Is Visible	${locator}	3
-	Wait Until Element Is Enabled	${locator}	3
+	Wait Until Element Is Visible	${locator}	7
+	Wait Until Element Is Enabled	${locator}	5
 	[Return]	True
 
 
@@ -999,7 +1001,7 @@ Try Search Element With Text
 
 Wait For Element With Reload
 	[Arguments]  ${locator}  ${time_to_wait}=4
-	Wait Until Keyword Succeeds			${time_to_wait}min	3s	Try Search Element	${locator}
+	Wait Until Keyword Succeeds			${time_to_wait}min	15s	Try Search Element	${locator}
 
 
 Set Date
