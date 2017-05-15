@@ -11,7 +11,7 @@ def modify_test_data(initial_data):
     # initial_data['procuringEntity']['name'] = u'Товариство З Обмеженою Відповідальністю \'Мак Медіа Прінт\''
     #initial_data['procuringEntity']['name'] = u'Товариство З Обмеженою Відповідальністю \'Сільськогосподарська Фірма \'Рубіжне\''
     # initial_data['procuringEntity']['name'] = u'Макстрой Діск, Товариство З Обмеженою Відповідальністю'
-    initial_data['procuringEntity']['name'] = u'ФОП Оганін Олександр Петрович'
+    initial_data['procuringEntity']['name'] = u'ФОП ОГАНІН ОЛЕКСАНДР ПЕТРОВИЧ'
     return initial_data
 
 

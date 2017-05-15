@@ -374,9 +374,11 @@ ${tender_data_complaint.description}  //div[@class='question-div']
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
     Wait Until Element Is Visible  css=section[data-id='step2']  ${COMMONWAIT}
     Wait Visibility And Click Element  css=#tab_4 a
+    Wait For Ajax
+    Sleep  1s
     Wait Visibility And Click Element  ${locator_tenderCreation.buttonSend}
     Close Confirmation In Editor  Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.
-#    Sleep  120s
+    Sleep  120s
 
 
 Змінити лот
@@ -392,6 +394,8 @@ ${tender_data_complaint.description}  //div[@class='question-div']
     Wait For Ajax
     Sleep  1s
     Wait Visibility And Click Element  css=#tab_4 a
+    Wait For Ajax
+    Sleep  1s
     Wait Visibility And Click Element  ${locator_tenderCreation.buttonSend}
 #    Sleep  4s
 #    Wait Until Element Is Visible  css=div.modal-body.info-div  ${COMMONWAIT}
@@ -418,6 +422,8 @@ ${tender_data_complaint.description}  //div[@class='question-div']
     Wait For Ajax
     Sleep  1s
     Wait Visibility And Click Element  css=#tab_4 a
+    Wait For Ajax
+    Sleep  1s
     Wait Visibility And Click Element  ${locator_tenderCreation.buttonSend}
 #    Sleep  4s
 #    Wait Until Element Is Visible  css=div.modal-body.info-div  ${COMMONWAIT}
@@ -482,6 +488,8 @@ ${tender_data_complaint.description}  //div[@class='question-div']
     Wait For Ajax
     Sleep  1s
     Wait Visibility And Click Element  css=#tab_4 a
+    Wait For Ajax
+    Sleep  1s
     Wait Visibility And Click Element  ${locator_tenderCreation.buttonSend}
 #    Sleep  4s
 #    Wait Until Element Is Visible  css=div.modal-body.info-div  ${COMMONWAIT}
@@ -536,6 +544,7 @@ ${tender_data_complaint.description}  //div[@class='question-div']
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
     Wait For Ajax
     Wait Until Element Is Visible  css=section[data-id='step5']  ${COMMONWAIT}
+    Wait For Ajax
     Sleep  1s
     Wait Visibility And Click Element  ${locator_tenderCreation.buttonSend}
 
@@ -566,11 +575,22 @@ ${tender_data_complaint.description}  //div[@class='question-div']
 
 Підтвердити кваліфікацію
     [Arguments]  ${user_name}  ${tenderId}  ${bid_index}
+    Run Keyword If  '${bid_index}' == '0'  Wait Visibility And Click Element  xpath=//li[contains(@ng-class, 'lot-parts')]
+    ${index}=  privatmarket_service.sum_of_numbers  ${bid_index}  1
+    Run Keyword If  '${bid_index}' == '0'  Wait Visibility And Click Element  xpath=(//a[@ng-click='act.openQualification(q)'])[${index}]
+    Wait For Ajax
+    Sleep  1s
     Wait Visibility And Click Element  css=#chkSelfQualified
     Wait Visibility And Click Element  css=#chkSelfEligible
     Wait Until Element Is Enabled  xpath=//button[@ng-click="act.setQualificationStatus('active')"]
     Wait Visibility And Click Element  xpath=//button[@ng-click="act.setQualificationStatus('active')"]
     Wait Until Element Is Visible  css=.notify
+
+
+Затвердити остаточне рішення кваліфікації
+    [Arguments]  ${user_name}  ${tenderId}
+    Sleep  1s
+    Sleep  1s
 
 
 Отримати інформацію із тендера
@@ -623,8 +643,6 @@ ${tender_data_complaint.description}  //div[@class='question-div']
 
 Отримати інформацію зі сторінки
     [Arguments]  ${base_tender_uaid}  ${field_name}
-    Run Keyword And Return If  'статусу першої пропозиції кваліфікації' in '${TEST_NAME}'  Отримати статус пропозиції кваліфікації  1
-    Run Keyword And Return If  'статусу другої пропозиції кваліфікації' in '${TEST_NAME}'  Отримати статус пропозиції кваліфікації  2
     Run Keyword And Return If  '${field_name}' == 'value.amount'  Convert Amount To Number  ${field_name}
     Run Keyword And Return If  '${field_name}' == 'value.currency'  Отримати інформацію з ${field_name}  ${field_name}
     Run Keyword And Return If  '${field_name}' == 'value.valueAddedTaxIncluded'  Отримати інформацію з ${field_name}  ${field_name}
@@ -635,6 +653,8 @@ ${tender_data_complaint.description}  //div[@class='question-div']
     Run Keyword And Return If  '${field_name}' == 'minimalStep.amount'  Convert Amount To Number  ${field_name}
     Run Keyword And Return If  '${field_name}' == 'status'  Отримати інформацію з ${field_name}  ${field_name}
     Run Keyword And Return If  '${field_name}' == 'qualificationPeriod.endDate'  Отримати дату та час  ${field_name}  1
+    Run Keyword And Return If  '${field_name}' == 'qualifications[0].status'  Отримати статус пропозиції кваліфікації  1
+    Run Keyword And Return If  '${field_name}' == 'qualifications[1].status'  Отримати статус пропозиції кваліфікації  2
 
     Wait Until Element Is Visible  ${tender_data_${field_name}}  ${COMMONWAIT}
     ${result_full}=  Get Text  ${tender_data_${field_name}}
@@ -747,8 +767,11 @@ ${tender_data_complaint.description}  //div[@class='question-div']
     ${class}=  Get Element Attribute  xpath=//li[contains(@ng-class, 'lot-parts')]@class
     Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=//li[contains(@ng-class, 'lot-parts')]
     Wait Until Element Is Visible  css=.bids>tbody>tr:nth-of-type(${item})>td:nth-of-type(3)  timeout=${COMMONWAIT}
-    ${result_full}=  Get Text  css=.bids>tbody>tr:nth-of-type(${item})>td:nth-of-type(3)
-    ${result}=  Strip String  ${result_full}
+
+    ${elem_text}=  Get Text  css=.bids>tbody>tr:nth-of-type(${item})>td:nth-of-type(3)
+    ${status_text}=  Split String  ${elem_text}  \n
+    ${status}=  Strip String  ${status_text[0]}
+    ${result}=  privatmarket_service.get_status_type  ${status}
     [Return]  ${result}
 
 
