@@ -148,6 +148,7 @@ ${tender_data_complaint.description}  //div[@class='question-div']
     Check Current Mode New Realisation
 
 #go to form
+    Wait For Ajax
     Wait Visibility And Click Element  ${locator_tenderSearch.addTender}
     Unselect Frame
     Wait Until Page Contains Element  id=sender-analytics  ${COMMONWAIT}
@@ -375,7 +376,6 @@ ${tender_data_complaint.description}  //div[@class='question-div']
     Wait Until Element Is Visible  css=section[data-id='step2']  ${COMMONWAIT}
     Wait Visibility And Click Element  css=#tab_4 a
     Wait For Ajax
-    Sleep  1s
     Wait Visibility And Click Element  ${locator_tenderCreation.buttonSend}
     Close Confirmation In Editor  Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.
     Sleep  120s
@@ -392,10 +392,8 @@ ${tender_data_complaint.description}  //div[@class='question-div']
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
     Wait For Ajax
-    Sleep  1s
     Wait Visibility And Click Element  css=#tab_4 a
     Wait For Ajax
-    Sleep  1s
     Wait Visibility And Click Element  ${locator_tenderCreation.buttonSend}
 #    Sleep  4s
 #    Wait Until Element Is Visible  css=div.modal-body.info-div  ${COMMONWAIT}
@@ -408,6 +406,7 @@ ${tender_data_complaint.description}  //div[@class='question-div']
     [Arguments]  ${value}
     Wait For Element With Reload  ${locator_tenderClaim.buttonCreate}  1
     Wait Visibility And Click Element  ${locator_tenderClaim.buttonCreate}
+    Wait For Ajax
     Wait Visibility And Click Element  css=#tab_1 a
     ${value_amount}=  privatmarket_service.convert_float_to_string  ${value}
     Wait Element Visibility And Input Text  css=input[data-id='valueAmount']  ${value_amount}
@@ -420,10 +419,8 @@ ${tender_data_complaint.description}  //div[@class='question-div']
     Wait Element Visibility And Input Text  css=input[data-id='minimalStepAmount']  ${minimalStep_amount}
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
     Wait For Ajax
-    Sleep  1s
     Wait Visibility And Click Element  css=#tab_4 a
     Wait For Ajax
-    Sleep  1s
     Wait Visibility And Click Element  ${locator_tenderCreation.buttonSend}
 #    Sleep  4s
 #    Wait Until Element Is Visible  css=div.modal-body.info-div  ${COMMONWAIT}
@@ -461,18 +458,9 @@ ${tender_data_complaint.description}  //div[@class='question-div']
     Switch To PMFrame
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
     Wait For Ajax
-    Sleep  1s
     Wait Visibility And Click Element  css=#tab_4 a
     Wait For Ajax
-    Sleep  1s
     Wait Visibility And Click Element  ${locator_tenderCreation.buttonSend}
-
-#    #Дождемся подтверждения и обновим страницу, поскольку тут не выходит его закрыть
-#    Sleep  4s
-#    Wait Until Element Is Visible  css=div.modal-body.info-div  ${COMMONWAIT}
-#    Wait Until Element Contains  css=div.modal-body.info-div  Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.  ${COMMONWAIT}
-#    Wait For Ajax
-#    Reload Page
     Close Confirmation In Editor  Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.
 
 
@@ -481,15 +469,12 @@ ${tender_data_complaint.description}  //div[@class='question-div']
     Wait For Element With Reload  ${locator_tenderClaim.buttonCreate}  1
     Wait Visibility And Click Element  ${locator_tenderClaim.buttonCreate}
     Wait For Ajax
-    Sleep  1s
     Wait Visibility And Click Element  css=#tab_2 a
     Wait Visibility And Click Element  xpath=(//div[@data-id='lot']//button[@data-id='actRemove'])[last()]
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
     Wait For Ajax
-    Sleep  1s
     Wait Visibility And Click Element  css=#tab_4 a
     Wait For Ajax
-    Sleep  1s
     Wait Visibility And Click Element  ${locator_tenderCreation.buttonSend}
 #    Sleep  4s
 #    Wait Until Element Is Visible  css=div.modal-body.info-div  ${COMMONWAIT}
@@ -545,7 +530,6 @@ ${tender_data_complaint.description}  //div[@class='question-div']
     Wait For Ajax
     Wait Until Element Is Visible  css=section[data-id='step5']  ${COMMONWAIT}
     Wait For Ajax
-    Sleep  1s
     Wait Visibility And Click Element  ${locator_tenderCreation.buttonSend}
 
 #Дождемся подтверждения и обновим страницу, поскольку тут не выходит его закрыть
@@ -563,7 +547,6 @@ ${tender_data_complaint.description}  //div[@class='question-div']
     ${index}=  privatmarket_service.sum_of_numbers  ${bid_index}  1
     Wait Visibility And Click Element  xpath=(//a[@ng-click='act.openQualification(q)'])[${index}]
     Wait For Ajax
-    Sleep  1s
     #Wait Visibility And Click Element  xpath=//form[@name='fileForm']/select[1]/option[text()='Отчет об оценке']
     Wait Visibility And Click Element  xpath=//form[@name='fileForm']/select[1]/option[text()='Уведомления о решении']
     Sleep  1s
@@ -579,7 +562,6 @@ ${tender_data_complaint.description}  //div[@class='question-div']
     ${index}=  privatmarket_service.sum_of_numbers  ${bid_index}  1
     Run Keyword If  '${bid_index}' == '0'  Wait Visibility And Click Element  xpath=(//a[@ng-click='act.openQualification(q)'])[${index}]
     Wait For Ajax
-    Sleep  1s
     Wait Visibility And Click Element  css=#chkSelfQualified
     Wait Visibility And Click Element  css=#chkSelfEligible
     Wait Until Element Is Enabled  xpath=//button[@ng-click="act.setQualificationStatus('active')"]
@@ -1247,5 +1229,5 @@ Set Tender Period
 
 
 Wait For Ajax
-	Wait For Condition	return window.jQuery!=undefined && jQuery.active==0	60s
-
+    Wait For Condition  return window.jQuery!=undefined && jQuery.active==0  60s
+    Sleep  2s
