@@ -155,7 +155,7 @@ ${tender_data_complaint.description}  //div[@class='question-div']
     ${status}  ${type}=  Run Keyword And Ignore Error  Set Variable  '${tender_data.data.procurementMethodType}'
     ${type}=  Run Keyword If
     ...  '${status}' == 'PASS'  Set Variable  ${type}
-    ...  ELSE  Set Variable  ${EMPTY}
+    ...  ELSE  Set Variable  ''
 
     Run Keyword IF
     ...  ${type} == 'aboveThresholdEU'  Wait Visibility And Click Element  xpath=//a[contains(@ng-click, 'aboveThresholdEU')]
@@ -180,7 +180,7 @@ ${tender_data_complaint.description}  //div[@class='question-div']
 
     #date
     Switch To PMFrame
-    Run Keyword Unless  '${tender_data.data.procurementMethodType}' == 'aboveThresholdEU'  Set Enquiry Period  ${tender_data.data.enquiryPeriod.startDate}  ${tender_data.data.enquiryPeriod.endDate}
+    Run Keyword Unless  ${type} == 'aboveThresholdEU'  Set Enquiry Period  ${tender_data.data.enquiryPeriod.startDate}  ${tender_data.data.enquiryPeriod.endDate}
     Set Tender Period  ${tender_data.data.tenderPeriod.startDate}  ${tender_data.data.tenderPeriod.endDate}
 
     #procuringEntityAddress
