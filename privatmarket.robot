@@ -288,8 +288,7 @@ ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 
 Отримати інформацію із тендера
 	[Arguments]  ${user_name}  ${tender_id}  ${element}
-#	Run Keyword And Return If	'${element}' == 'status'  Отримати status аукціону  ${element}
-	Run Keyword And Return If  '${element}' == 'status'  Отримати інформацію з status  ${element}
+	Run Keyword And Return If	'${element}' == 'status'  Отримати status аукціону  ${element}
 	Run Keyword And Return If	'${element}' == 'value.amount'							Отримати число								${element}
 	Run Keyword And Return If	'${element}' == 'value.valueAddedTaxIncluded'			Отримати інформацію про включення ПДВ		${element}
 	Run Keyword And Return If	'${element}' == 'minimalStep.amount'					Отримати число								${element}
@@ -450,9 +449,13 @@ Wait for question
 
 Отримати status аукціону
 	[Arguments]  ${element}
-	Wait For Element With Reload	${tender_data.${element}}
-	Wait For Element With Any Text	${tender_data.${element}}
-	${text} =	Отримати текст елемента	${element}
+#	Wait For Element With Reload	${tender_data.${element}}
+#	Wait For Element With Any Text	${tender_data.${element}}
+#	${text} =	Отримати текст елемента	${element}
+    Reload Page
+    Sleep  5s
+    ${element_text} =  Get Text  xpath=//span[@tid='data.statusName']/span[1]
+    ${text} =  Strip String  ${element_text}
 	${result} =	Set Variable If
 	...  '${text}' == 'Період уточнень'	active.enquiries
 	...  '${text}' == 'Період прийому пропозицій'	active.tendering
@@ -470,16 +473,6 @@ Wait for question
 	...  ${element}
 	[Return]  ${result}
 
-Отримати інформацію з status
-    [Arguments]  ${element}
-    Reload Page
-    Sleep  3s
-    Wait Until Element Is Visible  ${tender_data.${element}}  ${COMMONWAIT}
-    #Added sleep, becource we taketext in status bar
-    Sleep  3s
-    ${status_name}=  Get text  ${tender_data.${element}}
-    ${status_type}=  privatmarket_service.get_status_type  ${status_name}
-    [Return]  ${status_type}
 
 Отримати інформацію із пропозиції
 	[Arguments]  ${user_name}  ${tender_id}  ${field}
