@@ -102,7 +102,7 @@ ${tender_data_complaint.description}  //div[@class='question-div']
     Call Method  ${chrome_options}  add_argument  --disable-web-security
     Call Method  ${chrome_options}  add_argument  --nativeEvents\=false
     Call Method  ${chrome_options}  add_experimental_option  prefs  ${prefs}
-#    Call Method  ${chrome_options}  add_argument  --user-data-dir\=/home/lugovskoy/.config/google-chrome/Default
+    Call Method  ${chrome_options}  add_argument  --user-data-dir\=/home/lugovskoy/.config/google-chrome/Default
 
     #Для Viewer'а нужен хром, т.к. на хром настроена автоматическая закачка файлов
     Run Keyword If  '${username}' == 'PrivatMarket_Viewer'  Create WebDriver  Chrome  chrome_options=${chrome_options}  alias=${username}
@@ -571,8 +571,9 @@ ${tender_data_complaint.description}  //div[@class='question-div']
 
 Затвердити остаточне рішення кваліфікації
     [Arguments]  ${user_name}  ${tenderId}
-    Sleep  1s
-    Sleep  1s
+    Wait For Element With Reload  css=button[ng-click='commonActions.finishPreQualification()']  1
+    Wait Visibility And Click Element  css=button[ng-click='commonActions.finishPreQualification()']
+    Wait For Element With Reload  xpath=//div[@id='tenderStatus' and contains(., 'Пауза перед аукціоном')]  1
 
 
 Отримати інформацію із тендера
