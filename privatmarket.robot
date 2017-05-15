@@ -1139,6 +1139,7 @@ Try Search Element
     ...  ELSE IF  '${tab_number}' == '2' and 'відповіді на запитання' in '${TEST_NAME}'  Wait Visibility And Click Element  css=.question-answer .question-expand-div>a:nth-of-type(1)
     ...  ELSE IF  '${tab_number}' == '3' and 'заголовку документації' in '${TEST_NAME}'  Відкрити інформацію про вкладені файли вимоги
     Wait Until Element Is Enabled  ${locator}  10
+    Wait For Ajax
     [Return]  True
 
 
