@@ -472,7 +472,7 @@ Wait for question
 
 Отримати інформацію з status
     [Arguments]  ${element_name}
-    privatmarket.Оновити сторінку з тендером
+    Reload Page
     Wait Until Element Is Visible  ${tender_data_${element_name}}  ${COMMONWAIT}
     #Added sleep, becource we taketext in status bar
     Sleep  5s
