@@ -174,7 +174,8 @@ def get_status_type(status_name):
         u'Отменено': 'cancelled',
         u'Відмінено': 'cancelled',
         u'Розглядається': 'pending',
-        u'Кваліфікація учасника': 'active.pre-qualification'
+        u'Кваліфікація учасника': 'active.pre-qualification',
+        u'Пауза перед аукціоном': 'active.pre-qualification.stand-still'
     }
     type_name = type_dictionary.get(status_name)
     return type_name
