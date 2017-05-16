@@ -63,6 +63,7 @@ ${tender_data.tenderAttempts}							css=span[tid='data.tenderAttempts']
 ${tender_data.dgfDecisionDate}							css=span[tid='data.dgfDecisionDate']
 ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 
+${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 
 *** Keywords ***
 Підготувати дані для оголошення тендера
@@ -149,7 +150,7 @@ ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 	\	${should_we_click_btn.additem} =	Set Variable If		'0' != '${index}'	${True}	${False}
 	\	Додати новий предмет закупівлі	${items[${index}]}	${should_we_click_btn.additem}
 
-	Click Button	css=button[tid='btn.createlot']
+	Click Button	${tenderBtn.create_edit}
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=div.progress.progress-bar	${COMMONWAIT}
 	Wait Until Element Is Visible	css=div[tid='data.title']	${COMMONWAIT}
@@ -169,11 +170,11 @@ ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 
 Внести зміни в тендер
 	[Arguments]  ${user_name}  ${tender_id}  ${field}  ${value}
-	${at_modification_page} = 	Run Keyword And return Status	Wait Until Element Is Visible	css=button[tid='btn.modifyLot']	10s
-	Run Keyword If	${at_modification_page}	Click Element	css=button[tid='btn.modifyLot']
-	Wait Until Element Is Visible	css=input[tid='data.title']
-
-	Run Keyword	Змінити ${field}  ${value}
+    Увійти в редагування тендера
+    Run Keyword  Змінити ${field}  ${value}
+    Wait Until Element Is Visible  ${tenderBtn.create_edit}  ${COMMONWAIT}
+    Click Element  ${tenderBtn.create_edit}
+    Sleep  10s
 
 
 Змінити value.amount
@@ -598,7 +599,8 @@ Check If Question Is Uploaded
 
 Додати документ до аукціону
 	[Arguments]  ${filepath}  ${file_type}
-	Wait Until Element Is Visible	css=div[tid='auction.docs'] div[tid='btn.addFiles']
+    Run Keyword If
+	Wait Until Element Is Visible	css=div[tid='auction.docs'] div[tid='btn.addFiles']  ${COMMONWAIT}
 	Execute Javascript	document.querySelector("div[tid='auction.docs'] input#input-doc-lot").className = ''
 	Sleep	2s
 	Choose File	css=div[tid='auction.docs'] input#input-doc-lot	${filepath}
@@ -608,18 +610,27 @@ Check If Question Is Uploaded
 
 
 Завантажити документ
-	[Arguments]  ${user_name}  ${filepath}  ${tender_id}=${None}
-	Додати документ до аукціону	${filepath}	string:technicalSpecifications
+    [Arguments]  ${user_name}  ${filepath}  ${tender_id}=${None}
+    Увійти в редагування тендера
+    Додати документ до аукціону	${filepath}	string:technicalSpecifications
 
 
 Завантажити ілюстрацію
-	[Arguments]  ${user_name}  ${tender_id}  ${filepath}
-	Додати документ до аукціону	${filepath}	string:illustration
+    [Arguments]  ${user_name}  ${tender_id}  ${filepath}
+    Увійти в редагування тендера
+    Додати документ до аукціону	${filepath}	string:illustration
 
 
 Завантажити документ в тендер з типом
-	[Arguments]  ${user_name}  ${tender_id}  ${file_path}  ${doc_type}
-	Додати документ до аукціону	${file_path}	string:${doc_type}
+    [Arguments]  ${user_name}  ${tender_id}  ${file_path}  ${doc_type}
+    Увійти в редагування тендера
+    Додати документ до аукціону	${file_path}	string:${doc_type}
+
+
+Увійти в редагування тендера
+    ${at_modification_page} =  Run Keyword And return Status  Wait Until Element Is Visible  css=button[tid='btn.modifyLot']  15s
+    Run Keyword If	${at_modification_page}	Click Element	css=button[tid='btn.modifyLot']
+    Wait Until Element Is Visible  css=input[tid='data.title']
 
 
 Додати публічний паспорт активу
@@ -687,9 +698,9 @@ Check If Question Is Uploaded
 	Input Text	xpath=(//textarea[@tid='docurl.addfield'])[last()]	${accessDetails}
 
 #	Auction publication section
-	Wait Until Element Is Visible	css=button[tid='btn.createlot']
+	Wait Until Element Is Visible  ${tenderBtn.create_edit}
 	Wait For Ajax
-	Click Element	css=button[tid='btn.createlot']
+	Click Element  ${tenderBtn.create_edit}
 	Wait For Ajax
 	Wait Until Element Is Visible	css=button[tid='btn.cancellationLot']	${COMMONWAIT}
 
@@ -817,6 +828,19 @@ Check If Question Is Uploaded
 	Click Element	xpath=//*[@tid='confirmProtocol']
 	Sleep	20s
 
+Завантажити протокол аукціону в авард
+    privatmarket.Пошук тендера по ідентифікатору  ${username}  ${tender_id}
+#   wait until element is visible  xpath=//*[@tid='createBid']  ${COMMONWAIT}
+#    click element  xpath=//*[@tid='createBid']
+    Wait Until Element Is Visible  xpath=//*[@tid='docProtocol']  ${COMMONWAIT}
+    Execute Javascript  document.querySelector("input[id='docsProtocolI']").className = ''
+    Sleep  2s
+    Choose File  css=input[id='docsProtocolI']  ${file_path}
+    Wait For Ajax
+#    Wait Until Element Is Not Visible  css=div.progress.progress-bar  ${COMMONWAIT}
+    Wait Until Element Is Enabled  xpath=//*[@tid='confirmProtocol']  ${COMMONWAIT}
+    Click Element  xpath=//*[@tid='confirmProtocol']
+    Sleep  20s
 
 Скасування рішення кваліфікаційної комісії
 	[Arguments]  ${username}  ${tender_uaid}  ${award_num}
