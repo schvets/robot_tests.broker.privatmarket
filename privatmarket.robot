@@ -599,7 +599,6 @@ Check If Question Is Uploaded
 
 Додати документ до аукціону
 	[Arguments]  ${filepath}  ${file_type}
-    Run Keyword If
 	Wait Until Element Is Visible	css=div[tid='auction.docs'] div[tid='btn.addFiles']  ${COMMONWAIT}
 	Execute Javascript	document.querySelector("div[tid='auction.docs'] input#input-doc-lot").className = ''
 	Sleep	2s
@@ -629,7 +628,7 @@ Check If Question Is Uploaded
 
 Увійти в редагування тендера
     ${at_modification_page} =  Run Keyword And return Status  Wait Until Element Is Visible  css=button[tid='btn.modifyLot']  15s
-    Run Keyword If	${at_modification_page}	Click Element	css=button[tid='btn.modifyLot']
+    Run Keyword If  ${at_modification_page}  Click Element  css=button[tid='btn.modifyLot']
     Wait Until Element Is Visible  css=input[tid='data.title']
 
 
