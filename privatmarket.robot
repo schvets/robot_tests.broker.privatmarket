@@ -462,6 +462,7 @@ ${tender_data_complaint.description}  //div[@class='question-div']
     Wait For Ajax
     Wait Visibility And Click Element  ${locator_tenderCreation.buttonSend}
     Close Confirmation In Editor  Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.
+    Sleep  120s
 
 
 Видалити неціновий показник
