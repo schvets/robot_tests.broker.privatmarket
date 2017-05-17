@@ -19,7 +19,7 @@ ${locator_lotAdd.locality}  css=input[data-id='locality']
 ${locator_lotAdd.streetAddress}  css=input[data-id='streetAddress']
 ${locator_tenderAdd.btnSave}  css=button[data-id='actSave']
 ${locator_tenderCreation.buttonSend}  css=button[data-id='actSend']
-${locator_tenderClaim.buttonCreate}  xpath=//button[contains(@ng-click, 'commonActions.createAfp()') and contains(., 'Редагувати')]
+${locator_tenderClaim.buttonCreate}  xpath=button[data-id='editProcBtn']
 
 ${tender_data_title}  xpath=//div[contains(@class,'title-div')]
 ${tender_data_description}  id=tenderDescription
@@ -160,6 +160,7 @@ ${tender_data_complaint.description}  //div[@class='question-div']
 
     Run Keyword IF
     ...  ${type} == 'aboveThresholdEU'  Wait Visibility And Click Element  css=a[data-id='choosedPrzAboveThresholdEU']
+    ...  ELSE IF  ${type} == 'aboveThresholdUA'  Wait Visibility And Click Element  css=a[data-id='choosedPrzAboveThresholdUA']
     ...  ELSE  Wait Visibility And Click Element  css=a[data-id='choosedPrzBelowThreshold']
 
 
@@ -181,7 +182,7 @@ ${tender_data_complaint.description}  //div[@class='question-div']
 
     #date
     Switch To PMFrame
-    Run Keyword Unless  ${type} == 'aboveThresholdEU'  Set Enquiry Period  ${tender_data.data.enquiryPeriod.startDate}  ${tender_data.data.enquiryPeriod.endDate}
+    Run Keyword Unless  ${type} == 'aboveThresholdEU' or ${type} == 'aboveThresholdUA'  Set Enquiry Period  ${tender_data.data.enquiryPeriod.startDate}  ${tender_data.data.enquiryPeriod.endDate}
     Set Tender Period  ${tender_data.data.tenderPeriod.startDate}  ${tender_data.data.tenderPeriod.endDate}
 
     #procuringEntityAddress
@@ -1175,10 +1176,18 @@ Search By Query
     [Arguments]  ${element}  ${query}
     Sleep  1s
     Wait Element Visibility And Input Text  ${element}  ${query}
-    Wait Element Visibility And Input Text  ${element}  ${query}
     Wait Until Element Is Not Visible  css=.modal-body.tree.pm-tree
+    Wait Until Keyword Succeeds  20s  500ms  Check Element Attribute  css=[data-id='searchMonitor']  data-status  ok
     Wait Until Element Is Enabled  xpath=//div[@data-id='foundItem']//label[@for='found_${query}']  ${COMMONWAIT}
     Wait Visibility And Click Element  xpath=//div[@data-id='foundItem']//label[@for='found_${query}']
+
+
+Check Element Attribute
+    [Arguments]  ${element}  ${attribute_name}  ${value}
+    ${attribute}=  Get Element Attribute  ${element}@${attribute_name}
+    ${result}=  Set Variable  False
+    ${result}=  Run Keyword If  '${attribute}' == '${value}'  Set Variable  True
+    [Return]  ${result}
 
 
 Set Date And Time
