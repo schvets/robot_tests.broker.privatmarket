@@ -19,7 +19,7 @@ ${locator_lotAdd.locality}  css=input[data-id='locality']
 ${locator_lotAdd.streetAddress}  css=input[data-id='streetAddress']
 ${locator_tenderAdd.btnSave}  css=button[data-id='actSave']
 ${locator_tenderCreation.buttonSend}  css=button[data-id='actSend']
-${locator_tenderClaim.buttonCreate}  xpath=button[data-id='editProcBtn']
+${locator_tenderClaim.buttonCreate}  css=button[data-id='editProcBtn']
 
 ${tender_data_title}  xpath=//div[contains(@class,'title-div')]
 ${tender_data_description}  id=tenderDescription
