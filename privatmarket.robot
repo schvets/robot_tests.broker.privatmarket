@@ -286,6 +286,9 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 
 Пошук тендера по ідентифікатору
 	[Arguments]  ${user_name}  ${tender_id}
+    Log  ${tender_id}
+    Log to console  +
+    Log to console  ${tender_id}
 	Wait For Auction	${tender_id}
 	Wait Enable And Click Element	css=a[tid='${tender_id}']
 	Wait Until element Is Visible	css=div[tid='data.title']	${COMMONWAIT}
