@@ -575,7 +575,7 @@ ${tender_data_complaint.description}  //div[@class='question-div']
     Wait For Ajax
     Wait Visibility And Click Element  css=#chkSelfQualified
     Wait Visibility And Click Element  css=#chkSelfEligible
-    debug
+#    debug
     Wait Until Element Is Enabled  xpath=//button[@ng-click="act.setQualificationStatus('active')"]
     Wait Visibility And Click Element  xpath=//button[@ng-click="act.setQualificationStatus('active')"]
     Wait Until Element Is Visible  css=.notify
@@ -583,9 +583,9 @@ ${tender_data_complaint.description}  //div[@class='question-div']
 
 Затвердити остаточне рішення кваліфікації
     [Arguments]  ${user_name}  ${tenderId}
-    Wait For Element With Reload  css=button[ng-click='commonActions.finishPreQualification()']  1
-    debug
-    Wait Visibility And Click Element  css=button[ng-click='commonActions.finishPreQualification()']
+    Wait For Element With Reload  css=button[data-id='finishPreQualBtn']  1
+#    debug
+    Wait Visibility And Click Element  css=button[data-id='finishPreQualBtn']
     Wait For Element With Reload  xpath=//div[@id='tenderStatus' and contains(., 'Пауза перед аукціоном')]  1
 
 
@@ -804,7 +804,7 @@ ${tender_data_complaint.description}  //div[@class='question-div']
 
     Switch To Tab  2
     Wait For Element With Reload  xpath=//button[contains(@ng-click, 'act.answerFaq')]  2
-    debug
+#    debug
     Wait Visibility And Click Element  xpath=//button[contains(@ng-click, 'act.answerFaq')]
     Wait Element Visibility And Input Text  id=questionAnswer  ${answer_data.data.answer}
     Sleep  2s
@@ -1175,8 +1175,9 @@ Search By Query
     [Arguments]  ${element}  ${query}
     Sleep  1s
     Wait Element Visibility And Input Text  ${element}  ${query}
+    Wait Element Visibility And Input Text  ${element}  ${query}
     Wait Until Element Is Not Visible  css=.modal-body.tree.pm-tree
-    Wait Until Element Is Enabled  xpath=//div[@data-id='foundItem']//label[@for='found_${query}']
+    Wait Until Element Is Enabled  xpath=//div[@data-id='foundItem']//label[@for='found_${query}']  ${COMMONWAIT}
     Wait Visibility And Click Element  xpath=//div[@data-id='foundItem']//label[@for='found_${query}']
 
 
@@ -1231,7 +1232,7 @@ Scroll Page To Element
 
 Set Enquiry Period
     [Arguments]  ${startDate}  ${endDate}
-    debug
+#    debug
     Wait Until Element Is Visible  css=input[ng-model='model.ptr.enquiryPeriod.sd.d']  ${COMMONWAIT}
     Set Date And Time  enquiryPeriod  startDate  css=span[data-id='ptrEnquiryPeriodStartDate'] input[ng-model='inputTime']  ${startDate}
     Wait Until Element Is Visible  css=span[data-id='ptrEnquiryPeriodEndDate'] input[ng-model='inputTime']  ${COMMONWAIT}
