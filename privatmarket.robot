@@ -836,8 +836,7 @@ Check If Question Is Uploaded
 
 Завантажити протокол аукціону в авард
     [Arguments]  ${username}  ${tender_id}  ${file_path}  ${bid_index}
-    log  [Arguments]
-    debug
+    Log Many  @{arguments}
     privatmarket.Пошук тендера по ідентифікатору  ${username}  ${tender_id}
 #   wait until element is visible  xpath=//*[@tid='createBid']  ${COMMONWAIT}
 #    click element  xpath=//*[@tid='createBid']
