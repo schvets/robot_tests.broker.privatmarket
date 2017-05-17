@@ -63,6 +63,9 @@ ${tender_data.tenderAttempts}							css=span[tid='data.tenderAttempts']
 ${tender_data.dgfDecisionDate}							css=span[tid='data.dgfDecisionDate']
 ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 
+${tender_data.awards[0].status}  css=span[tid='award.status']
+${tender_data.awards[1].status}  css=span[tid='award.status']
+
 ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 
 *** Keywords ***
@@ -102,7 +105,7 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 Оновити сторінку з тендером
 	[Arguments]  ${user_name}  ${tender_id}
 	Switch Browser	${user_name}
-	${tenderEdit}=  Run Keyword And Return Status	Wait Until Element Is Visible  css=input[tid='data.title']  5s
+    ${tenderEdit}=  Run Keyword And Return Status	Wait Until Element Is Visible  css=input[tid='data.title']  5s
 	run keyword if  '${tenderEdit}' == 'False'  Reload Page
 	Sleep	3s
 
@@ -129,7 +132,7 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 	Select From List	css=select[tid='data.tenderAttempts']	number:${tender_data.data.tenderAttempts}
 	Input text	css=textarea[tid='data.description']	${tender_data.data.description}
 	${amount_to_enter} = 	Convert To String	${tender_data.data.value.amount}
-	${amount_to_enter2} = 	Replace String	${amount_to_enter}	.	,
+	${amount_to_enter2} = 	Replace String	${amount_to_enter}  .  ,
 	Click Element	css=input[tid='data.value.amount']
 	Run Keyword If	'${os}' == 'Linux'	Input text	css=input[tid='data.value.amount']	${amount_to_enter}
 	...  ELSE	Input text	css=input[tid='data.value.amount']	${amount_to_enter2}
@@ -138,6 +141,7 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 	...  ELSE	Click Element	css=input[tid='data.value.valueAddedTaxNotIncluded']
 	${amount_to_enter} = 	Convert To String	${tender_data.data.minimalStep.amount}
 	${amount_to_enter2} = 	Replace String	${amount_to_enter}	.	,
+	debug
 	Click Element	css=input[tid='data.minimalStep.amount']
 	Run Keyword If	'${os}' == 'Linux'	Input text	css=input[tid='data.minimalStep.amount']	${amount_to_enter}
 	...  ELSE	Input text	css=input[tid='data.minimalStep.amount']	${amount_to_enter2}
@@ -162,7 +166,7 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 	Wait For Ajax
 	Wait Until Element Is Not Visible	css=button[tid='btn.publicateLot']	${COMMONWAIT}
 	Wait For Element With Reload	css=div[tid='data.auctionID']
-	${tender_id} = 	Get Text	css=div[tid='data.auctionID']
+	${tender_id}=  Get Text	css=div[tid='data.auctionID']
 	Go To	${USERS.users['${username}'].homepage}
 	Wait For Ajax
 	[Return]  ${tender_id}
@@ -828,6 +832,9 @@ Check If Question Is Uploaded
 	Sleep	20s
 
 Завантажити протокол аукціону в авард
+    [Arguments]  ${username}  ${tender_id}  ${file_path}  ${bid_index}
+    log  [Arguments]
+    debug
     privatmarket.Пошук тендера по ідентифікатору  ${username}  ${tender_id}
 #   wait until element is visible  xpath=//*[@tid='createBid']  ${COMMONWAIT}
 #    click element  xpath=//*[@tid='createBid']
