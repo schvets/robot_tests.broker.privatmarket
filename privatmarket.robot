@@ -141,7 +141,6 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 	...  ELSE	Click Element	css=input[tid='data.value.valueAddedTaxNotIncluded']
 	${amount_to_enter} = 	Convert To String	${tender_data.data.minimalStep.amount}
 	${amount_to_enter2} = 	Replace String	${amount_to_enter}	.	,
-	debug
 	Click Element	css=input[tid='data.minimalStep.amount']
 	Run Keyword If	'${os}' == 'Linux'	Input text	css=input[tid='data.minimalStep.amount']	${amount_to_enter}
 	...  ELSE	Input text	css=input[tid='data.minimalStep.amount']	${amount_to_enter2}
@@ -836,6 +835,8 @@ Check If Question Is Uploaded
 
 Завантажити протокол аукціону в авард
     [Arguments]  ${username}  ${tender_id}  ${file_path}  ${bid_index}
+    log to console  +
+    log to console  Завантажити протокол аукціону в авард
     Log Many  @{arguments}
     privatmarket.Пошук тендера по ідентифікатору  ${username}  ${tender_id}
 #   wait until element is visible  xpath=//*[@tid='createBid']  ${COMMONWAIT}
