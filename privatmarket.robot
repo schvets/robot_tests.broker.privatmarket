@@ -517,8 +517,8 @@ Wait for question
     Log  ${element}
     Log  ${text}
     ${result} =	Set Variable If
-    ...  '${text}' == 'очікується кінець кваліфікації'  pending.verification
     ...  '${text}' == 'очікується протокол'  pending.waiting
+    ...  '${text}' == 'очікується кінець кваліфікації'  pending.verification
     ...  '${text}' == 'Очікується підписання договору'	pending.payment
     ...  ${element}
     [Return]  ${result}
@@ -881,23 +881,30 @@ Check If Question Is Uploaded
 	Click Element	xpath=//*[@tid='confirmProtocol']
 	Sleep	20s
 
+#В роботі
 Завантажити протокол аукціону в авард
     [Arguments]  ${username}  ${tender_id}  ${file_path}  ${bid_index}
-    log to console  +
-    log to console  Завантажити протокол аукціону в авард
-    Log Many  @{arguments}
     privatmarket.Пошук тендера по ідентифікатору  ${username}  ${tender_id}
+    debug
 #   wait until element is visible  xpath=//*[@tid='createBid']  ${COMMONWAIT}
 #    click element  xpath=//*[@tid='createBid']
-    Wait Until Element Is Visible  xpath=//*[@tid='docProtocol']  ${COMMONWAIT}
-    Execute Javascript  document.querySelector("input[id='docsProtocolI']").className = ''
-    Sleep  2s
-    Choose File  css=input[id='docsProtocolI']  ${file_path}
-    Wait For Ajax
-#    Wait Until Element Is Not Visible  css=div.progress.progress-bar  ${COMMONWAIT}
-    Wait Until Element Is Enabled  xpath=//*[@tid='confirmProtocol']  ${COMMONWAIT}
-    Click Element  xpath=//*[@tid='confirmProtocol']
-    Sleep  20s
+	Wait For Ajax
+	Wait Until Element Is Visible  css=button[tid='btn.award.disqualify']	${COMMONWAIT}
+	Click Element  css=button[tid='btn.award.disqualify']
+	Wait Until Element Is Visible	css=button[tid='btn.award.addDocForCancel']	${COMMONWAIT}
+	${file_input_path} = 	Set Variable	//button[@tid='btn.award.addDocForCancel']/following-sibling::input
+	Execute Javascript	document.evaluate("${file_input_path}", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.className = ''
+	Sleep	2s
+	Choose File		xpath=${file_input_path}	${file_path}
+
+#В роботі
+Підтвердити наявність протоколу аукціону
+    [Arguments]  ${username}
+#    wait until element is visible
+#    click element  
+    [Return]  ${TRUE}
+
+
 
 Скасування рішення кваліфікаційної комісії
 	[Arguments]  ${username}  ${tender_uaid}  ${award_num}
