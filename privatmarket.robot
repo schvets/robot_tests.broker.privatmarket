@@ -283,10 +283,13 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 	Input text	xpath=(//div[@tid='classification']//input)[last()]	${item.classification.id}
 	Wait Until Element Is Enabled	xpath=(//ul[contains(@class, 'ui-select-choices-content')])[last()]
 	Wait Enable And Click Element	xpath=//span[@class='ui-select-choices-row-inner' and contains(., '${item.classification.id}')]
+
 	#quantity
-	Input text	xpath=(//input[@tid='item.unit.code'])[last()]	${item.unit.code}
-	Input text	xpath=(//input[@tid='item.unit.name'])[last()]	${item.unit.name}
-	Input text	xpath=(//input[@tid='item.quantity'])[last()]	${item.quantity}
+#    более нет необходимости во вставлении кода
+#    Input text	xpath=(//input[@tid='item.unit.code'])[last()]	${item.unit.code}
+    Input text	xpath=(//input[@tid='item.quantity'])[last()]	${item.quantity}
+    Select From List  xpath=(//select[@tid='item.unit.name'])[last()]  ${item.unit.name}
+
 	#address
 	Select Checkbox	xpath=(//input[@tid='item.address.checkbox'])[last()]
 	Wait Until Element Is Enabled	xpath=(//input[@tid='item.address.countryName'])[last()]
@@ -760,6 +763,7 @@ Check If Question Is Uploaded
 	Go To	${USERS.users['${username}'].homepage}
 	Run Keyword And Ignore Error	Login	${user_name}
 	privatmarket.Пошук тендера по ідентифікатору	${username}	${tender_id}
+	debug
 	Wait For Element With Reload	xpath=//a[@tid='bid.participationUrl']	5
 	${url} = 	Get Element Attribute	xpath=//a[@tid='bid.participationUrl']@href
 	[Return]  ${url}
@@ -767,6 +771,7 @@ Check If Question Is Uploaded
 
 Отримати посилання на аукціон для глядача
 	[Arguments]  ${user_name}  ${tender_id}  ${lot_id}=1
+	debug
 	Wait For Element With Reload  css=a[tid='public.data.auctionUrl']	5
 	${url} =  Get Element Attribute  css=a[tid='public.data.auctionUrl']@href
 	[Return]  ${url}
