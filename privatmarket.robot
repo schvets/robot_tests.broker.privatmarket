@@ -740,8 +740,8 @@ Check If Question Is Uploaded
 	Wait Until Element Is Visible	xpath=(//input[@tid='docurl.title'])[last()]	10s
 	Input Text	xpath=(//input[@tid='docurl.title'])[last()]	${accessDetails}
 	Input Text	xpath=(//textarea[@tid='docurl.addfield'])[last()]	${accessDetails}
-    ${file_path_forChanges}  ${file_title_forChanges}  ${file_content_forChanges}=  create_fake_doc
-    Додати документ до аукціону  ${file_path_forChanges}  string:clarifications
+    ${file_path}  ${file_title}  ${file_content}=  create_fake_doc
+    Додати документ до аукціону  ${file_path}  string:clarifications
 
 #	Auction publication section
 	Wait Until Element Is Visible  ${tenderBtn.create_edit}
@@ -855,7 +855,7 @@ Check If Question Is Uploaded
 Дискваліфікувати постачальника
 	[Arguments]  ${username}  ${tender_id}  ${award_num}  ${description}
     Wait Until Element Is Visible  xpath=(//button[@class='btn btn-danger'])[1]  ${COMMONWAIT}
-    Click Button  css=button[tid='btn.award.unsuccessful']
+    Click Button  xpath=(//button[@class='btn btn-danger'])[1]
 #	Wait Until Element Is Visible	css=button[tid='btn.award.unsuccessful']	${COMMONWAIT}
 #	Click Button	css=button[tid='btn.award.unsuccessful']
     Wait For Ajax
