@@ -96,10 +96,21 @@ def get_unit_name(current_name):
         u'штуки': {u'штука', u'штуки', u'штук'},
         u'місяць': {u'месяц', u'месяца', u'месяцев'},
         u'пачка': {u'пачка', u'пачек', u'пачкики'},
-        u'упаковка': {u'упковка', u'упаковок', u'упаковки'},
+        u'упаковка': {u'упаковка', u'упаковок', u'упаковки'},
         u'гектар': {u'гектар', u'гектара', u'гектаров'},
         u'блок': {u'блок', u'блока', u'блоков'}
     }
+
+    expected_name = None
+    dictionary.get(current_name)
+    for name, variants in dictionary.iteritems():
+        if current_name in variants:
+            expected_name = name
+
+    if expected_name:
+        return expected_name
+    else:
+        return current_name
 
 
 def get_unit_name_ru(current_name):
@@ -127,7 +138,6 @@ def get_unit_name_ru(current_name):
         u'гектар': {u'гектар', u'гектара', u'гектаров'},
         u'блок': {u'блок', u'блока', u'блоков'}
     }
-
 
     expected_name = None
     dictionary.get(current_name)

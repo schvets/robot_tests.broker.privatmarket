@@ -221,7 +221,9 @@ ${tender_data_complaint.description}  //div[@class='question-div']
     Wait Until Element Is Visible  css=section[data-id='step3']  ${COMMONWAIT}
 
 #step 3
-    Run Keyword IF  ${type} == 'aboveThresholdEU'  Додати нецінові показники  ${features}
+    Run Keyword IF
+    ...  ${type} == 'aboveThresholdEU'  Додати нецінові показники  ${features}
+    ...  ELSE IF  ${type} == 'aboveThresholdUA'  Додати нецінові показники  ${features}  ${type}
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
 
 #step 4
@@ -238,6 +240,7 @@ ${tender_data_complaint.description}  //div[@class='question-div']
 
     Run Keyword IF
     ...  ${type} == 'aboveThresholdEU'  Wait For Element With Reload  xpath=//div[@id='tenderStatus' and contains(., 'Подача пропозицій')]  1
+    ...  ELSE IF  ${type} == 'aboveThresholdUA'  Wait For Element With Reload  xpath=//div[@id='tenderStatus' and contains(., 'Подача пропозицій')]  1
     ...  ELSE  Wait For Element With Reload  xpath=//div[@id='tenderStatus' and contains(., 'Період уточнень')]  1
 
     ${tender_id}=  Get Text  css=div#tenderId
@@ -271,7 +274,9 @@ ${tender_data_complaint.description}  //div[@class='question-div']
     : FOR  ${index}  IN RANGE  0  ${items_count}
     \  Wait Element Visibility And Input Text  xpath=(//input[@data-id='description'])  ${items[${index}].description}
     \  Wait Element Visibility And Input Text  xpath=(//input[@data-id='quantity'])  ${items[${index}].quantity}
-    \  ${unitName}=  privatmarket_service.get_unit_name_ru  ${items[${index}].unit.name}
+    \  ${unitName}=  Run Keyword If
+    \  ...  ${type} == 'aboveThresholdEU'  privatmarket_service.get_unit_name_ru  ${items[${index}].unit.name}
+    \  ...  ELSE  privatmarket_service.get_unit_name  ${items[${index}].unit.name}
     \  Wait Visibility And Click Element  xpath=//select[@data-id='unit']/option[text()='${unitName}']
     \  ${deliveryStartDate}=  Get Regexp Matches  ${items[${index}].deliveryDate.startDate}  (\\d{4}-\\d{2}-\\d{2})
     \  ${deliveryStartDate}=  Convert Date  ${deliveryStartDate[0]}  result_format=%d-%m-%Y
@@ -291,16 +296,16 @@ ${tender_data_complaint.description}  //div[@class='question-div']
 
 
 Додати нецінові показники
-    [Arguments]  ${features}
+    [Arguments]  ${features}  ${type}
     Switch To PMFrame
 
     #add tender feature
     Wait Visibility And Click Element  css=label[for='features_tender_yes']
 #    debug
     Wait Element Visibility And Input Text  css=[data-id='ptrFeatures'] [ng-model='feature.title']  ${features[1].title}
-    Wait Element Visibility And Input Text  css=[data-id='ptrFeatures'] [ng-model='feature.title_en']  ${features[1].title_en}
+    Run Keyword If  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  css=[data-id='ptrFeatures'] [ng-model='feature.title_en']  ${features[1].title_en}
     Wait Element Visibility And Input Text  css=[data-id='ptrFeatures'] [ng-model='feature.description']  ${features[1].description}
-    Wait Element Visibility And Input Text  css=[data-id='ptrFeatures'] [ng-model='feature.description_en']  ${features[1].description}
+    Run Keyword If  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  css=[data-id='ptrFeatures'] [ng-model='feature.description_en']  ${features[1].description}
 
     @{tender_enums}=  Get From Dictionary  ${features[1]}  enum
     ${tender_criterion_count}=  Get Length  ${tender_enums}
@@ -313,16 +318,17 @@ ${tender_data_complaint.description}  //div[@class='question-div']
 #    \  debug
     \  Wait Element Visibility And Input Text  xpath=(//section[@data-id='ptrFeatures']//input[@data-id='value'])[${elem_index}]  ${tender_criterion_value}
     \  Wait Element Visibility And Input Text  xpath=(//section[@data-id='ptrFeatures']//input[@ng-model='criterion.title'])[${elem_index}]  ${tender_enums[${index}].title}
-    \  Wait Element Visibility And Input Text  xpath=(//section[@data-id='ptrFeatures']//input[@ng-model='criterion.title_en'])[${elem_index}]  ${tender_enums[${index}].title}
+    \  Run Keyword If  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  xpath=(//section[@data-id='ptrFeatures']//input[@ng-model='criterion.title_en'])[${elem_index}]  ${tender_enums[${index}].title}
 
     #add lot feature
+    debug
     Wait Visibility And Click Element  css=label[for='features_lots_yes']
     Wait Visibility And Click Element  css=[data-id='lot'] button[data-id='actAdd']
 #    debug
     Wait Element Visibility And Input Text  css=[data-id='lot'] [ng-model='feature.title']  ${features[0].title}
-    Wait Element Visibility And Input Text  css=[data-id='lot'] [ng-model='feature.title_en']  ${features[0].title_en}
+    Run Keyword If  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  css=[data-id='lot'] [ng-model='feature.title_en']  ${features[0].title_en}
     Wait Element Visibility And Input Text  css=[data-id='lot'] [ng-model='feature.description']  ${features[0].description}
-    Wait Element Visibility And Input Text  css=[data-id='lot'] [ng-model='feature.description_en']  ${features[0].description}
+    Run Keyword If  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  css=[data-id='lot'] [ng-model='feature.description_en']  ${features[0].description}
 
     @{lot_enums}=  Get From Dictionary  ${features[0]}  enum
     ${lot_criterion_count}=  Get Length  ${lot_enums}
@@ -335,16 +341,16 @@ ${tender_data_complaint.description}  //div[@class='question-div']
 #    \  debug
     \  Wait Element Visibility And Input Text  xpath=(//div[@data-id='lot']//input[@data-id='value'])[${elem_index}]  ${lot_criterion_value}
     \  Wait Element Visibility And Input Text  xpath=(//div[@data-id='lot']//input[@ng-model='criterion.title'])[${elem_index}]  ${lot_enums[${index}].title}
-    \  Wait Element Visibility And Input Text  xpath=(//div[@data-id='lot']//input[@ng-model='criterion.title_en'])[${elem_index}]  ${lot_enums[${index}].title}
+    \  Run Keyword If  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  xpath=(//div[@data-id='lot']//input[@ng-model='criterion.title_en'])[${elem_index}]  ${lot_enums[${index}].title}
 
     #add item feature
     Wait Visibility And Click Element  css=label[for='features_item_yes']
     Wait Visibility And Click Element  css=[data-id='item'] button[data-id='actAdd']
 #    debug
     Wait Element Visibility And Input Text  css=[data-id='item'] [ng-model='feature.title']  ${features[2].title}
-    Wait Element Visibility And Input Text  css=[data-id='item'] [ng-model='feature.title_en']  ${features[2].title_en}
+    Run Keyword If  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  css=[data-id='item'] [ng-model='feature.title_en']  ${features[2].title_en}
     Wait Element Visibility And Input Text  css=[data-id='item'] [ng-model='feature.description']  ${features[2].description}
-    Wait Element Visibility And Input Text  css=[data-id='item'] [ng-model='feature.description_en']  ${features[2].description}
+    Run Keyword If  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  css=[data-id='item'] [ng-model='feature.description_en']  ${features[2].description}
 
 
     @{item_enums}=  Get From Dictionary  ${features[2]}  enum
@@ -358,7 +364,7 @@ ${tender_data_complaint.description}  //div[@class='question-div']
 #    \  debug
     \  Wait Element Visibility And Input Text  xpath=(//div[@data-id='item']//input[@data-id='value'])[${elem_index}]  ${item_criterion_value}
     \  Wait Element Visibility And Input Text  xpath=(//div[@data-id='item']//input[@ng-model='criterion.title'])[${elem_index}]  ${item_enums[${index}].title}
-    \  Wait Element Visibility And Input Text  xpath=(//div[@data-id='item']//input[@ng-model='criterion.title_en'])[${elem_index}]  ${item_enums[${index}].title}
+    \  Run Keyword If  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  xpath=(//div[@data-id='item']//input[@ng-model='criterion.title_en'])[${elem_index}]  ${item_enums[${index}].title}
 
 
 Оновити сторінку з тендером
