@@ -172,71 +172,88 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 
 
 Внести зміни в тендер
-	[Arguments]  ${user_name}  ${tender_id}  ${field}  ${value}
+    [Arguments]  ${user_name}  ${tender_id}  ${field}  ${value}
     Увійти в редагування тендера
     Run Keyword  Змінити ${field}  ${value}
+    ${file_path}  ${file_title}  ${file_content}=  create_fake_doc
+    Додати документ до аукціону  ${filepath}  string:clarifications
+#    Wait Until Element Is Visible  css=select[tid='doc.type']
+#    Select From List  css=select[tid='doc.type']  string:clarifications
     Wait Until Element Is Visible  ${tenderBtn.create_edit}  ${COMMONWAIT}
     Click Element  ${tenderBtn.create_edit}
+    Wait Until Element Is Visible  css=div[tid='data.title']  ${COMMONWAIT}
     Sleep  10s
 
 
 Змінити value.amount
-	[Arguments]  ${value}
-	Input text	css=input[tid='data.minimalStep.amount']	'${value}'
+    [Arguments]  ${value}
+    Wait Until Element Is Visible  css=input[tid='data.minimalStep.amount']
+    Input text  css=input[tid='data.minimalStep.amount']  '${value}'
 
 
 Змінити minimalStep.amount
 	[Arguments]  ${value}
+    Wait Until Element Is Visible  css=input[tid='data.minimalStep.amount']
 	Input text	css=input[tid='data.minimalStep.amount']	'${value}'
 
 
 Змінити title
 	[Arguments]  ${value}
+    Wait Until Element Is Visible  css=input[tid='data.title']
 	Input text	css=input[tid='data.title']	 ${value}
 
 Змінити title_ru
-	[Arguments]  ${value}
-    Input text	css=input[tid='data.title_ru']  ${value}
+    [Arguments]  ${value}
+    Wait Until Element Is Visible  css=input[tid='data.title_ru']
+    Input text  css=input[tid='data.title_ru']  ${value}
 
 Змінити title_en
-	[Arguments]  ${value}
+    [Arguments]  ${value}
+    Wait Until Element Is Visible  css=input[tid='data.title_en']
     Input text	css=input[tid='data.title_en']  ${value}
 
 Змінити description
-	[Arguments]  ${value}
-	Input text	css=textarea[tid='data.description']	${value}
+    [Arguments]  ${value}
+    Wait Until Element Is Visible  css=textarea[tid='data.description']
+    Input text	css=textarea[tid='data.description']	${value}
 
 
 Змінити procuringEntity.name
 	[Arguments]  ${value}
+    Wait Until Element Is Visible  css=input[tid='procuringEntity.name'
 	Input text	css=input[tid='procuringEntity.name']	${value}
 
 
 Змінити tenderPeriod.startDate
 	[Arguments]  ${value}
+    Wait Until Element Is Visible  css=input[tid='auctionStartDate']
 	Set Date And Time	css=input[tid='auctionStartDate']	css=div[tid='auctionStartTime'] input[ng-model='hours']	css=div[tid='auctionStartTime'] input[ng-model='minutes']	${value}
 
 
 Змінити eligibilityCriteria
 	[Arguments]  ${value}
+    Wait Until Element Is Visible  css=input[tid='eligibilityCriteria']
 	Input text	css=input[tid='eligibilityCriteria']	${value}
 
 
 Змінити guarantee
 	[Arguments]  ${value}
+    Wait Until Element Is Visible  css=input[tid='data.dgfDecisionID']
 	Input text	css=input[tid='guarantyAmount']	${value}
 
 
 Змінити dgfDecisionDate
 	[Arguments]  ${value}
+    Wait Until Element Is Visible  css=input[tid='data.dgfDecisionID']
 	${correctDate} =	Convert Date	 ${value}	result_format=%d/%m/%Y
 	${correctDate} =	Convert To String	${correctDate}
 	Input Text	css=input[tid='dgfDecisionDate']	${correctDate}
 
 
 Змінити dgfDecisionID
-	[Arguments]  ${value}
-	Input text	css=input[tid='data.dgfDecisionID']	${value}
+    [Arguments]  ${value}
+    Wait Until Element Is Visible  css=input[tid='data.dgfDecisionID']
+    Input text  css=input[tid='data.dgfDecisionID']  ${value}
 
 
 Змінити tenderAttempts
@@ -244,11 +261,13 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 #	${element} = 	Set Variable	css=select[tid='data.tenderAttempts']
 #	${is_element_disabled} = 	Get Element Attribute	${element}@disabled
 #	Run Keyword If	'true' == '${is_element_disabled}'	Fail	Element '${element}' is unreadable
-	Select From List	css=select[tid='data.tenderAttempts']	number:${value}
+    Wait Until Element Is Visible  css=select[tid='data.tenderAttempts']
+    Select From List  css=select[tid='data.tenderAttempts']  number:${value}
 
 Змінити dgfID
-	[Arguments]  ${value}
-	Input text	css=input[tid='data.dgfID']	${value}
+    [Arguments]  ${value}
+    Wait Until Element Is Visible  css=input[tid='data.dgfID']
+    Input text  css=input[tid='data.dgfID']  ${value}
 
 Додати предмет закупівлі
 	[Arguments]  ${user_name}  ${tender_id}  ${item}
