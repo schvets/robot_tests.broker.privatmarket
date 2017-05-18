@@ -324,6 +324,9 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 	Run Keyword And Return If	'${element}' == 'tenderAttempts'						Отримати значення поля Лоти виставляються	${element}
 	Run Keyword And Return If	'${element}' == 'cancellations[0].status'				Перевірити cancellations[0].status
 
+    Run Keyword And Return If  '${element}' == 'awards[0].status'  Отримати awards status  ${element}
+    Run Keyword And Return If  '${element}' == 'awards[1].status'  Отримати awards status  ${element}
+#    ${tender_data.awards[1].status}
 	Run Keyword And Return If	'Period.' in '${element}'								Отримати дату та час						${element}
 
 	Wait Until Element Is Visible	${tender_data.${element}}	timeout=${COMMONWAIT}
@@ -501,6 +504,21 @@ Wait for question
 	...  ${element}
 	[Return]  ${result}
 
+
+Отримати awards status
+    [Arguments]  ${element}
+    Log  ${element}
+    Reload Page
+    Sleep  10s
+    ${element_text} =  Get Text  ${tender_data.${element_name}}
+    ${text} =  Strip String  ${element_text}
+    Log  ${text}
+    ${result} =	Set Variable If
+    ...  '${text}' == 'очікується кінець кваліфікації'  pending.verification
+    ...  '${text}' == 'очікується протокол'  pending.waiting
+    ...  '${text}' == 'Очікується підписання договору'	pending.payment
+    ...  ${element}
+    [Return]  ${result}
 
 Отримати інформацію із пропозиції
 	[Arguments]  ${user_name}  ${tender_id}  ${field}
@@ -832,9 +850,12 @@ Check If Question Is Uploaded
 
 Дискваліфікувати постачальника
 	[Arguments]  ${username}  ${tender_id}  ${award_num}  ${description}
-	Wait Until Element Is Visible	css=button[tid='btn.award.unsuccessful']	${COMMONWAIT}
-	Click Button	css=button[tid='btn.award.unsuccessful']
-	Wait For Ajax
+    Wait Until Element Is Visible  xpath=(//button[@class='btn btn-danger'])[1]  ${COMMONWAIT}
+    Click Button  css=button[tid='btn.award.unsuccessful']
+#	Wait Until Element Is Visible	css=button[tid='btn.award.unsuccessful']	${COMMONWAIT}
+#	Click Button	css=button[tid='btn.award.unsuccessful']
+    Wait For Ajax
+    Reload Page
 
 
 Завантажити протокол аукціону
