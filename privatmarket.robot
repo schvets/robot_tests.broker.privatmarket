@@ -672,7 +672,6 @@ Check If Question Is Uploaded
 
 Увійти в редагування тендера
     ${at_modification_page} =  Run Keyword And Return Status  Wait Until Element Is Visible  css=button[tid='btn.modifyLot']  15s
-    Wait Until Element Is Visible  css=button[tid='btn.modifyLot']
     Run Keyword If  ${at_modification_page}  Click Element  css=button[tid='btn.modifyLot']
     Wait Until Element Is Visible  css=input[tid='data.title']
 
