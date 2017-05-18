@@ -858,10 +858,10 @@ Check If Question Is Uploaded
 
 Дискваліфікувати постачальника
 	[Arguments]  ${username}  ${tender_id}  ${award_num}  ${description}
-    Wait Until Element Is Visible  xpath=(//button[@class='btn btn-danger'])[1]  ${COMMONWAIT}
-    Click Button  xpath=(//button[@class='btn btn-danger'])[1]
-#	Wait Until Element Is Visible	css=button[tid='btn.award.unsuccessful']	${COMMONWAIT}
-#	Click Button	css=button[tid='btn.award.unsuccessful']
+#    Wait Until Element Is Visible  xpath=(//button[@class='btn btn-danger'])[1]  ${COMMONWAIT}
+#    Click Button  xpath=(//button[@class='btn btn-danger'])[1]
+	Wait Until Element Is Visible	css=button[tid='btn.award.unsuccessful']	${COMMONWAIT}
+	Click Button	css=button[tid='btn.award.unsuccessful']
     Wait For Ajax
     Reload Page
 
@@ -901,7 +901,7 @@ Check If Question Is Uploaded
 Підтвердити наявність протоколу аукціону
     [Arguments]  ${username}
 #    wait until element is visible
-#    click element  
+#    click element
     [Return]  ${TRUE}
 
 
