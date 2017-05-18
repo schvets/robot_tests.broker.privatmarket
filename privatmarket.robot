@@ -740,11 +740,11 @@ Check If Question Is Uploaded
 	Wait Until Element Is Visible	xpath=(//input[@tid='docurl.title'])[last()]	10s
 	Input Text	xpath=(//input[@tid='docurl.title'])[last()]	${accessDetails}
 	Input Text	xpath=(//textarea[@tid='docurl.addfield'])[last()]	${accessDetails}
+    ${file_path_forChanges}  ${file_title_forChanges}  ${file_content_forChanges}=  create_fake_doc
+    Додати документ до аукціону  ${file_path_forChanges}  string:clarifications
 
 #	Auction publication section
 	Wait Until Element Is Visible  ${tenderBtn.create_edit}
-	${file_path_forChanges}  ${file_title_forChanges}  ${file_content_forChanges}=  create_fake_doc
-    Додати документ до аукціону  ${file_path_forChanges}  string:clarifications
 	Wait For Ajax
 	Click Element  ${tenderBtn.create_edit}
 	Wait For Ajax
