@@ -326,7 +326,7 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 
     Run Keyword And Return If  '${element}' == 'awards[0].status'  Отримати awards status  ${element}
     Run Keyword And Return If  '${element}' == 'awards[1].status'  Отримати awards status  ${element}
-#    ${tender_data.awards[1].status}
+
 	Run Keyword And Return If	'Period.' in '${element}'								Отримати дату та час						${element}
 
 	Wait Until Element Is Visible	${tender_data.${element}}	timeout=${COMMONWAIT}
@@ -520,6 +520,7 @@ Wait for question
     ...  ${element}
     [Return]  ${result}
 
+
 Отримати інформацію із пропозиції
 	[Arguments]  ${user_name}  ${tender_id}  ${field}
 	${locator} = 	Set Variable If	'${field}' == 'value.amount'	css=span[tid='bid.amount']	null
@@ -670,7 +671,8 @@ Check If Question Is Uploaded
 
 
 Увійти в редагування тендера
-    ${at_modification_page} =  Run Keyword And return Status  Wait Until Element Is Visible  css=button[tid='btn.modifyLot']  15s
+    ${at_modification_page} =  Run Keyword And Return Status  Wait Until Element Is Visible  css=button[tid='btn.modifyLot']  15s
+    Wait Until Element Is Visible  css=button[tid='btn.modifyLot']
     Run Keyword If  ${at_modification_page}  Click Element  css=button[tid='btn.modifyLot']
     Wait Until Element Is Visible  css=input[tid='data.title']
 
@@ -741,6 +743,8 @@ Check If Question Is Uploaded
 
 #	Auction publication section
 	Wait Until Element Is Visible  ${tenderBtn.create_edit}
+	${file_path_forChanges}  ${file_title_forChanges}  ${file_content_forChanges}=  create_fake_doc
+    Додати документ до аукціону  ${file_path_forChanges}  string:clarifications
 	Wait For Ajax
 	Click Element  ${tenderBtn.create_edit}
 	Wait For Ajax
