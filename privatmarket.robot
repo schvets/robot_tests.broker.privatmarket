@@ -507,11 +507,11 @@ Wait for question
 
 Отримати awards status
     [Arguments]  ${element}
-    Log  ${element}
     Reload Page
     Sleep  10s
-    ${element_text} =  Get Text  ${tender_data.${element_name}}
+    ${element_text} =  Get Text  ${tender_data.${element}}
     ${text} =  Strip String  ${element_text}
+    Log  ${element}
     Log  ${text}
     ${result} =	Set Variable If
     ...  '${text}' == 'очікується кінець кваліфікації'  pending.verification
