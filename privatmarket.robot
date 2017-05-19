@@ -300,9 +300,6 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 
 Пошук тендера по ідентифікатору
 	[Arguments]  ${user_name}  ${tender_id}
-    Log  ${tender_id}
-    Log to console  +
-    Log to console  ${tender_id}
 	Wait For Auction	${tender_id}
 	Wait Enable And Click Element	css=a[tid='${tender_id}']
 	Wait Until element Is Visible	css=div[tid='data.title']	${COMMONWAIT}
@@ -446,8 +443,8 @@ Wait for question
 
 Отримати текст
 	[Arguments]  ${element_name}
-	${result_full} =				Get Text		${tender_data.${element_name}}
-	${result} =						Strip String	${result_full}
+	${result_full} =  Get Text  ${tender_data.${element_name}}
+	${result} =  Strip String  ${result_full}
 	[Return]	${result}
 
 
@@ -589,8 +586,8 @@ Check If Question Is Uploaded
 	Wait Until Element Is Visible	xpath=//div[@class='row question' and contains(., '${question_id}')]//input[@tid='input.answer']	${COMMONWAIT}
 	Input Text	xpath=//div[@class='row question' and contains(., '${question_id}')]//input[@tid='input.answer']	${answer.data.answer}
 	Click Button	xpath=//div[@class='row question' and contains(., '${question_id}')]//button[@tid='answerQuestion']
+	Sleep  3s
 	Wait For Ajax
-	Wait Until Element Is Not Visible	css=div.progress.progress-bar	${COMMONWAIT}
 
 
 Подати цінову пропозицію
@@ -879,11 +876,9 @@ Check If Question Is Uploaded
 	Sleep	20s
 
 
-#В роботі
 Завантажити протокол аукціону в авард
     [Arguments]  ${username}  ${tender_id}  ${file_path}  ${bid_index}
     privatmarket.Пошук тендера по ідентифікатору  ${username}  ${tender_id}
-    debug
     Wait For Ajax
     Wait Until Element Is Visible  css=button[tid='btn.award.disqualify']	${COMMONWAIT}
     Click Element  css=button[tid='btn.award.disqualify']
@@ -893,13 +888,12 @@ Check If Question Is Uploaded
     Sleep	2s
     Choose File		xpath=${file_input_path}	${file_path}
 
-#В роботі
 Підтвердити наявність протоколу аукціону
-    [Arguments]  ${username}
+    [Arguments]  ${user_name}   ${tender_id}   ${award_index}
     privatmarket.Пошук тендера по ідентифікатору  ${username}  ${tender_id}
     Wait For Ajax
-    Wait Until Element Is Visible  css=button[tid='btn.award.disqualify']	${COMMONWAIT}
-    [Return]  ${TRUE}
+    Wait Until Element Is Visible   xpath=//*[text()[contains(.,'Підтвердити протокол')]]  ${COMMONWAIT}
+    Click Element   xpath=//*[text()[contains(.,'Підтвердити протокол')]]
 
 
 Скасування рішення кваліфікаційної комісії
