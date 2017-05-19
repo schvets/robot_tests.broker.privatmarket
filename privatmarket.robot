@@ -104,11 +104,11 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 
 
 Оновити сторінку з тендером
-	[Arguments]  ${user_name}  ${tender_id}
-	Switch Browser	${user_name}
+    [Arguments]  ${user_name}  ${tender_id}
+    Switch Browser	${user_name}
     ${tenderEdit}=  Run Keyword And Return Status	Wait Until Element Is Visible  css=input[tid='data.title']  5s
-	run keyword if  '${tenderEdit}' == 'False'  Reload Page
-	Sleep	3s
+    Run Keyword If  '${tenderEdit}' == 'False'  Reload Page
+    Sleep	3s
 
 
 Створити тендер
