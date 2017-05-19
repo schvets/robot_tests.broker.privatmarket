@@ -489,9 +489,6 @@ Wait for question
 Отримати status аукціону
 	[Arguments]  ${element}
 	Log  ${element}
-#	Wait For Element With Reload	${tender_data.${element}}
-#	Wait For Element With Any Text	${tender_data.${element}}
-#	${text} =	Отримати текст елемента	${element}
     Reload Page
     Sleep  5s
     ${element_text} =  Get Text  xpath=//span[@tid='data.statusName']/span[1]
