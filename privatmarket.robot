@@ -45,6 +45,7 @@ ${tender_data.items.unit.name}							span[@tid='item.unit.name']
 ${tender_data.items.unit.code}							span[@tid='item.unit.code']
 ${tender_data.items.quantity}							span[@tid='item.quantity']
 ${tender_data.items.description}						div[@tid='item.description']
+${tender_data.items[0].unit.code}						span[@tid='item.unit.code']
 
 ${tender_data.questions.title}							span[@tid='data.question.title']
 ${tender_data.questions.description}					span[@tid='data.question.description']
@@ -163,7 +164,6 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 	Wait Until Element Is Visible	css=button[tid='btn.publicateLot']
 	Click Button	css=button[tid='btn.publicateLot']
 	Wait For Ajax
-	Wait Until Element Is Not Visible	css=button[tid='btn.publicateLot']	${COMMONWAIT}
 	Wait For Element With Reload	css=div[tid='data.auctionID']
 	${tender_id}=  Get Text	css=div[tid='data.auctionID']
 	Go To	${USERS.users['${username}'].homepage}
@@ -177,8 +177,6 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
     Run Keyword  Змінити ${field}  ${value}
     ${file_path}  ${file_title}  ${file_content}=  create_fake_doc
     Додати документ до аукціону  ${filepath}  string:clarifications
-#    Wait Until Element Is Visible  css=select[tid='doc.type']
-#    Select From List  css=select[tid='doc.type']  string:clarifications
     Wait Until Element Is Visible  ${tenderBtn.create_edit}  ${COMMONWAIT}
     Click Element  ${tenderBtn.create_edit}
     Wait Until Element Is Visible  css=div[tid='data.title']  ${COMMONWAIT}
@@ -192,15 +190,15 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 
 
 Змінити minimalStep.amount
-	[Arguments]  ${value}
+    [Arguments]  ${value}
     Wait Until Element Is Visible  css=input[tid='data.minimalStep.amount']
-	Input text	css=input[tid='data.minimalStep.amount']	'${value}'
+    Input text	css=input[tid='data.minimalStep.amount']	'${value}'
 
 
 Змінити title
-	[Arguments]  ${value}
+    [Arguments]  ${value}
     Wait Until Element Is Visible  css=input[tid='data.title']
-	Input text	css=input[tid='data.title']	 ${value}
+    Input text	css=input[tid='data.title']	 ${value}
 
 Змінити title_ru
     [Arguments]  ${value}
@@ -219,9 +217,9 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 
 
 Змінити procuringEntity.name
-	[Arguments]  ${value}
+    [Arguments]  ${value}
     Wait Until Element Is Visible  css=input[tid='procuringEntity.name'
-	Input text	css=input[tid='procuringEntity.name']	${value}
+    Input text	css=input[tid='procuringEntity.name']	${value}
 
 
 Змінити tenderPeriod.startDate
@@ -231,9 +229,9 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 
 
 Змінити eligibilityCriteria
-	[Arguments]  ${value}
+    [Arguments]  ${value}
     Wait Until Element Is Visible  css=input[tid='eligibilityCriteria']
-	Input text	css=input[tid='eligibilityCriteria']	${value}
+    Input text	css=input[tid='eligibilityCriteria']	${value}
 
 
 Змінити guarantee
@@ -258,9 +256,6 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 
 Змінити tenderAttempts
 	[Arguments]  ${value}
-#	${element} = 	Set Variable	css=select[tid='data.tenderAttempts']
-#	${is_element_disabled} = 	Get Element Attribute	${element}@disabled
-#	Run Keyword If	'true' == '${is_element_disabled}'	Fail	Element '${element}' is unreadable
     Wait Until Element Is Visible  css=select[tid='data.tenderAttempts']
     Select From List  css=select[tid='data.tenderAttempts']  number:${value}
 
@@ -285,8 +280,6 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 	Wait Enable And Click Element	xpath=//span[@class='ui-select-choices-row-inner' and contains(., '${item.classification.id}')]
 
 	#quantity
-#    более нет необходимости во вставлении кода
-#    Input text	xpath=(//input[@tid='item.unit.code'])[last()]	${item.unit.code}
     Input text	xpath=(//input[@tid='item.quantity'])[last()]	${item.quantity}
     Select From List  xpath=(//select[@tid='item.unit.name'])[last()]  ${item.unit.name}
 
@@ -340,16 +333,16 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 Отримати інформацію із предмету
 	[Arguments]  ${username}  ${tender_uaid}  ${item_id}  ${element}
 	${element} = 			Convert To String	items.${element}
-	${element_for_work} = 	Set variable		xpath=//div[@ng-repeat='item in data.items' and contains(., '${item_id}')]//${tender_data.${element}}
+	${element_for_work} =  Set variable		xpath=//div[@ng-repeat='item in data.items' and contains(., '${item_id}')]//${tender_data.${element}}
 	Wait For Element With Reload				${element_for_work}
 
 	Run Keyword And Return If	'${element}' == 'items.deliveryDate.endDate'			Отримати дату та час			${element_for_work}
 	Run Keyword And Return If	'${element}' == 'items.deliveryLocation.latitude'		Отримати число					${element_for_work}
 	Run Keyword And Return If	'${element}' == 'items.deliveryLocation.longitude'		Отримати число					${element_for_work}
 	Run Keyword And Return If	'${element}' == 'items.quantity'						Отримати число					${element_for_work}
-
+    Run Keyword And Return If	'${element}' == 'items.unit.code'  Отримати unit.code  ${element_for_work}
 	Wait Until Element Is Visible	${element_for_work}	timeout=${COMMONWAIT}
-	${result} =				Отримати текст елемента		${element_for_work}
+	${result} =  Отримати текст елемента  ${element_for_work}
 	[Return]	${result}
 
 
@@ -421,10 +414,24 @@ Wait for question
 		...  'css=' in '${temp_name}' or 'xpath=' in '${temp_name}'	${element_name}
 		...  ${tender_data.${element_name}}
 
-	Wait Until Element Is Visible	${selector}
-	${result_full} =				Get Text		${selector}
-	${result_full} =				Strip String	${result_full}
-	[Return]	${result_full}
+	Wait Until Element Is Visible  ${selector}
+	${result_full} =  Get Text  ${selector}
+	${result} =  Strip String  ${result_full}
+	[Return]	${result}
+
+
+Отримати unit.code
+    [Arguments]  ${element_name}
+    ${temp_name} =  Remove String  ${element_name}  '
+    ${selector} =  Set Variable If
+        ...  'css=' in '${temp_name}' or 'xpath=' in '${temp_name}'	${element_name}
+        ...  ${tender_data.${element_name}}
+    Wait Until Element Is Visible  ${selector}
+    ${is_present} =  Run Keyword And Return Status  Get Element Attribute  ${selector}@tidvalue
+    Run Keyword And Return If  '${is_present}' == '${TRUE}'  Get Element Attribute  ${selector}@tidvalue
+    ${result_full} =  Get Text  ${selector}
+    ${result} =  Strip String  ${result_full}
+    [Return]  ${result}
 
 
 Отримати документ
@@ -763,7 +770,6 @@ Check If Question Is Uploaded
 	Go To	${USERS.users['${username}'].homepage}
 	Run Keyword And Ignore Error	Login	${user_name}
 	privatmarket.Пошук тендера по ідентифікатору	${username}	${tender_id}
-	debug
 	Wait For Element With Reload	xpath=//a[@tid='bid.participationUrl']	5
 	${url} = 	Get Element Attribute	xpath=//a[@tid='bid.participationUrl']@href
 	[Return]  ${url}
@@ -771,7 +777,6 @@ Check If Question Is Uploaded
 
 Отримати посилання на аукціон для глядача
 	[Arguments]  ${user_name}  ${tender_id}  ${lot_id}=1
-	debug
 	Wait For Element With Reload  css=a[tid='public.data.auctionUrl']	5
 	${url} =  Get Element Attribute  css=a[tid='public.data.auctionUrl']@href
 	[Return]  ${url}
@@ -858,8 +863,6 @@ Check If Question Is Uploaded
 
 Дискваліфікувати постачальника
 	[Arguments]  ${username}  ${tender_id}  ${award_num}  ${description}
-#    Wait Until Element Is Visible  xpath=(//button[@class='btn btn-danger'])[1]  ${COMMONWAIT}
-#    Click Button  xpath=(//button[@class='btn btn-danger'])[1]
 	Wait Until Element Is Visible	css=button[tid='btn.award.unsuccessful']	${COMMONWAIT}
 	Click Button	css=button[tid='btn.award.unsuccessful']
     Wait For Ajax
@@ -869,41 +872,37 @@ Check If Question Is Uploaded
 Завантажити протокол аукціону
 	[Arguments]  ${username}  ${tender_id}  ${file_path}  ${bid_index}
 	privatmarket.Пошук тендера по ідентифікатору	${username}	${tender_id}
-#	wait until element is visible  xpath=//*[@tid='createBid']  ${COMMONWAIT}
-#	click element  xpath=//*[@tid='createBid']
 	Wait Until Element Is Visible	xpath=//*[@tid='docProtocol']	${COMMONWAIT}
 	Execute Javascript	document.querySelector("input[id='docsProtocolI']").className = ''
 	Sleep	2s
 	Choose File		css=input[id='docsProtocolI']	${file_path}
 	Wait For Ajax
-#	Wait Until Element Is Not Visible		css=div.progress.progress-bar	${COMMONWAIT}
 	Wait Until Element Is Enabled	xpath=//*[@tid='confirmProtocol']	${COMMONWAIT}
 	Click Element	xpath=//*[@tid='confirmProtocol']
 	Sleep	20s
+
 
 #В роботі
 Завантажити протокол аукціону в авард
     [Arguments]  ${username}  ${tender_id}  ${file_path}  ${bid_index}
     privatmarket.Пошук тендера по ідентифікатору  ${username}  ${tender_id}
     debug
-#   wait until element is visible  xpath=//*[@tid='createBid']  ${COMMONWAIT}
-#    click element  xpath=//*[@tid='createBid']
-	Wait For Ajax
-	Wait Until Element Is Visible  css=button[tid='btn.award.disqualify']	${COMMONWAIT}
-	Click Element  css=button[tid='btn.award.disqualify']
-	Wait Until Element Is Visible	css=button[tid='btn.award.addDocForCancel']	${COMMONWAIT}
-	${file_input_path} = 	Set Variable	//button[@tid='btn.award.addDocForCancel']/following-sibling::input
-	Execute Javascript	document.evaluate("${file_input_path}", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.className = ''
-	Sleep	2s
-	Choose File		xpath=${file_input_path}	${file_path}
+    Wait For Ajax
+    Wait Until Element Is Visible  css=button[tid='btn.award.disqualify']	${COMMONWAIT}
+    Click Element  css=button[tid='btn.award.disqualify']
+    Wait Until Element Is Visible	css=button[tid='btn.award.addDocForCancel']	${COMMONWAIT}
+    ${file_input_path} = 	Set Variable	//button[@tid='btn.award.addDocForCancel']/following-sibling::input
+    Execute Javascript	document.evaluate("${file_input_path}", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.className = ''
+    Sleep	2s
+    Choose File		xpath=${file_input_path}	${file_path}
 
 #В роботі
 Підтвердити наявність протоколу аукціону
     [Arguments]  ${username}
-#    wait until element is visible
-#    click element
+    privatmarket.Пошук тендера по ідентифікатору  ${username}  ${tender_id}
+    Wait For Ajax
+    Wait Until Element Is Visible  css=button[tid='btn.award.disqualify']	${COMMONWAIT}
     [Return]  ${TRUE}
-
 
 
 Скасування рішення кваліфікаційної комісії
@@ -921,7 +920,6 @@ Check If Question Is Uploaded
 	Wait Until Element Is Visible	${tender_data.${element}}
 	Wait For Element With Any Text	${tender_data.${element}}
 	${result} =	Get Element Attribute	css=div[tid='data.procurementMethodType']@tidvalue
-#	${result} =	Execute Javascript	return document.querySelector("div[tid='data.procurementMethodType']").innerHTML
 	[Return]	${result}
 
 
