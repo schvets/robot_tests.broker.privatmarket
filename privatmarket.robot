@@ -135,16 +135,18 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 	${amount_to_enter} = 	Convert To String	${tender_data.data.value.amount}
 	${amount_to_enter2} = 	Replace String	${amount_to_enter}  .  ,
 	Click Element	css=input[tid='data.value.amount']
-	Run Keyword If	'${os}' == 'Linux'	Input text	css=input[tid='data.value.amount']	${amount_to_enter}
-	...  ELSE	Input text	css=input[tid='data.value.amount']	${amount_to_enter2}
+#	Run Keyword If	'${os}' == 'Linux'	Input text	css=input[tid='data.value.amount']	${amount_to_enter}
+#	...  ELSE	Input text	css=input[tid='data.value.amount']	${amount_to_enter2}
+    Input text	css=input[tid='data.value.amount']	${amount_to_enter2}
 
 	Run Keyword If	'${tender_data.data.value.valueAddedTaxIncluded}' == 'True'	Click Element	css=input[tid='data.value.valueAddedTaxIncluded']
 	...  ELSE	Click Element	css=input[tid='data.value.valueAddedTaxNotIncluded']
 	${amount_to_enter} = 	Convert To String	${tender_data.data.minimalStep.amount}
 	${amount_to_enter2} = 	Replace String	${amount_to_enter}	.	,
 	Click Element	css=input[tid='data.minimalStep.amount']
-	Run Keyword If	'${os}' == 'Linux'	Input text	css=input[tid='data.minimalStep.amount']	${amount_to_enter}
-	...  ELSE	Input text	css=input[tid='data.minimalStep.amount']	${amount_to_enter2}
+#	Run Keyword If	'${os}' == 'Linux'	Input text	css=input[tid='data.minimalStep.amount']	${amount_to_enter}
+#	...  ELSE	Input text	css=input[tid='data.minimalStep.amount']	${amount_to_enter2}
+    Input text	css=input[tid='data.minimalStep.amount']	${amount_to_enter2}
 	#date/time
 	Set Date And Time	css=input[tid='auctionStartDate']	css=div[tid='auctionStartTime'] input[ng-model='hours']	css=div[tid='auctionStartTime'] input[ng-model='minutes']	${tender_data.data.auctionPeriod.startDate}
 
@@ -518,9 +520,12 @@ Wait for question
     Log  ${element}
     Log  ${text}
     ${result} =	Set Variable If
-    ...  '${text}' == 'очікується протокол'  pending.waiting
-    ...  '${text}' == 'очікується кінець кваліфікації'  pending.verification
+    ...  '${text}' == 'очікується протокол'  pending.verification
+    ...  '${text}' == 'очікується кінець кваліфікації'  pending.waiting
     ...  '${text}' == 'Очікується підписання договору'	pending.payment
+    ...  '${text}' == 'Оплачено, очікується підписання договору/переможець'	active
+    ...  '${text}' == 'учасник самодискваліфікувався'  cancelled
+    ...  '${text}' == 'дискваліфіковано'  unsuccessful
     ...  ${element}
     [Return]  ${result}
 
@@ -888,12 +893,13 @@ Check If Question Is Uploaded
     Sleep	2s
     Choose File		xpath=${file_input_path}	${file_path}
 
+
 Підтвердити наявність протоколу аукціону
     [Arguments]  ${user_name}   ${tender_id}   ${award_index}
     privatmarket.Пошук тендера по ідентифікатору  ${username}  ${tender_id}
     Wait For Ajax
-    Wait Until Element Is Visible   xpath=//*[text()[contains(.,'Підтвердити протокол')]]  ${COMMONWAIT}
-    Click Element   xpath=//*[text()[contains(.,'Підтвердити протокол')]]
+    Wait Until Element Is Visible   css=button[tid='confirmProtocol']  ${COMMONWAIT}
+    Click Element   css=button[tid='confirmProtocol']
 
 
 Скасування рішення кваліфікаційної комісії
