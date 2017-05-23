@@ -64,8 +64,8 @@ ${tender_data.tenderAttempts}							css=span[tid='data.tenderAttempts']
 ${tender_data.dgfDecisionDate}							css=span[tid='data.dgfDecisionDate']
 ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 
-${tender_data.awards[0].status}  css=span[tid='award.status']
-${tender_data.awards[1].status}  css=span[tid='award.status']
+${tender_data.awards[0].status}  xpath=(//span[@tid='award.status'])[1]
+${tender_data.awards[1].status}  xpath=(//span[@tid='award.status'])[2]
 
 ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 
@@ -135,18 +135,18 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 	${amount_to_enter} = 	Convert To String	${tender_data.data.value.amount}
 	${amount_to_enter2} = 	Replace String	${amount_to_enter}  .  ,
 	Click Element	css=input[tid='data.value.amount']
-#	Run Keyword If	'${os}' == 'Linux'	Input text	css=input[tid='data.value.amount']	${amount_to_enter}
-#	...  ELSE	Input text	css=input[tid='data.value.amount']	${amount_to_enter2}
-    Input text	css=input[tid='data.value.amount']	${amount_to_enter2}
+	Run Keyword If	'${os}' == 'Linux'	Input text	css=input[tid='data.value.amount']	${amount_to_enter}
+	...  ELSE	Input text	css=input[tid='data.value.amount']	${amount_to_enter2}
+#    Input text	css=input[tid='data.value.amount']	${amount_to_enter2}
 
 	Run Keyword If	'${tender_data.data.value.valueAddedTaxIncluded}' == 'True'	Click Element	css=input[tid='data.value.valueAddedTaxIncluded']
 	...  ELSE	Click Element	css=input[tid='data.value.valueAddedTaxNotIncluded']
 	${amount_to_enter} = 	Convert To String	${tender_data.data.minimalStep.amount}
 	${amount_to_enter2} = 	Replace String	${amount_to_enter}	.	,
 	Click Element	css=input[tid='data.minimalStep.amount']
-#	Run Keyword If	'${os}' == 'Linux'	Input text	css=input[tid='data.minimalStep.amount']	${amount_to_enter}
-#	...  ELSE	Input text	css=input[tid='data.minimalStep.amount']	${amount_to_enter2}
-    Input text	css=input[tid='data.minimalStep.amount']	${amount_to_enter2}
+	Run Keyword If	'${os}' == 'Linux'	Input text	css=input[tid='data.minimalStep.amount']	${amount_to_enter}
+	...  ELSE	Input text	css=input[tid='data.minimalStep.amount']	${amount_to_enter2}
+#    Input text	css=input[tid='data.minimalStep.amount']	${amount_to_enter2}
 	#date/time
 	Set Date And Time	css=input[tid='auctionStartDate']	css=div[tid='auctionStartTime'] input[ng-model='hours']	css=div[tid='auctionStartTime'] input[ng-model='minutes']	${tender_data.data.auctionPeriod.startDate}
 
