@@ -600,6 +600,7 @@ Check If Question Is Uploaded
 	${os} = 	Evaluate	platform.system()	platform
 	Run Keyword If	'без кваліфікації' in '${TEST NAME}'	Fail	Is not implemented yet
 	#дождаться появления поля ввода ссуммы только в случае выполнения первого позитивного теста
+	debug
 	Run Keyword Unless	'Неможливість подати цінову' in '${TEST NAME}' or 'подати повторно цінову' in '${TEST NAME}'
 		...  Wait Until Element Is Enabled	css=button[tid='createBid']	${COMMONWAIT}
 	Click Button	css=button[tid='createBid']
@@ -891,16 +892,21 @@ Check If Question Is Uploaded
 	Sleep	2s
 	Choose File		css=input[id='docsProtocolI']	${file_path}
 	Wait For Ajax
-
-
-Підтвердити наявність протоколу аукціону
-    [Arguments]  ${user_name}   ${tender_id}   ${award_index}
-    Wait For Ajax
     Wait Until Element Is Visible   css=button[tid='confirmProtocol']  ${COMMONWAIT}
     Click Element   css=button[tid='confirmProtocol']
 	Wait For Ajax
 	Wait Until Element Is Visible   css=button[tid='defaultOk']  ${COMMONWAIT}
     Click Element   css=button[tid='defaultOk']
+
+
+Підтвердити наявність протоколу аукціону
+    [Arguments]  ${user_name}   ${tender_id}   ${award_index}
+    Wait Until Element Is Visible	${tender_data.awards[${award_index}].status}	${COMMONWAIT}
+    ${element_text}=  Get Text  ${tender_data.awards[${award_index}].status}
+    ${text}=  Strip String  ${element_text}
+    ${result}=  Set Variable  False
+    ${result}=  Set Variable If  '${text}' == 'Очікується підписання договору'  True
+    [Return]  ${result}
 
 
 Скасування рішення кваліфікаційної комісії
