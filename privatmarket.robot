@@ -786,8 +786,7 @@ Check If Question Is Uploaded
 	[Arguments]  ${user_name}  ${tender_id}  ${award_num}
 	Wait For Ajax
 	Wait For Element With Reload  css=button[tid='btn.award.active']  4
-	${buttons_list} =  Get Webelements  css=button[tid='btn.award.active']
-	Click Button  ${buttons_list[${award_num}]}
+	Click Button  css=button[tid='btn.award.active']
 	Wait For Ajax
 	Wait Until Element Is Visible   css=button[tid='defaultOk']  ${COMMONWAIT}
     Click Element   css=button[tid='defaultOk']
@@ -901,12 +900,8 @@ Check If Question Is Uploaded
 
 Підтвердити наявність протоколу аукціону
     [Arguments]  ${user_name}   ${tender_id}   ${award_index}
-    Wait Until Element Is Visible	${tender_data.awards[${award_index}].status}	${COMMONWAIT}
-    ${element_text}=  Get Text  ${tender_data.awards[${award_index}].status}
-    ${text}=  Strip String  ${element_text}
-    ${result}=  Set Variable  False
-    ${result}=  Set Variable If  '${text}' == 'Очікується підписання договору'  True
-    [Return]  ${result}
+    Wait For Ajax
+    Wait Until Element Contains  ${tender_data.awards[${award_index}].status}  Очікується підписання договору
 
 
 Скасування рішення кваліфікаційної комісії
