@@ -788,6 +788,8 @@ Check If Question Is Uploaded
 	${buttons_list} =  Get Webelements  css=button[tid='btn.award.active']
 	Click Button  ${buttons_list[${award_num}]}
 	Wait For Ajax
+	Wait Until Element Is Visible   css=button[tid='defaultOk']  ${COMMONWAIT}
+    Click Element   css=button[tid='defaultOk']
 
 
 Завантажити угоду до тендера
@@ -893,9 +895,12 @@ Check If Question Is Uploaded
 
 Підтвердити наявність протоколу аукціону
     [Arguments]  ${user_name}   ${tender_id}   ${award_index}
+    Wait For Ajax
     Wait Until Element Is Visible   css=button[tid='confirmProtocol']  ${COMMONWAIT}
     Click Element   css=button[tid='confirmProtocol']
 	Wait For Ajax
+	Wait Until Element Is Visible   css=button[tid='defaultOk']  ${COMMONWAIT}
+    Click Element   css=button[tid='defaultOk']
 
 
 Скасування рішення кваліфікаційної комісії
