@@ -883,15 +883,12 @@ Check If Question Is Uploaded
 
 Завантажити протокол аукціону в авард
     [Arguments]  ${username}  ${tender_id}  ${file_path}  ${bid_index}
-    privatmarket.Пошук тендера по ідентифікатору  ${username}  ${tender_id}
-    Wait For Ajax
-    Wait Until Element Is Visible  css=button[tid='btn.award.disqualify']	${COMMONWAIT}
-    Click Element  css=button[tid='btn.award.disqualify']
-    Wait Until Element Is Visible	css=button[tid='btn.award.addDocForCancel']	${COMMONWAIT}
-    ${file_input_path} = 	Set Variable	//button[@tid='btn.award.addDocForCancel']/following-sibling::input
-    Execute Javascript	document.evaluate("${file_input_path}", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.className = ''
-    Sleep	2s
-    Choose File		xpath=${file_input_path}	${file_path}
+	privatmarket.Пошук тендера по ідентифікатору	${username}	${tender_id}
+	Wait Until Element Is Visible	xpath=//*[@tid='docProtocol']	${COMMONWAIT}
+	Execute Javascript	document.querySelector("input[id='docsProtocolI']").className = ''
+	Sleep	2s
+	Choose File		css=input[id='docsProtocolI']	${file_path}
+	Wait For Ajax
 
 
 Підтвердити наявність протоколу аукціону
@@ -900,6 +897,7 @@ Check If Question Is Uploaded
     Wait For Ajax
     Wait Until Element Is Visible   css=button[tid='confirmProtocol']  ${COMMONWAIT}
     Click Element   css=button[tid='confirmProtocol']
+	Sleep	20s
 
 
 Скасування рішення кваліфікаційної комісії
