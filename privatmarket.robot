@@ -135,18 +135,18 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 	${amount_to_enter} = 	Convert To String	${tender_data.data.value.amount}
 	${amount_to_enter2} = 	Replace String	${amount_to_enter}  .  ,
 	Click Element	css=input[tid='data.value.amount']
-	Run Keyword If	'${os}' == 'Linux'	Input text	css=input[tid='data.value.amount']	${amount_to_enter}
-	...  ELSE	Input text	css=input[tid='data.value.amount']	${amount_to_enter2}
-#    Input text	css=input[tid='data.value.amount']	${amount_to_enter2}
+#	Run Keyword If	'${os}' == 'Linux'	Input text	css=input[tid='data.value.amount']	${amount_to_enter}
+#	...  ELSE	Input text	css=input[tid='data.value.amount']	${amount_to_enter2}
+    Input text	css=input[tid='data.value.amount']	${amount_to_enter2}
 
 	Run Keyword If	'${tender_data.data.value.valueAddedTaxIncluded}' == 'True'	Click Element	css=input[tid='data.value.valueAddedTaxIncluded']
 	...  ELSE	Click Element	css=input[tid='data.value.valueAddedTaxNotIncluded']
 	${amount_to_enter} = 	Convert To String	${tender_data.data.minimalStep.amount}
 	${amount_to_enter2} = 	Replace String	${amount_to_enter}	.	,
 	Click Element	css=input[tid='data.minimalStep.amount']
-	Run Keyword If	'${os}' == 'Linux'	Input text	css=input[tid='data.minimalStep.amount']	${amount_to_enter}
-	...  ELSE	Input text	css=input[tid='data.minimalStep.amount']	${amount_to_enter2}
-#    Input text	css=input[tid='data.minimalStep.amount']	${amount_to_enter2}
+#	Run Keyword If	'${os}' == 'Linux'	Input text	css=input[tid='data.minimalStep.amount']	${amount_to_enter}
+#	...  ELSE	Input text	css=input[tid='data.minimalStep.amount']	${amount_to_enter2}
+    Input text	css=input[tid='data.minimalStep.amount']	${amount_to_enter2}
 	#date/time
 	Set Date And Time	css=input[tid='auctionStartDate']	css=div[tid='auctionStartTime'] input[ng-model='hours']	css=div[tid='auctionStartTime'] input[ng-model='minutes']	${tender_data.data.auctionPeriod.startDate}
 
@@ -893,11 +893,9 @@ Check If Question Is Uploaded
 
 Підтвердити наявність протоколу аукціону
     [Arguments]  ${user_name}   ${tender_id}   ${award_index}
-    privatmarket.Пошук тендера по ідентифікатору  ${username}  ${tender_id}
-    Wait For Ajax
     Wait Until Element Is Visible   css=button[tid='confirmProtocol']  ${COMMONWAIT}
     Click Element   css=button[tid='confirmProtocol']
-	Sleep	20s
+	Wait For Ajax
 
 
 Скасування рішення кваліфікаційної комісії
