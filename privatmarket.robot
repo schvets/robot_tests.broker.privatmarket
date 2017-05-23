@@ -521,7 +521,7 @@ Wait for question
     Log  ${text}
     ${result} =	Set Variable If
     ...  '${text}' == 'очікується протокол'  pending.verification
-    ...  '${text}' == 'очікується кінець кваліфікації'  pending.waiting
+    ...  '${text}' == 'у черзі на кваліфікацію'  pending.waiting
     ...  '${text}' == 'Очікується підписання договору'	pending.payment
     ...  '${text}' == 'Оплачено, очікується підписання договору/переможець'	active
     ...  '${text}' == 'учасник самодискваліфікувався'  cancelled
