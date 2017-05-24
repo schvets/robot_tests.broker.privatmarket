@@ -137,7 +137,7 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 	Click Element	css=input[tid='data.value.amount']
 	Run Keyword If	'${os}' == 'Linux'	Input text	css=input[tid='data.value.amount']	${amount_to_enter}
 	...  ELSE	Input text	css=input[tid='data.value.amount']	${amount_to_enter2}
-#    Input text	css=input[tid='data.value.amount']	${amount_to_enter2}
+    #Input text	css=input[tid='data.value.amount']	${amount_to_enter2}
 
 	Run Keyword If	'${tender_data.data.value.valueAddedTaxIncluded}' == 'True'	Click Element	css=input[tid='data.value.valueAddedTaxIncluded']
 	...  ELSE	Click Element	css=input[tid='data.value.valueAddedTaxNotIncluded']
@@ -146,7 +146,7 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 	Click Element	css=input[tid='data.minimalStep.amount']
 	Run Keyword If	'${os}' == 'Linux'	Input text	css=input[tid='data.minimalStep.amount']	${amount_to_enter}
 	...  ELSE	Input text	css=input[tid='data.minimalStep.amount']	${amount_to_enter2}
-#    Input text	css=input[tid='data.minimalStep.amount']	${amount_to_enter2}
+    #Input text	css=input[tid='data.minimalStep.amount']	${amount_to_enter2}
 	#date/time
 	Set Date And Time	css=input[tid='auctionStartDate']	css=div[tid='auctionStartTime'] input[ng-model='hours']	css=div[tid='auctionStartTime'] input[ng-model='minutes']	${tender_data.data.auctionPeriod.startDate}
 
@@ -600,7 +600,6 @@ Check If Question Is Uploaded
 	${os} = 	Evaluate	platform.system()	platform
 	Run Keyword If	'без кваліфікації' in '${TEST NAME}'	Fail	Is not implemented yet
 	#дождаться появления поля ввода ссуммы только в случае выполнения первого позитивного теста
-	debug
 	Run Keyword Unless	'Неможливість подати цінову' in '${TEST NAME}' or 'подати повторно цінову' in '${TEST NAME}'
 		...  Wait Until Element Is Enabled	css=button[tid='createBid']	${COMMONWAIT}
 	Click Button	css=button[tid='createBid']
@@ -693,6 +692,7 @@ Check If Question Is Uploaded
 
 Завантажити фінансову ліцензію
 	[Arguments]  ${user_name}  ${tender_id}  ${financial_license_path}
+	debug
 	Wait For Element With Reload	css=button[tid='modifyBid']
 	Wait Visibulity And Click Element	css=button[tid='modifyBid']
 	Wait For Ajax
@@ -885,7 +885,7 @@ Check If Question Is Uploaded
 
 Завантажити протокол аукціону в авард
     [Arguments]  ${username}  ${tender_id}  ${file_path}  ${bid_index}
-	privatmarket.Пошук тендера по ідентифікатору	${username}	${tender_id}
+	#privatmarket.Пошук тендера по ідентифікатору	${username}	${tender_id}
 	Wait Until Element Is Visible	xpath=//*[@tid='docProtocol']	${COMMONWAIT}
 	Execute Javascript	document.querySelector("input[id='docsProtocolI']").className = ''
 	Sleep	2s
