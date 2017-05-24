@@ -1,7 +1,6 @@
 *** Settings ***
 Library  String
 Library  Selenium2Library
-Library  DebugLibrary
 Library  privatmarket_service.py
 Library  Collections
 Library  BuiltIn
@@ -137,7 +136,6 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 	Click Element	css=input[tid='data.value.amount']
 	Run Keyword If	'${os}' == 'Linux'	Input text	css=input[tid='data.value.amount']	${amount_to_enter}
 	...  ELSE	Input text	css=input[tid='data.value.amount']	${amount_to_enter2}
-    #Input text	css=input[tid='data.value.amount']	${amount_to_enter2}
 
 	Run Keyword If	'${tender_data.data.value.valueAddedTaxIncluded}' == 'True'	Click Element	css=input[tid='data.value.valueAddedTaxIncluded']
 	...  ELSE	Click Element	css=input[tid='data.value.valueAddedTaxNotIncluded']
@@ -146,7 +144,6 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 	Click Element	css=input[tid='data.minimalStep.amount']
 	Run Keyword If	'${os}' == 'Linux'	Input text	css=input[tid='data.minimalStep.amount']	${amount_to_enter}
 	...  ELSE	Input text	css=input[tid='data.minimalStep.amount']	${amount_to_enter2}
-    #Input text	css=input[tid='data.minimalStep.amount']	${amount_to_enter2}
 	#date/time
 	Set Date And Time	css=input[tid='auctionStartDate']	css=div[tid='auctionStartTime'] input[ng-model='hours']	css=div[tid='auctionStartTime'] input[ng-model='minutes']	${tender_data.data.auctionPeriod.startDate}
 
@@ -934,7 +931,7 @@ Check If Question Is Uploaded
 	${result} = 	Get Matching Xpath Count	//span[@tid='item.classification.description']
 	[Return]  ${result}
 
-#Custom Keywords
+
 Login
 	[Arguments]  ${username}
 	Wait For Ajax
