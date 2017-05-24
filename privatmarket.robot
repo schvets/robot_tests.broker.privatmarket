@@ -692,7 +692,6 @@ Check If Question Is Uploaded
 
 Завантажити фінансову ліцензію
 	[Arguments]  ${user_name}  ${tender_id}  ${financial_license_path}
-	debug
 	Wait For Element With Reload	css=button[tid='modifyBid']
 	Wait Visibulity And Click Element	css=button[tid='modifyBid']
 	Wait For Ajax
