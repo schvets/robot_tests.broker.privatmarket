@@ -64,8 +64,8 @@ ${tender_data.tenderAttempts}							css=span[tid='data.tenderAttempts']
 ${tender_data.dgfDecisionDate}							css=span[tid='data.dgfDecisionDate']
 ${tender_data.dgfDecisionID}							css=span[tid='data.dgfDecisionID']
 
-${tender_data.awards[0].status}  css=span[tid='award.status']
-${tender_data.awards[1].status}  css=span[tid='award.status']
+${tender_data.awards[0].status}  xpath=(//span[@tid='award.status'])[1]
+${tender_data.awards[1].status}  xpath=(//span[@tid='award.status'])[2]
 
 ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 
@@ -137,6 +137,7 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 	Click Element	css=input[tid='data.value.amount']
 	Run Keyword If	'${os}' == 'Linux'	Input text	css=input[tid='data.value.amount']	${amount_to_enter}
 	...  ELSE	Input text	css=input[tid='data.value.amount']	${amount_to_enter2}
+    #Input text	css=input[tid='data.value.amount']	${amount_to_enter2}
 
 	Run Keyword If	'${tender_data.data.value.valueAddedTaxIncluded}' == 'True'	Click Element	css=input[tid='data.value.valueAddedTaxIncluded']
 	...  ELSE	Click Element	css=input[tid='data.value.valueAddedTaxNotIncluded']
@@ -145,6 +146,7 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 	Click Element	css=input[tid='data.minimalStep.amount']
 	Run Keyword If	'${os}' == 'Linux'	Input text	css=input[tid='data.minimalStep.amount']	${amount_to_enter}
 	...  ELSE	Input text	css=input[tid='data.minimalStep.amount']	${amount_to_enter2}
+    #Input text	css=input[tid='data.minimalStep.amount']	${amount_to_enter2}
 	#date/time
 	Set Date And Time	css=input[tid='auctionStartDate']	css=div[tid='auctionStartTime'] input[ng-model='hours']	css=div[tid='auctionStartTime'] input[ng-model='minutes']	${tender_data.data.auctionPeriod.startDate}
 
@@ -518,9 +520,12 @@ Wait for question
     Log  ${element}
     Log  ${text}
     ${result} =	Set Variable If
-    ...  '${text}' == 'очікується протокол'  pending.waiting
-    ...  '${text}' == 'очікується кінець кваліфікації'  pending.verification
+    ...  '${text}' == 'очікується протокол'  pending.verification
+    ...  '${text}' == 'у черзі на кваліфікацію'  pending.waiting
     ...  '${text}' == 'Очікується підписання договору'	pending.payment
+    ...  '${text}' == 'Оплачено, очікується підписання договору/переможець'	active
+    ...  '${text}' == 'учасник самодискваліфікувався'  cancelled
+    ...  '${text}' == 'дискваліфіковано'  unsuccessful
     ...  ${element}
     [Return]  ${result}
 
@@ -780,9 +785,10 @@ Check If Question Is Uploaded
 	[Arguments]  ${user_name}  ${tender_id}  ${award_num}
 	Wait For Ajax
 	Wait For Element With Reload  css=button[tid='btn.award.active']  4
-	${buttons_list} =  Get Webelements  css=button[tid='btn.award.active']
-	Click Button  ${buttons_list[${award_num}]}
+	Click Button  css=button[tid='btn.award.active']
 	Wait For Ajax
+	Wait Until Element Is Visible   css=button[tid='defaultOk']  ${COMMONWAIT}
+    Click Element   css=button[tid='defaultOk']
 
 
 Завантажити угоду до тендера
@@ -878,22 +884,23 @@ Check If Question Is Uploaded
 
 Завантажити протокол аукціону в авард
     [Arguments]  ${username}  ${tender_id}  ${file_path}  ${bid_index}
-    privatmarket.Пошук тендера по ідентифікатору  ${username}  ${tender_id}
-    Wait For Ajax
-    Wait Until Element Is Visible  css=button[tid='btn.award.disqualify']	${COMMONWAIT}
-    Click Element  css=button[tid='btn.award.disqualify']
-    Wait Until Element Is Visible	css=button[tid='btn.award.addDocForCancel']	${COMMONWAIT}
-    ${file_input_path} = 	Set Variable	//button[@tid='btn.award.addDocForCancel']/following-sibling::input
-    Execute Javascript	document.evaluate("${file_input_path}", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.className = ''
-    Sleep	2s
-    Choose File		xpath=${file_input_path}	${file_path}
+	#privatmarket.Пошук тендера по ідентифікатору	${username}	${tender_id}
+	Wait Until Element Is Visible	xpath=//*[@tid='docProtocol']	${COMMONWAIT}
+	Execute Javascript	document.querySelector("input[id='docsProtocolI']").className = ''
+	Sleep	2s
+	Choose File		css=input[id='docsProtocolI']	${file_path}
+	Wait For Ajax
+    Wait Until Element Is Visible   css=button[tid='confirmProtocol']  ${COMMONWAIT}
+    Click Element   css=button[tid='confirmProtocol']
+	Wait For Ajax
+	Wait Until Element Is Visible   css=button[tid='defaultOk']  ${COMMONWAIT}
+    Click Element   css=button[tid='defaultOk']
+
 
 Підтвердити наявність протоколу аукціону
     [Arguments]  ${user_name}   ${tender_id}   ${award_index}
-    privatmarket.Пошук тендера по ідентифікатору  ${username}  ${tender_id}
     Wait For Ajax
-    Wait Until Element Is Visible   xpath=//*[text()[contains(.,'Підтвердити протокол')]]  ${COMMONWAIT}
-    Click Element   xpath=//*[text()[contains(.,'Підтвердити протокол')]]
+    Wait Until Element Contains  ${tender_data.awards[${award_index}].status}  Очікується підписання договору
 
 
 Скасування рішення кваліфікаційної комісії
