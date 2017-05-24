@@ -923,13 +923,28 @@ Check If Question Is Uploaded
 
 
 Скасування рішення кваліфікаційної комісії
-	[Arguments]  ${username}  ${tender_uaid}  ${award_num}
-	Wait For Element With Reload	css=button[tid='btn.award.cancelled']  4
-	Wait Until Element Is Visible	css=button[tid='btn.award.cancelled']	${COMMONWAIT}
-	${buttons_list} = 	Get Webelements	css=button[tid='btn.award.cancelled']
-	Click Button	${buttons_list[${award_num}]}
-	Wait For Ajax
-	Close Confirmation
+    [Arguments]  ${username}  ${tender_uaid}  ${award_num}
+    Run Keyword If  'PrivatMarket_Provider' in '${username}'  Скасувати рішення для ролі provider  ${award_num}
+    ...  ELSE  Скасувати рішення для ролі tender_owner  ${award_num}
+
+
+Скасувати рішення для ролі provider
+    [Arguments]  ${award_num}
+    Wait For Element With Reload  css=button[tid='btn.award.cancellation']  4
+    Click Button  css=button[tid='btn.award.cancellation']
+    Wait For Ajax
+    Wait Until Element Is Visible  xpath=(//div[@tid='dialogModal']//button[contains(@class, 'btn btn-success')])[2]  ${COMMONWAIT}
+    Click Button  xpath=(//div[@tid='dialogModal']//button[contains(@class, 'btn btn-success')])[2]
+
+
+Скасувати рішення для ролі tender_owner
+    [Arguments]  ${award_num}
+    Wait For Element With Reload  css=button[tid='btn.award.cancelled']  4
+    Wait Until Element Is Visible  css=button[tid='btn.award.cancelled']  ${COMMONWAIT}
+    ${buttons_list}=  Get Webelements  css=button[tid='btn.award.cancelled']
+    Click Button  css=button[tid='btn.award.cancelled']
+    Wait For Ajax
+    Close Confirmation
 
 
 Отримати тип оголошеного лоту
