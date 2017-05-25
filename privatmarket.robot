@@ -147,7 +147,6 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 	#date/time
 	Set Date And Time	css=input[tid='auctionStartDate']	css=div[tid='auctionStartTime'] input[ng-model='hours']	css=div[tid='auctionStartTime'] input[ng-model='minutes']	${tender_data.data.auctionPeriod.startDate}
 
-
 	#items
 	: FOR  ${index}  IN RANGE  ${items_number}
 	\	${should_we_click_btn.additem} =	Set Variable If		'0' != '${index}'	${True}	${False}
@@ -859,11 +858,34 @@ Check If Question Is Uploaded
 
 
 Дискваліфікувати постачальника
-	[Arguments]  ${username}  ${tender_id}  ${award_num}  ${description}
-	Wait Until Element Is Visible	css=button[tid='btn.award.unsuccessful']	${COMMONWAIT}
-	Click Button	css=button[tid='btn.award.unsuccessful']
+    [Arguments]  ${username}  ${tender_id}  ${award_num}  ${description}
+    ${status}=  Run Keyword And Return Status  Wait Until Element Is Visible  css=button[tid='btn.award.disqualify']  5
+    Run Keyword If  ${status}  Дискваліфікувати з документом  ${award_num}
+    ...  ELSE  Дискваліфікувати без документа  ${award_num}
+
+
+Дискваліфікувати з документом
+    [Arguments]  ${award_num}
+    ${file_path}  ${file_title}  ${file_content}=  create_fake_doc
+    Click Button  css=button[tid='btn.award.disqualify']
+    Wait Until Element Is Visible  css=button[tid='btn.award.addDocForCancel']  ${COMMONWAIT}
+    Execute Javascript  document.querySelector("input[id='rejectQualificationInput${award_num}']").className = ''
+    Sleep  2s
+    Choose File  css=input[id='rejectQualificationInput${award_num}']  ${file_path}
+    Wait For Ajax
+    Wait Until Element Is Visible  css=button[tid='btn.award.unsuccessful']  ${COMMONWAIT}
+    Click Button  css=button[tid='btn.award.unsuccessful']
     Wait For Ajax
     Reload Page
+
+
+Дискваліфікувати без документа
+    [Arguments]  ${award_num}
+    Wait Until Element Is Visible  css=button[tid='btn.award.unsuccessful']  ${COMMONWAIT}
+    Click Button  css=button[tid='btn.award.unsuccessful']
+    Wait For Ajax
+    Reload Page
+
 
 
 Завантажити протокол аукціону
@@ -901,13 +923,32 @@ Check If Question Is Uploaded
 
 
 Скасування рішення кваліфікаційної комісії
-	[Arguments]  ${username}  ${tender_uaid}  ${award_num}
-	Wait For Element With Reload	css=button[tid='btn.award.cancelled']  4
-	Wait Until Element Is Visible	css=button[tid='btn.award.cancelled']	${COMMONWAIT}
-	${buttons_list} = 	Get Webelements	css=button[tid='btn.award.cancelled']
-	Click Button	${buttons_list[${award_num}]}
-	Wait For Ajax
-	Close Confirmation
+    [Arguments]  ${username}  ${tender_uaid}  ${award_num}
+    Run Keyword If  'PrivatMarket_Provider' in '${username}'  Скасувати рішення для ролі provider  ${username}  ${tender_uaid}  ${award_num}
+    ...  ELSE  Скасувати рішення для ролі tender_owner  ${award_num}
+
+
+Скасувати рішення для ролі provider
+    [Arguments]  ${username}  ${tender_uaid}  ${award_num}
+    privatmarket.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
+    Wait For Element With Reload  css=button[tid='btn.award.cancellation']  4
+    Click Button  css=button[tid='btn.award.cancellation']
+    Wait For Ajax
+    Wait Until Element Is Visible  xpath=(//div[@tid='dialogModal']//button[contains(@class, 'btn btn-success')])[2]  ${COMMONWAIT}
+    Click Button  xpath=(//div[@tid='dialogModal']//button[contains(@class, 'btn btn-success')])[2]
+    Wait For Ajax
+    Wait Until Element Is Visible   css=button[tid='defaultOk']  ${COMMONWAIT}
+    Click Element   css=button[tid='defaultOk']
+
+
+Скасувати рішення для ролі tender_owner
+    [Arguments]  ${award_num}
+    Wait For Element With Reload  css=button[tid='btn.award.cancelled']  4
+    Wait Until Element Is Visible  css=button[tid='btn.award.cancelled']  ${COMMONWAIT}
+    ${buttons_list}=  Get Webelements  css=button[tid='btn.award.cancelled']
+    Click Button  css=button[tid='btn.award.cancelled']
+    Wait For Ajax
+    Close Confirmation
 
 
 Отримати тип оголошеного лоту
