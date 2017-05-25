@@ -925,17 +925,21 @@ Check If Question Is Uploaded
 
 Скасування рішення кваліфікаційної комісії
     [Arguments]  ${username}  ${tender_uaid}  ${award_num}
-    Run Keyword If  'PrivatMarket_Provider' in '${username}'  Скасувати рішення для ролі provider  ${award_num}
+    Run Keyword If  'PrivatMarket_Provider' in '${username}'  Скасувати рішення для ролі provider  ${username}  ${tender_uaid}  ${award_num}
     ...  ELSE  Скасувати рішення для ролі tender_owner  ${award_num}
 
 
 Скасувати рішення для ролі provider
-    [Arguments]  ${award_num}
+    [Arguments]  ${username}  ${tender_uaid}  ${award_num}
+    privatmarket.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
     Wait For Element With Reload  css=button[tid='btn.award.cancellation']  4
     Click Button  css=button[tid='btn.award.cancellation']
     Wait For Ajax
     Wait Until Element Is Visible  xpath=(//div[@tid='dialogModal']//button[contains(@class, 'btn btn-success')])[2]  ${COMMONWAIT}
     Click Button  xpath=(//div[@tid='dialogModal']//button[contains(@class, 'btn btn-success')])[2]
+    Wait For Ajax
+    Wait Until Element Is Visible   css=button[tid='defaultOk']  ${COMMONWAIT}
+    Click Element   css=button[tid='defaultOk']
 
 
 Скасувати рішення для ролі tender_owner
