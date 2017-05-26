@@ -321,7 +321,6 @@ ${tender_data_complaint.description}  //div[@class='question-div']
     \  Run Keyword If  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  xpath=(//section[@data-id='ptrFeatures']//input[@ng-model='criterion.title_en'])[${elem_index}]  ${tender_enums[${index}].title}
 
     #add lot feature
-    debug
     Wait Visibility And Click Element  css=label[for='features_lots_yes']
     Wait Visibility And Click Element  css=[data-id='lot'] button[data-id='actAdd']
 #    debug
@@ -510,14 +509,15 @@ ${tender_data_complaint.description}  //div[@class='question-div']
 
     #загрузим файл
     Wait Visibility And Click Element  css=label[for='documentation_tender_yes']
-    Wait Visibility And Click Element  xpath=//section[@data-id='ptrDocuments']//form[@name='fileForm']/select[1]/option[text()='Документы закупки']
+    Wait Visibility And Click Element  xpath=//section[@data-id='ptrDocuments']//form[@name='fileForm']/select[1]/option[2]
     Sleep  1s
-    Wait Visibility And Click Element  xpath=//section[@data-id='ptrDocuments']//form[@name='fileForm']/select[2]/option[@value='en']
+    Run Keyword And Ignore Error  Wait Visibility And Click Element  xpath=//section[@data-id='ptrDocuments']//form[@name='fileForm']/select[2]/option[@value='en']
     Sleep  1s
     Choose File  css=section[data-id='ptrDocuments'] #inputFile  ${filePath}
     Sleep  5s
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
     Wait For Ajax
+    debug
     Wait Until Element Is Visible  css=section[data-id='step5']  ${COMMONWAIT}
     Sleep  1s
     Wait Visibility And Click Element  ${locator_tenderCreation.buttonSend}
@@ -1199,17 +1199,17 @@ Check Element Attribute
 Set Date And Time
     [Arguments]  ${element}  ${fild}  ${time_element}  ${date}
     Set Date  ${element}  ${fild}  ${date}
-    Set Time  ${time_element}  ${date}
+#    Set Time  ${time_element}  ${date}
 
 
 Set Date
     [Arguments]  ${element}  ${fild}  ${date}
-    Execute Javascript  var s = angular.element('[ng-controller=CreateProcurementCtrl]').scope(); s.model.ptr.${element}.${fild} = new Date(Date.parse("${date}")); s.model.prepareDateModel(s.model.ptr, '${element}'); s.$root.$apply()
+    Execute Javascript  var s = angular.element('[ng-controller=CreateProcurementCtrl]').scope(); s.model.ptr.${element}.${fild} = new Date(Date.parse("${date}")); s.$broadcast('periods:init'); s.$root.$apply()
 
 
 Set Date In Item
     [Arguments]  ${index}  ${element}  ${fild}  ${date}
-    Execute Javascript  var s = angular.element('[ng-controller=CreateProcurementCtrl]').scope(); s.model.ptr.items[${index}].${element}.${fild} = new Date(Date.parse("${date}")); s.model.prepareDateModel(s.model.ptr.items[${index}], '${element}'); s.$root.$apply()
+    Execute Javascript  var s = angular.element('[ng-controller=CreateProcurementCtrl]').scope(); s.model.ptr.items[${index}].${element}.${fild} = new Date(Date.parse("${date}")); s.model.prepareDateModel2(s.model.ptr.items[${index}], '${element}'); s.$root.$apply()
 
 
 Set Time
@@ -1247,19 +1247,18 @@ Scroll Page To Element
 
 Set Enquiry Period
     [Arguments]  ${startDate}  ${endDate}
-#    debug
-    Wait Until Element Is Visible  css=input[ng-model='model.ptr.enquiryPeriod.sd.d']  ${COMMONWAIT}
-    Set Date And Time  enquiryPeriod  startDate  css=span[data-id='ptrEnquiryPeriodStartDate'] input[ng-model='inputTime']  ${startDate}
-    Wait Until Element Is Visible  css=span[data-id='ptrEnquiryPeriodEndDate'] input[ng-model='inputTime']  ${COMMONWAIT}
-    Set Date And Time  enquiryPeriod  endDate  css=span[data-id='ptrEnquiryPeriodEndDate'] input[ng-model='inputTime']  ${endDate}
+    Wait Until Element Is Visible  css=input[data-id='enquiryPeriodStart']  ${COMMONWAIT}
+    Set Date And Time  enquiryPeriod  startDate  css=input[data-id='enquiryPeriodStart']  ${startDate}
+    Wait Until Element Is Visible  css=input[data-id='enquiryPeriodEnd']  ${COMMONWAIT}
+    Set Date And Time  enquiryPeriod  endDate  css=input[data-id='enquiryPeriodEnd']  ${endDate}
 
 
 Set Tender Period
     [Arguments]  ${startDate}  ${endDate}
-    Wait Until Element Is Visible  css=span[data-id='ptrTenderPeriodStartDate'] [data-id='timepickerPop']>span>input  ${COMMONWAIT}
-    Set Date And Time  tenderPeriod  startDate  css=span[data-id='ptrTenderPeriodStartDate'] [data-id='timepickerPop']>span>input  ${startDate}
-    Wait Until Element Is Visible  css=span[data-id='ptrTenderPeriodEndDate'] [data-id='timepickerPop']>span>input  ${COMMONWAIT}
-    Set Date And Time  tenderPeriod  endDate  css=span[data-id='ptrTenderPeriodEndDate'] [data-id='timepickerPop']>span>input  ${endDate}
+    Wait Until Element Is Visible  css=input[data-id='tenderPeriodStart']  ${COMMONWAIT}
+    Set Date And Time  tenderPeriod  startDate  css=input[data-id='tenderPeriodStart']  ${startDate}
+    Wait Until Element Is Visible  css=input[data-id='tenderPeriodEnd']  ${COMMONWAIT}
+    Set Date And Time  tenderPeriod  endDate  css=input[data-id='tenderPeriodEnd']  ${endDate}
 
 
 Wait For Ajax
