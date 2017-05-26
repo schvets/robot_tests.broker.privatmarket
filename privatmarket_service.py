@@ -11,7 +11,8 @@ def modify_test_data(initial_data):
     # initial_data['procuringEntity']['name'] = u'Товариство З Обмеженою Відповідальністю \'Мак Медіа Прінт\''
     #initial_data['procuringEntity']['name'] = u'Товариство З Обмеженою Відповідальністю \'Сільськогосподарська Фірма \'Рубіжне\''
     # initial_data['procuringEntity']['name'] = u'Макстрой Діск, Товариство З Обмеженою Відповідальністю'
-    initial_data['procuringEntity']['name'] = u'ФОП ОГАНІН ОЛЕКСАНДР ПЕТРОВИЧ'
+    initial_data['procuringEntity']['name'] = u'ФЕРМЕРСЬКЕ ГОСПОДАРСТВО \'ВІРА-АГРО 2014\''
+    # initial_data['procuringEntity']['name'] = u'ФОП ОГАНІН ОЛЕКСАНДР ПЕТРОВИЧ'
     return initial_data
 
 
@@ -156,7 +157,8 @@ def get_classification_type(classifications):
         u'ДК 016:2010': u'ДКПП',
         u'ДК 021:2015': u'CPV',
         u'ДК 18-2000': u'ДК018',
-        u'ДК003: 2010': u'ДК003'
+        u'ДК003: 2010': u'ДК003',
+        u'ДК 021': u'CPV'
     }
     classifications_type = classifications_dictionary.get(classifications)
     if classifications_type:
