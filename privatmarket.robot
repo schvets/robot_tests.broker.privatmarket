@@ -289,8 +289,8 @@ ${tender_data_complaint.description}  //div[@class='question-div']
     \  Wait Element Visibility And Input Text  ${locator_lotAdd.locality}  ${items[${index}].deliveryAddress.locality}
     \  Wait Element Visibility And Input Text  ${locator_lotAdd.streetAddress}  ${items[${index}].deliveryAddress.streetAddress}
     \  Wait Until Element Is Visible  css=[data-id='deliveryEndDate'] input  ${COMMONWAIT}
-    \  Set Date In Item  ${index}  deliveryDate  startDate  ${items[${index}].deliveryDate.startDate}
-    \  Set Date In Item  ${index}  deliveryDate  endDate  ${items[${index}].deliveryDate.endDate}
+    \  Set Date In Item  ${index}  deliveryDate  sd  startDate  ${items[${index}].deliveryDate.startDate}
+    \  Set Date In Item  ${index}  deliveryDate  ed  endDate  ${items[${index}].deliveryDate.endDate}
     \  ${elem_index}=  privatmarket_service.sum_of_numbers  ${index}  1
     \  Run Keyword IF  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  xpath=(//input[@data-id='descriptionEn'])[${elem_index}]  ${items[${index}].description_en}
 
@@ -1119,7 +1119,7 @@ Try Search Tender
 Check Current Mode New Realisation
     [Arguments]  ${education_type}=${True}
     privatmarket.Оновити сторінку з тендером
-
+    Close notification
     #проверим правильный ли режим
     Wait Until Element Is Visible  ${locator_tender.switchToDemo}  ${COMMONWAIT}
     ${check_result}=  Get Text  ${locator_tender.switchToDemo}
@@ -1208,8 +1208,12 @@ Set Date
 
 
 Set Date In Item
-    [Arguments]  ${index}  ${element}  ${fild}  ${date}
-    Execute Javascript  var s = angular.element('[ng-controller=CreateProcurementCtrl]').scope(); s.model.ptr.items[${index}].${element}.${fild} = new Date(Date.parse("${date}")); s.model.prepareDateModel2(s.model.ptr.items[${index}], '${element}'); s.$root.$apply()
+    [Arguments]  ${index}  ${element}  ${param}  ${field}  ${date}
+    Execute Javascript
+    ...  var s = angular.element('[ng-controller=CreateProcurementCtrl]').scope();
+    ...  s.model.ptr.items[${index}].${element}.${param} = new Date("${date}");
+    ...  s.model.ptr.items[${index}].${element}.${field} = new Date("${date}").getTime();
+    ...  s.$root.$apply()
 
 
 Set Time
