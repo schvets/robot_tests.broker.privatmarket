@@ -11,7 +11,7 @@ def modify_test_data(initial_data):
     # initial_data['procuringEntity']['name'] = u'Товариство З Обмеженою Відповідальністю \'Мак Медіа Прінт\''
     #initial_data['procuringEntity']['name'] = u'Товариство З Обмеженою Відповідальністю \'Сільськогосподарська Фірма \'Рубіжне\''
     # initial_data['procuringEntity']['name'] = u'Макстрой Діск, Товариство З Обмеженою Відповідальністю'
-    initial_data['procuringEntity']['name'] = u'ФОП Оганін Олександр Петрович'
+    initial_data['procuringEntity']['name'] = u'ФОП ОГАНІН ОЛЕКСАНДР ПЕТРОВИЧ'
     return initial_data
 
 
@@ -96,10 +96,21 @@ def get_unit_name(current_name):
         u'штуки': {u'штука', u'штуки', u'штук'},
         u'місяць': {u'месяц', u'месяца', u'месяцев'},
         u'пачка': {u'пачка', u'пачек', u'пачкики'},
-        u'упаковка': {u'упковка', u'упаковок', u'упаковки'},
+        u'упаковка': {u'упаковка', u'упаковок', u'упаковки'},
         u'гектар': {u'гектар', u'гектара', u'гектаров'},
         u'блок': {u'блок', u'блока', u'блоков'}
     }
+
+    expected_name = None
+    dictionary.get(current_name)
+    for name, variants in dictionary.iteritems():
+        if current_name in variants:
+            expected_name = name
+
+    if expected_name:
+        return expected_name
+    else:
+        return current_name
 
 
 def get_unit_name_ru(current_name):
@@ -127,7 +138,6 @@ def get_unit_name_ru(current_name):
         u'гектар': {u'гектар', u'гектара', u'гектаров'},
         u'блок': {u'блок', u'блока', u'блоков'}
     }
-
 
     expected_name = None
     dictionary.get(current_name)
@@ -174,7 +184,8 @@ def get_status_type(status_name):
         u'Отменено': 'cancelled',
         u'Відмінено': 'cancelled',
         u'Розглядається': 'pending',
-        u'Кваліфікація учасника': 'active.pre-qualification'
+        u'Кваліфікація учасника': 'active.pre-qualification',
+        u'Пауза перед аукціоном': 'active.pre-qualification.stand-still'
     }
     type_name = type_dictionary.get(status_name)
     return type_name
