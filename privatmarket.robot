@@ -221,6 +221,7 @@ ${tender_data_complaint.description}  //div[@class='question-div']
     Wait Until Element Is Visible  css=section[data-id='step3']  ${COMMONWAIT}
 
 #step 3
+    Wait For Ajax
     Run Keyword IF
     ...  ${type} == 'aboveThresholdEU'  Додати нецінові показники  ${features}
     ...  ELSE IF  ${type} == 'aboveThresholdUA'  Додати нецінові показники  ${features}  ${type}
@@ -517,7 +518,6 @@ ${tender_data_complaint.description}  //div[@class='question-div']
     Sleep  5s
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
     Wait For Ajax
-    debug
     Wait Until Element Is Visible  css=section[data-id='step5']  ${COMMONWAIT}
     Sleep  1s
     Wait Visibility And Click Element  ${locator_tenderCreation.buttonSend}
@@ -788,6 +788,7 @@ ${tender_data_complaint.description}  //div[@class='question-div']
     Wait For Element With Reload  xpath=//div[@class='file-descriptor']/span[contains(., '${doc_id}')]  1
     Scroll Page To Element  xpath=//div[@class='file-descriptor']/span[contains(., '${doc_id}')]
     Wait Visibility And Click Element  xpath=//div[@class='file-descriptor']/span[contains(., '${doc_id}')]
+    Wait Visibility And Click Element  xpath=//div[contains(@class, 'file-item') and contains(., '${doc_id}')]//a[@ng-click='openUrl(file.url)']
     # Добален слип, т.к. док не успевал загрузиться
     sleep  20s
     ${file_name_full}=  Get Text  xpath=//div[@class='file-descriptor']/span[contains(., '${doc_id}')]
