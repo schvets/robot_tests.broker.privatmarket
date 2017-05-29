@@ -788,6 +788,7 @@ ${tender_data_complaint.description}  //div[@class='question-div']
     Wait For Element With Reload  xpath=//div[@class='file-descriptor']/span[contains(., '${doc_id}')]  1
     Scroll Page To Element  xpath=//div[@class='file-descriptor']/span[contains(., '${doc_id}')]
     Wait Visibility And Click Element  xpath=//div[@class='file-descriptor']/span[contains(., '${doc_id}')]
+    Wait Visibility And Click Element  xpath=//div[contains(@class, 'file-item') and contains(., '${doc_id}')]//a[@ng-click='openUrl(file.url)']
     # Добален слип, т.к. док не успевал загрузиться
     sleep  20s
     ${file_name_full}=  Get Text  xpath=//div[@class='file-descriptor']/span[contains(., '${doc_id}')]
