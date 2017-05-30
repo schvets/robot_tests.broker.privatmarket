@@ -660,6 +660,8 @@ ${tender_data_complaint.description}  //div[@class='question-div']
     Run Keyword And Return If  '${field_name}' == 'qualifications[1].status'  Отримати статус пропозиції кваліфікації  2
     Run Keyword And Return If  '${field_name}' == 'title_en'  Отримати інформацію зі зміною локалізації  ${field_name}  EN
     Run Keyword And Return If  '${field_name}' == 'title_ru'  Отримати інформацію зі зміною локалізації  ${field_name}  RU
+    Run Keyword And Return If  '${field_name}' == 'description_en'  Отримати інформацію зі зміною локалізації  ${field_name}  EN
+    Run Keyword And Return If  '${field_name}' == 'description_ru'  Отримати інформацію зі зміною локалізації  ${field_name}  RU
 
     Wait Until Element Is Visible  ${tender_data_${field_name}}  ${COMMONWAIT}
     ${result_full}=  Get Text  ${tender_data_${field_name}}
@@ -963,7 +965,10 @@ ${tender_data_complaint.description}  //div[@class='question-div']
     Wait Until Element Is Visible  xpath=//li[contains(@class, 'change-language-item') and contains(., '${lang}')]/b
     Wait For Ajax
     Switch To PMFrame
-    ${text}=  Отримати текст елемента  ${tender_data_title}
+    ${element}=  Set Variable If
+    ...  'title' in '${element}'  title
+    ...  'description' in '${element}'  description
+    ${text}=  Отримати текст елемента  ${element}
     ${result}=  Strip String  ${text}
     Unselect Frame
     Wait Visibility And Click Element  xpath=//li[contains(@class, 'change-language-item') and contains(., 'UK')]
