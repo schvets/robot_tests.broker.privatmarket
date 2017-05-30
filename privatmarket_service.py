@@ -205,3 +205,16 @@ def sum_of_numbers(number, value):
 def get_percent(value):
     value = value * 100
     return format(value, '.0f')
+
+
+def get_claim_status (status):
+    type_dictionary = {
+        u'Вiдправлено': 'claim',
+        u'Отримано вiдповiдь': 'answered',
+        u'Вирiшена': 'complete',
+        u'Скасована': 'cancelled'
+    }
+    type_name = type_dictionary.get(status)
+    return type_name
+
+

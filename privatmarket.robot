@@ -80,6 +80,10 @@ ${tender_data_feature.featureOf}  /../../../*[1]
 
 ${tender_data_complaint.title}  //span[contains(@class, 'claimHead')]
 ${tender_data_complaint.description}  //div[@class='question-div']
+${tender_data_complaint.status}  //span[contains(@id, 'cmplStatus')]
+${tender_data_complaint.resolutionType}  //div[contains(@ng-if,"resolutionType")]
+${tender_data_complaint.resolution}  //div[@class="question-answer title ng-scope"]//div[@class="question-div"]/div[1]
+#${tender_data_complaint.resolutionType}  //div[@class='question-div']
 
 
 *** Keywords ***
@@ -103,6 +107,7 @@ ${tender_data_complaint.description}  //div[@class='question-div']
     Call Method  ${chrome_options}  add_argument  --nativeEvents\=false
     Call Method  ${chrome_options}  add_experimental_option  prefs  ${prefs}
 #    Call Method  ${chrome_options}  add_argument  --user-data-dir\=/home/lugovskoy/.config/google-chrome/Default
+    Call Method  ${chrome_options}  add_argument  --user-data-dir\=/home/vitalii/.config/google-chrome/Default
 
     #Для Viewer'а нужен хром, т.к. на хром настроена автоматическая закачка файлов
     Run Keyword If  '${username}' == 'PrivatMarket_Viewer'  Create WebDriver  Chrome  chrome_options=${chrome_options}  alias=${username}
@@ -753,15 +758,54 @@ ${tender_data_complaint.description}  //div[@class='question-div']
 Отримати інформацію із скарги
     [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${field_name}  ${award_index}
     ${element}=  Set Variable  xpath=//div[contains(@class, 'faq') and contains(., '${complaintID}')]${tender_data_complaint.${field_name}}
-    Wait For Element With Reload  ${element}  3
+
+    run keyword if  '${field_name}' == 'description'  Wait Until Keyword Succeeds  3min  15s  Try To Search Complain  ${element}  3
+#    Sleeps for sync
+#    run keyword and return if  '${field_name}' == 'description'  Sleep  40s
+    sleep  60s
+    Reload And Switch To Tab  3
+#    Wait For Ajax
+#    Wait Visibility And Click Element  xpath=//span[contains(text(),"Оскарження")]
     Wait Until Element Is Visible  ${element}  timeout=${COMMONWAIT}
     ${result_full}=  Get Text  ${element}
     ${result}=  Strip String  ${result_full}
+    Run Keyword And Return If  '${field_name}' == 'status'  privatmarket_service.get_claim_status  ${result}
+    Run Keyword And Return If  '${field_name}' == 'resolutionType'  Отримати resolutionType  ${result}
     [Return]  ${result}
+
+Try To Search Complain
+    [Arguments]  ${locator}  ${tab_number}
+    Reload And Switch To Tab  ${tab_number}
+    Wait For Ajax
+    ${status}=  run keyword and return status  Wait Until Element Is Visible  ${locator}  5s
+    [Return]  ${status}
 
 
 Отримати інформацію із документа до скарги
     [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${doc_id}  ${field}
+    ${element} =  set variable  xpath=//span[contains(.,"${complaintID}")]/ancestor::div[@class="faq ng-scope"]
+    Показати вкладені файли  ${element}
+    wait until element is visible  ${element}//span[contains(.,"${doc_id}")]
+#    Wait Visibility And Click Element  ${element}//span[contains(.,"${doc_id}")]
+#    Wait Visibility And Click Element  ${element}//a[contains(.,"Завантажити")]
+    ${doc_text} =  Get Text  ${element}//span[contains(.,"${doc_id}")]
+    [Return]  ${doc_text}
+
+
+Отримати resolutionType
+    [Arguments]  ${text}
+#     run keyword and return if  'Відправлено' in '${text}'  set variable  claim
+#     run keyword and return if  'вирішена' in '${text}'  set variable  resolved
+
+#    ${text}=  Set Variable If  'вирішена' in '${text}'  resolved
+    ${text}=  Set Variable If  'Рішення замовника: вирiшена' in '${text}'  resolved
+    [Return]  ${text}
+
+Показати вкладені файли
+     [Arguments]  ${element}
+     ${updated_element}=  Set Variable  ${element}//a[contains(.,"Показати вкладені файли")]
+     ${status}=  Run Keyword And Return Status  Wait Until Element Is Visible  ${updated_element}  20s
+     Run Keyword If  '${status}' == 'True'  click element  ${updated_element}
 
 
 Отримати статус пропозиції кваліфікації
