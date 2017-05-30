@@ -158,7 +158,9 @@ def get_classification_type(classifications):
         u'ДК 021:2015': u'CPV',
         u'ДК 18-2000': u'ДК018',
         u'ДК003: 2010': u'ДК003',
+        u'ДК003:2010': u'ДК003',
         u'ДК021': u'CPV'
+
     }
     classifications_type = classifications_dictionary.get(classifications)
     if classifications_type:

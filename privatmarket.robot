@@ -223,7 +223,7 @@ ${tender_data_complaint.description}  //div[@class='question-div']
 #step 3
     Wait For Ajax
     Run Keyword IF
-    ...  ${type} == 'aboveThresholdEU'  Додати нецінові показники  ${features}
+    ...  ${type} == 'aboveThresholdEU'  Додати нецінові показники  ${features}  ${type}
     ...  ELSE IF  ${type} == 'aboveThresholdUA'  Додати нецінові показники  ${features}  ${type}
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
 
@@ -658,6 +658,8 @@ ${tender_data_complaint.description}  //div[@class='question-div']
     Run Keyword And Return If  '${field_name}' == 'qualificationPeriod.endDate'  Отримати дату та час  ${field_name}  1
     Run Keyword And Return If  '${field_name}' == 'qualifications[0].status'  Отримати статус пропозиції кваліфікації  1
     Run Keyword And Return If  '${field_name}' == 'qualifications[1].status'  Отримати статус пропозиції кваліфікації  2
+    Run Keyword And Return If  '${field_name}' == 'title_en'  Отримати інформацію зі зміною локалізації  ${field_name}  EN
+    Run Keyword And Return If  '${field_name}' == 'title_ru'  Отримати інформацію зі зміною локалізації  ${field_name}  RU
 
     Wait Until Element Is Visible  ${tender_data_${field_name}}  ${COMMONWAIT}
     ${result_full}=  Get Text  ${tender_data_${field_name}}
@@ -954,6 +956,19 @@ ${tender_data_complaint.description}  //div[@class='question-div']
     [Return]  ${result}
 
 
+Отримати інформацію зі зміною локалізації
+    [Arguments]  ${element}  ${lang}
+    Unselect Frame
+    Wait Visibility And Click Element  xpath=//li[contains(@class, 'change-language-item') and contains(., '${lang}')]
+    Wait Until Element Is Visible  xpath=//li[contains(@class, 'change-language-item') and contains(., '${lang}')]/b
+    Wait For Ajax
+    Switch To PMFrame
+    ${text}=  Отримати текст елемента  ${tender_data_title}
+    ${result}=  Strip String  ${text}
+    Unselect Frame
+    Wait Visibility And Click Element  xpath=//li[contains(@class, 'change-language-item') and contains(., 'UK')]
+    Switch To PMFrame
+    [Return]  ${result}
 
 
 Отримати строку
