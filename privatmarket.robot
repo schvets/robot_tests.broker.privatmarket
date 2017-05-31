@@ -121,8 +121,7 @@ ${tender_data_procuringEntity.identifier.id}  css=.delivery-info:nth-of-type(2) 
     Call Method  ${chrome_options}  add_argument  --disable-web-security
     Call Method  ${chrome_options}  add_argument  --nativeEvents\=false
     Call Method  ${chrome_options}  add_experimental_option  prefs  ${prefs}
-#    Call Method  ${chrome_options}  add_argument  --user-data-dir\=/home/lugovskoy/.config/google-chrome/Default
-    Call Method  ${chrome_options}  add_argument  --user-data-dir\=/home/vitalii/.config/google-chrome/Default
+    Call Method  ${chrome_options}  add_argument  --user-data-dir\=/home/lugovskoy/.config/google-chrome/Default
 
     #Для Viewer'а нужен хром, т.к. на хром настроена автоматическая закачка файлов
     Run Keyword If  '${username}' == 'PrivatMarket_Viewer'  Create WebDriver  Chrome  chrome_options=${chrome_options}  alias=${username}
@@ -799,10 +798,12 @@ ${tender_data_procuringEntity.identifier.id}  css=.delivery-info:nth-of-type(2) 
     Run Keyword And Return If  '${field_name}' == 'satisfied'  Отримати статус вирішення  ${result}
     [Return]  ${result}
 
+
 Search by status
     [Arguments]  ${locator}  ${tab_number}
     Log  ${locator}
     Wait Until Keyword Succeeds  3min  10s  Try To Search Complain  ${locator}  3
+
 
 Try To Search Complain
     [Arguments]  ${locator}  ${tab_number}
@@ -863,12 +864,13 @@ Try To Search Complain
     ${file_name}=  privatmarket.Отримати документ  ${username}  ${tender_uaid}  ${doc_id}
     [Return]  ${file_name}
 
+
 Отримати документ
     [Arguments]  ${username}  ${tender_uaid}  ${doc_id}
     Wait For Element With Reload  xpath=//div[@class='file-descriptor']/span[contains(., '${doc_id}')]  1
     Scroll Page To Element  xpath=//div[@class='file-descriptor']/span[contains(., '${doc_id}')]
     Wait Visibility And Click Element  xpath=//div[@class='file-descriptor']/span[contains(., '${doc_id}')]
-    Wait Visibility And Click Element  xpath=//div[contains(@class, 'file-item') and contains(., '${doc_id}')]//a[@ng-click='openUrl(file.url)']
+    Wait Visibility And Click Element  xpath=//div[contains(@class, 'file-item') and contains(., '${doc_id}')]//a[@data-id='file-item']
     # Добален слип, т.к. док не успевал загрузиться
     sleep  20s
     ${file_name_full}=  Get Text  xpath=//div[@class='file-descriptor']/span[contains(., '${doc_id}')]
