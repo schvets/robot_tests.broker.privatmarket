@@ -83,8 +83,10 @@ ${tender_data_complaint.description}  //div[@class='question-div']
 ${tender_data_complaint.status}  //span[contains(@id, 'cmplStatus')]
 ${tender_data_complaint.resolutionType}  //div[contains(@ng-if,"resolutionType")]
 ${tender_data_complaint.resolution}  //div[@class="question-answer title ng-scope"]//div[@class="question-div"]/div[1]
-#${tender_data_complaint.resolutionType}  //div[@class='question-div']
+${tender_data_complaint.satisfied}  //div[contains(@ng-if,"claim")]
+${tender_data_complaint.cancellationReason}  //*[@description='q.cancellationReason']/div/div[1]
 
+#//span[contains(.,"${UA-2017-05-31-000021-1.8}")]/ancestor::div[@class="faq ng-scope"]
 
 *** Keywords ***
 Підготувати дані для оголошення тендера
@@ -758,27 +760,51 @@ ${tender_data_complaint.resolution}  //div[@class="question-answer title ng-scop
 Отримати інформацію із скарги
     [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${field_name}  ${award_index}
     ${element}=  Set Variable  xpath=//div[contains(@class, 'faq') and contains(., '${complaintID}')]${tender_data_complaint.${field_name}}
-
-    run keyword if  '${field_name}' == 'description'  Wait Until Keyword Succeeds  3min  15s  Try To Search Complain  ${element}  3
-#    Sleeps for sync
-#    run keyword and return if  '${field_name}' == 'description'  Sleep  40s
-    sleep  60s
-    Reload And Switch To Tab  3
-#    Wait For Ajax
-#    Wait Visibility And Click Element  xpath=//span[contains(text(),"Оскарження")]
-    Wait Until Element Is Visible  ${element}  timeout=${COMMONWAIT}
+    ${test_case_name}=  Remove String  ${TEST_NAME}  '
+    Run Keyword If
+    ...  '${test_case_name}' == 'Відображення поданого статусу вимоги'  Search by status  ${element}[contains(.,"Вiдправлено")]  3
+    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу answered вимоги'  Search by status  ${element}[contains(.,"Отримано вiдповiдь")]  3
+    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу resolved вимоги'  Search by status  ${element}[contains(.,"Вирiшена")]  3
+    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу cancelled вимоги'  Search by status  ${element}[contains(.,"Скасована")]  3
+    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу pending вимоги'  Search by status  ${element}[contains(.,"Отримано вiдповiдь")]  3
+    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу cancelled скарги'  Search by status  ${element}[contains(.,"Скасована")]  3
+    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу answered вимоги про виправлення визначення переможця'  Search by status  ${element}[contains(.,"Отримано вiдповiдь")]  3
+    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу resolved вимоги про виправлення визначення переможця'  Search by status  ${element}[contains(.,"Вирiшена")]  3
+    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу cancelled чернетки вимоги про виправлення визначення переможця'  Search by status  ${element}[contains(.,"Скасована")]  3
+    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу cancelled скарги про виправлення визначення переможця'  Search by status  ${element}[contains(.,"Скасована")]  3
+    ...  ELSE  run keyword  Search by status  ${element}  3
     ${result_full}=  Get Text  ${element}
     ${result}=  Strip String  ${result_full}
     Run Keyword And Return If  '${field_name}' == 'status'  privatmarket_service.get_claim_status  ${result}
     Run Keyword And Return If  '${field_name}' == 'resolutionType'  Отримати resolutionType  ${result}
+    Run Keyword And Return If  '${field_name}' == 'satisfied'  Отримати статус вирішення  ${result}
     [Return]  ${result}
+
+Search by status
+    [Arguments]  ${locator}  ${tab_number}
+    Log  ${locator}
+    Wait Until Keyword Succeeds  3min  10s  Try To Search Complain  ${locator}  3
 
 Try To Search Complain
     [Arguments]  ${locator}  ${tab_number}
     Reload And Switch To Tab  ${tab_number}
     Wait For Ajax
-    ${status}=  run keyword and return status  Wait Until Element Is Visible  ${locator}  5s
-    [Return]  ${status}
+    Wait Until Element Is Visible  ${locator}  5s
+
+
+Отримати resolutionType
+    [Arguments]  ${text}
+    ${text}=  Set Variable If  'Рішення замовника: вирiшена' in '${text}'  resolved
+    [Return]  ${text}
+
+
+Отримати статус вирішення
+    [Arguments]  ${text}
+    ${text}=  Set Variable If
+    ...  'так' in '${text}'  ${TRUE}
+    ...  'ні' in '${text}'  ${FALSE}
+    ...  ${text}
+    [Return]  ${text}
 
 
 Отримати інформацію із документа до скарги
@@ -791,15 +817,6 @@ Try To Search Complain
     ${doc_text} =  Get Text  ${element}//span[contains(.,"${doc_id}")]
     [Return]  ${doc_text}
 
-
-Отримати resolutionType
-    [Arguments]  ${text}
-#     run keyword and return if  'Відправлено' in '${text}'  set variable  claim
-#     run keyword and return if  'вирішена' in '${text}'  set variable  resolved
-
-#    ${text}=  Set Variable If  'вирішена' in '${text}'  resolved
-    ${text}=  Set Variable If  'Рішення замовника: вирiшена' in '${text}'  resolved
-    [Return]  ${text}
 
 Показати вкладені файли
      [Arguments]  ${element}
