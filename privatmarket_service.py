@@ -205,7 +205,7 @@ def get_claim_status (status):
         u'Отримано вiдповiдь': 'answered',
         u'Вирiшена': 'resolved',
         u'Скасована': 'cancelled',
-        u'Не вирiшена': 'pending'
+        u'Не вирiшена, обробляється': 'pending'
     }
     type_name = type_dictionary.get(status)
     return type_name

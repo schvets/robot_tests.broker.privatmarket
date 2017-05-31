@@ -802,10 +802,10 @@ ${tender_data_procuringEntity.identifier.id}  css=.delivery-info:nth-of-type(2) 
 Search by status
     [Arguments]  ${locator}  ${tab_number}
     Log  ${locator}
-    Wait Until Keyword Succeeds  3min  10s  Try To Search Complain  ${locator}  3
+    Wait Until Keyword Succeeds  3min  10s  Try To Search Complaint  ${locator}  3
 
 
-Try To Search Complain
+Try To Search Complaint
     [Arguments]  ${locator}  ${tab_number}
     Reload And Switch To Tab  ${tab_number}
     Wait For Ajax
