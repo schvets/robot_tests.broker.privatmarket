@@ -38,6 +38,8 @@ ${tender_data_auctionPeriod.startDate}  xpath=(//span[@ng-if='p.bd'])[3]
 ${tender_data_minimalStep.amount}  css=div#lotMinStepAmount
 ${tender_data_documentation.title}  xpath=//div[@class='file-descriptor']/span[1]
 ${tender_data_qualificationPeriod.endDate}  xpath=(//span[contains(@ng-if, 'p.ed')])[4]
+${tender_data_causeDescription}  css=#tenderType div.question-div>div:nth-of-type(1)
+${tender_data_cause}  css=#tenderType>.action-element
 
 ${tender_data_item.description}  //div[@class='description']//span)
 ${tender_data_item.deliveryDate.startDate}  //div[@ng-if='adb.deliveryDate.startDate']/div[2])
@@ -85,6 +87,18 @@ ${tender_data_complaint.satisfied}  //div[contains(@ng-if,"claim")]
 ${tender_data_complaint.cancellationReason}  //*[@description='q.cancellationReason']/div/div[1]
 ${tender_data_complaint.title}  //span[contains(@class, 'claimHead')]
 ${tender_data_complaint.description}  //div[@class='question-div']
+
+${tender_data_procuringEntity.address.countryName}  css=#contacts-section #countryName
+${tender_data_procuringEntity.address.locality}  css=#contacts-section #locality
+${tender_data_procuringEntity.address.postalCode}  css=#contacts-section #postalCode
+${tender_data_procuringEntity.address.region}  css=#contacts-section #region
+${tender_data_procuringEntity.address.streetAddress}  css=#contacts-section #streetAddress
+${tender_data_procuringEntity.contactPoint.name}  css=.delivery-info:nth-of-type(1) .info-item:nth-of-type(2) .info-item-val
+${tender_data_procuringEntity.contactPoint.telephone}  css=.delivery-info:nth-of-type(1) .info-item:nth-of-type(4) .info-item-val
+${tender_data_procuringEntity.contactPoint.url}  css=.delivery-info:nth-of-type(1) .info-item:nth-of-type(5) .info-item-val
+${tender_data_procuringEntity.identifier.legalName}  css=.delivery-info:nth-of-type(2) .info-item:nth-of-type(4) .info-item-val
+${tender_data_procuringEntity.identifier.scheme}  css=.delivery-info:nth-of-type(2) .info-item:nth-of-type(2) .info-item-val
+${tender_data_procuringEntity.identifier.id}  css=.delivery-info:nth-of-type(2) .info-item:nth-of-type(3) .info-item-val
 
 
 *** Keywords ***
@@ -229,7 +243,7 @@ ${tender_data_complaint.description}  //div[@class='question-div']
 #step 3
     Wait For Ajax
     Run Keyword IF
-    ...  ${type} == 'aboveThresholdEU'  Додати нецінові показники  ${features}
+    ...  ${type} == 'aboveThresholdEU'  Додати нецінові показники  ${features}  ${type}
     ...  ELSE IF  ${type} == 'aboveThresholdUA'  Додати нецінові показники  ${features}  ${type}
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
 
@@ -664,6 +678,12 @@ ${tender_data_complaint.description}  //div[@class='question-div']
     Run Keyword And Return If  '${field_name}' == 'qualificationPeriod.endDate'  Отримати дату та час  ${field_name}  1
     Run Keyword And Return If  '${field_name}' == 'qualifications[0].status'  Отримати статус пропозиції кваліфікації  1
     Run Keyword And Return If  '${field_name}' == 'qualifications[1].status'  Отримати статус пропозиції кваліфікації  2
+    Run Keyword And Return If  '${field_name}' == 'title_en'  Отримати інформацію зі зміною локалізації  ${field_name}  EN
+    Run Keyword And Return If  '${field_name}' == 'title_ru'  Отримати інформацію зі зміною локалізації  ${field_name}  RU
+    Run Keyword And Return If  '${field_name}' == 'description_en'  Отримати інформацію зі зміною локалізації  ${field_name}  EN
+    Run Keyword And Return If  '${field_name}' == 'description_ru'  Отримати інформацію зі зміною локалізації  ${field_name}  RU
+    Run Keyword And Return If  '${field_name}' == 'causeDescription'  Отримати інформацію з ${field_name}  ${field_name}
+    Run Keyword And Return If  '${field_name}' == 'cause'  Отримати інформацію з ${field_name}  ${field_name}
 
     Wait Until Element Is Visible  ${tender_data_${field_name}}  ${COMMONWAIT}
     ${result_full}=  Get Text  ${tender_data_${field_name}}
@@ -1014,6 +1034,39 @@ Try To Search Complain
     [Return]  ${result}
 
 
+Отримати інформацію з causeDescription
+    [Arguments]  ${element}
+    Wait Visibility And Click Element  css=#tenderType
+    ${result_full}=  Отримати текст елемента  ${element}
+    ${result}=  Strip String  ${result_full}
+    [Return]  ${result}
+
+
+Отримати інформацію з cause
+    [Arguments]  ${element}
+    Wait Until Element Is Visible  css=#tenderType
+    ${result_full}=  Отримати текст елемента  ${element}
+    ${result_full}=  Strip String  ${result_full}
+    ${result}=  privatmarket_service.get_cause  ${result_full}
+    [Return]  ${result}
+
+
+Отримати інформацію зі зміною локалізації
+    [Arguments]  ${element}  ${lang}
+    Unselect Frame
+    Wait Visibility And Click Element  xpath=//li[contains(@class, 'change-language-item') and contains(., '${lang}')]
+    Wait Until Element Is Visible  xpath=//li[contains(@class, 'change-language-item') and contains(., '${lang}')]/b
+    Wait For Ajax
+    Switch To PMFrame
+    ${element}=  Set Variable If
+    ...  'title' in '${element}'  title
+    ...  'description' in '${element}'  description
+    ${text}=  Отримати текст елемента  ${element}
+    ${result}=  Strip String  ${text}
+    Unselect Frame
+    Wait Visibility And Click Element  xpath=//li[contains(@class, 'change-language-item') and contains(., 'UK')]
+    Switch To PMFrame
+    [Return]  ${result}
 
 
 Отримати строку
@@ -1289,7 +1342,7 @@ Close Confirmation In Editor
     Wait Until Element Contains  css=div.modal-body.info-div  ${confirmation_text}  ${COMMONWAIT}
     Sleep  2s
 #    debug
-    Wait Visibility And Click Element  css=button[ng-click='close()']
+    Wait Visibility And Click Element  css=button[data-id='modal-close']
     Sleep  1s
     Wait Until Element Is Not Visible  css=div.modal-body.info-div  ${COMMONWAIT}
 
