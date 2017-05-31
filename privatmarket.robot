@@ -86,8 +86,6 @@ ${tender_data_complaint.resolution}  //div[@class="question-answer title ng-scop
 ${tender_data_complaint.satisfied}  //div[contains(@ng-if,"claim")]
 ${tender_data_complaint.cancellationReason}  //*[@description='q.cancellationReason']/div/div[1]
 
-#//span[contains(.,"${UA-2017-05-31-000021-1.8}")]/ancestor::div[@class="faq ng-scope"]
-
 *** Keywords ***
 Підготувати дані для оголошення тендера
     [Arguments]  ${username}  ${tender_data}  ${role_name}

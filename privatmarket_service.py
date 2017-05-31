@@ -197,16 +197,6 @@ def convert_float_to_string(number):
     return format(number, '.2f')
 
 
-def sum_of_numbers(number, value):
-    number = int(number) + int(value)
-    return number
-
-
-def get_percent(value):
-    value = value * 100
-    return format(value, '.0f')
-
-
 def get_claim_status (status):
     type_dictionary = {
         u'Вiдправлено': 'claim',
@@ -219,3 +209,11 @@ def get_claim_status (status):
     return type_name
 
 
+def sum_of_numbers(number, value):
+    number = int(number) + int(value)
+    return number
+
+
+def get_percent(value):
+    value = value * 100
+    return format(value, '.0f')
