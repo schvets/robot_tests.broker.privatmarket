@@ -78,13 +78,14 @@ ${tender_data_lot_question.answer}  //div[@class='question-div question-expanded
 
 ${tender_data_feature.featureOf}  /../../../*[1]
 
-${tender_data_complaint.title}  //span[contains(@class, 'claimHead')]
-${tender_data_complaint.description}  //div[@class='question-div']
 ${tender_data_complaint.status}  //span[contains(@id, 'cmplStatus')]
 ${tender_data_complaint.resolutionType}  //div[contains(@ng-if,"resolutionType")]
 ${tender_data_complaint.resolution}  //div[@class="question-answer title ng-scope"]//div[@class="question-div"]/div[1]
 ${tender_data_complaint.satisfied}  //div[contains(@ng-if,"claim")]
 ${tender_data_complaint.cancellationReason}  //*[@description='q.cancellationReason']/div/div[1]
+${tender_data_complaint.title}  //span[contains(@class, 'claimHead')]
+${tender_data_complaint.description}  //div[@class='question-div']
+
 
 *** Keywords ***
 Підготувати дані для оголошення тендера
