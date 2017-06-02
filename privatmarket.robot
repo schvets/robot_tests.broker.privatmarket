@@ -37,6 +37,7 @@ ${tender_data_tenderPeriod.endDate}  xpath=(//span[contains(@ng-if, 'p.ed')])[2]
 ${tender_data_auctionPeriod.startDate}  xpath=(//span[@ng-if='p.bd'])[3]
 ${tender_data_minimalStep.amount}  css=div#lotMinStepAmount
 ${tender_data_documentation.title}  xpath=//div[@class='file-descriptor']/span[1]
+${tender_data_documents[0].title}  xpath=//div[@class='file-descriptor']/span[1]
 ${tender_data_qualificationPeriod.endDate}  xpath=(//span[contains(@ng-if, 'p.ed')])[4]
 ${tender_data_causeDescription}  css=#tenderType div.question-div>div:nth-of-type(1)
 ${tender_data_cause}  css=#tenderType>.action-element
@@ -47,6 +48,8 @@ ${tender_data_item.deliveryDate.endDate}  //div[@ng-if='adb.deliveryDate.endDate
 ${tender_data_item.deliveryLocation.latitude}  //span[contains(@class, 'latitude')])
 ${tender_data_item.deliveryLocation.longitude}  //span[contains(@class, 'longitude')])
 ${tender_data_item.deliveryAddress.countryName}  //span[@id='countryName'])
+${tender_data_item.deliveryAddress.countryName_ru}  //span[@id='countryName'])
+${tender_data_item.deliveryAddress.countryName_en}  //span[@id='countryName'])
 ${tender_data_item.deliveryAddress.postalCode}  //span[@id='postalCode'])
 ${tender_data_item.deliveryAddress.region}  //span[@id='region'])
 ${tender_data_item.deliveryAddress.locality}  //span[@id='locality'])
@@ -93,18 +96,38 @@ ${tender_data_procuringEntity.address.locality}  css=#contacts-section #locality
 ${tender_data_procuringEntity.address.postalCode}  css=#contacts-section #postalCode
 ${tender_data_procuringEntity.address.region}  css=#contacts-section #region
 ${tender_data_procuringEntity.address.streetAddress}  css=#contacts-section #streetAddress
-${tender_data_procuringEntity.contactPoint.name}  css=.delivery-info:nth-of-type(1) .info-item:nth-of-type(2) .info-item-val
-${tender_data_procuringEntity.contactPoint.telephone}  css=.delivery-info:nth-of-type(1) .info-item:nth-of-type(4) .info-item-val
-${tender_data_procuringEntity.contactPoint.url}  css=.delivery-info:nth-of-type(1) .info-item:nth-of-type(5) .info-item-val
-${tender_data_procuringEntity.identifier.legalName}  css=.delivery-info:nth-of-type(2) .info-item:nth-of-type(4) .info-item-val
-${tender_data_procuringEntity.identifier.scheme}  css=.delivery-info:nth-of-type(2) .info-item:nth-of-type(2) .info-item-val
-${tender_data_procuringEntity.identifier.id}  css=.delivery-info:nth-of-type(2) .info-item:nth-of-type(3) .info-item-val
+${tender_data_procuringEntity.contactPoint.name}  css=div[data-id='contactPoint.name']
+${tender_data_procuringEntity.contactPoint.telephone}  css=div[data-id='contactPoint.telephone']
+${tender_data_procuringEntity.contactPoint.url}  css=div[data-id='contactPoint.url']
+${tender_data_procuringEntity.identifier.legalName}  css=[data-id='identifier.legalName']
+${tender_data_procuringEntity.identifier.scheme}  css=div[data-id='identifier.scheme']
+${tender_data_procuringEntity.identifier.id}  css=div[data-id='identifier.id']
+
+${tender_data_awards[0].documents[0].title}  css=.modal.fade.in .file-name
+${tender_data_awards[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2) .info-item:nth-of-type(4) .info-item-val
+${tender_data_awards[0].suppliers[0].address.countryName}  css=.modal.fade.in [data-id='address.countryName']
+${tender_data_awards[0].suppliers[0].address.locality}  css=.modal.fade.in [data-id='address.locality']
+${tender_data_awards[0].suppliers[0].address.postalCode}  css=.modal.fade.in [data-id='address.postalCode']
+${tender_data_awards[0].suppliers[0].address.region}  css=.modal.fade.in [data-id='address.region']
+${tender_data_awards[0].suppliers[0].address.streetAddress}  css=.modal.fade.in [data-id='address.streetAddress']
+${tender_data_awards[0].suppliers[0].contactPoint.telephone}  css=.modal.fade.in .modal-body:nth-of-type(2) .info-item:nth-of-type(7) .info-item-val
+${tender_data_awards[0].suppliers[0].contactPoint.name}  css=.modal.fade.in .modal-body:nth-of-type(2) .info-item:nth-of-type(6) .info-item-val
+${tender_data_awards[0].suppliers[0].contactPoint.email}  css=.modal.fade.in .modal-body:nth-of-type(2) .info-item:nth-of-type(8) .info-item-val
+${tender_data_awards[0].suppliers[0].identifier.scheme}  css=.modal.fade.in .modal-body:nth-of-type(2) .info-item:nth-of-type(2) .info-item-val
+${tender_data_awards[0].suppliers[0].identifier.legalName}  css=.modal.fade.in .modal-body:nth-of-type(2) .info-item:nth-of-type(1) .info-item-val
+${tender_data_awards[0].suppliers[0].identifier.id}  css=.modal.fade.in .modal-body:nth-of-type(2) .info-item:nth-of-type(3) .info-item-val
+${tender_data_awards[0].suppliers[0].name}  css=.modal.fade.in .modal-body:nth-of-type(2) .info-item:nth-of-type(1) .info-item-val
+${tender_data_awards[0].value.valueAddedTaxIncluded}  css=.modal.fade.in .modal-body:nth-of-type(2) .info-item:nth-of-type(9) .info-item-val
+${tender_data_awards[0].value.currency}  css=.modal.fade.in .modal-body:nth-of-type(2) .info-item:nth-of-type(9) .info-item-val
+${tender_data_awards[0].value.amount}  css=.modal.fade.in .modal-body:nth-of-type(2) .info-item:nth-of-type(9) .info-item-val
+${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2) .info-item:nth-of-type(10) .info-item-val
 
 
 *** Keywords ***
 Підготувати дані для оголошення тендера
     [Arguments]  ${username}  ${tender_data}  ${role_name}
-    ${tender_data.data}=  Run Keyword If  'PrivatMarket_Owner' == '${username}'  privatmarket_service.modify_test_data  ${tender_data.data}
+#    ${tender_data.data}=  Run Keyword If  'PrivatMarket_Owner' == '${username}'  privatmarket_service.modify_test_data  ${tender_data.data}
+    ${tender_data.data}=  privatmarket_service.modify_test_data  ${tender_data.data}
     ${adapted.data}=  privatmarket_service.modify_test_data  ${tender_data.data}
     [Return]  ${tender_data}
 
@@ -121,7 +144,7 @@ ${tender_data_procuringEntity.identifier.id}  css=.delivery-info:nth-of-type(2) 
     Call Method  ${chrome_options}  add_argument  --disable-web-security
     Call Method  ${chrome_options}  add_argument  --nativeEvents\=false
     Call Method  ${chrome_options}  add_experimental_option  prefs  ${prefs}
-    Call Method  ${chrome_options}  add_argument  --user-data-dir\=/home/lugovskoy/.config/google-chrome/Default
+#    Call Method  ${chrome_options}  add_argument  --user-data-dir\=/home/lugovskoy/.config/google-chrome/Default
 
     #Для Viewer'а нужен хром, т.к. на хром настроена автоматическая закачка файлов
     Run Keyword If  '${username}' == 'PrivatMarket_Viewer'  Create WebDriver  Chrome  chrome_options=${chrome_options}  alias=${username}
@@ -620,10 +643,12 @@ ${tender_data_procuringEntity.identifier.id}  css=.delivery-info:nth-of-type(2) 
     Switch To PMFrame
     Wait Until Element Is Visible  ${tender_data_title}  ${COMMONWAIT}
 
-    Відкрити детальну інформацію по позиціям
+    Run Keyword Unless  'award_view' in @{TEST_TAGS} or 'add_contract' in @{TEST_TAGS}  Відкрити детальну інформацію по позиціям
 
     #get information
-    ${result}=  Отримати інформацію зі сторінки  ${tender_uaid}  ${field_name}
+    ${result}=  Run Keyword If
+    ...  'award_view' in @{TEST_TAGS} or 'add_contract' in @{TEST_TAGS}  Отримати інформацію про постачальника  ${tender_uaid}  ${field_name}
+    ...  ELSE  Отримати інформацію зі сторінки  ${tender_uaid}  ${field_name}
     [Return]  ${result}
 
 
@@ -656,11 +681,12 @@ ${tender_data_procuringEntity.identifier.id}  css=.delivery-info:nth-of-type(2) 
 
 
 Відкрити детальну інформацію по лотам
-    #check if extra information is already opened
-    ${element_class}=  Get Element Attribute  xpath=//li[contains(@ng-class, 'description')]@class
-    Run Keyword IF  'checked-nav' in '${element_class}'  Return From Keyword  True
-    Wait Visibility And Click Element  xpath=//li[contains(@ng-class, 'description')]
-    Wait Until Element Is Visible  xpath=//section[@class='description marged ng-binding']  ${COMMONWAIT}
+    ${elements}=  Get Webelements  xpath=//li[contains(@ng-class, 'description')]
+    ${count}=  Get_Length  ${elements}
+    :FOR  ${item}  In Range  0  ${count}
+    \  ${item}=  privatmarket_service.sum_of_numbers  ${item}  1
+    \  ${class}=  Get Element Attribute  xpath=(//li[contains(@ng-class, 'description')])[${item}]@class
+    \  Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=(//li[contains(@ng-class, 'description')])[${item}]
 
 
 Отримати інформацію зі сторінки
@@ -683,6 +709,7 @@ ${tender_data_procuringEntity.identifier.id}  css=.delivery-info:nth-of-type(2) 
     Run Keyword And Return If  '${field_name}' == 'description_ru'  Отримати інформацію зі зміною локалізації  ${field_name}  RU
     Run Keyword And Return If  '${field_name}' == 'causeDescription'  Отримати інформацію з ${field_name}  ${field_name}
     Run Keyword And Return If  '${field_name}' == 'cause'  Отримати інформацію з ${field_name}  ${field_name}
+    Run Keyword And Return If  '${field_name}' == 'awards[0].complaintPeriod.endDate'  Отримати інформацію з ${field_name}  1
 
     Wait Until Element Is Visible  ${tender_data_${field_name}}  ${COMMONWAIT}
     ${result_full}=  Get Text  ${tender_data_${field_name}}
@@ -710,25 +737,43 @@ ${tender_data_procuringEntity.identifier.id}  css=.delivery-info:nth-of-type(2) 
 
 Отримати інформацію із предмету
     [Arguments]  ${username}  ${tender_uaid}  ${object_id}  ${field_name}
-    ${info}=  Set Variable  xpath=//section[contains(., '${object_id}') and contains(@id, 'lotSection')]/section//div[@class='info-item-val']/div[@class='description']/a
+    Відкрити детальну інформацію по позиціям
+    ${info}=  Set Variable  xpath=//div[@class='lot-info']/section[contains(., '${object_id}')]//div[@class='info-item-val']/div[@class='description']/a
     ${info_class}=  Get Element Attribute  ${info}@class
     Run Keyword Unless  'checked-item' in '${info_class}'  Click Element  ${info}
-
-    ${element}=  Set Variable  xpath=(//section[contains(., '${object_id}') and contains(@id, 'lotSection')]/section${tender_data_item.${field_name}}
+    ${element}=  Set Variable  xpath=(//div[@class='lot-info']/section[contains(., '${object_id}')]${tender_data_item.${field_name}}
 
     Run Keyword And Return If  '${field_name}' == 'deliveryDate.startDate'  Отримати дату та час  ${element}  0
     Run Keyword And Return If  '${field_name}' == 'deliveryDate.endDate'  Отримати дату та час  ${element}  0
     Run Keyword And Return If  '${field_name}' == 'deliveryLocation.latitude'  Отримати число  ${element}  0
     Run Keyword And Return If  '${field_name}' == 'deliveryLocation.longitude'  Отримати число  ${element}  0
     Run Keyword And Return If  '${field_name}' == 'additionalClassifications[0].scheme'  Отримати інформацію з ${field_name}  ${element}
-    Run Keyword And Return If  '${field_name}' == 'classification.scheme'  Отримати інформацію з ${field_name}  ${element}
+#    Run Keyword And Return If  '${field_name}' == 'classification.scheme'  Отримати інформацію з ${field_name}  ${element}
     Run Keyword And Return If  '${field_name}' == 'unit.name'  Отримати інформацію з ${field_name}  ${element}  0
     Run Keyword And Return If  '${field_name}' == 'unit.code'  Отримати інформацію з ${field_name}  ${element}
     Run Keyword And Return If  '${field_name}' == 'quantity'  Отримати суму  ${element}
-
+    Run Keyword And Return If  '${field_name}' == 'deliveryAddress.countryName_ru'  Отримати інформацію із предмету зі зміною локалізації  ${field_name}  ${object_id}  RU
+    Run Keyword And Return If  '${field_name}' == 'deliveryAddress.countryName_en'  Отримати інформацію із предмету зі зміною локалізації  ${field_name}  ${object_id}  EN
 
     Wait Until Element Is Visible  ${element}  timeout=${COMMONWAIT}
     ${result_full}=  Get Text  ${element}
+    ${result}=  Strip String  ${result_full}
+    [Return]  ${result}
+
+
+Отримати інформацію про постачальника
+    [Arguments]  ${tender_uaid}  ${field_name}
+    ${open_status}=  Run Keyword And Return Status  Wait Until Element Is Visible  css=.modal.fade.in  1s
+    Run Keyword Unless  ${open_status}  Відкрити детальну інформацію про постачальника
+
+    Run Keyword And Return If  '${field_name}' == 'awards[0].status'  Отримати статус заявки  ${field_name}
+    Run Keyword And Return If  '${field_name}' == 'awards[0].value.valueAddedTaxIncluded'  Отримати інформацію з ${field_name}  ${field_name}
+    Run Keyword And Return If  '${field_name}' == 'awards[0].value.currency'  Отримати інформацію з ${field_name}  ${field_name}
+    Run Keyword And Return If  '${field_name}' == 'awards[0].value.amount'  Отримати інформацію з ${field_name}  ${field_name}
+    Run Keyword And Return If  '${field_name}' == 'contracts[0].status'  Отримати статус договору  ${field_name}
+
+    Wait Until Element Is Visible  ${tender_data_${field_name}}  ${COMMONWAIT}
+    ${result_full}=  Get Text  ${tender_data_${field_name}}
     ${result}=  Strip String  ${result_full}
     [Return]  ${result}
 
@@ -827,9 +872,42 @@ Try To Search Complaint
     [Return]  ${text}
 
 
+Відкрити детальну інформацію про постачальника
+    ${class}=  Get Element Attribute  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]@class
+    Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]
+    Wait Visibility And Click Element  css=.bids tbody tr td:nth-of-type(2) a
+    Wait Until Element Is Visible  css=.modal.fade.in  ${COMMONWAIT}
+
+
+Отримати статус заявки
+    [Arguments]  ${field_name}
+    Wait Until Element Is Visible  ${tender_data_${field_name}}  ${COMMONWAIT}
+    ${status_name}=  Get text  ${tender_data_${field_name}}
+    ${status_type}=  Set Variable If
+    ...  'Переможець' == '${status_name}'  active
+    ...  ELSE  ${status_name}
+    [Return]  ${status_type}
+
+
+Отримати статус договору
+    [Arguments]  ${field_name}
+
+    Run Keyword If  'статусу підписаної угоди з постачальником' in '${TEST_NAME}'
+    ...  Wait For Element With Reload  //div[contains(@class, 'modal fade')]//div[contains(@class, 'modal-body')][1]/div[10]/div[contains(., 'Підписаний')]  1
+
+    Wait Until Element Is Visible  ${tender_data_${field_name}}  ${COMMONWAIT}
+    ${status_name}=  Get text  ${tender_data_${field_name}}
+    ${status_type}=  Run Keyword If
+    ...  'Очiкує пiдписання' == '${status_name}'  Set Variable  pending
+    ...  ELSE IF  'Підписаний' == '${status_name}'  Set Variable  active
+    ...  ELSE  Set Variable  ${status_name}
+    Reload Page
+    [Return]  ${status_type}
+
+
 Отримати інформацію із документа до скарги
     [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${doc_id}  ${field}
-    ${element} =  set variable  xpath=//span[contains(.,"${complaintID}")]/ancestor::div[@class="faq ng-scope"]
+    ${element} =  Set Variable  xpath=//span[contains(.,"${complaintID}")]/ancestor::div[@class="faq ng-scope"]
     Показати вкладені файли  ${element}
     wait until element is visible  ${element}//span[contains(.,"${doc_id}")]
 #    Wait Visibility And Click Element  ${element}//span[contains(.,"${doc_id}")]
@@ -929,7 +1007,36 @@ Try To Search Complaint
     [Return]  ${currency_type}
 
 
+Отримати інформацію з awards[0].value.currency
+    [Arguments]  ${element_name}
+    ${currency}=  Отримати строку  ${element_name}  1
+    ${currency_type}=  privatmarket_service.get_currency_type  ${currency}
+    [Return]  ${currency_type}
+
+
+Отримати інформацію з awards[0].value.amount
+    [Arguments]  ${element_name}
+    ${text}=  Отримати строку  ${element_name}  0
+    ${text_new}=  Strip String  ${text}
+    ${result}=  convert to number  ${text_new}
+    [Return]  ${result}
+
+
 Отримати інформацію з value.valueAddedTaxIncluded
+    [Arguments]  ${element_name}
+    ${temp_name}=  Remove String  ${element_name}  '
+
+    ${element}=  Set Variable If
+        ...  'css=' in '${temp_name}' or 'xpath=' in '${temp_name}'  ${element_name}
+        ...  ${tender_data_${element_name}}
+
+    ${value_added_tax_included}=  Get text  ${element}
+    ${result}=  Set Variable If  'з ПДВ' in '${value_added_tax_included}'  True
+    ${result}=  Convert To Boolean  ${result}
+    [Return]  ${result}
+
+
+Отримати інформацію з awards[0].value.valueAddedTaxIncluded
     [Arguments]  ${element_name}
     ${temp_name}=  Remove String  ${element_name}  '
 
@@ -1068,6 +1175,46 @@ Try To Search Complaint
     Unselect Frame
     Wait Visibility And Click Element  xpath=//li[contains(@class, 'change-language-item') and contains(., 'UK')]
     Switch To PMFrame
+    [Return]  ${result}
+
+
+Отримати інформацію із предмету зі зміною локалізації
+    [Arguments]  ${field_name}  ${object_id}  ${lang}
+    ${index}=  Get Item Number  ${object_id}
+    Unselect Frame
+    Wait Visibility And Click Element  xpath=//li[contains(@class, 'change-language-item') and contains(., '${lang}')]
+    Wait Until Element Is Visible  xpath=//li[contains(@class, 'change-language-item') and contains(., '${lang}')]/b
+    Wait For Ajax
+    Switch To PMFrame
+    Відкрити детальну інформацію по позиціям
+    ${element}=  Set Variable  xpath=(//section[@id='subject-section']${tender_data_item.${field_name}}[${index}]
+    ${text}=  Отримати текст елемента  ${element}
+    ${result}=  Strip String  ${text}
+    Unselect Frame
+    Wait Visibility And Click Element  xpath=//li[contains(@class, 'change-language-item') and contains(., 'UK')]
+    Switch To PMFrame
+    [Return]  ${result}
+
+
+Отримати інформацію з awards[0].complaintPeriod.endDate
+    [Arguments]  ${shift}
+    Reload Page
+    Switch To PMFrame
+    ${class}=  Get Element Attribute  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]@class
+    Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]
+    ${title}=  Get Element Attribute  xpath=//table[@class='bids']/tbody//td[4]/a@title
+    ${work_string}=  Get Regexp Matches  ${title}  до (.)*
+    ${work_string}=  Get From List  ${work_string}  0
+    ${work_string}=  Replace String  ${work_string}  ,${SPACE}  ${SPACE}
+    ${values_list}=  Split String  ${work_string}
+    ${day}=  Convert To Integer  ${values_list[0 + ${shift}]}
+    ${day}=  Set Variable If  ${day} < 10  0${day}
+    ${month}=  privatmarket_service.get_month_number  ${values_list[1 + ${shift}]}
+    ${month}=  Set Variable If  ${month} < 10  0${month}
+    ${year}=  Convert To String  ${values_list[2 + ${shift}]}
+    ${time}=  Convert To String  ${values_list[3 + ${shift}]}
+    ${date}=  Convert To String  ${year}-${month}-${day} ${time}
+    ${result}=  privatmarket_service.get_time_with_offset  ${date}
     [Return]  ${result}
 
 
@@ -1273,6 +1420,7 @@ Try Search Element
     Reload And Switch To Tab  ${tab_number}
     Run Keyword If
     ...  '${tab_number}' == '1' and 'запитання на всі лоти' in '${TEST_NAME}'  Відкрити інформацію по запитанням на всі лоти
+    ...  ELSE IF  '${tab_number}' == '1' and 'статусу підписаної угоди з постачальником' in '${TEST_NAME}'  Відкрити детальну інформацію про постачальника
     ...  ELSE IF  '${tab_number}' == '1'  Відкрити детальну інформацію по позиціям
     ...  ELSE IF  '${tab_number}' == '2' and 'відповіді на запитання' in '${TEST_NAME}'  Wait Visibility And Click Element  css=.question-answer .question-expand-div>a:nth-of-type(1)
     ...  ELSE IF  '${tab_number}' == '3' and 'заголовку документації' in '${TEST_NAME}'  Відкрити інформацію про вкладені файли вимоги
@@ -1384,3 +1532,16 @@ Set Tender Period
 Wait For Ajax
     Wait For Condition  return window.jQuery!=undefined && jQuery.active==0  60s
     Sleep  2s
+
+
+Get Item Number
+    [Arguments]  ${object_id}
+    ${elements}=  Get Webelements  css=.lot-description section .lot-info:nth-of-type(2) section
+    ${item_num}=  Set Variable  0
+    ${count}=  Get_Length  ${elements}
+    :FOR  ${item}  In Range  0  ${count}
+    \  ${item}=  privatmarket_service.sum_of_numbers  ${item}  1
+    \  ${text}=  Get Text  xpath=(//div[@class='lot-info']/section//div[@class='description']//span)[${item}]
+    \  ${item_num}=  Run Keyword If  '${object_id}' in '${text}'  Set Variable  ${item}
+    \  ...  ELSE  Set Variable  ${item_num}
+    [Return]  ${item_num}
