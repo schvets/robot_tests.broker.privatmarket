@@ -10,12 +10,9 @@ def modify_test_data(initial_data):
     #set user name
     # initial_data['procuringEntity']['name'] = u'Товариство З Обмеженою Відповідальністю \'Мак Медіа Прінт\''
     initial_data['procuringEntity']['name'] = u'ТОВАРИСТВО З ОБМЕЖЕНОЮ ВІДПОВІДАЛЬНІСТЮ \'СІЛЬСЬКОГОСПОДАРСЬКА ФІРМА \'РУБІЖНЕ\''
-    items = initial_data['items']
-    for item in items:
-        item['classification']['scheme'] = u'ДК021'
-
-
-    # initial_data['items'][0]['classification']['scheme'] = u'ДК021'
+    # items = initial_data['items']
+    # for item in items:
+    #     item['classification']['scheme'] = u'ДК021'
     # initial_data['procuringEntity']['name'] = u'Макстрой Діск, Товариство З Обмеженою Відповідальністю'
     # initial_data['procuringEntity']['name'] = u'ФОП ОГАНІН ОЛЕКСАНДР ПЕТРОВИЧ'
     return initial_data

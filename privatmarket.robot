@@ -286,7 +286,7 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     ...  ELSE IF  ${type} == 'aboveThresholdUA'  Wait For Element With Reload  xpath=//div[@id='tenderStatus' and contains(., 'Подача пропозицій')]  1
     ...  ELSE  Wait For Element With Reload  xpath=//div[@id='tenderStatus' and contains(., 'Період уточнень')]  1
 
-    ${tender_id}=  Get Text  css=div#tenderId
+    ${tender_id}=  Get Text  css=#tenderId
     [Return]  ${tender_id}
 
 
@@ -1536,7 +1536,7 @@ Wait For Ajax
 
 Get Item Number
     [Arguments]  ${object_id}
-    ${elements}=  Get Webelements  css=.lot-description section .lot-info:nth-of-type(2) section
+    ${elements}=  Get Webelements  xpath=//section[contains(@class, 'lot-description')]//section/div/section[not (contains(@class, 'description'))]
     ${item_num}=  Set Variable  0
     ${count}=  Get_Length  ${elements}
     :FOR  ${item}  In Range  0  ${count}
