@@ -28,7 +28,7 @@ ${tender_data_status}  id=tenderStatus
 ${tender_data_value.amount}  id=tenderBudget
 ${tender_data_value.currency}  id=tenderBudgetCcy
 ${tender_data_value.valueAddedTaxIncluded}  id=tenderBudgetTax
-${tender_data_tenderID}  id=tenderId
+${tender_data_tenderID}  css=#tenderId
 ${tender_data_procuringEntity.name}  css=a[ng-click='commonActions.openCard()']
 ${tender_data_enquiryPeriod.startDate}  xpath=(//span[@ng-if='p.bd'])[1]
 ${tender_data_enquiryPeriod.endDate}  xpath=(//span[contains(@ng-if, 'p.ed')])[1]
@@ -86,7 +86,7 @@ ${tender_data_feature.featureOf}  /../../../*[1]
 ${tender_data_complaint.status}  //span[contains(@id, 'cmplStatus')]
 ${tender_data_complaint.resolutionType}  //div[contains(@ng-if,"resolutionType")]
 ${tender_data_complaint.resolution}  //div[@class="question-answer title ng-scope"]//div[@class="question-div"]/div[1]
-${tender_data_complaint.satisfied}  //div[contains(@ng-if,"claim")]
+${tender_data_complaint.satisfied}  //span[contains(@data-id, 'satisfied')]
 ${tender_data_complaint.cancellationReason}  //*[@description='q.cancellationReason']/div/div[1]
 ${tender_data_complaint.title}  //span[contains(@class, 'claimHead')]
 ${tender_data_complaint.description}  //div[@class='question-div']
@@ -286,7 +286,7 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     ...  ELSE IF  ${type} == 'aboveThresholdUA'  Wait For Element With Reload  xpath=//div[@id='tenderStatus' and contains(., 'Подача пропозицій')]  1
     ...  ELSE  Wait For Element With Reload  xpath=//div[@id='tenderStatus' and contains(., 'Період уточнень')]  1
 
-    ${tender_id}=  Get Text  css=#tenderId
+    ${tender_id}=  Get Text  ${tender_data_tenderID}
     [Return]  ${tender_id}
 
 
@@ -835,6 +835,8 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     ...  ELSE IF  '${test_case_name}' == 'Відображення статусу resolved вимоги про виправлення визначення переможця'  Search by status  ${element}[contains(.,"Вирiшена")]  3
     ...  ELSE IF  '${test_case_name}' == 'Відображення статусу cancelled чернетки вимоги про виправлення визначення переможця'  Search by status  ${element}[contains(.,"Скасована")]  3
     ...  ELSE IF  '${test_case_name}' == 'Відображення статусу cancelled скарги про виправлення визначення переможця'  Search by status  ${element}[contains(.,"Скасована")]  3
+    ...  ELSE IF  'Відображення статусу cancelled після draft -> claim -> answered вимоги' in '${test_case_name}'  Search by status  ${element}[contains(.,"Скасована")]  3
+    ...  ELSE IF  'Відображення статусу pending після draft -> claim -> answered вимоги' in '${test_case_name}'  Search by status  ${element}[contains(.,"Не вирiшена, обробляється")]  3
     ...  ELSE  run keyword  Search by status  ${element}  3
     ${result_full}=  Get Text  ${element}
     ${result}=  Strip String  ${result_full}
@@ -846,8 +848,7 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
 
 Search by status
     [Arguments]  ${locator}  ${tab_number}
-    Log  ${locator}
-    Wait Until Keyword Succeeds  3min  10s  Try To Search Complaint  ${locator}  3
+    Wait Until Keyword Succeeds  4min  10s  Try To Search Complaint  ${locator}  3
 
 
 Try To Search Complaint
