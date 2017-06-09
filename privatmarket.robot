@@ -1386,6 +1386,8 @@ Check Current Mode New Realisation
     Close notification
     #проверим правильный ли режим
     Wait Until Element Is Visible  ${locator_tender.switchToDemo}  ${COMMONWAIT}
+    Wait Visibility And Click Element  ${locator_tender.switchToDemo}
+    Wait For Ajax
     ${check_result}=  Get Text  ${locator_tender.switchToDemo}
     Run Keyword If  '${check_result}' == 'Увійти в демо-режим' or '${check_result}' == 'Войти в демо-режим'  Switch To Education Mode
 
