@@ -10,6 +10,11 @@ def modify_test_data(initial_data):
     #set user name
     # initial_data['procuringEntity']['name'] = u'Товариство З Обмеженою Відповідальністю \'Мак Медіа Прінт\''
     initial_data['procuringEntity']['name'] = u'ТОВАРИСТВО З ОБМЕЖЕНОЮ ВІДПОВІДАЛЬНІСТЮ \'СІЛЬСЬКОГОСПОДАРСЬКА ФІРМА \'РУБІЖНЕ\''
+    initial_data['procuringEntity']['contactPoint']['telephone'] = u'+380670444580'
+    initial_data['procuringEntity']['contactPoint']['url'] = u'https://dadadad.com'
+    initial_data['procuringEntity']['identifier']['legalName'] = u'ТОВАРИСТВО З ОБМЕЖЕНОЮ ВІДПОВІДАЛЬНІСТЮ \'СІЛЬСЬКОГОСПОДАРСЬКА ФІРМА \'РУБІЖНЕ\''
+    initial_data['procuringEntity']['identifier']['id'] = u'38580144'
+
     # items = initial_data['items']
     # for item in items:
     #     item['classification']['scheme'] = u'ДК021'
@@ -218,6 +223,11 @@ def sum_of_numbers(number, value):
     return number
 
 
+def get_abs_item_index(lot_index, item_index, items_count):
+    abs_index = ((int(lot_index)-1) * int(items_count)) + item_index
+    return abs_index
+
+
 def get_percent(value):
     value = value * 100
     return format(value, '.0f')
@@ -238,3 +248,11 @@ def get_cause(cause_text):
         return cause_type
     else:
         return cause_text
+
+
+def get_items_from_lot(items, lot_id):
+    lot_items = []
+    for item in items:
+        if item['relatedLot'] == lot_id:
+            lot_items.append(item)
+    return lot_items
