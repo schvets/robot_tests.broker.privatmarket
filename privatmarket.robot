@@ -251,6 +251,7 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     ${modified_phone}=  Get Substring  ${modified_phone}  0  13
     Wait Element Visibility And Input Text  css=section[data-id='contactPoint'] input[data-id='telephone']  ${modified_phone}
     Wait Element Visibility And Input Text  css=section[data-id='contactPoint'] input[data-id='email']  ${USERS.users['${username}'].email}
+    Wait Element Visibility And Input Text  css=section[data-id='contactPoint'] input[data-id='url']  ${tender_data.data.procuringEntity.contactPoint.url}
     Run Keyword IF  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  css=section[data-id='addContactPoint'] input[data-id='name']  ${tender_data.data.procuringEntity.contactPoint.name}
     Run Keyword IF  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  css=section[data-id='addContactPoint'] input[data-id='nameEn']  ${tender_data.data.procuringEntity.contactPoint.name_en}
     Run Keyword IF  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  css=section[data-id='addContactPoint'] input[data-id='telephone']  ${modified_phone}
@@ -308,7 +309,7 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     \  Wait Element Visibility And Input Text  xpath=(//input[@data-id='valueAmount'])[${lot_index}]  ${value_amount}
     \  Sleep  3s
     \  Run Keyword Unless  ${type} == 'negotiation'  Ввести мінімальний крок  ${lots}  ${index}  ${lot_index}
-    \  Run Keyword Unless  ${type} == 'negotiation'  Wait Visibility And Click Element  css=div.lot-guarantee label
+    \  Run Keyword Unless  ${type} == 'negotiation'  Wait Visibility And Click Element  css=(//div[@class='lot-guarantee']/label)[${lot_index}]
     \  Run Keyword Unless  ${type} == 'negotiation'  Wait Element Visibility And Input Text  xpath=(//input[@data-id='guaranteeAmount'])[${lot_index}]  1
     \  Run Keyword IF  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  xpath=(//input[@data-id='titleEn'])[${lot_index}]  ${lots[${index}].title_en}
     \  Run Keyword IF  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  xpath=(//textarea[@data-id='descriptionEn'])[${lot_index}]  ${lots[${index}].description}
@@ -337,6 +338,14 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     ...  ${type} == 'aboveThresholdEU'  privatmarket_service.get_unit_name_ru  ${items[${index}].unit.name}
     ...  ELSE  privatmarket_service.get_unit_name  ${items[${index}].unit.name}
     Wait Visibility And Click Element  xpath=//div[@data-id='lot'][${lot_index}]//div[@data-id='item'][${item_index}]//select[@data-id='unit']/option[text()='${unitName}']
+
+    #CPV
+    Wait Visibility And Click Element  xpath=//div[@data-id='lot'][${lot_index}]//div[@data-id='item'][${item_index}]//span[@data-id='actChoose']
+    Wait Until Element Is Visible  css=section[data-id='classificationTreeModal']  ${COMMONWAIT}
+    Wait Until Element Is Visible  css=input[data-id='query']  ${COMMONWAIT}
+    Search By Query  css=input[data-id='query']  ${items[${index}].classification.id}
+    Wait Visibility And Click Element  css=button[data-id='actConfirm']
+
     ${deliveryStartDate}=  Get Regexp Matches  ${items[${index}].deliveryDate.startDate}  (\\d{4}-\\d{2}-\\d{2})
     ${deliveryStartDate}=  Convert Date  ${deliveryStartDate[0]}  result_format=%d-%m-%Y
     ${deliveryEndDate}=  Get Regexp Matches  ${items[${index}].deliveryDate.endDate}  (\\d{4}-\\d{2}-\\d{2})
@@ -737,6 +746,12 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     Wait Element Visibility And Input Text  css=input[ng-model='supplier.address.streetAddress']  ${supplier_data.data.suppliers[0].address.streetAddress}
 
     Wait Element Visibility And Input Text  css=input[ng-model='supplier.contactPoint.name']  ${supplier_data.data.suppliers[0].contactPoint.name}
+#    ${modified_phone}=  Remove String  ${supplier_data.data.suppliers[0].contactPoint.telephone}  ${SPACE}
+#    ${modified_phone}=  Remove String  ${modified_phone}  -
+#    ${modified_phone}=  Remove String  ${modified_phone}  (
+#    ${modified_phone}=  Remove String  ${modified_phone}  )
+#    ${modified_phone}=  Set Variable If  '+38' in '${modified_phone}'  ${modified_phone}  +38067${modified_phone}
+#    ${modified_phone}=  Get Substring  ${modified_phone}  0  13
     Wait Element Visibility And Input Text  css=input[ng-model='supplier.contactPoint.telephone']  ${supplier_data.data.suppliers[0].contactPoint.telephone}
     Wait Element Visibility And Input Text  css=input[ng-model='supplier.contactPoint.email']  ${supplier_data.data.suppliers[0].contactPoint.email}
     Wait Element Visibility And Input Text  css=input[ng-model='supplier.contactPoint.url']  ${supplier_data.data.suppliers[0].contactPoint.url}
@@ -747,6 +762,32 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     Wait Until Element Is Enabled  css=div.alert-info  timeout=${COMMONWAIT}
     Wait Until Element Contains  css=div.alert-info  Данні успішно відправлені  timeout=10
     Wait Visibility And Click Element  css=div.modal-header i.icon-remove
+    Wait For Ajax
+    Reload Page
+    Switch To PMFrame
+    Wait Visibility And Click Element  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]
+    Wait Visibility And Click Element  css=.bids tbody tr td:nth-of-type(4) a
+    Wait Visibility And Click Element  xpath=//div[@class='form-block__item']/form/select[1]/option[text()='Уведомления о решении']
+    Sleep  1s
+    Wait Visibility And Click Element  xpath=//div[@class='form-block__item']/form/select[2]/option[@value='1']
+    Sleep  1s
+    Choose File  xpath=//div[@class='form-block__item']/form/div/input  ${document}
+    Sleep  5s
+    Wait Visibility And Click Element  css=button[data-id='setActive']
+    Sleep  2min
+
+
+Підтвердити підписання контракту
+    [Arguments]  ${username}  ${tender_uaid}  ${contract_num}
+    Reload Page
+    Switch To PMFrame
+    Click Element  xpath=(//li[contains(@ng-class, 'lot-cont')])[1]
+    ${date}=  privatmarket_service.get_current_date
+    Wait Element Visibility And Input Text  css=#contractNumber  ${tender_uaid}
+    Wait Element Visibility And Input Text  css=#dateSigned  ${date}
+    Wait Element Visibility And Input Text  css=#startDate  ${date}
+    Wait Element Visibility And Input Text  css=#endDate  ${date}
+    debug
 
 
 Отримати інформацію зі сторінки
@@ -1269,9 +1310,9 @@ Try To Search Complaint
     ${work_string}=  Replace String  ${work_string}  ,${SPACE}  ${SPACE}
     ${values_list}=  Split String  ${work_string}
     ${day}=  Convert To Integer  ${values_list[0 + ${shift}]}
-    ${day}=  Set Variable If  ${day} < 10  0${day}
+    ${day}=  Set Variable If  ${day} < 10  0${day}  ${day}
     ${month}=  privatmarket_service.get_month_number  ${values_list[1 + ${shift}]}
-    ${month}=  Set Variable If  ${month} < 10  0${month}
+    ${month}=  Set Variable If  ${month} < 10  0${month}  ${month}
     ${year}=  Convert To String  ${values_list[2 + ${shift}]}
     ${time}=  Convert To String  ${values_list[3 + ${shift}]}
     ${date}=  Convert To String  ${year}-${month}-${day} ${time}
