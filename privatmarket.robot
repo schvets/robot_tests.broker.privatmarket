@@ -36,8 +36,11 @@ ${tender_data_tenderPeriod.startDate}  xpath=(//span[@ng-if='p.bd'])[2]
 ${tender_data_tenderPeriod.endDate}  xpath=(//span[contains(@ng-if, 'p.ed')])[2]
 ${tender_data_auctionPeriod.startDate}  xpath=(//span[@ng-if='p.bd'])[3]
 ${tender_data_minimalStep.amount}  css=div#lotMinStepAmount
-${tender_data_documentation.title}  xpath=//div[@class='file-descriptor']/span[1]
-${tender_data_documents[0].title}  xpath=//div[@class='file-descriptor']/span[1]
+#${tender_data_documentation.title}  xpath=//div[@class='file-descriptor']/span[1]
+${tender_data_documentation.title}  xpath=//div[contains(@title,'.docx')]
+#${tender_data_documents[0].title}  xpath=//div[@class='file-descriptor']/span[1]
+${tender_data_documents[0].title}  xpath=//div[contains(@title,'.docx')]
+
 ${tender_data_qualificationPeriod.endDate}  xpath=(//span[contains(@ng-if, 'p.ed')])[4]
 ${tender_data_causeDescription}  css=#tenderType div.question-div>div:nth-of-type(1)
 ${tender_data_cause}  css=#tenderType>.action-element
@@ -227,6 +230,7 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     Wait For Ajax
     Run Keyword Unless  ${type} == 'aboveThresholdEU' or ${type} == 'aboveThresholdUA' or ${type} == 'negotiation'  Set Enquiry Period  ${tender_data.data.enquiryPeriod.startDate}  ${tender_data.data.enquiryPeriod.endDate}
     Run Keyword Unless  ${type} == 'negotiation'  Set Tender Period  ${tender_data.data.tenderPeriod.startDate}  ${tender_data.data.tenderPeriod.endDate}
+    Wait Visibility And Click Element  xpath=//span[@class='lot_budget_tax ng-scope']//label[contains(@for,'tax_')]
 
     #cause
     Run Keyword If  ${type} == 'negotiation'  Обрати підставу вибору переговорної процедури  ${tender_data}
@@ -238,7 +242,6 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     Wait Element Visibility And Input Text  ${locator_lotAdd.region}  ${tender_data.data.procuringEntity.address.region}
     Wait Element Visibility And Input Text  ${locator_lotAdd.locality}  ${tender_data.data.procuringEntity.address.locality}
     Wait Element Visibility And Input Text  ${locator_lotAdd.streetAddress}  ${tender_data.data.procuringEntity.address.streetAddress}
-
     #contactPoint
     Wait Element Visibility And Input Text  css=input[data-id='name']  ${tender_data.data.procuringEntity.contactPoint.name}
     Run Keyword IF  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  css=section[data-id='contactPoint'] input[data-id='nameEn']  ${tender_data.data.procuringEntity.contactPoint.name_en}
@@ -308,7 +311,7 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     \  Wait Element Visibility And Input Text  xpath=(//input[@data-id='valueAmount'])[${lot_index}]  ${value_amount}
     \  Sleep  3s
     \  Run Keyword Unless  ${type} == 'negotiation'  Ввести мінімальний крок  ${lots}  ${index}  ${lot_index}
-    \  Run Keyword Unless  ${type} == 'negotiation'  Wait Visibility And Click Element  css=(//div[@class='lot-guarantee']/label)[${lot_index}]
+    \  Run Keyword Unless  ${type} == 'negotiation'  Wait Visibility And Click Element  xpath=(//label[contains(@for,'guarantee')])[${lot_index}]
     \  Run Keyword Unless  ${type} == 'negotiation'  Wait Element Visibility And Input Text  xpath=(//input[@data-id='guaranteeAmount'])[${lot_index}]  1
     \  Run Keyword IF  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  xpath=(//input[@data-id='titleEn'])[${lot_index}]  ${lots[${index}].title_en}
     \  Run Keyword IF  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  xpath=(//textarea[@data-id='descriptionEn'])[${lot_index}]  ${lots[${index}].description}
@@ -590,9 +593,9 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
 
     #загрузим файл
     Wait Visibility And Click Element  css=label[for='documentation_tender_yes']
-    Wait Visibility And Click Element  xpath=//section[@data-id='ptrDocuments']//form[@name='fileForm']/select[1]/option[2]
+    Wait Visibility And Click Element  xpath=//select[@id='chooseTypeptr']//option[2]
     Sleep  1s
-    Run Keyword And Ignore Error  Wait Visibility And Click Element  xpath=//section[@data-id='ptrDocuments']//form[@name='fileForm']/select[2]/option[@value='en']
+    Run Keyword And Ignore Error  Wait Visibility And Click Element  xpath=//select[@id='chooseLangptr']//option[@value='en']
     Sleep  1s
     Choose File  css=section[data-id='ptrDocuments'] #inputFile  ${filePath}
     Sleep  5s
@@ -615,6 +618,8 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     Wait Visibility And Click Element  css=#tab_3 a
     Sleep  2s
     Wait Visibility And Click Element  css=label[for='documentation_lot_yes']
+    Wait Visibility And Click Element  xpath=//section[@data-id='lots']//form[@name='fileForm']/select[1]/option[text()='Документы закупки']
+
     Wait Visibility And Click Element  xpath=//section[@data-id='lots']//form[@name='fileForm']/select[1]/option[text()='Документы закупки']
     Sleep  1s
     Wait Visibility And Click Element  xpath=//section[@data-id='lots']//form[@name='fileForm']/select[2]/option[@value='en']
@@ -895,9 +900,9 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
 
 Отримати інформацію із документа
     [Arguments]  ${username}  ${tender_uaid}  ${doc_id}  ${field}
-    Wait For Element With Reload  xpath=//div[@class='file-descriptor']/span[contains(., '${doc_id}')]  1
-    Wait Until Element Is Visible  xpath=//div[@class='file-descriptor']/span[contains(., '${doc_id}')]  ${COMMONWAIT}
-    ${result}=  Get Text  xpath=//div[@class='file-descriptor']/span[contains(., '${doc_id}')]
+    Wait For Element With Reload  xpath=//div[contains(@${field},'${doc_id}')]  1
+    Wait Until Element Is Visible  xpath=//div[contains(@${field},'${doc_id}')]  ${COMMONWAIT}
+    ${result}=  Get Text  xpath=//div[contains(@${field},'${doc_id}')]
     [Return]  ${result}
 
 
@@ -923,6 +928,12 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${field_name}  ${award_index}
     ${element}=  Set Variable  xpath=//div[contains(@class, 'faq') and contains(., '${complaintID}')]${tender_data_complaint.${field_name}}
     ${test_case_name}=  Remove String  ${TEST_NAME}  '
+    log to console  '#####################################################################################################'
+    log to console  ${field_name}
+    log to console  '#####################################################################################################'
+    log to console  ${element}
+    log to console  '#####################################################################################################'
+    log to console  ${complaintID}
     Run Keyword If
     ...  '${test_case_name}' == 'Відображення поданого статусу вимоги'  Search by status  ${element}[contains(.,"Вiдправлено")]  3
     ...  ELSE IF  '${test_case_name}' == 'Відображення статусу answered вимоги'  Search by status  ${element}[contains(.,"Отримано вiдповiдь")]  3
@@ -1007,20 +1018,19 @@ Try To Search Complaint
 
 Отримати інформацію із документа до скарги
     [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${doc_id}  ${field}
-    ${element} =  Set Variable  xpath=//span[contains(.,"${complaintID}")]/ancestor::div[@class="faq ng-scope"]
+    ${element} =  Set Variable  xpath=//a[contains(.,"Показати вкладені файли")]
     Показати вкладені файли  ${element}
-    wait until element is visible  ${element}//span[contains(.,"${doc_id}")]
-#    Wait Visibility And Click Element  ${element}//span[contains(.,"${doc_id}")]
-#    Wait Visibility And Click Element  ${element}//a[contains(.,"Завантажити")]
-    ${doc_text} =  Get Text  ${element}//span[contains(.,"${doc_id}")]
+    ${element_new}=  Set Variable  xpath=(//div[contains(@title,'${doc_id}')])
+    Wait Until Element Is Visible  xpath=(//div[contains(@title,'${doc_id}')])
+    ${doc_text} =  Get Text  ${element_new}
     [Return]  ${doc_text}
 
 
 Показати вкладені файли
      [Arguments]  ${element}
-     ${updated_element}=  Set Variable  ${element}//a[contains(.,"Показати вкладені файли")]
-     ${status}=  Run Keyword And Return Status  Wait Until Element Is Visible  ${updated_element}  20s
-     Run Keyword If  '${status}' == 'True'  click element  ${updated_element}
+     ${status}=  Run Keyword And Return Status  Wait Until Element Is Visible  ${element}  20s
+     Run Keyword If  '${status}' == 'True'  Click Element  ${element}
+
 
 
 Отримати статус пропозиції кваліфікації
@@ -1045,13 +1055,12 @@ Try To Search Complaint
 
 Отримати документ
     [Arguments]  ${username}  ${tender_uaid}  ${doc_id}
-    Wait For Element With Reload  xpath=//div[@class='file-descriptor']/span[contains(., '${doc_id}')]  1
-    Scroll Page To Element  xpath=//div[@class='file-descriptor']/span[contains(., '${doc_id}')]
-    Wait Visibility And Click Element  xpath=//div[@class='file-descriptor']/span[contains(., '${doc_id}')]
-    Wait Visibility And Click Element  xpath=//div[contains(@class, 'file-item') and contains(., '${doc_id}')]//a[@data-id='file-item']
+    Wait For Element With Reload  xpath=//div[contains(@title,'${doc_id}')]  1
+    Scroll Page To Element  xpath=//div[contains(@title,'${doc_id}')]
+    Wait Visibility And Click Element  xpath=//div[contains(@title,'${doc_id}')]
     # Добален слип, т.к. док не успевал загрузиться
     sleep  20s
-    ${file_name_full}=  Get Text  xpath=//div[@class='file-descriptor']/span[contains(., '${doc_id}')]
+    ${file_name_full}=  Get Text  xpath=//div[contains(@title,'${doc_id}')]
     ${file_name}=  Strip String  ${file_name_full}
     [Return]  ${file_name}
 
@@ -1350,7 +1359,7 @@ Try To Search Complaint
     ${values_list}=  Split String  ${work_string}
     ${day}=  Convert To String  ${values_list[0 + ${shift}]}
     ${month}=  privatmarket_service.get_month_number  ${values_list[1 + ${shift}]}
-    ${month}=  Set Variable If  ${month} < 10  0${month}
+    ${month}=  Set Variable If  ${month} < 10  0${month}  ${month}
     ${year}=  Convert To String  ${values_list[2 + ${shift}]}
     ${time}=  Convert To String  ${values_list[3 + ${shift}]}
     ${date}=  Convert To String  ${year}-${month}-${day} ${time}
@@ -1647,3 +1656,35 @@ Get Item Number
     \  ${item_num}=  Run Keyword If  '${object_id}' in '${text}'  Set Variable  ${item}
     \  ...  ELSE  Set Variable  ${item_num}
     [Return]  ${item_num}
+
+
+Відповісти на вимогу про виправлення умов закупівлі
+    [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${answer_data}
+    log to console  ${answer_data}
+    log to console  '____________________________________________________________'
+    debug
+    Wait Until Keyword Succeeds  5min  10s  Wait For Element With Reload  xpath=//div[@id='nav-tab']//span[@class='ng-scope ng-binding']  3
+    Wait Until Keyword Succeeds  10min  10s  Wait For Element With Reload  xpath=//div[contains(@class,'faq ng-scope') and contains(.,', id: '${complaintID})]//button[@class='btn btn-success ng-scope ng-binding']  3
+    Wait Visibility And Click Element  xpath=//div[@class='actions ng-scope']//button[@class='btn btn-success ng-scope ng-binding']
+    Wait Visibility And Click Element  xpath=//div[contains(@class,'faq ng-scope') and contains(.,', id: '${complaintID})]//button[@class='btn btn-success ng-scope ng-binding']
+    Wait Visibility And Click Element  xpath=//div[@class='info-item']//select[@id='resolutionType']/option[@value='${answer_data.data.resolutionType}']
+    Wait Element Visibility And Input Text  xpath=//textarea[@class='ng-pristine ng-valid']  ${answer_data.data.resolution}
+    Wait Visibility And Click Element  xpath=//button[@data-id='btn-send-complaint-resolution']
+
+
+Відповісти на вимогу про виправлення умов лоту
+    [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${answer_data}
+    log to console  ${answer_data}
+    log to console  '____________________________________________________________'
+    debug
+    privatmarket.Відповісти на вимогу про виправлення умов закупівлі  ${username}  ${tender_uaid}  ${complaintID}  ${answer_data}
+
+Завантажити документ рішення кваліфікаційної комісії
+    [Arguments]  ${username}  ${document}  ${tender_uaid}  ${award_num}
+    log to console  ${award_num}
+    debug
+
+Відповісти на вимогу про виправлення визначення переможця
+    [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${answer_data}  ${award_index}
+    debug
+    privatmarket.Відповісти на вимогу про виправлення умов закупівлі  ${username}  ${tender_uaid}  ${complaintID}  ${answer_data}
