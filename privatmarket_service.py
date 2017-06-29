@@ -14,10 +14,6 @@ def modify_test_data(initial_data):
     initial_data['procuringEntity']['contactPoint']['url'] = u'https://dadadad.com'
     initial_data['procuringEntity']['identifier']['legalName'] = u'ТОВАРИСТВО З ОБМЕЖЕНОЮ ВІДПОВІДАЛЬНІСТЮ \'СІЛЬСЬКОГОСПОДАРСЬКА ФІРМА \'РУБІЖНЕ\''
     initial_data['procuringEntity']['identifier']['id'] = u'38580144'
-
-    # items = initial_data['items']
-    # for item in items:
-    #     item['classification']['scheme'] = u'ДК021'
     # initial_data['procuringEntity']['name'] = u'Макстрой Діск, Товариство З Обмеженою Відповідальністю'
     # initial_data['procuringEntity']['name'] = u'ФОП ОГАНІН ОЛЕКСАНДР ПЕТРОВИЧ'
     return initial_data
@@ -51,6 +47,11 @@ def get_time_with_offset(date):
     time_zone = timezone('Europe/Kiev')
     localized_date = time_zone.localize(date_obj)
     return localized_date.strftime('%Y-%m-%d %H:%M:%S.%f%z')
+
+
+def get_current_date():
+    now = datetime.now()
+    return now.strftime('%d-%m-%Y')
 
 
 def get_unit_code(name):

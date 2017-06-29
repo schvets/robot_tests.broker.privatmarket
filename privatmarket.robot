@@ -254,6 +254,7 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     ${modified_phone}=  Get Substring  ${modified_phone}  0  13
     Wait Element Visibility And Input Text  css=section[data-id='contactPoint'] input[data-id='telephone']  ${modified_phone}
     Wait Element Visibility And Input Text  css=section[data-id='contactPoint'] input[data-id='email']  ${USERS.users['${username}'].email}
+    Wait Element Visibility And Input Text  css=section[data-id='contactPoint'] input[data-id='url']  ${tender_data.data.procuringEntity.contactPoint.url}
     Run Keyword IF  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  css=section[data-id='addContactPoint'] input[data-id='name']  ${tender_data.data.procuringEntity.contactPoint.name}
     Run Keyword IF  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  css=section[data-id='addContactPoint'] input[data-id='nameEn']  ${tender_data.data.procuringEntity.contactPoint.name_en}
     Run Keyword IF  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  css=section[data-id='addContactPoint'] input[data-id='telephone']  ${modified_phone}
@@ -337,6 +338,14 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     ...  ${type} == 'aboveThresholdEU'  privatmarket_service.get_unit_name_ru  ${items[${index}].unit.name}
     ...  ELSE  privatmarket_service.get_unit_name  ${items[${index}].unit.name}
     Wait Visibility And Click Element  xpath=//div[@data-id='lot'][${lot_index}]//div[@data-id='item'][${item_index}]//select[@data-id='unit']/option[text()='${unitName}']
+
+    #CPV
+    Wait Visibility And Click Element  xpath=//div[@data-id='lot'][${lot_index}]//div[@data-id='item'][${item_index}]//span[@data-id='actChoose']
+    Wait Until Element Is Visible  css=section[data-id='classificationTreeModal']  ${COMMONWAIT}
+    Wait Until Element Is Visible  css=input[data-id='query']  ${COMMONWAIT}
+    Search By Query  css=input[data-id='query']  ${items[${index}].classification.id}
+    Wait Visibility And Click Element  css=button[data-id='actConfirm']
+
     ${deliveryStartDate}=  Get Regexp Matches  ${items[${index}].deliveryDate.startDate}  (\\d{4}-\\d{2}-\\d{2})
     ${deliveryStartDate}=  Convert Date  ${deliveryStartDate[0]}  result_format=%d-%m-%Y
     ${deliveryEndDate}=  Get Regexp Matches  ${items[${index}].deliveryDate.endDate}  (\\d{4}-\\d{2}-\\d{2})
@@ -749,6 +758,39 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     Wait Until Element Is Enabled  css=div.alert-info  timeout=${COMMONWAIT}
     Wait Until Element Contains  css=div.alert-info  Данні успішно відправлені  timeout=10
     Wait Visibility And Click Element  css=div.modal-header i.icon-remove
+    Wait For Ajax
+    Reload Page
+    Switch To PMFrame
+    Wait Visibility And Click Element  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]
+    Wait Visibility And Click Element  css=.bids tbody tr td:nth-of-type(4) a
+    Wait Visibility And Click Element  xpath=//div[@class='form-block__item']/form/select[1]/option[text()='Уведомления о решении']
+    Sleep  1s
+    Wait Visibility And Click Element  xpath=//div[@class='form-block__item']/form/select[2]/option[@value='1']
+    Sleep  1s
+    Choose File  xpath=//div[@class='form-block__item']/form/div/input  ${document}
+    Sleep  5s
+    Wait Visibility And Click Element  css=button[data-id='setActive']
+    Sleep  2min
+
+
+Підтвердити підписання контракту
+    [Arguments]  ${username}  ${tender_uaid}  ${contract_num}
+    Reload Page
+    Switch To PMFrame
+    Wait Visibility And Click Element  xpath=(//li[contains(@ng-class, 'lot-cont')])[1]
+    Wait For Ajax
+    Wait Element Visibility And Input Text  css=input[ng-model='local.entity.title']  ${tender_uaid}
+    Wait Element Visibility And Input Text  css=#contractNumber  ${tender_uaid}
+    Click Element  css=#dateSigned
+    Wait Visibility And Click Element  css=.today.day
+    Wait For Ajax
+    Click Element  css=#endDate
+    Wait Visibility And Click Element  css=.today.day
+    Wait For Ajax
+    Wait Until Element Is Enabled  css=button[ng-click="act.saveContract('active')"]  ${COMMONWAIT}
+    Click Button  css=button[ng-click="act.saveContract('active')"]
+    Wait Until Element Is Visible  css=.notify  ${COMMONWAIT}
+    Sleep  1min
 
 
 Отримати інформацію зі сторінки
