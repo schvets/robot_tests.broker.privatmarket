@@ -230,7 +230,7 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     Wait For Ajax
     Run Keyword Unless  ${type} == 'aboveThresholdEU' or ${type} == 'aboveThresholdUA' or ${type} == 'negotiation'  Set Enquiry Period  ${tender_data.data.enquiryPeriod.startDate}  ${tender_data.data.enquiryPeriod.endDate}
     Run Keyword Unless  ${type} == 'negotiation'  Set Tender Period  ${tender_data.data.tenderPeriod.startDate}  ${tender_data.data.tenderPeriod.endDate}
-    Wait Visibility And Click Element  xpath=//span[@class='lot_budget_tax ng-scope']//label[contains(@for,'tax_')]
+    Run Keyword Unless  ${type} == 'negotiation'  Wait Visibility And Click Element  xpath=//span[@class='lot_budget_tax ng-scope']//label[contains(@for,'tax_')]
 
     #cause
     Run Keyword If  ${type} == 'negotiation'  Обрати підставу вибору переговорної процедури  ${tender_data}
@@ -589,7 +589,8 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     Wait Visibility And Click Element  ${locator_tenderClaim.buttonCreate}
 
     #откроем нужную вкладку
-    Wait Visibility And Click Element  css=#tab_3 a
+    Run Keyword If  'переговорної процедури' in '${TEST_NAME}'  Wait Visibility And Click Element  css=#tab_2 a
+    ...  ELSE  Wait Visibility And Click Element  css=#tab_3 a
 
     #загрузим файл
     Wait Visibility And Click Element  css=label[for='documentation_tender_yes']
@@ -597,7 +598,7 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     Sleep  1s
     Run Keyword And Ignore Error  Wait Visibility And Click Element  xpath=//select[@id='chooseLangptr']//option[@value='en']
     Sleep  1s
-    Choose File  css=section[data-id='ptrDocuments'] #inputFile  ${filePath}
+    Choose File  css=section[data-id='ptrDocuments'] #inputFileptr  ${filePath}
     Sleep  5s
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
     Wait For Ajax
