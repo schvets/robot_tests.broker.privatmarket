@@ -260,7 +260,6 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
 
 #step 1
-    log to console  ${tender_data.data}
     Додати lots  ${lots}  ${items}  ${type}
 
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
@@ -329,8 +328,6 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
 Додати item до лоту
     [Arguments]  ${items}  ${items_count}  ${lot_index}  ${index}  ${type}
     ${item_index}=  privatmarket_service.sum_of_numbers  ${index}  1
-    log to console  '#####################################################################################################'
-    log to console  ${items[${index}]}
     Run Keyword Unless  '${item_index}' == '1'  Wait Visibility And Click Element  xpath=(//button[@data-id='actAddItem'])[${lot_index}]
     Wait Element Visibility And Input Text  xpath=//div[@data-id='lot'][${lot_index}]//div[@data-id='item'][${item_index}]//input[@data-id='description']  ${items[${index}].description}
     Wait Element Visibility And Input Text  xpath=//div[@data-id='lot'][${lot_index}]//div[@data-id='item'][${item_index}]//input[@data-id='quantity']  ${items[${index}].quantity}
@@ -746,12 +743,6 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     Wait Element Visibility And Input Text  css=input[ng-model='supplier.address.streetAddress']  ${supplier_data.data.suppliers[0].address.streetAddress}
 
     Wait Element Visibility And Input Text  css=input[ng-model='supplier.contactPoint.name']  ${supplier_data.data.suppliers[0].contactPoint.name}
-#    ${modified_phone}=  Remove String  ${supplier_data.data.suppliers[0].contactPoint.telephone}  ${SPACE}
-#    ${modified_phone}=  Remove String  ${modified_phone}  -
-#    ${modified_phone}=  Remove String  ${modified_phone}  (
-#    ${modified_phone}=  Remove String  ${modified_phone}  )
-#    ${modified_phone}=  Set Variable If  '+38' in '${modified_phone}'  ${modified_phone}  +38067${modified_phone}
-#    ${modified_phone}=  Get Substring  ${modified_phone}  0  13
     Wait Element Visibility And Input Text  css=input[ng-model='supplier.contactPoint.telephone']  ${supplier_data.data.suppliers[0].contactPoint.telephone}
     Wait Element Visibility And Input Text  css=input[ng-model='supplier.contactPoint.email']  ${supplier_data.data.suppliers[0].contactPoint.email}
     Wait Element Visibility And Input Text  css=input[ng-model='supplier.contactPoint.url']  ${supplier_data.data.suppliers[0].contactPoint.url}
@@ -781,13 +772,20 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     [Arguments]  ${username}  ${tender_uaid}  ${contract_num}
     Reload Page
     Switch To PMFrame
-    Click Element  xpath=(//li[contains(@ng-class, 'lot-cont')])[1]
-    ${date}=  privatmarket_service.get_current_date
+    Wait Visibility And Click Element  xpath=(//li[contains(@ng-class, 'lot-cont')])[1]
+    Wait For Ajax
+    Wait Element Visibility And Input Text  css=input[ng-model='local.entity.title']  ${tender_uaid}
     Wait Element Visibility And Input Text  css=#contractNumber  ${tender_uaid}
-    Wait Element Visibility And Input Text  css=#dateSigned  ${date}
-    Wait Element Visibility And Input Text  css=#startDate  ${date}
-    Wait Element Visibility And Input Text  css=#endDate  ${date}
-    debug
+    Click Element  css=#dateSigned
+    Wait Visibility And Click Element  css=.today.day
+    Wait For Ajax
+    Click Element  css=#endDate
+    Wait Visibility And Click Element  css=.today.day
+    Wait For Ajax
+    Wait Until Element Is Enabled  css=button[ng-click="act.saveContract('active')"]  ${COMMONWAIT}
+    Click Button  css=button[ng-click="act.saveContract('active')"]
+    Wait Until Element Is Visible  css=.notify  ${COMMONWAIT}
+    Sleep  1min
 
 
 Отримати інформацію зі сторінки
