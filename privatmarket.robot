@@ -36,11 +36,8 @@ ${tender_data_tenderPeriod.startDate}  xpath=(//span[@ng-if='p.bd'])[2]
 ${tender_data_tenderPeriod.endDate}  xpath=(//span[contains(@ng-if, 'p.ed')])[2]
 ${tender_data_auctionPeriod.startDate}  xpath=(//span[@ng-if='p.bd'])[3]
 ${tender_data_minimalStep.amount}  css=div#lotMinStepAmount
-#${tender_data_documentation.title}  xpath=//div[@class='file-descriptor']/span[1]
-${tender_data_documentation.title}  xpath=//div[contains(@title,'.docx')]
-#${tender_data_documents[0].title}  xpath=//div[@class='file-descriptor']/span[1]
-${tender_data_documents[0].title}  xpath=//div[contains(@title,'.docx')]
-
+${tender_data_documentation.title}  xpath=//div[@class='file-descriptor']/span[1]
+${tender_data_documents[0].title}  xpath=//div[@class='file-descriptor']/span[1]
 ${tender_data_qualificationPeriod.endDate}  xpath=(//span[contains(@ng-if, 'p.ed')])[4]
 ${tender_data_causeDescription}  css=#tenderType div.question-div>div:nth-of-type(1)
 ${tender_data_cause}  css=#tenderType>.action-element
@@ -242,6 +239,7 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     Wait Element Visibility And Input Text  ${locator_lotAdd.region}  ${tender_data.data.procuringEntity.address.region}
     Wait Element Visibility And Input Text  ${locator_lotAdd.locality}  ${tender_data.data.procuringEntity.address.locality}
     Wait Element Visibility And Input Text  ${locator_lotAdd.streetAddress}  ${tender_data.data.procuringEntity.address.streetAddress}
+
     #contactPoint
     Wait Element Visibility And Input Text  css=input[data-id='name']  ${tender_data.data.procuringEntity.contactPoint.name}
     Run Keyword IF  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  css=section[data-id='contactPoint'] input[data-id='nameEn']  ${tender_data.data.procuringEntity.contactPoint.name_en}
@@ -562,6 +560,40 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     Sleep  120s
 
 
+Додати неціновий показник на предмет
+  [Arguments]  ${username}  ${tender_uaid}  ${feature}  ${item_id}
+    Wait For Element With Reload  ${locator_tenderClaim.buttonCreate}  1
+    Switch To PMFrame
+    Wait Visibility And Click Element  ${locator_tenderClaim.buttonCreate}
+    Wait Visibility And Click Element  css=#tab_2 a
+    Sleep  3
+    Wait Visibility And Click Element  xpath=//div[@data-id='item']//button[contains(., 'Додати показник')]
+
+    Wait Element Visibility And Input Text  xpath=(//div[@data-id='item']//input[@ng-model='feature.title'])[last()]  ${feature.title}
+    Wait Element Visibility And Input Text  xpath=(//div[@data-id='item']//textarea[@ng-model='feature.description'])[last()]  ${feature.description}
+
+    @{item_enums}=  Get From Dictionary  ${feature}  enum
+    ${item_criterion_count}=  Get Length  ${item_enums}
+
+    : FOR  ${index}  IN RANGE  0  ${item_criterion_count}
+    \  Run Keyword Unless  '${index}' == '0'  Wait Visibility And Click Element  xpath=(//div[@data-id='item']//section[@data-id='criteria']//button)[last()]
+    \  ${item_criterion_value}=  privatmarket_service.get_percent  ${item_enums[${index}].value}
+    \  ${item_criterion_value}=  Convert to String   ${item_criterion_value}
+    \  ${elem_index}=  privatmarket_service.sum_of_numbers  ${index}  1
+    \  Wait Element Visibility And Input Text  xpath=(//div[@data-id='item']//input[@ng-model='criterion.value'])[last()]  ${item_criterion_value}
+    \  Wait Element Visibility And Input Text  xpath=(//div[@data-id='item']//input[@ng-model='criterion.title'])[last()]  ${item_enums[${index}].title}
+
+    Switch To PMFrame
+    Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
+    Wait For Ajax
+    Wait Visibility And Click Element  css=#tab_4 a
+    Wait For Ajax
+    Wait Visibility And Click Element  ${locator_tenderCreation.buttonSend}
+    Close Confirmation In Editor  Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.
+    Sleep  120s
+
+    Sleep  360s
+
 Видалити неціновий показник
     [Arguments]  ${user_name}  ${tenderId}  ${feature_id}
     Wait For Element With Reload  ${locator_tenderClaim.buttonCreate}  1
@@ -594,11 +626,13 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
 
     #загрузим файл
     Wait Visibility And Click Element  css=label[for='documentation_tender_yes']
-    Wait Visibility And Click Element  xpath=//select[@id='chooseTypeptr']//option[2]
+    Run Keyword And Ignore Error  Wait Visibility And Click Element  xpath=//select[@id='chooseTypeptr']//option[2]
+    Run Keyword And Ignore Error  Wait Visibility And Click Element  xpath=//select[@id='chooseType0']//option[2]
     Sleep  1s
     Run Keyword And Ignore Error  Wait Visibility And Click Element  xpath=//select[@id='chooseLangptr']//option[@value='en']
     Sleep  1s
-    Choose File  css=section[data-id='ptrDocuments'] #inputFileptr  ${filePath}
+    Run Keyword And Ignore Error  Choose File  css=section[data-id='ptrDocuments'] #inputFileptr  ${filePath}
+    Run Keyword And Ignore Error  Choose File  css=section[data-id='ptrDocuments'] #inputFile0  ${filePath}
     Sleep  5s
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
     Wait For Ajax
@@ -620,12 +654,12 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     Sleep  2s
     Wait Visibility And Click Element  css=label[for='documentation_lot_yes']
     Wait Visibility And Click Element  xpath=//section[@data-id='lots']//form[@name='fileForm']/select[1]/option[text()='Документы закупки']
-
-    Wait Visibility And Click Element  xpath=//section[@data-id='lots']//form[@name='fileForm']/select[1]/option[text()='Документы закупки']
     Sleep  1s
-    Wait Visibility And Click Element  xpath=//section[@data-id='lots']//form[@name='fileForm']/select[2]/option[@value='en']
+    Wait Visibility And Click Element  xpath=//div[@data-id='lot']//select[@data-id='choseType']//option[2]
     Sleep  1s
-    Choose File  css=section[data-id='lots'] #inputFile  ${filePath}
+    Wait Visibility And Click Element  xpath=//div[@data-id='lot']//select[@data-id='choseLang']//option[2]
+    Sleep  1s
+    Choose File  xpath=//div[@data-id='lot']//input[@type='file']  ${filePath}
     Sleep  5s
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
     Wait For Ajax
@@ -652,11 +686,11 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     ...  ELSE  Wait Visibility And Click Element  xpath=(//a[@ng-click='act.openQualification(q)'])[last()]
     Wait For Ajax
     #Wait Visibility And Click Element  xpath=//form[@name='fileForm']/select[1]/option[text()='Отчет об оценке']
-    Wait Visibility And Click Element  xpath=//form[@name='fileForm']/select[1]/option[text()='Уведомления о решении']
+    Wait Visibility And Click Element  xpath=//div[@class='files-upload']//select[@class='form-block__select form-block__select_short']//option[2]
     Sleep  1s
-    Wait Visibility And Click Element  xpath=//form[@name='fileForm']/select[2]/option[@value='en']
+    Wait Visibility And Click Element  xpath=//div[@class='files-upload']//select[@class='form-block__select ng-scope form-block__select_short']//option[2]
     Sleep  1s
-    Choose File  css=#inputFile  ${filePath}
+    Choose File  xpath=//div[@class='files-upload']//input[@type='file']  ${filePath}
     Sleep  5s
 
 
@@ -931,12 +965,6 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${field_name}  ${award_index}
     ${element}=  Set Variable  xpath=//div[contains(@class, 'faq') and contains(., '${complaintID}')]${tender_data_complaint.${field_name}}
     ${test_case_name}=  Remove String  ${TEST_NAME}  '
-    log to console  '#####################################################################################################'
-    log to console  ${field_name}
-    log to console  '#####################################################################################################'
-    log to console  ${element}
-    log to console  '#####################################################################################################'
-    log to console  ${complaintID}
     Run Keyword If
     ...  '${test_case_name}' == 'Відображення поданого статусу вимоги'  Search by status  ${element}[contains(.,"Вiдправлено")]  3
     ...  ELSE IF  '${test_case_name}' == 'Відображення статусу answered вимоги'  Search by status  ${element}[contains(.,"Отримано вiдповiдь")]  3
@@ -1663,31 +1691,43 @@ Get Item Number
 
 Відповісти на вимогу про виправлення умов закупівлі
     [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${answer_data}
-    log to console  ${answer_data}
-    log to console  '____________________________________________________________'
-    debug
     Wait Until Keyword Succeeds  5min  10s  Wait For Element With Reload  xpath=//div[@id='nav-tab']//span[@class='ng-scope ng-binding']  3
-    Wait Until Keyword Succeeds  10min  10s  Wait For Element With Reload  xpath=//div[contains(@class,'faq ng-scope') and contains(.,', id: '${complaintID})]//button[@class='btn btn-success ng-scope ng-binding']  3
-    Wait Visibility And Click Element  xpath=//div[@class='actions ng-scope']//button[@class='btn btn-success ng-scope ng-binding']
-    Wait Visibility And Click Element  xpath=//div[contains(@class,'faq ng-scope') and contains(.,', id: '${complaintID})]//button[@class='btn btn-success ng-scope ng-binding']
+    Wait Until Keyword Succeeds  15min  10s  Wait For Element With Reload  xpath=//div[contains(@class,'faq ng-scope') and contains(.,', id: ${complaintID}')]//button[@class='btn btn-success ng-scope ng-binding']  3
+    Wait Visibility And Click Element  xpath=//div[contains(@class,'faq ng-scope') and contains(.,', id: ${complaintID}')]//button[@class='btn btn-success ng-scope ng-binding']
     Wait Visibility And Click Element  xpath=//div[@class='info-item']//select[@id='resolutionType']/option[@value='${answer_data.data.resolutionType}']
     Wait Element Visibility And Input Text  xpath=//textarea[@class='ng-pristine ng-valid']  ${answer_data.data.resolution}
     Wait Visibility And Click Element  xpath=//button[@data-id='btn-send-complaint-resolution']
+    Sleep  120s
 
 
 Відповісти на вимогу про виправлення умов лоту
     [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${answer_data}
-    log to console  ${answer_data}
-    log to console  '____________________________________________________________'
-    debug
     privatmarket.Відповісти на вимогу про виправлення умов закупівлі  ${username}  ${tender_uaid}  ${complaintID}  ${answer_data}
 
 Завантажити документ рішення кваліфікаційної комісії
     [Arguments]  ${username}  ${document}  ${tender_uaid}  ${award_num}
-    log to console  ${award_num}
-    debug
+    Wait Until Element Is Visible  xpath=//li[contains(@ng-class, 'lot-parts')]
+    ${class}=  Get Element Attribute  xpath=//li[contains(@ng-class, 'lot-parts')]@class
+    Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=//li[contains(@ng-class, 'lot-parts')]
+
+    Wait Until Keyword Succeeds  15min  10s  Wait Visibility And Click Element  xpath=//div[@class='lot-info ng-scope' and contains(.,'Кваліфікація учасників') ]//table[@class='bids']//a[@class='ng-binding']
+    Sleep  1s
+    Wait Visibility And Click Element  xpath=//div[@class='files-upload']//select[@class='form-block__select form-block__select_short']//option[2]
+    Sleep  1s
+    Wait Visibility And Click Element  xpath=//div[@class='files-upload']//select[@class='form-block__select ng-scope form-block__select_short']//option[3]
+    Sleep  1s
+    Choose File  xpath=//div[@class='files-upload']//input[@type='file']  ${document}
+    Sleep  5s
+
 
 Відповісти на вимогу про виправлення визначення переможця
     [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${answer_data}  ${award_index}
-    debug
     privatmarket.Відповісти на вимогу про виправлення умов закупівлі  ${username}  ${tender_uaid}  ${complaintID}  ${answer_data}
+
+Підтвердити постачальника
+    [Arguments]  ${username}  ${tender_uaid}  ${award_num}
+    Wait Until Element Is Visible  xpath=//li[contains(@ng-class, 'lot-parts')]
+    ${class}=  Get Element Attribute  xpath=//li[contains(@ng-class, 'lot-parts')]@class
+    Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=//li[contains(@ng-class, 'lot-parts')]
+    Wait Visibility And Click Element  xpath=//div[@class='award-section award-actions ng-scope']//button[@data-id='setActive']
+
