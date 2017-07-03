@@ -736,6 +736,8 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
 Створити постачальника, додати документацію і підтвердити його
     [Arguments]  ${username}  ${tender_uaid}  ${supplier_data}  ${document}
     Click Element  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]
+    Wait For Ajax
+    Run Keyword And Ignore Error  Click Button  css=button[data-id='addParticipant']
     Wait Visibility And Click Element  css=.bids tbody tr td:nth-of-type(4) a
     Wait Until Element Is Visible  css=.modal.fade.in  ${COMMONWAIT}
     Wait For Ajax
