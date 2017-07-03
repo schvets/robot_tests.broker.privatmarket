@@ -36,11 +36,8 @@ ${tender_data_tenderPeriod.startDate}  xpath=(//span[@ng-if='p.bd'])[2]
 ${tender_data_tenderPeriod.endDate}  xpath=(//span[contains(@ng-if, 'p.ed')])[2]
 ${tender_data_auctionPeriod.startDate}  xpath=(//span[@ng-if='p.bd'])[3]
 ${tender_data_minimalStep.amount}  css=div#lotMinStepAmount
-#${tender_data_documentation.title}  xpath=//div[@class='file-descriptor']/span[1]
-${tender_data_documentation.title}  xpath=//div[contains(@title,'.docx')]
-#${tender_data_documents[0].title}  xpath=//div[@class='file-descriptor']/span[1]
-${tender_data_documents[0].title}  xpath=//div[contains(@title,'.docx')]
-
+${tender_data_documentation.title}  xpath=//div[@class='file-descriptor']/span[1]
+${tender_data_documents[0].title}  xpath=//div[@class='file-descriptor']/span[1]
 ${tender_data_qualificationPeriod.endDate}  xpath=(//span[contains(@ng-if, 'p.ed')])[4]
 ${tender_data_causeDescription}  css=#tenderType div.question-div>div:nth-of-type(1)
 ${tender_data_cause}  css=#tenderType>.action-element
@@ -242,6 +239,7 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     Wait Element Visibility And Input Text  ${locator_lotAdd.region}  ${tender_data.data.procuringEntity.address.region}
     Wait Element Visibility And Input Text  ${locator_lotAdd.locality}  ${tender_data.data.procuringEntity.address.locality}
     Wait Element Visibility And Input Text  ${locator_lotAdd.streetAddress}  ${tender_data.data.procuringEntity.address.streetAddress}
+
     #contactPoint
     Wait Element Visibility And Input Text  css=input[data-id='name']  ${tender_data.data.procuringEntity.contactPoint.name}
     Run Keyword IF  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  css=section[data-id='contactPoint'] input[data-id='nameEn']  ${tender_data.data.procuringEntity.contactPoint.name_en}
@@ -465,7 +463,6 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     Switch To PMFrame
     Wait Visibility And Click Element  ${locator_tenderClaim.buttonCreate}
     Wait Until Element Is Visible  css=input[data-id='tenderPeriodEnd']  ${COMMONWAIT}
-    debug
     Run Keyword If  '${parameter}' == 'tenderPeriod'  Set Date And Time  tenderPeriod  endDate  css=input[data-id='tenderPeriodEnd']  ${value}
     Run Keyword If  '${parameter}' == 'description'  Wait Element Visibility And Input Text  css=textarea[data-id='procurementDescription']  ${value}
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
@@ -624,7 +621,8 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     Wait Visibility And Click Element  ${locator_tenderClaim.buttonCreate}
 
     #откроем нужную вкладку
-    Wait Visibility And Click Element  css=#tab_3 a
+    Run Keyword If  'переговорної процедури' in '${TEST_NAME}'  Wait Visibility And Click Element  css=#tab_2 a
+    ...  ELSE  Wait Visibility And Click Element  css=#tab_3 a
 
     #загрузим файл
     Wait Visibility And Click Element  css=label[for='documentation_tender_yes']
@@ -655,6 +653,7 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     Wait Visibility And Click Element  css=#tab_3 a
     Sleep  2s
     Wait Visibility And Click Element  css=label[for='documentation_lot_yes']
+    Wait Visibility And Click Element  xpath=//section[@data-id='lots']//form[@name='fileForm']/select[1]/option[text()='Документы закупки']
     Sleep  1s
     Wait Visibility And Click Element  xpath=//div[@data-id='lot']//select[@data-id='choseType']//option[2]
     Sleep  1s
@@ -771,6 +770,8 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
 Створити постачальника, додати документацію і підтвердити його
     [Arguments]  ${username}  ${tender_uaid}  ${supplier_data}  ${document}
     Click Element  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]
+    Wait For Ajax
+    Run Keyword And Ignore Error  Click Button  css=button[data-id='addParticipant']
     Wait Visibility And Click Element  css=.bids tbody tr td:nth-of-type(4) a
     Wait Until Element Is Visible  css=.modal.fade.in  ${COMMONWAIT}
     Wait For Ajax
@@ -964,12 +965,6 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${field_name}  ${award_index}
     ${element}=  Set Variable  xpath=//div[contains(@class, 'faq') and contains(., '${complaintID}')]${tender_data_complaint.${field_name}}
     ${test_case_name}=  Remove String  ${TEST_NAME}  '
-#    log to console  '#####################################################################################################'
-#    log to console  ${field_name}
-#    log to console  '#####################################################################################################'
-#    log to console  ${element}
-#    log to console  '#####################################################################################################'
-#    log to console  ${complaintID}
     Run Keyword If
     ...  '${test_case_name}' == 'Відображення поданого статусу вимоги'  Search by status  ${element}[contains(.,"Вiдправлено")]  3
     ...  ELSE IF  '${test_case_name}' == 'Відображення статусу answered вимоги'  Search by status  ${element}[contains(.,"Отримано вiдповiдь")]  3
