@@ -227,7 +227,7 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     Wait For Ajax
     Run Keyword Unless  ${type} == 'aboveThresholdEU' or ${type} == 'aboveThresholdUA' or ${type} == 'negotiation'  Set Enquiry Period  ${tender_data.data.enquiryPeriod.startDate}  ${tender_data.data.enquiryPeriod.endDate}
     Run Keyword Unless  ${type} == 'negotiation'  Set Tender Period  ${tender_data.data.tenderPeriod.startDate}  ${tender_data.data.tenderPeriod.endDate}
-    Wait Visibility And Click Element  xpath=//span[@class='lot_budget_tax ng-scope']//label[contains(@for,'tax_')]
+    Run Keyword Unless  ${type} == 'negotiation'  Wait Visibility And Click Element  xpath=//span[@class='lot_budget_tax ng-scope']//label[contains(@for,'tax_')]
 
     #cause
     Run Keyword If  ${type} == 'negotiation'  Обрати підставу вибору переговорної процедури  ${tender_data}
@@ -1691,11 +1691,7 @@ Get Item Number
 
 Відповісти на вимогу про виправлення умов закупівлі
     [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${answer_data}
-#    log to console  ${complaintID}
     Wait Until Keyword Succeeds  5min  10s  Wait For Element With Reload  xpath=//div[@id='nav-tab']//span[@class='ng-scope ng-binding']  3
-
-#    Wait Until Keyword Succeeds  15min  10s  Run Keywords  Reload Page  AND  Page Should Contain  ${complaintID}
-
     Wait Until Keyword Succeeds  15min  10s  Wait For Element With Reload  xpath=//div[contains(@class,'faq ng-scope') and contains(.,', id: ${complaintID}')]//button[@class='btn btn-success ng-scope ng-binding']  3
     Wait Visibility And Click Element  xpath=//div[contains(@class,'faq ng-scope') and contains(.,', id: ${complaintID}')]//button[@class='btn btn-success ng-scope ng-binding']
     Wait Visibility And Click Element  xpath=//div[@class='info-item']//select[@id='resolutionType']/option[@value='${answer_data.data.resolutionType}']
