@@ -227,7 +227,7 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     Wait For Ajax
     Run Keyword Unless  ${type} == 'aboveThresholdEU' or ${type} == 'aboveThresholdUA' or ${type} == 'negotiation'  Set Enquiry Period  ${tender_data.data.enquiryPeriod.startDate}  ${tender_data.data.enquiryPeriod.endDate}
     Run Keyword Unless  ${type} == 'negotiation'  Set Tender Period  ${tender_data.data.tenderPeriod.startDate}  ${tender_data.data.tenderPeriod.endDate}
-    Run Keyword Unless  ${type} == 'negotiation'  Wait Visibility And Click Element  xpath=//span[@class='lot_budget_tax ng-scope']//label[contains(@for,'tax_')]
+    Run Keyword If  ${type} == 'complaints'  Wait Visibility And Click Element  xpath=//span[@class='lot_budget_tax ng-scope']//label[contains(@for,'tax_')]
 
     #cause
     Run Keyword If  ${type} == 'negotiation'  Обрати підставу вибору переговорної процедури  ${tender_data}
@@ -592,8 +592,6 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     Close Confirmation In Editor  Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.
     Sleep  120s
 
-    Sleep  360s
-
 Видалити неціновий показник
     [Arguments]  ${user_name}  ${tenderId}  ${feature_id}
     Wait For Element With Reload  ${locator_tenderClaim.buttonCreate}  1
@@ -653,13 +651,13 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     Wait Visibility And Click Element  css=#tab_3 a
     Sleep  2s
     Wait Visibility And Click Element  css=label[for='documentation_lot_yes']
-    Wait Visibility And Click Element  xpath=//section[@data-id='lots']//form[@name='fileForm']/select[1]/option[text()='Документы закупки']
+    Wait Visibility And Click Element  xpath=//section[@data-id='lots']//select[@data-id='choseType']/option[2]
     Sleep  1s
     Wait Visibility And Click Element  xpath=//div[@data-id='lot']//select[@data-id='choseType']//option[2]
     Sleep  1s
     Wait Visibility And Click Element  xpath=//div[@data-id='lot']//select[@data-id='choseLang']//option[2]
     Sleep  1s
-    Choose File  xpath=//div[@data-id='lot']//input[@type='file']  ${filePath}
+    Choose File  css=section[data-id='lots'] [type='file']  ${filePath}
     Sleep  5s
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
     Wait For Ajax
