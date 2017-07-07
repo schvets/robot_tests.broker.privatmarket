@@ -1146,6 +1146,7 @@ Try To Search Complaint
     [Arguments]  ${element_name}
     ${text}=  Отримати текст елемента  ${element_name}
     ${text_new}=  Strip String  ${text}
+    ${text_new}=  Replace String  ${text_new}  ${SPACE}  ${EMPTY}
     ${result}=  convert to number  ${text_new}
     [Return]  ${result}
 
