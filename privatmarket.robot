@@ -36,8 +36,8 @@ ${tender_data_tenderPeriod.startDate}  xpath=(//span[@ng-if='p.bd'])[2]
 ${tender_data_tenderPeriod.endDate}  xpath=(//span[contains(@ng-if, 'p.ed')])[2]
 ${tender_data_auctionPeriod.startDate}  xpath=(//span[@ng-if='p.bd'])[3]
 ${tender_data_minimalStep.amount}  css=div#lotMinStepAmount
-${tender_data_documentation.title}  xpath=//div[@class='file-descriptor']/span[1]
-${tender_data_documents[0].title}  xpath=//div[@class='file-descriptor']/span[1]
+${tender_data_documentation.title}  xpath=//div[contains(@class, 'doc-file-title')]
+${tender_data_documents[0].title}  xpath=//div[contains(@class, 'doc-file-title')]
 ${tender_data_qualificationPeriod.endDate}  xpath=(//span[contains(@ng-if, 'p.ed')])[4]
 ${tender_data_causeDescription}  css=#tenderType div.question-div>div:nth-of-type(1)
 ${tender_data_cause}  css=#tenderType>.action-element
@@ -91,35 +91,35 @@ ${tender_data_complaint.cancellationReason}  //*[@description='q.cancellationRea
 ${tender_data_complaint.title}  //span[contains(@class, 'claimHead')]
 ${tender_data_complaint.description}  //div[@class='question-div']
 
-${tender_data_procuringEntity.address.countryName}  css=#contacts-section #countryName
-${tender_data_procuringEntity.address.locality}  css=#contacts-section #locality
-${tender_data_procuringEntity.address.postalCode}  css=#contacts-section #postalCode
-${tender_data_procuringEntity.address.region}  css=#contacts-section #region
-${tender_data_procuringEntity.address.streetAddress}  css=#contacts-section #streetAddress
-${tender_data_procuringEntity.contactPoint.name}  css=div[data-id='contactPoint.name']
-${tender_data_procuringEntity.contactPoint.telephone}  css=div[data-id='contactPoint.telephone']
-${tender_data_procuringEntity.contactPoint.url}  css=div[data-id='contactPoint.url']
+${tender_data_procuringEntity.address.countryName}  css=.delivery-info-container [data-id='address.countryName']
+${tender_data_procuringEntity.address.locality}  css=.delivery-info-container [data-id='address.locality']
+${tender_data_procuringEntity.address.postalCode}  css=.delivery-info-container [data-id='address.postalCode']
+${tender_data_procuringEntity.address.region}  css=.delivery-info-container [data-id='address.region']
+${tender_data_procuringEntity.address.streetAddress}  css=.delivery-info-container [data-id='address.streetAddress']
+${tender_data_procuringEntity.contactPoint.name}  css=[data-id='contactPoint.name']
+${tender_data_procuringEntity.contactPoint.telephone}  css=[data-id='contactPoint.telephone']
+${tender_data_procuringEntity.contactPoint.url}  css=[data-id='contactPoint.url']
 ${tender_data_procuringEntity.identifier.legalName}  css=[data-id='identifier.legalName']
-${tender_data_procuringEntity.identifier.scheme}  css=div[data-id='identifier.scheme']
-${tender_data_procuringEntity.identifier.id}  css=div[data-id='identifier.id']
+${tender_data_procuringEntity.identifier.scheme}  css=[data-id='identifier.scheme']
+${tender_data_procuringEntity.identifier.id}  css=[data-id='identifier.id']
 
-${tender_data_awards[0].documents[0].title}  css=.modal.fade.in .file-name
-${tender_data_awards[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2) .info-item:nth-of-type(4) .info-item-val
-${tender_data_awards[0].suppliers[0].address.countryName}  css=.modal.fade.in [data-id='address.countryName']
-${tender_data_awards[0].suppliers[0].address.locality}  css=.modal.fade.in [data-id='address.locality']
-${tender_data_awards[0].suppliers[0].address.postalCode}  css=.modal.fade.in [data-id='address.postalCode']
-${tender_data_awards[0].suppliers[0].address.region}  css=.modal.fade.in [data-id='address.region']
-${tender_data_awards[0].suppliers[0].address.streetAddress}  css=.modal.fade.in [data-id='address.streetAddress']
-${tender_data_awards[0].suppliers[0].contactPoint.telephone}  css=.modal.fade.in .modal-body:nth-of-type(2) .info-item:nth-of-type(7) .info-item-val
-${tender_data_awards[0].suppliers[0].contactPoint.name}  css=.modal.fade.in .modal-body:nth-of-type(2) .info-item:nth-of-type(6) .info-item-val
-${tender_data_awards[0].suppliers[0].contactPoint.email}  css=.modal.fade.in .modal-body:nth-of-type(2) .info-item:nth-of-type(8) .info-item-val
-${tender_data_awards[0].suppliers[0].identifier.scheme}  css=.modal.fade.in .modal-body:nth-of-type(2) .info-item:nth-of-type(2) .info-item-val
-${tender_data_awards[0].suppliers[0].identifier.legalName}  css=.modal.fade.in .modal-body:nth-of-type(2) .info-item:nth-of-type(1) .info-item-val
-${tender_data_awards[0].suppliers[0].identifier.id}  css=.modal.fade.in .modal-body:nth-of-type(2) .info-item:nth-of-type(3) .info-item-val
-${tender_data_awards[0].suppliers[0].name}  css=.modal.fade.in .modal-body:nth-of-type(2) .info-item:nth-of-type(1) .info-item-val
-${tender_data_awards[0].value.valueAddedTaxIncluded}  css=.modal.fade.in .modal-body:nth-of-type(2) .info-item:nth-of-type(9) .info-item-val
-${tender_data_awards[0].value.currency}  css=.modal.fade.in .modal-body:nth-of-type(2) .info-item:nth-of-type(9) .info-item-val
-${tender_data_awards[0].value.amount}  css=.modal.fade.in .modal-body:nth-of-type(2) .info-item:nth-of-type(9) .info-item-val
+${tender_data_awards[0].documents[0].title}  css=.participant-info-block .doc-file-title
+${tender_data_awards[0].status}  css=.lot-info tbody tr:nth-of-type(1) td:nth-of-type(4)>a
+${tender_data_awards[0].suppliers[0].address.countryName}  css=.participant-info-block [data-id='address.countryName']
+${tender_data_awards[0].suppliers[0].address.locality}  css=.participant-info-block [data-id='address.locality']
+${tender_data_awards[0].suppliers[0].address.postalCode}  css=.participant-info-block [data-id='address.postalCode']
+${tender_data_awards[0].suppliers[0].address.region}  css=.participant-info-block [data-id='address.region']
+${tender_data_awards[0].suppliers[0].address.streetAddress}  css=.participant-info-block [data-id='address.streetAddress']
+${tender_data_awards[0].suppliers[0].contactPoint.telephone}  css=.participant-info-block [data-id='contactPoint.telephone']
+${tender_data_awards[0].suppliers[0].contactPoint.name}  css=.participant-info-block [data-id='contactPoint.name']
+${tender_data_awards[0].suppliers[0].contactPoint.email}  css=.participant-info-block [data-id='contactPoint.email']
+${tender_data_awards[0].suppliers[0].identifier.scheme}  css=.participant-info-block [data-id='identifier.scheme']
+${tender_data_awards[0].suppliers[0].identifier.legalName}  css=.participant-info-block [data-id='identifier.legalName']
+${tender_data_awards[0].suppliers[0].identifier.id}  css=.participant-info-block [data-id='identifier.id']
+${tender_data_awards[0].suppliers[0].name}  css=.participant-info-block [data-id='identifier.legalName']
+${tender_data_awards[0].value.valueAddedTaxIncluded}  css=.participant-info-block [data-id='value.valueAddedTaxIncluded']
+${tender_data_awards[0].value.currency}  css=.participant-info-block [data-id='value.currency']
+${tender_data_awards[0].value.amount}  css=.participant-info-block [data-id='value.amount']
 ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2) .info-item:nth-of-type(10) .info-item-val
 
 
@@ -367,7 +367,6 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
 
     #add tender feature
     Wait Visibility And Click Element  css=label[for='features_tender_yes']
-#    debug
     Wait Element Visibility And Input Text  css=[data-id='ptrFeatures'] [ng-model='feature.title']  ${features[1].title}
     Run Keyword If  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  css=[data-id='ptrFeatures'] [ng-model='feature.title_en']  ${features[1].title_en}
     Wait Element Visibility And Input Text  css=[data-id='ptrFeatures'] [ng-model='feature.description']  ${features[1].description}
@@ -381,7 +380,6 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     \  ${tender_criterion_value}=  privatmarket_service.get_percent  ${tender_enums[${index}].value}
     \  ${tender_criterion_value}=  Convert to String  ${tender_criterion_value}
     \  ${elem_index}=  privatmarket_service.sum_of_numbers  ${index}  1
-#    \  debug
     \  Wait Element Visibility And Input Text  xpath=(//section[@data-id='ptrFeatures']//input[@data-id='value'])[${elem_index}]  ${tender_criterion_value}
     \  Wait Element Visibility And Input Text  xpath=(//section[@data-id='ptrFeatures']//input[@ng-model='criterion.title'])[${elem_index}]  ${tender_enums[${index}].title}
     \  Run Keyword If  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  xpath=(//section[@data-id='ptrFeatures']//input[@ng-model='criterion.title_en'])[${elem_index}]  ${tender_enums[${index}].title}
@@ -389,7 +387,6 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     #add lot feature
     Wait Visibility And Click Element  css=label[for='features_lots_yes']
     Wait Visibility And Click Element  css=[data-id='lot'] button[data-id='actAdd']
-#    debug
     Wait Element Visibility And Input Text  css=[data-id='lot'] [ng-model='feature.title']  ${features[0].title}
     Run Keyword If  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  css=[data-id='lot'] [ng-model='feature.title_en']  ${features[0].title_en}
     Wait Element Visibility And Input Text  css=[data-id='lot'] [ng-model='feature.description']  ${features[0].description}
@@ -403,7 +400,6 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     \  ${lot_criterion_value}=  privatmarket_service.get_percent  ${lot_enums[${index}].value}
     \  ${lot_criterion_value}=  Convert to String   ${lot_criterion_value}
     \  ${elem_index}=  privatmarket_service.sum_of_numbers  ${index}  1
-#    \  debug
     \  Wait Element Visibility And Input Text  xpath=(//div[@data-id='lot']//input[@data-id='value'])[${elem_index}]  ${lot_criterion_value}
     \  Wait Element Visibility And Input Text  xpath=(//div[@data-id='lot']//input[@ng-model='criterion.title'])[${elem_index}]  ${lot_enums[${index}].title}
     \  Run Keyword If  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  xpath=(//div[@data-id='lot']//input[@ng-model='criterion.title_en'])[${elem_index}]  ${lot_enums[${index}].title}
@@ -411,7 +407,6 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     #add item feature
     Wait Visibility And Click Element  css=label[for='features_item_yes']
     Wait Visibility And Click Element  css=[data-id='item'] button[data-id='actAdd']
-#    debug
     Wait Element Visibility And Input Text  css=[data-id='item'] [ng-model='feature.title']  ${features[2].title}
     Run Keyword If  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  css=[data-id='item'] [ng-model='feature.title_en']  ${features[2].title_en}
     Wait Element Visibility And Input Text  css=[data-id='item'] [ng-model='feature.description']  ${features[2].description}
@@ -426,7 +421,6 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     \  ${item_criterion_value}=  privatmarket_service.get_percent  ${item_enums[${index}].value}
     \  ${item_criterion_value}=  Convert to String   ${item_criterion_value}
     \  ${elem_index}=  privatmarket_service.sum_of_numbers  ${index}  1
-#    \  debug
     \  Wait Element Visibility And Input Text  xpath=(//div[@data-id='item']//input[@data-id='value'])[${elem_index}]  ${item_criterion_value}
     \  Wait Element Visibility And Input Text  xpath=(//div[@data-id='item']//input[@ng-model='criterion.title'])[${elem_index}]  ${item_enums[${index}].title}
     \  Run Keyword If  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  xpath=(//div[@data-id='item']//input[@ng-model='criterion.title_en'])[${elem_index}]  ${item_enums[${index}].title}
@@ -531,7 +525,6 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     Wait Visibility And Click Element  css=#tab_2 a
     Sleep  2s
     Wait Visibility And Click Element  xpath=//div[@data-id='lot']//button[contains(., 'Додати показник')]
-#    debug
     Wait Element Visibility And Input Text  xpath=(//div[@data-id='lot']//input[@ng-model='feature.title'])[last()]  ${feature.title}
     Wait Element Visibility And Input Text  xpath=(//div[@data-id='lot']//input[@ng-model='feature.title_en'])[last()]  ${feature.title_en}
     Wait Element Visibility And Input Text  xpath=(//div[@data-id='lot']//textarea[@ng-model='feature.description'])[last()]  ${feature.description}
@@ -545,7 +538,6 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     \  ${lot_criterion_value}=  privatmarket_service.get_percent  ${lot_enums[${index}].value}
     \  ${lot_criterion_value}=  Convert to String   ${lot_criterion_value}
     \  ${elem_index}=  privatmarket_service.sum_of_numbers  ${index}  1
-#    \  debug
     \  Wait Element Visibility And Input Text  xpath=(//div[@data-id='lot']//input[@ng-model='criterion.value'])[last()]  ${lot_criterion_value}
     \  Wait Element Visibility And Input Text  xpath=(//div[@data-id='lot']//input[@ng-model='criterion.title'])[last()]  ${lot_enums[${index}].title}
     \  Wait Element Visibility And Input Text  xpath=(//div[@data-id='lot']//input[@ng-model='criterion.title_en'])[last()]  ${lot_enums[${index}].title}
@@ -591,6 +583,8 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     Wait Visibility And Click Element  ${locator_tenderCreation.buttonSend}
     Close Confirmation In Editor  Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.
     Sleep  120s
+
+    Sleep  360s
 
 Видалити неціновий показник
     [Arguments]  ${user_name}  ${tenderId}  ${feature_id}
@@ -678,7 +672,6 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=//li[contains(@ng-class, 'lot-parts')]
 
     ${index}=  privatmarket_service.sum_of_numbers  ${bid_index}  1
-#    debug
     Run Keyword If
     ...  '${index}' == '1'  Wait Visibility And Click Element  xpath=(//a[@ng-click='act.openQualification(q)'])[${index}]
     ...  ELSE  Wait Visibility And Click Element  xpath=(//a[@ng-click='act.openQualification(q)'])[last()]
@@ -700,7 +693,6 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     Wait For Ajax
     Wait Visibility And Click Element  css=#chkSelfQualified
     Wait Visibility And Click Element  css=#chkSelfEligible
-#    debug
     Wait Until Element Is Enabled  xpath=//button[@ng-click="act.setQualificationStatus('active')"]
     Wait Visibility And Click Element  xpath=//button[@ng-click="act.setQualificationStatus('active')"]
     Wait Until Element Is Visible  css=.notify
@@ -709,7 +701,6 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
 Затвердити остаточне рішення кваліфікації
     [Arguments]  ${user_name}  ${tenderId}
     Wait For Element With Reload  css=button[data-id='finishPreQualBtn']  1
-#    debug
     Wait Visibility And Click Element  css=button[data-id='finishPreQualBtn']
     Wait For Element With Reload  xpath=//div[@id='tenderStatus' and contains(., 'Пауза перед аукціоном')]  1
 
@@ -850,7 +841,7 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     Run Keyword And Return If  '${field_name}' == 'cause'  Отримати інформацію з ${field_name}  ${field_name}
     Run Keyword And Return If  '${field_name}' == 'awards[0].complaintPeriod.endDate'  Отримати інформацію з ${field_name}  1
 
-    Wait Until Element Is Visible  ${tender_data_${field_name}}  ${COMMONWAIT}
+    Wait Until Element Is Visible  ${tender_data_${field_name}}
     ${result_full}=  Get Text  ${tender_data_${field_name}}
     ${result}=  Strip String  ${result_full}
     [Return]  ${result}
@@ -902,7 +893,7 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
 
 Отримати інформацію про постачальника
     [Arguments]  ${tender_uaid}  ${field_name}
-    ${open_status}=  Run Keyword And Return Status  Wait Until Element Is Visible  css=.modal.fade.in  1s
+    ${open_status}=  Run Keyword And Return Status  Wait Until Element Is Visible  xpath=//img[contains(@ng-src, 'icon-minus.png')]  1s
     Run Keyword Unless  ${open_status}  Відкрити детальну інформацію про постачальника
 
     Run Keyword And Return If  '${field_name}' == 'awards[0].status'  Отримати статус заявки  ${field_name}
@@ -987,7 +978,7 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
 
 Search by status
     [Arguments]  ${locator}  ${tab_number}
-    Wait Until Keyword Succeeds  4min  10s  Try To Search Complaint  ${locator}  3
+    Wait Until Keyword Succeeds  5min  10s  Try To Search Complaint  ${locator}  3
 
 
 Try To Search Complaint
@@ -1015,8 +1006,8 @@ Try To Search Complaint
 Відкрити детальну інформацію про постачальника
     ${class}=  Get Element Attribute  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]@class
     Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]
-    Wait Visibility And Click Element  css=.bids tbody tr td:nth-of-type(2) a
-    Wait Until Element Is Visible  css=.modal.fade.in  ${COMMONWAIT}
+    Wait Visibility And Click Element  xpath=//img[contains(@ng-src, 'icon-plus.png')]
+    Wait Until Element Is Visible  xpath=//img[contains(@ng-src, 'icon-minus.png')]
 
 
 Отримати статус заявки
@@ -1024,7 +1015,7 @@ Try To Search Complaint
     Wait Until Element Is Visible  ${tender_data_${field_name}}  ${COMMONWAIT}
     ${status_name}=  Get text  ${tender_data_${field_name}}
     ${status_type}=  Set Variable If
-    ...  'Переможець' == '${status_name}'  active
+    ...  'Переможець переговорів' == '${status_name}'  active
     ...  ELSE  ${status_name}
     [Return]  ${status_type}
 
@@ -1110,7 +1101,6 @@ Try To Search Complaint
 
     Switch To Tab  2
     Wait For Element With Reload  xpath=//button[contains(@ng-click, 'act.answerFaq')]  2
-#    debug
     Wait Visibility And Click Element  xpath=//button[contains(@ng-click, 'act.answerFaq')]
     Wait Element Visibility And Input Text  id=questionAnswer  ${answer_data.data.answer}
     Sleep  2s
@@ -1147,14 +1137,14 @@ Try To Search Complaint
 
 Отримати інформацію з awards[0].value.currency
     [Arguments]  ${element_name}
-    ${currency}=  Отримати строку  ${element_name}  1
+    ${currency}=  Отримати текст елемента  ${element_name}
     ${currency_type}=  privatmarket_service.get_currency_type  ${currency}
     [Return]  ${currency_type}
 
 
 Отримати інформацію з awards[0].value.amount
     [Arguments]  ${element_name}
-    ${text}=  Отримати строку  ${element_name}  0
+    ${text}=  Отримати текст елемента  ${element_name}
     ${text_new}=  Strip String  ${text}
     ${result}=  convert to number  ${text_new}
     [Return]  ${result}
@@ -1631,7 +1621,6 @@ Close Confirmation In Editor
     Wait Until Element Is Visible  css=div.modal-body.info-div  ${COMMONWAIT}
     Wait Until Element Contains  css=div.modal-body.info-div  ${confirmation_text}  ${COMMONWAIT}
     Sleep  2s
-#    debug
     Wait Visibility And Click Element  css=button[data-id='modal-close']
     Sleep  1s
     Wait Until Element Is Not Visible  css=div.modal-body.info-div  ${COMMONWAIT}
@@ -1681,7 +1670,7 @@ Get Item Number
     ${count}=  Get_Length  ${elements}
     :FOR  ${item}  In Range  0  ${count}
     \  ${item}=  privatmarket_service.sum_of_numbers  ${item}  1
-    \  ${text}=  Get Text  xpath=(//div[@class='lot-info']/section//div[@class='description']//span)[${item}]
+    \  ${text}=  Get Text  xpath=(//div[@class='lot-info']/section//div[@class='description']//a)[${item}]
     \  ${item_num}=  Run Keyword If  '${object_id}' in '${text}'  Set Variable  ${item}
     \  ...  ELSE  Set Variable  ${item_num}
     [Return]  ${item_num}
