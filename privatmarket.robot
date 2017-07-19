@@ -1573,17 +1573,15 @@ Search By Query
     Sleep  1s
     Wait Element Visibility And Input Text  ${element}  ${query}
     Wait Until Element Is Not Visible  css=.modal-body.tree.pm-tree
-    Wait Until Keyword Succeeds  20s  500ms  Check Element Attribute  css=[data-id='searchMonitor']  data-status  ok
+    Wait Until Keyword Succeeds  20s  500ms  Check Element Attribute  css=[data-status='ok']  data-id
     Wait Until Element Is Enabled  xpath=//div[@data-id='foundItem']//label[@for='found_${query}']  ${COMMONWAIT}
     Wait Visibility And Click Element  xpath=//div[@data-id='foundItem']//label[@for='found_${query}']
 
 
 Check Element Attribute
-    [Arguments]  ${element}  ${attribute_name}  ${value}
+    [Arguments]  ${element}  ${attribute_name}
+    Sleep  500ms
     ${attribute}=  Get Element Attribute  ${element}@${attribute_name}
-    ${result}=  Set Variable  False
-    ${result}=  Run Keyword If  '${attribute}' == '${value}'  Set Variable  True
-    [Return]  ${result}
 
 
 Set Date And Time
