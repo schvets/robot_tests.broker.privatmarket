@@ -120,7 +120,7 @@ ${tender_data_awards[0].suppliers[0].name}  css=.participant-info-block [data-id
 ${tender_data_awards[0].value.valueAddedTaxIncluded}  css=.participant-info-block [data-id='value.valueAddedTaxIncluded']
 ${tender_data_awards[0].value.currency}  css=.participant-info-block [data-id='value.currency']
 ${tender_data_awards[0].value.amount}  css=.participant-info-block [data-id='value.amount']
-${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2) .info-item:nth-of-type(10) .info-item-val
+${tender_data_contracts[0].status}  css=#contractStatus
 
 
 *** Keywords ***
@@ -200,6 +200,12 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     ...  '${status}' == 'PASS'  Set Variable  ${type}
     ...  ELSE  Set Variable  ''
 
+    #submissionMethodDetails
+    ${submissionMethod}  ${mode}=  Run Keyword And Ignore Error  Set Variable  '${tender_data.data.submissionMethodDetails}'
+    ${mode}=  Run Keyword If
+    ...  '${submissionMethod}' == 'PASS'  Set Variable  ${mode}
+    ...  ELSE  Set Variable  ''
+
     Run Keyword IF
     ...  ${type} == 'aboveThresholdEU'  Wait Visibility And Click Element  css=a[data-id='choosedPrzAboveThresholdEU']
     ...  ELSE IF  ${type} == 'aboveThresholdUA'  Wait Visibility And Click Element  css=a[data-id='choosedPrzAboveThresholdUA']
@@ -227,7 +233,13 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     Wait For Ajax
     Run Keyword Unless  ${type} == 'aboveThresholdEU' or ${type} == 'aboveThresholdUA' or ${type} == 'negotiation'  Set Enquiry Period  ${tender_data.data.enquiryPeriod.startDate}  ${tender_data.data.enquiryPeriod.endDate}
     Run Keyword Unless  ${type} == 'negotiation'  Set Tender Period  ${tender_data.data.tenderPeriod.startDate}  ${tender_data.data.tenderPeriod.endDate}
-    Run Keyword If  ${type} == 'complaints'  Wait Visibility And Click Element  xpath=//span[@class='lot_budget_tax ng-scope']//label[contains(@for,'tax_')]
+    Run Keyword If  'quick(mode:fast-forward)' in ${mode}  Wait Visibility And Click Element  xpath=//div[@class='decorated_check']//label[contains(@for,'skip_auction')]
+
+    Run Keyword IF
+    ...  ${type} == 'aboveThresholdEU'  Wait Visibility And Click Element  xpath=//select[@data-id='accelerator-select']//option[8]
+    ...  ELSE IF  ${type} == 'aboveThresholdUA'  Wait Visibility And Click Element  xpath=//select[@data-id='accelerator-select']//option[8]
+    ...  ELSE IF  ${type} == 'negotiation'  Wait Visibility And Click Element  xpath=//select[@data-id='accelerator-select']//option[7]
+    ...  ELSE  Wait Visibility And Click Element  xpath=//select[@data-id='accelerator-select']//option[5]
 
     #cause
     Run Keyword If  ${type} == 'negotiation'  Обрати підставу вибору переговорної процедури  ${tender_data}
@@ -470,7 +482,6 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
 
 Змінити лот
     [Arguments]  ${user_name}  ${tenderId}  ${lot_id}  ${field}  ${value}
-
     Run Keyword And Return If  'value.amount' == '${field}'  Змінити ${field} лоту  ${value}
     Run Keyword And Return If  'minimalStep.amount' == '${field}'  Змінити ${field} лоту  ${value}
 
@@ -582,9 +593,8 @@ ${tender_data_contracts[0].status}  css=.modal.fade.in .modal-body:nth-of-type(2
     Wait For Ajax
     Wait Visibility And Click Element  ${locator_tenderCreation.buttonSend}
     Close Confirmation In Editor  Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.
-    Sleep  120s
-
     Sleep  360s
+
 
 Видалити неціновий показник
     [Arguments]  ${user_name}  ${tenderId}  ${feature_id}
@@ -1003,11 +1013,15 @@ Try To Search Complaint
     [Return]  ${text}
 
 
+Відкрити детальну інформацію про контракт
+    ${class}=  Get Element Attribute  xpath=(//li[contains(@ng-class, 'lot-cont')])[1]@class
+    Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=(//li[contains(@ng-class, 'lot-cont')])[1]
+
+
 Відкрити детальну інформацію про постачальника
     ${class}=  Get Element Attribute  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]@class
     Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]
-    Wait Visibility And Click Element  xpath=//img[contains(@ng-src, 'icon-plus.png')]
-    Wait Until Element Is Visible  xpath=//img[contains(@ng-src, 'icon-minus.png')]
+    Run keyword And Ignore Error  Wait Visibility And Click Element  xpath=//img[contains(@ng-src, 'icon-plus')]
 
 
 Отримати статус заявки
@@ -1022,12 +1036,17 @@ Try To Search Complaint
 
 Отримати статус договору
     [Arguments]  ${field_name}
+    Відкрити детальну інформацію про контракт
 
     Run Keyword If  'статусу підписаної угоди з постачальником' in '${TEST_NAME}'
-    ...  Wait For Element With Reload  //div[contains(@class, 'modal fade')]//div[contains(@class, 'modal-body')][1]/div[10]/div[contains(., 'Підписаний')]  1
+    ...  Wait For Element With Reload  xpath=//span[contains(., 'Підписаний') and contains(@id, 'contractStatus')]  1
 
-    Wait Until Element Is Visible  ${tender_data_${field_name}}  ${COMMONWAIT}
-    ${status_name}=  Get text  ${tender_data_${field_name}}
+    ${status}  ${status_name}=  Run Keyword And Ignore Error  Get text  ${tender_data_${field_name}}
+    ${status_name}=  Run Keyword If
+    ...  '${status}' == 'PASS'  Set Variable  ${status_name}
+    ...  ELSE  Set Variable  'Очiкує пiдписання'
+    ${status_name}=  Replace String  ${status_name}  '  ${EMPTY}
+
     ${status_type}=  Run Keyword If
     ...  'Очiкує пiдписання' == '${status_name}'  Set Variable  pending
     ...  ELSE IF  'Підписаний' == '${status_name}'  Set Variable  active
@@ -1551,7 +1570,7 @@ Try Search Element
     Reload And Switch To Tab  ${tab_number}
     Run Keyword If
     ...  '${tab_number}' == '1' and 'запитання на всі лоти' in '${TEST_NAME}'  Відкрити інформацію по запитанням на всі лоти
-    ...  ELSE IF  '${tab_number}' == '1' and 'статусу підписаної угоди з постачальником' in '${TEST_NAME}'  Відкрити детальну інформацію про постачальника
+    ...  ELSE IF  '${tab_number}' == '1' and 'статусу підписаної угоди з постачальником' in '${TEST_NAME}'  Відкрити детальну інформацію про контракт
     ...  ELSE IF  '${tab_number}' == '1'  Відкрити детальну інформацію по позиціям
     ...  ELSE IF  '${tab_number}' == '2' and 'відповіді на запитання' in '${TEST_NAME}'  Wait Visibility And Click Element  css=.question-answer .question-expand-div>a:nth-of-type(1)
     ...  ELSE IF  '${tab_number}' == '3' and 'заголовку документації' in '${TEST_NAME}'  Відкрити інформацію про вкладені файли вимоги
@@ -1695,17 +1714,20 @@ Get Item Number
 Завантажити документ рішення кваліфікаційної комісії
     [Arguments]  ${username}  ${document}  ${tender_uaid}  ${award_num}
     Wait Until Element Is Visible  xpath=//li[contains(@ng-class, 'lot-parts')]
-    ${class}=  Get Element Attribute  xpath=//li[contains(@ng-class, 'lot-parts')]@class
-    Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=//li[contains(@ng-class, 'lot-parts')]
-
-    Wait Until Keyword Succeeds  15min  10s  Wait Visibility And Click Element  xpath=//div[@class='lot-info ng-scope' and contains(.,'Кваліфікація учасників') ]//table[@class='bids']//a[@class='ng-binding']
-    Sleep  1s
+    Wait Until Keyword Succeeds  10min  10s  Дочекатися можливості завантажити документ рішення кваліфікаційної комісії
     Wait Visibility And Click Element  xpath=//div[@class='files-upload']//select[@class='form-block__select form-block__select_short']//option[2]
     Sleep  1s
     Wait Visibility And Click Element  xpath=//div[@class='files-upload']//select[@class='form-block__select ng-scope form-block__select_short']//option[3]
     Sleep  1s
     Choose File  xpath=//div[@class='files-upload']//input[@type='file']  ${document}
     Sleep  5s
+
+
+Дочекатися можливості завантажити документ рішення кваліфікаційної комісії
+    Reload Page
+    Switch To PMFrame
+    Wait Visibility And Click Element  xpath=//li[contains(@ng-class, 'lot-parts')]
+    Wait Visibility And Click Element  xpath=//div[@class='lot-info ng-scope' and contains(.,'Кваліфікація учасників') ]//table[@class='bids']//a[@class='ng-binding']
 
 
 Відповісти на вимогу про виправлення визначення переможця
