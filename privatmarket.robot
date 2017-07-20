@@ -781,7 +781,7 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     Wait Visibility And Click Element  css=.bids tbody tr td:nth-of-type(4) a
     Wait Visibility And Click Element  xpath=//div[@class='form-block__item']/form/select[1]/option[text()='Уведомления о решении']
     Sleep  1s
-    Wait Visibility And Click Element  xpath=//div[@class='form-block__item']/form/select[2]/option[@value='1']
+    Wait Visibility And Click Element  xpath=//div[@class='form-block__item']/form/select[2]/option[2]
     Sleep  1s
     Choose File  xpath=//div[@class='form-block__item']/form/div/input  ${document}
     Sleep  5s
