@@ -1621,7 +1621,7 @@ Close Confirmation In Editor
 
 Wait For Notification
     [Arguments]  ${message_text}
-    Wait Until Element Is Enabled  xpath=//div[@class='alert-info ng-scope ng-binding']  timeout=${COMMONWAIT}
+    Wait Until Element Is Enabled  xpath=//div[@data-id='alert-info']  timeout=${COMMONWAIT}
     Wait Until Element Contains  xpath=//div[@data-id='alert-info']  ${message_text}  timeout=10
 
 
