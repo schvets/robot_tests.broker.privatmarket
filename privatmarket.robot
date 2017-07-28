@@ -491,6 +491,7 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     Wait Visibility And Click Element  ${locator_tenderCreation.buttonSend}
     Close Confirmation In Editor  Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.
 
+
 Змінити value.amount лоту
     [Arguments]  ${value}
     Wait For Element With Reload  ${locator_tenderClaim.buttonCreate}  1
@@ -697,6 +698,7 @@ ${tender_data_contracts[0].status}  css=#contractStatus
 
 Отримати інформацію із тендера
     [Arguments]  ${user_name}  ${tender_uaid}  ${field_name}
+    Reload Page
     Switch To PMFrame
     Wait Until Element Is Visible  ${tender_data_title}  ${COMMONWAIT}
 
@@ -1537,7 +1539,7 @@ Convert Amount To Number
 
 Wait For Element With Reload
     [Arguments]  ${locator}  ${tab_number}
-    Wait Until Keyword Succeeds  5min  10s  Try Search Element  ${locator}  ${tab_number}
+    Wait Until Keyword Succeeds  7min  10s  Try Search Element  ${locator}  ${tab_number}
 
 
 Try Search Element
