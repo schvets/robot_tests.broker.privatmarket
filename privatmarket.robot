@@ -697,6 +697,7 @@ ${tender_data_contracts[0].status}  css=#contractStatus
 
 Отримати інформацію із тендера
     [Arguments]  ${user_name}  ${tender_uaid}  ${field_name}
+    Reload page
     Switch To PMFrame
     Wait Until Element Is Visible  ${tender_data_title}  ${COMMONWAIT}
 
@@ -1537,7 +1538,7 @@ Convert Amount To Number
 
 Wait For Element With Reload
     [Arguments]  ${locator}  ${tab_number}
-    Wait Until Keyword Succeeds  5min  10s  Try Search Element  ${locator}  ${tab_number}
+    Wait Until Keyword Succeeds  7min  10s  Try Search Element  ${locator}  ${tab_number}
 
 
 Try Search Element
@@ -1621,8 +1622,8 @@ Close Confirmation In Editor
 
 Wait For Notification
     [Arguments]  ${message_text}
-    Wait Until Element Is Enabled  xpath=//div[@class='alert-info ng-scope ng-binding']  timeout=${COMMONWAIT}
-    Wait Until Element Contains  xpath=//div[@class='alert-info ng-scope ng-binding']  ${message_text}  timeout=10
+    Wait Until Element Is Enabled  xpath=//div[@data-id='alert-info']  timeout=${COMMONWAIT}
+    Wait Until Element Contains  xpath=//div[@data-id='alert-info']  ${message_text}  timeout=10
 
 
 Scroll Page To Element
