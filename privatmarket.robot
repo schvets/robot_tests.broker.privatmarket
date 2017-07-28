@@ -466,6 +466,7 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     Wait Until Element Is Visible  css=input[data-id='tenderPeriodEnd']  ${COMMONWAIT}
     Run Keyword If  '${parameter}' == 'tenderPeriod'  Set Date And Time  tenderPeriod  endDate  css=input[data-id='tenderPeriodEnd']  ${value}
     Run Keyword If  '${parameter}' == 'description'  Wait Element Visibility And Input Text  css=textarea[data-id='procurementDescription']  ${value}
+    Run Keyword And Ignore Error  Click Element  css=[data-id='modal-close']
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
     Wait Until Element Is Visible  css=section[data-id='step2']  ${COMMONWAIT}
     Wait Visibility And Click Element  css=#tab_4 a
@@ -483,6 +484,7 @@ ${tender_data_contracts[0].status}  css=#contractStatus
 
     Wait For Element With Reload  ${locator_tenderClaim.buttonCreate}  1
     Wait Visibility And Click Element  ${locator_tenderClaim.buttonCreate}
+    Run Keyword And Ignore Error  Click Element  css=[data-id='modal-close']
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
     Wait For Ajax
@@ -490,6 +492,7 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     Wait For Ajax
     Wait Visibility And Click Element  ${locator_tenderCreation.buttonSend}
     Close Confirmation In Editor  Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.
+
 
 Змінити value.amount лоту
     [Arguments]  ${value}
@@ -697,6 +700,7 @@ ${tender_data_contracts[0].status}  css=#contractStatus
 
 Отримати інформацію із тендера
     [Arguments]  ${user_name}  ${tender_uaid}  ${field_name}
+    Reload Page
     Switch To PMFrame
     Wait Until Element Is Visible  ${tender_data_title}  ${COMMONWAIT}
 
