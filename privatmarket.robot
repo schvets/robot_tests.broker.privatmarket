@@ -466,7 +466,6 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     Wait Until Element Is Visible  css=input[data-id='tenderPeriodEnd']  ${COMMONWAIT}
     Run Keyword If  '${parameter}' == 'tenderPeriod'  Set Date And Time  tenderPeriod  endDate  css=input[data-id='tenderPeriodEnd']  ${value}
     Run Keyword If  '${parameter}' == 'description'  Wait Element Visibility And Input Text  css=textarea[data-id='procurementDescription']  ${value}
-    Run Keyword And Ignore Error  Click Element  css=[data-id='modal-close']
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
     Wait Until Element Is Visible  css=section[data-id='step2']  ${COMMONWAIT}
     Wait Visibility And Click Element  css=#tab_4 a
@@ -484,7 +483,6 @@ ${tender_data_contracts[0].status}  css=#contractStatus
 
     Wait For Element With Reload  ${locator_tenderClaim.buttonCreate}  1
     Wait Visibility And Click Element  ${locator_tenderClaim.buttonCreate}
-    Run Keyword And Ignore Error  Click Element  css=[data-id='modal-close']
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
     Wait For Ajax
@@ -1541,7 +1539,7 @@ Convert Amount To Number
 
 Wait For Element With Reload
     [Arguments]  ${locator}  ${tab_number}
-    Wait Until Keyword Succeeds  5min  10s  Try Search Element  ${locator}  ${tab_number}
+    Wait Until Keyword Succeeds  7min  10s  Try Search Element  ${locator}  ${tab_number}
 
 
 Try Search Element
