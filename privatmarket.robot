@@ -1674,9 +1674,9 @@ Get Item Number
 Відповісти на вимогу про виправлення умов закупівлі
     [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${answer_data}
     Wait Until Keyword Succeeds  5min  10s  Wait For Element With Reload  xpath=//div[@id='nav-tab']//span[@class='ng-scope ng-binding']  3
-    Wait Until Keyword Succeeds  15min  10s  Wait For Element With Reload  xpath=//div[contains(@class,'faq ng-scope') and contains(.,', id: ${complaintID}')]//button[@class='btn btn-success ng-scope ng-binding']  3
-    Wait Visibility And Click Element  xpath=//div[contains(@class,'faq ng-scope') and contains(.,', id: ${complaintID}')]//button[@class='btn btn-success ng-scope ng-binding']
-    Wait Visibility And Click Element  xpath=//div[@class='info-item']//select[@id='resolutionType']/option[@value='${answer_data.data.resolutionType}']
+    Wait Until Keyword Succeeds  15min  10s  Wait For Element With Reload  xpath=//div[contains(@class,'faq ng-scope') and contains(.,'${complaintID}')]//button[@class='btn btn-success ng-scope ng-binding']  3
+    Wait Visibility And Click Element  xpath=//div[contains(@class,'faq ng-scope') and contains(.,'${complaintID}')]//button[@class='btn btn-success ng-scope ng-binding']
+    Wait Visibility And Click Element  xpath=//select[@id='resolutionType']/option[@value='${answer_data.data.resolutionType}']
     Wait Element Visibility And Input Text  xpath=//textarea[@class='ng-pristine ng-valid']  ${answer_data.data.resolution}
     Wait Visibility And Click Element  xpath=//button[@data-id='btn-send-complaint-resolution']
     Sleep  120s
