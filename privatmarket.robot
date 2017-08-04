@@ -829,6 +829,7 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     Run Keyword And Return If  '${field_name}' == 'causeDescription'  Отримати інформацію з ${field_name}  ${field_name}
     Run Keyword And Return If  '${field_name}' == 'cause'  Отримати інформацію з ${field_name}  ${field_name}
     Run Keyword And Return If  '${field_name}' == 'awards[0].complaintPeriod.endDate'  Отримати інформацію з ${field_name}  1
+    Run Keyword And Return If  '${field_name}' == 'awards[-1].complaintPeriod.endDate'  Отримати інформацію з ${field_name}  1
 
     Wait Until Element Is Visible  ${tender_data_${field_name}}
     ${result_full}=  Get Text  ${tender_data_${field_name}}
@@ -974,7 +975,7 @@ ${tender_data_contracts[0].status}  css=#contractStatus
 
 Search by status
     [Arguments]  ${locator}  ${tab_number}
-    Wait Until Keyword Succeeds  5min  10s  Try To Search Complaint  ${locator}  3
+    Wait Until Keyword Succeeds  20min  10s  Try To Search Complaint  ${locator}  3
 
 
 Try To Search Complaint
@@ -1349,6 +1350,28 @@ Try To Search Complaint
     ${date}=  Convert To String  ${year}-${month}-${day} ${time}
     ${result}=  privatmarket_service.get_time_with_offset  ${date}
     [Return]  ${result}
+
+
+Отримати інформацію з awards[-1].complaintPeriod.endDate
+    [Arguments]  ${shift}  ${field_name}
+    Reload Page
+    Switch To PMFrame
+    ${class}=  Get Element Attribute  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]@class
+    Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]
+    ${title}=  Get Element Attribute  xpath=//table[@class='bids']/tbody//td[4]/a@title
+    ${work_string}=  Get Regexp Matches  ${title}  до (.)*
+    ${work_string}=  Get From List  ${work_string}  0
+    ${work_string}=  Replace String  ${work_string}  ,${SPACE}  ${SPACE}
+    ${values_list}=  Split String  ${work_string}
+    ${day}=  Convert To Integer  ${values_list[0 + ${shift}]}
+    ${day}=  Set Variable If  ${day} < 10  0${day}  ${day}
+    ${month}=  privatmarket_service.get_month_number  ${values_list[1 + ${shift}]}
+    ${month}=  Set Variable If  ${month} < 10  0${month}  ${month}
+    ${year}=  Convert To String  ${values_list[2 + ${shift}]}
+    ${time}=  Convert To String  ${values_list[3 + ${shift}]}
+    ${date}=  Convert To String  ${year}-${month}-${day} ${time}
+    ${result}=  privatmarket_service.get_time_with_offset  ${date}
+    [Return]  ${field_name}  ${result}
 
 
 Отримати строку
