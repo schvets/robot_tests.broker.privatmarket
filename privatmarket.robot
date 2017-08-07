@@ -210,14 +210,14 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     ...  ELSE IF  ${type} == 'negotiation'  Wait Visibility And Click Element  css=a[data-id='choosedPrzNegotiation']
     ...  ELSE  Wait Visibility And Click Element  css=a[data-id='choosedPrzBelowThreshold']
 
+    Wait For Ajax
     Run Keyword If
     ...  ${type} == 'negotiation'  Wait Visibility And Click Element  xpath=//select[@data-id='accelerator-select']/option[contains(., '1080')]
-    ...  ELSE IF  ${type} == ''  Wait Visibility And Click Element  xpath=//select[@data-id='accelerator-select']/option[contains(., '144 ')]
+    ...  ELSE IF  ${type} == ''  Wait Visibility And Click Element  xpath=//select[@data-id='accelerator-select']/option[contains(., '360 ')]
     ...  ELSE  Wait Visibility And Click Element  xpath=//select[@data-id='accelerator-select']/option[contains(., '1440')]
 
 #step 0
     #we should add choosing of procurementMethodType
-    Wait For Ajax
     Wait Element Visibility And Input Text  css=input[data-id='procurementName']  ${tender_data.data.title}
     Wait Element Visibility And Input Text  css=textarea[data-id='procurementDescription']  ${tender_data.data.description}
     Run Keyword IF  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  css=.procurementName input[data-id='procurementNameEn']  ${tender_data.data.title_en}
@@ -793,8 +793,8 @@ ${tender_data_contracts[0].status}  css=#contractStatus
 
 Підтвердити підписання контракту
     [Arguments]  ${username}  ${tender_uaid}  ${contract_num}
-    Wait For Element With Reload  css=input[ng-model='local.entity.title']  1
-    Wait Element Visibility And Input Text  css=input[ng-model='local.entity.title']  ${tender_uaid}
+    Wait For Element With Reload  css=input[data-id='contract.title']  1
+    Wait Element Visibility And Input Text  css=input[data-id='contract.title']  ${tender_uaid}
     Wait Element Visibility And Input Text  css=#contractNumber  ${tender_uaid}
     Click Element  css=#dateSigned
     Wait Visibility And Click Element  css=.today.day
@@ -829,6 +829,7 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     Run Keyword And Return If  '${field_name}' == 'causeDescription'  Отримати інформацію з ${field_name}  ${field_name}
     Run Keyword And Return If  '${field_name}' == 'cause'  Отримати інформацію з ${field_name}  ${field_name}
     Run Keyword And Return If  '${field_name}' == 'awards[0].complaintPeriod.endDate'  Отримати інформацію з ${field_name}  1
+    Run Keyword And Return If  '${field_name}' == 'awards[-1].complaintPeriod.endDate'  Отримати інформацію з ${field_name}  1
 
     Wait Until Element Is Visible  ${tender_data_${field_name}}
     ${result_full}=  Get Text  ${tender_data_${field_name}}
@@ -943,18 +944,26 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     ${element}=  Set Variable  xpath=//div[contains(@class, 'faq') and contains(., '${complaintID}')]${tender_data_complaint.${field_name}}
     ${test_case_name}=  Remove String  ${TEST_NAME}  '
     Run Keyword If
-    ...  '${test_case_name}' == 'Відображення поданого статусу вимоги'  Search by status  ${element}[contains(.,"Вiдправлено")]  3
-    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу answered вимоги'  Search by status  ${element}[contains(.,"Отримано вiдповiдь")]  3
-    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу resolved вимоги'  Search by status  ${element}[contains(.,"Вирiшена")]  3
-    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу cancelled вимоги'  Search by status  ${element}[contains(.,"Скасована")]  3
-    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу pending вимоги'  Search by status  ${element}[contains(.,"Отримано вiдповiдь")]  3
-    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу cancelled скарги'  Search by status  ${element}[contains(.,"Скасована")]  3
-    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу answered вимоги про виправлення визначення переможця'  Search by status  ${element}[contains(.,"Отримано вiдповiдь")]  3
-    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу resolved вимоги про виправлення визначення переможця'  Search by status  ${element}[contains(.,"Вирiшена")]  3
-    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу cancelled чернетки вимоги про виправлення визначення переможця'  Search by status  ${element}[contains(.,"Скасована")]  3
-    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу cancelled скарги про виправлення визначення переможця'  Search by status  ${element}[contains(.,"Скасована")]  3
-    ...  ELSE IF  'Відображення статусу cancelled після draft -> claim -> answered вимоги' in '${test_case_name}'  Search by status  ${element}[contains(.,"Скасована")]  3
-    ...  ELSE IF  'Відображення статусу pending після draft -> claim -> answered вимоги' in '${test_case_name}'  Search by status  ${element}[contains(.,"Не вирiшена, обробляється")]  3
+    ...  '${test_case_name}' == 'Відображення поданого статусу вимоги'  Search by status  ${element}[contains(@data-status,'claim')]  3
+    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу answered вимоги'  Search by status  ${element}[contains(@data-status,'answered')]  3
+    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу resolved вимоги'  Search by status  ${element}[contains(@data-status,'resolved')]  3
+    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу cancelled вимоги'  Search by status  ${element}[contains(@data-status,'cancelled')]  3
+    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу pending вимоги'  Search by status  ${element}[contains(@data-status,'pending')]  3
+    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу cancelled скарги'  Search by status  ${element}[contains(@data-status,'cancelled')]  3
+    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу answered вимоги про виправлення визначення переможця'  Search by status  ${element}[contains(@data-status,'answered')]  3
+    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу resolved вимоги про виправлення визначення переможця'  Search by status  ${element}[contains(@data-status,'resolved')]  3
+    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу cancelled чернетки вимоги про виправлення визначення переможця'  Search by status  ${element}[contains(@data-status,'cancelled')]  3
+    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу cancelled чернетки вимоги'  Search by status  ${element}[contains(@data-status,'cancelled')]  3
+    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу cancelled скарги про виправлення визначення переможця'  Search by status  ${element}[contains(@data-status,'cancelled')]  3
+    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу ignored вимоги про виправлення визначення переможця'  Search by status  ${element}[contains(@data-status,'ignored')]  3
+    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу declined вимоги про виправлення умов закупівлі'  Search by status  ${element}[contains(@data-status,'declined')]  3
+    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу invalid вимоги про виправлення умов лоту'  Search by status  ${element}[contains(@data-status,'invalid')]  3
+    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу invalid вимоги про виправлення умов закупівлі'  Search by status  ${element}[contains(@data-status,'invalid')]  3
+    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу declined вимоги про виправлення умов лоту'  Search by status  ${element}[contains(@data-status,'declined')]  3
+    ...  ELSE IF  '${test_case_name}' == 'Відображення статусу cancelled чернетки вимоги про виправлення визначення переможця'  Search by status  ${element}[contains(@data-status,'cancelled')]  3
+    ...  ELSE IF  'Відображення статусу cancelled після draft -> claim вимоги' in '${test_case_name}'  Search by status  ${element}[contains(@data-status,'cancelled')]  3
+    ...  ELSE IF  'Відображення статусу cancelled після draft -> claim -> answered вимоги' in '${test_case_name}'  Search by status  ${element}[contains(@data-status,'cancelled')]  3
+    ...  ELSE IF  'Відображення статусу pending після draft -> claim -> answered вимоги' in '${test_case_name}'  Search by status  ${element}[contains(@data-status,'pending')]  3
     ...  ELSE  run keyword  Search by status  ${element}  3
     ${result_full}=  Get Text  ${element}
     ${result}=  Strip String  ${result_full}
@@ -966,7 +975,7 @@ ${tender_data_contracts[0].status}  css=#contractStatus
 
 Search by status
     [Arguments]  ${locator}  ${tab_number}
-    Wait Until Keyword Succeeds  5min  10s  Try To Search Complaint  ${locator}  3
+    Wait Until Keyword Succeeds  20min  10s  Try To Search Complaint  ${locator}  3
 
 
 Try To Search Complaint
@@ -1343,6 +1352,28 @@ Try To Search Complaint
     [Return]  ${result}
 
 
+Отримати інформацію з awards[-1].complaintPeriod.endDate
+    [Arguments]  ${shift}  ${field_name}
+    Reload Page
+    Switch To PMFrame
+    ${class}=  Get Element Attribute  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]@class
+    Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]
+    ${title}=  Get Element Attribute  xpath=//table[@class='bids']/tbody//td[4]/a@title
+    ${work_string}=  Get Regexp Matches  ${title}  до (.)*
+    ${work_string}=  Get From List  ${work_string}  0
+    ${work_string}=  Replace String  ${work_string}  ,${SPACE}  ${SPACE}
+    ${values_list}=  Split String  ${work_string}
+    ${day}=  Convert To Integer  ${values_list[0 + ${shift}]}
+    ${day}=  Set Variable If  ${day} < 10  0${day}  ${day}
+    ${month}=  privatmarket_service.get_month_number  ${values_list[1 + ${shift}]}
+    ${month}=  Set Variable If  ${month} < 10  0${month}  ${month}
+    ${year}=  Convert To String  ${values_list[2 + ${shift}]}
+    ${time}=  Convert To String  ${values_list[3 + ${shift}]}
+    ${date}=  Convert To String  ${year}-${month}-${day} ${time}
+    ${result}=  privatmarket_service.get_time_with_offset  ${date}
+    [Return]  ${field_name}  ${result}
+
+
 Отримати строку
     [Arguments]  ${element_name}  ${position_number}
     ${result_full}=  Отримати текст елемента  ${element_name}
@@ -1548,7 +1579,8 @@ Try Search Element
     Run Keyword If
     ...  '${tab_number}' == '1' and 'запитання на всі лоти' in '${TEST_NAME}'  Відкрити інформацію по запитанням на всі лоти
     ...  ELSE IF  '${tab_number}' == '1' and 'статусу підписаної угоди з постачальником' in '${TEST_NAME}'  Відкрити детальну інформацію про контракт
-    ...  ELSE IF  '${tab_number}' == '1' and '${TEST_NAME}' == 'Можливість укласти угоду для переговорної процедури'  Відкрити детальну інформацію про контракт
+    ...  ELSE IF  '${tab_number}' == '1' and '${TEST_NAME}' == 'Можливість укласти угоду для закупівлі'  Відкрити детальну інформацію про контракт
+    ...  ELSE IF  '${tab_number}' == '1' and '${TEST_NAME}' == 'Можливість укласти угоду для переговорної процедури'  Відкрити детальну інформацію по позиціям
     ...  ELSE IF  '${tab_number}' == '1'  Відкрити детальну інформацію по позиціям
     ...  ELSE IF  '${tab_number}' == '2' and 'відповіді на запитання' in '${TEST_NAME}'  Wait Visibility And Click Element  css=.question-answer .question-expand-div>a:nth-of-type(1)
     ...  ELSE IF  '${tab_number}' == '3' and 'заголовку документації' in '${TEST_NAME}'  Відкрити інформацію про вкладені файли вимоги
@@ -1674,9 +1706,9 @@ Get Item Number
 Відповісти на вимогу про виправлення умов закупівлі
     [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${answer_data}
     Wait Until Keyword Succeeds  5min  10s  Wait For Element With Reload  xpath=//div[@id='nav-tab']//span[@class='ng-scope ng-binding']  3
-    Wait Until Keyword Succeeds  15min  10s  Wait For Element With Reload  xpath=//div[contains(@class,'faq ng-scope') and contains(.,', id: ${complaintID}')]//button[@class='btn btn-success ng-scope ng-binding']  3
-    Wait Visibility And Click Element  xpath=//div[contains(@class,'faq ng-scope') and contains(.,', id: ${complaintID}')]//button[@class='btn btn-success ng-scope ng-binding']
-    Wait Visibility And Click Element  xpath=//div[@class='info-item']//select[@id='resolutionType']/option[@value='${answer_data.data.resolutionType}']
+    Wait Until Keyword Succeeds  15min  10s  Wait For Element With Reload  xpath=//div[contains(@class,'faq ng-scope') and contains(.,'${complaintID}')]//button[@class='btn btn-success ng-scope ng-binding']  3
+    Wait Visibility And Click Element  xpath=//div[contains(@class,'faq ng-scope') and contains(.,'${complaintID}')]//button[@class='btn btn-success ng-scope ng-binding']
+    Wait Visibility And Click Element  xpath=//select[@id='resolutionType']/option[@value='${answer_data.data.resolutionType}']
     Wait Element Visibility And Input Text  xpath=//textarea[@class='ng-pristine ng-valid']  ${answer_data.data.resolution}
     Wait Visibility And Click Element  xpath=//button[@data-id='btn-send-complaint-resolution']
     Sleep  120s
