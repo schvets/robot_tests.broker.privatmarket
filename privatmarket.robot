@@ -1687,8 +1687,7 @@ Set Tender Period
 
 
 Wait For Ajax
-    Wait For Condition  return window.jQuery!=undefined && jQuery.active==0  60s
-    Sleep  2s
+    Sleep  5s
 
 
 Get Item Number
