@@ -213,7 +213,7 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     Wait For Ajax
     Run Keyword If
     ...  ${type} == 'negotiation'  Wait Visibility And Click Element  xpath=//select[@data-id='accelerator-select']/option[contains(., '1080')]
-    ...  ELSE IF  ${type} == ''  Wait Visibility And Click Element  xpath=//select[@data-id='accelerator-select']/option[contains(., '360 ')]
+    ...  ELSE IF  ${type} == ''  Wait Visibility And Click Element  xpath=//select[@data-id='accelerator-select']/option[contains(., '240')]
     ...  ELSE  Wait Visibility And Click Element  xpath=//select[@data-id='accelerator-select']/option[contains(., '1440')]
 
 #step 0
@@ -485,6 +485,7 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     Wait For Element With Reload  ${locator_tenderClaim.buttonCreate}  1
     Wait Visibility And Click Element  ${locator_tenderClaim.buttonCreate}
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
+    Sleep  10s
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
     Wait For Ajax
     Wait Visibility And Click Element  css=#tab_4 a
@@ -1354,7 +1355,7 @@ Try To Search Complaint
 
 
 Отримати інформацію з awards[-1].complaintPeriod.endDate
-    [Arguments]  ${shift}  ${field_name}
+    [Arguments]  ${shift}
     Reload Page
     Switch To PMFrame
     ${class}=  Get Element Attribute  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]@class
@@ -1372,7 +1373,7 @@ Try To Search Complaint
     ${time}=  Convert To String  ${values_list[3 + ${shift}]}
     ${date}=  Convert To String  ${year}-${month}-${day} ${time}
     ${result}=  privatmarket_service.get_time_with_offset  ${date}
-    [Return]  ${field_name}  ${result}
+    [Return]  ${result}
 
 
 Отримати строку
