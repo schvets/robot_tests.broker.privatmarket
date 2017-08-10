@@ -484,8 +484,8 @@ ${tender_data_contracts[0].status}  css=#contractStatus
 
     Wait For Element With Reload  ${locator_tenderClaim.buttonCreate}  1
     Wait Visibility And Click Element  ${locator_tenderClaim.buttonCreate}
-    Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
     Sleep  10s
+    Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
     Wait For Ajax
     Wait Visibility And Click Element  css=#tab_4 a
