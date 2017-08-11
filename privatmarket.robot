@@ -486,6 +486,7 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     Wait Visibility And Click Element  ${locator_tenderClaim.buttonCreate}
     Sleep  10s
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
+    Wait Element Visibility And Input Text  xpath=(//textarea[@data-id='description'])[1]  ${value}
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
     Wait For Ajax
     Wait Visibility And Click Element  css=#tab_4 a
