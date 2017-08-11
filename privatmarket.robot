@@ -464,7 +464,8 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     Wait For Element With Reload  ${locator_tenderClaim.buttonCreate}  1
     Switch To PMFrame
     Wait Visibility And Click Element  ${locator_tenderClaim.buttonCreate}
-    Wait Until Element Is Visible  css=input[data-id='tenderPeriodEnd']  ${COMMONWAIT}
+    Wait Until Element Is Visible  css=input[data-id='procurementName']  ${COMMONWAIT}
+    Wait Until Keyword Succeeds  1min  10s  Звiрити value of title на сторінці редагуванння  ${user_name}
     Run Keyword If  '${parameter}' == 'tenderPeriod'  Set Date And Time  tenderPeriod  endDate  css=input[data-id='tenderPeriodEnd']  ${value}
     Run Keyword If  '${parameter}' == 'description'  Wait Element Visibility And Input Text  css=textarea[data-id='procurementDescription']  ${value}
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
@@ -484,7 +485,8 @@ ${tender_data_contracts[0].status}  css=#contractStatus
 
     Wait For Element With Reload  ${locator_tenderClaim.buttonCreate}  1
     Wait Visibility And Click Element  ${locator_tenderClaim.buttonCreate}
-    Sleep  10s
+    Wait Until Element Is Visible  css=input[data-id='procurementName']  ${COMMONWAIT}
+    Wait Until Keyword Succeeds  1min  10s  Звiрити value of title на сторінці редагуванння  ${user_name}
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
     Wait Element Visibility And Input Text  xpath=(//textarea[@data-id='description'])[1]  ${value}
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
@@ -523,6 +525,8 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     [Arguments]  ${user_name}  ${tenderId}  ${feature}  ${lot_id}
     Wait For Element With Reload  ${locator_tenderClaim.buttonCreate}  1
     Wait Visibility And Click Element  ${locator_tenderClaim.buttonCreate}
+    Wait Until Element Is Visible  css=input[data-id='procurementName']  ${COMMONWAIT}
+    Wait Until Keyword Succeeds  1min  10s  Звiрити value of title на сторінці редагуванння  ${user_name}
     Wait Visibility And Click Element  css=#tab_2 a
     Sleep  2s
     Wait Visibility And Click Element  xpath=//div[@data-id='lot']//button[contains(., 'Додати показник')]
@@ -558,6 +562,8 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     Wait For Element With Reload  ${locator_tenderClaim.buttonCreate}  1
     Switch To PMFrame
     Wait Visibility And Click Element  ${locator_tenderClaim.buttonCreate}
+    Wait Until Element Is Visible  css=input[data-id='procurementName']  ${COMMONWAIT}
+    Wait Until Keyword Succeeds  1min  10s  Звiрити value of title на сторінці редагуванння  ${user_name}
     Wait Visibility And Click Element  css=#tab_2 a
     Sleep  3
     Wait Visibility And Click Element  xpath=//div[@data-id='item']//button[contains(., 'Додати показник')]
@@ -591,6 +597,8 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     Wait For Element With Reload  ${locator_tenderClaim.buttonCreate}  1
     Wait Visibility And Click Element  ${locator_tenderClaim.buttonCreate}
     Wait For Ajax
+    Wait Until Element Is Visible  css=input[data-id='procurementName']  ${COMMONWAIT}
+    Wait Until Keyword Succeeds  1min  10s  Звiрити value of title на сторінці редагуванння  ${user_name}
     Wait Visibility And Click Element  css=#tab_2 a
     Wait Visibility And Click Element  xpath=(//div[@data-id='lot']//button[@data-id='actRemove'])[last()]
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
@@ -606,7 +614,8 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     #перейдем к редактированию
     Wait For Element With Reload  ${locator_tenderClaim.buttonCreate}  1
     Wait Visibility And Click Element  ${locator_tenderClaim.buttonCreate}
-
+    Wait Until Element Is Visible  css=input[data-id='procurementName']  ${COMMONWAIT}
+    Wait Until Keyword Succeeds  1min  10s  Звiрити value of title на сторінці редагуванння  ${user_name}
     #откроем нужную вкладку
     Run Keyword If  'переговорної процедури' in '${TEST_NAME}'  Wait Visibility And Click Element  css=#tab_2 a
     ...  ELSE  Wait Visibility And Click Element  css=#tab_3 a
@@ -637,6 +646,8 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     [Arguments]  ${user_name}  ${filepath}  ${tenderId}  ${lot_id}
     Wait For Element With Reload  ${locator_tenderClaim.buttonCreate}  1
     Wait Visibility And Click Element  ${locator_tenderClaim.buttonCreate}
+    Wait Until Element Is Visible  css=input[data-id='procurementName']  ${COMMONWAIT}
+    Wait Until Keyword Succeeds  1min  10s  Звiрити value of title на сторінці редагуванння  ${user_name}
     Wait Visibility And Click Element  css=#tab_3 a
     Sleep  2s
     Wait Visibility And Click Element  css=label[for='documentation_lot_yes']
@@ -1583,7 +1594,7 @@ Try Search Element
     ...  '${tab_number}' == '1' and 'запитання на всі лоти' in '${TEST_NAME}'  Відкрити інформацію по запитанням на всі лоти
     ...  ELSE IF  '${tab_number}' == '1' and 'статусу підписаної угоди з постачальником' in '${TEST_NAME}'  Відкрити детальну інформацію про контракт
     ...  ELSE IF  '${tab_number}' == '1' and '${TEST_NAME}' == 'Можливість укласти угоду для закупівлі'  Відкрити детальну інформацію про контракт
-    ...  ELSE IF  '${tab_number}' == '1' and '${TEST_NAME}' == 'Можливість укласти угоду для переговорної процедури'  Відкрити детальну інформацію по позиціям
+    ...  ELSE IF  '${tab_number}' == '1' and '${TEST_NAME}' == 'Можливість укласти угоду для переговорної процедури'  Відкрити детальну інформацію про контракт
     ...  ELSE IF  '${tab_number}' == '1'  Відкрити детальну інформацію по позиціям
     ...  ELSE IF  '${tab_number}' == '2' and 'відповіді на запитання' in '${TEST_NAME}'  Wait Visibility And Click Element  css=.question-answer .question-expand-div>a:nth-of-type(1)
     ...  ELSE IF  '${tab_number}' == '3' and 'заголовку документації' in '${TEST_NAME}'  Відкрити інформацію про вкладені файли вимоги
@@ -1750,3 +1761,7 @@ Get Item Number
     Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=//li[contains(@ng-class, 'lot-parts')]
     Wait Visibility And Click Element  xpath=//div[@class='award-section award-actions ng-scope']//button[@data-id='setActive']
 
+Звiрити value of title на сторінці редагуванння
+    [Arguments]  ${username}
+    ${title_value}=  Get Value  css=input[data-id='procurementName']
+    Should be equal as strings  ${title_value}  ${USERS.users['${user_name}'].initial_data.data.title}
