@@ -145,8 +145,9 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 	Click Element	css=input[tid='data.minimalStep.amount']
 	Run Keyword If	'${os}' == 'Linux'	Input text	css=input[tid='data.minimalStep.amount']	${amount_to_enter}
 	...  ELSE	Input text	css=input[tid='data.minimalStep.amount']	${amount_to_enter2}
+
 	#date/time
-	Set Date And Time	css=input[tid='auctionStartDate']	css=div[tid='auctionStartTime'] input[ng-model='hours']	css=div[tid='auctionStartTime'] input[ng-model='minutes']	${tender_data.data.auctionPeriod.startDate}
+    Set Date  css=input[tid='auctionStartDate']	${tender_data.data.auctionPeriod.startDate}
 
 	#items
 	: FOR  ${index}  IN RANGE  ${items_number}
@@ -224,7 +225,7 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 Змінити tenderPeriod.startDate
 	[Arguments]  ${value}
     Wait Until Element Is Visible  css=input[tid='auctionStartDate']
-	Set Date And Time	css=input[tid='auctionStartDate']	css=div[tid='auctionStartTime'] input[ng-model='hours']	css=div[tid='auctionStartTime'] input[ng-model='minutes']	${value}
+	Set Date  css=input[tid='auctionStartDate']  ${value}
 
 
 Змінити eligibilityCriteria
@@ -888,7 +889,6 @@ Check If Question Is Uploaded
     Reload Page
 
 
-
 Завантажити протокол аукціону
 	[Arguments]  ${username}  ${tender_id}  ${file_path}  ${bid_index}
 	privatmarket.Пошук тендера по ідентифікатору	${username}	${tender_id}
@@ -1131,7 +1131,7 @@ Set Date
 	[Arguments]  ${element}  ${date}
 	${locator}  ${type} = 	Get Locator And Type	${element}
 	${correctDate} =	Get Regexp Matches	${date}	(\\d{4}-\\d{2}-\\d{2})	1
-	${correctDate} =	Convert Date		${correctDate[0]}	result_format=%d-%m-%Y
+	${correctDate} =	Convert Date		${correctDate[0]}	result_format=%d/%m/%Y
 	${correctDate} =	Convert To String	${correctDate}
 	Input Text	${element}	${correctDate}
 
