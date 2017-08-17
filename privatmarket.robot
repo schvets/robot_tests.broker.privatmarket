@@ -1684,9 +1684,9 @@ Scroll Page To Element
 Set Enquiry Period
     [Arguments]  ${startDate}  ${endDate}
     Wait Until Element Is Visible  css=input[data-id='enquiryPeriodStart']  ${COMMONWAIT}
-    Set Date And Time  enquiryPeriod  startDate  css=input[data-id='enquiryPeriodStart']  ${startDate}
+    Set Date  enquiryPeriod  startDate  ${startDate}
     Wait Until Element Is Visible  css=input[data-id='enquiryPeriodEnd']  ${COMMONWAIT}
-    Set Date And Time  enquiryPeriod  endDate  css=input[data-id='enquiryPeriodEnd']  ${endDate}
+    Set Date  enquiryPeriod  endDate  ${endDate}
 
 
 Set Start Tender Period
