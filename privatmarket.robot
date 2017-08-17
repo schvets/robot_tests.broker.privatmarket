@@ -235,7 +235,10 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     #date
     Wait For Ajax
     Run Keyword Unless  ${type} == 'aboveThresholdEU' or ${type} == 'aboveThresholdUA' or ${type} == 'negotiation'  Set Enquiry Period  ${tender_data.data.enquiryPeriod.startDate}  ${tender_data.data.enquiryPeriod.endDate}
-    Run Keyword Unless  ${type} == 'negotiation'  Set Tender Period  ${tender_data.data.tenderPeriod.startDate}  ${tender_data.data.tenderPeriod.endDate}
+    Run Keyword If  ${type} == ''  Set Start Tender Period  ${tender_data.data.tenderPeriod.startDate}
+    Run Keyword Unless  ${type} == 'negotiation'  Set End Tender Period  ${tender_data.data.tenderPeriod.endDate}
+
+    #skipAuction
     Run Keyword If  'quick(mode:fast-forward)' in ${mode}  Wait Visibility And Click Element  css=label[data-id='skip_auction']
 
     #cause
@@ -466,7 +469,7 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     Wait Visibility And Click Element  ${locator_tenderClaim.buttonCreate}
     Wait Until Element Is Visible  css=input[data-id='procurementName']  ${COMMONWAIT}
     Wait Until Keyword Succeeds  1min  10s  Звiрити value of title на сторінці редагуванння  ${user_name}
-    Run Keyword If  '${parameter}' == 'tenderPeriod'  Set Date And Time  tenderPeriod  endDate  css=input[data-id='tenderPeriodEnd']  ${value}
+    Run Keyword If  '${parameter}' == 'tenderPeriod'  Set Date  tenderPeriod  endDate  ${value}
     Run Keyword If  '${parameter}' == 'description'  Wait Element Visibility And Input Text  css=textarea[data-id='procurementDescription']  ${value}
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
     Wait Until Element Is Visible  css=section[data-id='step2']  ${COMMONWAIT}
@@ -1632,11 +1635,6 @@ Check Element Attribute
     ${attribute}=  Get Element Attribute  ${element}@${attribute_name}
 
 
-Set Date And Time
-    [Arguments]  ${element}  ${fild}  ${time_element}  ${date}
-    Set Date  ${element}  ${fild}  ${date}
-
-
 Set Date
     [Arguments]  ${element}  ${fild}  ${date}
     Execute Javascript  var s = angular.element('[ng-controller=CreateProcurementCtrl]').scope(); s.model.ptr.${element}.${fild} = new Date(Date.parse("${date}")); s.$broadcast('periods:init'); s.$root.$apply()
@@ -1691,12 +1689,16 @@ Set Enquiry Period
     Set Date And Time  enquiryPeriod  endDate  css=input[data-id='enquiryPeriodEnd']  ${endDate}
 
 
-Set Tender Period
-    [Arguments]  ${startDate}  ${endDate}
+Set Start Tender Period
+    [Arguments]  ${date}
     Wait Until Element Is Visible  css=input[data-id='tenderPeriodStart']  ${COMMONWAIT}
-    Set Date And Time  tenderPeriod  startDate  css=input[data-id='tenderPeriodStart']  ${startDate}
+    Set Date  tenderPeriod  startDate  ${date}
+
+
+Set End Tender Period
+    [Arguments]  ${date}
     Wait Until Element Is Visible  css=input[data-id='tenderPeriodEnd']  ${COMMONWAIT}
-    Set Date And Time  tenderPeriod  endDate  css=input[data-id='tenderPeriodEnd']  ${endDate}
+    Set Date  tenderPeriod  endDate  ${date}
 
 
 Wait For Ajax
