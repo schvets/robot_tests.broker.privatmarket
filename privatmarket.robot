@@ -298,10 +298,10 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     Switch To PMFrame
 
     Run Keyword IF
-    ...  ${type} == 'aboveThresholdEU'  Wait For Element With Reload  xpath=//div[@id='tenderStatus' and contains(., 'Подача пропозицій')]  1
-    ...  ELSE IF  ${type} == 'aboveThresholdUA'  Wait For Element With Reload  xpath=//div[@id='tenderStatus' and contains(., 'Подача пропозицій')]  1
-    ...  ELSE IF  ${type} == 'negotiation'  Wait For Element With Reload  xpath=//div[@id='tenderStatus' and contains(., 'Звіт')]  1
-    ...  ELSE  Wait For Element With Reload  xpath=//div[@id='tenderStatus' and contains(., 'Період уточнень')]  1
+    ...  ${type} == 'aboveThresholdEU'  Wait For Element With Reload  css=[data-tender-status='active.tendering']  1
+    ...  ELSE IF  ${type} == 'aboveThresholdUA'  Wait For Element With Reload  css=[data-tender-status='active.tendering']  1
+    ...  ELSE IF  ${type} == 'negotiation'  Wait For Element With Reload  css=[data-tender-status='active']  1
+    ...  ELSE  Wait For Element With Reload  css=[data-tender-status='active.enquiries']  1
     ${tender_id}=  Get Text  ${tender_data_tenderID}
     [Return]  ${tender_id}
 
@@ -710,7 +710,7 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     [Arguments]  ${user_name}  ${tenderId}
     Wait For Element With Reload  css=button[data-id='finishPreQualBtn']  1
     Wait Visibility And Click Element  css=button[data-id='finishPreQualBtn']
-    Wait For Element With Reload  xpath=//div[@id='tenderStatus' and contains(., 'Пауза перед аукціоном')]  1
+    Wait For Element With Reload  css=[data-tender-status='active.pre-qualification.stand-still']  1
 
 
 Отримати інформацію із тендера
