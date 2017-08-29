@@ -615,7 +615,10 @@ ${tender_data_contracts[0].status}  css=#contractStatus
 Завантажити документ
     [Arguments]  ${user_name}  ${filepath}  ${tenderId}
     #перейдем к редактированию
-    Wait For Element With Reload  ${locator_tenderClaim.buttonCreate}  1
+    Run Keyword If
+    ...  'Неможливість' in '${TEST_NAME}'  Wait Until Element Is Visible  ${locator_tenderClaim.buttonCreate}
+    ...  ELSE  Wait For Element With Reload  ${locator_tenderClaim.buttonCreate}  1
+
     Wait Visibility And Click Element  ${locator_tenderClaim.buttonCreate}
     Wait Until Element Is Visible  css=input[data-id='procurementName']  ${COMMONWAIT}
     Wait Until Keyword Succeeds  1min  10s  Звiрити value of title на сторінці редагуванння  ${user_name}
@@ -647,7 +650,10 @@ ${tender_data_contracts[0].status}  css=#contractStatus
 
 Завантажити документ в лот
     [Arguments]  ${user_name}  ${filepath}  ${tenderId}  ${lot_id}
-    Wait For Element With Reload  ${locator_tenderClaim.buttonCreate}  1
+    Run Keyword If
+    ...  'Неможливість' in '${TEST_NAME}'  Wait Until Element Is Visible  ${locator_tenderClaim.buttonCreate}
+    ...  ELSE  Wait For Element With Reload  ${locator_tenderClaim.buttonCreate}  1
+
     Wait Visibility And Click Element  ${locator_tenderClaim.buttonCreate}
     Wait Until Element Is Visible  css=input[data-id='procurementName']  ${COMMONWAIT}
     Wait Until Keyword Succeeds  1min  10s  Звiрити value of title на сторінці редагуванння  ${user_name}
@@ -1733,6 +1739,7 @@ Get Item Number
     [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${answer_data}
     privatmarket.Відповісти на вимогу про виправлення умов закупівлі  ${username}  ${tender_uaid}  ${complaintID}  ${answer_data}
 
+
 Завантажити документ рішення кваліфікаційної комісії
     [Arguments]  ${username}  ${document}  ${tender_uaid}  ${award_num}
     Wait Until Element Is Visible  xpath=//li[contains(@ng-class, 'lot-parts')]
@@ -1756,12 +1763,14 @@ Get Item Number
     [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${answer_data}  ${award_index}
     privatmarket.Відповісти на вимогу про виправлення умов закупівлі  ${username}  ${tender_uaid}  ${complaintID}  ${answer_data}
 
+
 Підтвердити постачальника
     [Arguments]  ${username}  ${tender_uaid}  ${award_num}
     Wait Until Element Is Visible  xpath=//li[contains(@ng-class, 'lot-parts')]
     ${class}=  Get Element Attribute  xpath=//li[contains(@ng-class, 'lot-parts')]@class
     Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=//li[contains(@ng-class, 'lot-parts')]
     Wait Visibility And Click Element  xpath=//div[@class='award-section award-actions ng-scope']//button[@data-id='setActive']
+
 
 Звiрити value of title на сторінці редагуванння
     [Arguments]  ${username}
