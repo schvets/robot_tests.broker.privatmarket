@@ -135,18 +135,16 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
   ${amount_to_enter}=  Convert To String  ${tender_data.data.value.amount}
   ${amount_to_enter2}=  Replace String  ${amount_to_enter}  .  ,
   Click Element  css=input[tid='data.value.amount']
-#  Run Keyword If  '${os}' == 'Linux'  Input text  css=input[tid='data.value.amount']  ${amount_to_enter}
-#  ...  ELSE  Input text  css=input[tid='data.value.amount']  ${amount_to_enter2}
-  Input text  css=input[tid='data.value.amount']  ${amount_to_enter2}
+  Run Keyword If  '${os}' == 'Linux'  Input text  css=input[tid='data.value.amount']  ${amount_to_enter}
+  ...  ELSE  Input text  css=input[tid='data.value.amount']  ${amount_to_enter2}
 
   Run Keyword If  '${tender_data.data.value.valueAddedTaxIncluded}' == 'True'  Click Element  css=input[tid='data.value.valueAddedTaxIncluded']
   ...  ELSE  Click Element  css=input[tid='data.value.valueAddedTaxNotIncluded']
   ${amount_to_enter}=  Convert To String  ${tender_data.data.minimalStep.amount}
   ${amount_to_enter2}=  Replace String  ${amount_to_enter}  .  ,
   Click Element  css=input[tid='data.minimalStep.amount']
-#  Run Keyword If  '${os}' == 'Linux'  Input text  css=input[tid='data.minimalStep.amount']  ${amount_to_enter}
-#  ...  ELSE  Input text  css=input[tid='data.minimalStep.amount']  ${amount_to_enter2}
-  Input text  css=input[tid='data.minimalStep.amount']  ${amount_to_enter2}
+  Run Keyword If  '${os}' == 'Linux'  Input text  css=input[tid='data.minimalStep.amount']  ${amount_to_enter}
+  ...  ELSE  Input text  css=input[tid='data.minimalStep.amount']  ${amount_to_enter2}
 
   #date/time
   Set Date  css=input[tid='auctionStartDate']  ${tender_data.data.auctionPeriod.startDate}
