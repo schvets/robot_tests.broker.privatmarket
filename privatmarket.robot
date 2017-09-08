@@ -24,7 +24,7 @@ ${tender_data.dgfID}  css=div[tid='data.dgfID']
 ${tender_data.status}  css=span[tid='data.statusName']
 ${tender_data.enquiryPeriod.startDate}  css=span[tid='data.enquiryPeriod.startDate']
 ${tender_data.enquiryPeriod.endDate}  css=span[tid='data.enquiryPeriod.endDate']
-${tender_data.tenderPeriod.startDate}  css=span[tid='data.tenderPeriod.startDate']
+${tender_data.tenderPeriod.startDate}  css=span[tid='period.from']
 ${tender_data.tenderPeriod.endDate}  css=span[tid='period.to']
 ${tender_data.auctionPeriod.startDate}  css=div[tid='data.auctionPeriod'] span[tid='period.from']
 ${tender_data.auctionPeriod.endDate}  css=div[tid='data.auctionPeriod'] span[tid='period.to']
@@ -599,6 +599,11 @@ Check If Question Is Uploaded
   ...  Wait Until Element Is Enabled  css=button[tid='createBid']  ${COMMONWAIT}
   Click Button  css=button[tid='createBid']
   Wait Until Element Is Enabled  css=#amount  ${COMMONWAIT}
+  Run Keyword Unless  '${MODE}' == 'dgfInsider'  Вказати ціну і підтвердити подання пропозиції  ${bid}
+
+
+Вказати ціну і підтвердити подання пропозиції
+  [Arguments]  ${bid}
   ${amount}=  Convert To String  ${bid.data.value.amount}
   ${amount2}=  Replace String  ${amount}  .  ,
   Run Keyword If  '${os}' == 'Linux'  Input Text  css=input[tid='bid.value.amount']  ${amount}
@@ -687,11 +692,10 @@ Check If Question Is Uploaded
 
 Завантажити фінансову ліцензію
   [Arguments]  ${user_name}  ${tender_id}  ${financial_license_path}
-  Wait For Element With Reload  css=button[tid='modifyBid']
-  Wait Visibulity And Click Element  css=button[tid='modifyBid']
+  Run Keyword If  '${MODE}' == 'dgfInsider'  Подати цінову пропозицію для Insider
+  ...  ELSE  Редагувати пропозицію
   Wait For Ajax
   Wait Until Element Is Visible  css=a[tid='btn.addFinLicenseDocs']  ${COMMONWAIT}
-
   Execute Javascript  document.querySelector("input[tid='finLicense']").className = ''
   Sleep  2s
   Choose File  css=input[tid='finLicense']  ${financial_license_path}
@@ -700,6 +704,15 @@ Check If Question Is Uploaded
   Click Button  css=div#bid button[tid='createBid']
   Wait For Ajax
   Wait Until Element Is Not Visible  css=div#bid button[tid='createBid']
+
+
+Подати цінову пропозицію для Insider
+  Wait Until Element Is Enabled  css=button[tid='createBid']  ${COMMONWAIT}
+  Click Button  css=button[tid='createBid']
+
+Редагувати пропозицію
+  Wait For Element With Reload  css=button[tid='modifyBid']
+  Wait Visibulity And Click Element  css=button[tid='modifyBid']
 
 
 Отримати кількість документів в ставці
