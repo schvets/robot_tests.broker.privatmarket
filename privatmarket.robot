@@ -259,14 +259,11 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
   Wait Until Element Is Visible  css=select[tid='data.tenderAttempts']
   Select From List  css=select[tid='data.tenderAttempts']  number:${value}
 
+
 Змінити dgfID
   [Arguments]  ${value}
   Wait Until Element Is Visible  css=input[tid='data.dgfID']
   Input text  css=input[tid='data.dgfID']  ${value}
-
-Додати предмет закупівлі
-  [Arguments]  ${user_name}  ${tender_id}  ${item}
-  [Return]  ${True}
 
 
 Додати новий предмет закупівлі
@@ -291,11 +288,6 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
   Input text  xpath=(//input[@tid='item.address.region'])[last()]  ${item.deliveryAddress.region}
   Input text  xpath=(//input[@tid='item.address.streetAddress'])[last()]  ${item.deliveryAddress.streetAddress}
   Input text  xpath=(//input[@tid='item.address.locality'])[last()]  ${item.deliveryAddress.locality}
-
-
-Видалити предмет закупівлі
-  [Arguments]  ${user_name}  ${tender_id}  ${item}
-  [Return]  ${True}
 
 
 Пошук тендера по ідентифікатору
@@ -599,7 +591,7 @@ Check If Question Is Uploaded
   ...  Wait Until Element Is Enabled  css=button[tid='createBid']  ${COMMONWAIT}
   Click Button  css=button[tid='createBid']
   Wait Until Element Is Enabled  css=#amount  ${COMMONWAIT}
-  Run Keyword Unless  '${MODE}' == 'dgfInsider'  Вказати ціну і підтвердити подання пропозиції  ${bid}
+  Run Keyword Unless  '${MODE}' == 'dgfInsider'  Вказати ціну і підтвердити подання пропозиції  ${bid}  ${os}
 
 
 Вказати ціну і підтвердити подання пропозиції
@@ -1041,11 +1033,10 @@ Wait For Ajax
 
 Wait Until Element Not Stale
   [Arguments]  ${locator}  ${time}
-  sleep  2s
-  ${time}=  Convert To Integer  ${time}
-  ${left_time}=  Evaluate  ${time}-2
+  Sleep  2s
+  ${left_time}=  sum_of_numbers  ${time}  -2
   ${element_state}=  Check If Element Stale  ${locator}
-  run keyword if  ${element_state} and ${left_time} > 0  Wait Until Element Not Stale  ${locator}  ${left_time}
+  Run Keyword If  ${element_state} and ${left_time} > 0  Wait Until Element Not Stale  ${locator}  ${left_time}
 
 
 Check If Element Stale
