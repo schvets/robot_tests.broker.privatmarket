@@ -104,7 +104,7 @@ ${tender_data_procuringEntity.identifier.scheme}  css=[data-id='identifier.schem
 ${tender_data_procuringEntity.identifier.id}  css=[data-id='identifier.id']
 
 ${tender_data_awards[0].documents[0].title}  css=.participant-info-block .doc-file-title
-${tender_data_awards[0].status}  css=.lot-info tbody tr:nth-of-type(1) td:nth-of-type(4)>a
+${tender_data_awards[0].status}  xpath=//a[@data-id='status']
 ${tender_data_awards[0].suppliers[0].address.countryName}  css=.participant-info-block [data-id='address.countryName']
 ${tender_data_awards[0].suppliers[0].address.locality}  css=.participant-info-block [data-id='address.locality']
 ${tender_data_awards[0].suppliers[0].address.postalCode}  css=.participant-info-block [data-id='address.postalCode']
@@ -776,7 +776,7 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     Click Element  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]
     Wait For Ajax
     Run Keyword And Ignore Error  Click Button  css=button[data-id='addParticipant']
-    Wait Visibility And Click Element  css=.bids tbody tr td:nth-of-type(4) a
+    Wait Visibility And Click Element  xpath=//span[@ng-click="act.openAwardDraftEditWnd(b.psId)"]
     Wait Until Element Is Visible  css=.modal.fade.in  ${COMMONWAIT}
     Wait For Ajax
     Wait Element Visibility And Input Text  css=input[ng-model='supplier.identifier.legalName']  ${supplier_data.data.suppliers[0].identifier.legalName}
@@ -803,7 +803,7 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     Reload Page
     Switch To PMFrame
     Wait Visibility And Click Element  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]
-    Wait Visibility And Click Element  css=.bids tbody tr td:nth-of-type(4) a
+    Wait Visibility And Click Element  xpath=//span[@ng-click="act.openAward(b)"]
     Wait Visibility And Click Element  xpath=//div[@class='form-block__item']/form/select[1]/option[text()='Уведомления о решении']
     Sleep  1s
     Wait Visibility And Click Element  xpath=//div[@class='form-block__item']/form/select[2]/option[2]
@@ -823,7 +823,7 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     Wait Visibility And Click Element  css=.today.day
     Wait For Ajax
     Click Element  css=#endDate
-    Wait Visibility And Click Element  css=.today.day
+    Wait Visibility And Click Element  xpath=//div[@class="datepicker-days"]//tbody//tr[6]//td[4]
     Wait For Ajax
     Wait Until Element Is Enabled  css=button[ng-click="act.saveContract('active')"]  ${COMMONWAIT}
     Click Button  css=button[ng-click="act.saveContract('active')"]
@@ -1359,7 +1359,29 @@ Try To Search Complaint
     Switch To PMFrame
     ${class}=  Get Element Attribute  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]@class
     Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]
-    ${title}=  Get Element Attribute  xpath=//table[@class='bids']/tbody//td[4]/a@title
+    ${title}=  Get Element Attribute  ${tender_data_awards[0].status}@title
+    ${work_string}=  Get Regexp Matches  ${title}  до (.)*
+    ${work_string}=  Get From List  ${work_string}  0
+    ${work_string}=  Replace String  ${work_string}  ,${SPACE}  ${SPACE}
+    ${values_list}=  Split String  ${work_string}
+    ${day}=  Convert To Integer  ${values_list[0 + ${shift}]}
+    ${day}=  Set Variable If  ${day} < 10  0${day}  ${day}
+    ${month}=  privatmarket_service.get_month_number  ${values_list[1 + ${shift}]}
+    ${month}=  Set Variable If  ${month} < 10  0${month}  ${month}
+    ${year}=  Convert To String  ${values_list[2 + ${shift}]}
+    ${time}=  Convert To String  ${values_list[3 + ${shift}]}
+    ${date}=  Convert To String  ${year}-${month}-${day} ${time}
+    ${result}=  privatmarket_service.get_time_with_offset  ${date}
+    [Return]  ${result}
+
+
+Отримати інформацію з awards[-1].complaintPeriod.endDate
+    [Arguments]  ${shift}
+    Reload Page
+    Switch To PMFrame
+    ${class}=  Get Element Attribute  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]@class
+    Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]
+    ${title}=  Get Element Attribute  ${tender_data_awards[0].status}@title
     ${work_string}=  Get Regexp Matches  ${title}  до (.)*
     ${work_string}=  Get From List  ${work_string}  0
     ${work_string}=  Replace String  ${work_string}  ,${SPACE}  ${SPACE}
@@ -1770,6 +1792,7 @@ Get Item Number
     ${class}=  Get Element Attribute  xpath=//li[contains(@ng-class, 'lot-parts')]@class
     Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=//li[contains(@ng-class, 'lot-parts')]
     Wait Visibility And Click Element  xpath=//div[@class='award-section award-actions ng-scope']//button[@data-id='setActive']
+    Sleep  180s
 
 
 Звiрити value of title на сторінці редагуванння

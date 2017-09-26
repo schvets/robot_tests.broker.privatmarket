@@ -178,6 +178,7 @@ def get_classification_type(classifications):
 
 
 def get_status_type(status_name):
+    status_name = status_name.strip()
     type_dictionary = {
         u'Период уточнений': 'active.enquiries',
         u'Період уточнень': 'active.enquiries',
@@ -197,7 +198,9 @@ def get_status_type(status_name):
         u'Відмінено': 'cancelled',
         u'Розглядається': 'pending',
         u'Кваліфікація учасника': 'active.pre-qualification',
-        u'Пауза перед аукціоном': 'active.pre-qualification.stand-still'
+        u'Пауза перед аукціоном': 'active.pre-qualification.stand-still',
+        u'Прекваліфікація': 'active.pre-qualification',
+        u'Преквалификация': 'active.pre-qualification'
     }
     type_name = type_dictionary.get(status_name)
     return type_name
