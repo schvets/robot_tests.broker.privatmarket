@@ -91,9 +91,11 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
   Call Method  ${options}  add_argument  --nativeEvents\=false
   Call Method  ${options}  add_experimental_option  prefs  ${prefs}
 
+  ${alias}=   Catenate   SEPARATOR=   browser  ${username}
+  Set Global Variable  ${ALIAS_NAME}  ${alias}
   Run Keyword If  'phantomjs' in '${browser}'  Create Webdriver  PhantomJS  ${username}  service_args=${service_args}
-  ...  ELSE IF  'chrome' in '${browser}'  Create WebDriver  Chrome  chrome_options=${options}  alias=${username}
-  ...  ELSE  Open Browser  ${USERS.users['${username}'].homepage}  ff  alias=${username}
+  ...  ELSE IF  'chrome' in '${browser}'  Create WebDriver  Chrome  chrome_options=${options}  alias=${ALIAS_NAME}
+  ...  ELSE  Open Browser  ${USERS.users['${username}'].homepage}  ff  alias=${ALIAS_NAME}
 
   Set Window Size  @{USERS.users['${username}'].size}
   Set Window Position  @{USERS.users['${username}'].position}
@@ -104,7 +106,7 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 
 Оновити сторінку з тендером
   [Arguments]  ${user_name}  ${tender_id}
-  Switch Browser  ${user_name}
+  Switch Browser  ${ALIAS_NAME}
   ${tenderEdit}=  Run Keyword And Return Status  Wait Until Element Is Visible  css=input[tid='data.title']  5s
   Run Keyword If  '${tenderEdit}' == 'False'  Reload Page
   Sleep  3s
@@ -122,6 +124,7 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 
   #main info
   Execute Javascript  angular.prozorroaccelerator=1440;
+  Execute Javascript  angular.prozorroauctionstartdelay = 30*60*1000;
   Wait Until Element Is Enabled  css=input[tid='data.title']
   Input text  css=input[tid='data.title']  ${tender_data.data.title}
   Input text  css=input[tid='data.dgfID']  ${tender_data.data.dgfID}
@@ -149,7 +152,7 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
   Set Date  css=input[tid='auctionStartDate']  ${tender_data.data.auctionPeriod.startDate}
 
   #items
-  : FOR  ${index}  IN RANGE  ${items_number}
+  :FOR  ${index}  IN RANGE  ${items_number}
   \  ${should_we_click_btn.additem}=  Set Variable If  '0' != '${index}'  ${True}  ${False}
   \  Додати новий предмет закупівлі  ${items[${index}]}  ${should_we_click_btn.additem}
 
@@ -185,57 +188,67 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 Змінити value.amount
   [Arguments]  ${value}
   Wait Until Element Is Visible  css=input[tid='data.minimalStep.amount']
+  Wait For Ajax
   Input text  css=input[tid='data.minimalStep.amount']  '${value}'
 
 
 Змінити minimalStep.amount
   [Arguments]  ${value}
   Wait Until Element Is Visible  css=input[tid='data.minimalStep.amount']
+  Wait For Ajax
   Input text  css=input[tid='data.minimalStep.amount']  '${value}'
 
 
 Змінити title
   [Arguments]  ${value}
   Wait Until Element Is Visible  css=input[tid='data.title']
+  Wait For Ajax
   Input text  css=input[tid='data.title']  ${value}
 
 Змінити title_ru
   [Arguments]  ${value}
   Wait Until Element Is Visible  css=input[tid='data.title_ru']
+  Wait For Ajax
   Input text  css=input[tid='data.title_ru']  ${value}
 
 Змінити title_en
   [Arguments]  ${value}
   Wait Until Element Is Visible  css=input[tid='data.title_en']
+  Wait For Ajax
   Input text  css=input[tid='data.title_en']  ${value}
 
 Змінити description
   [Arguments]  ${value}
   Wait Until Element Is Visible  css=textarea[tid='data.description']
+  Wait For Ajax
   Input text  css=textarea[tid='data.description']  ${value}
 
 
 Змінити procuringEntity.name
   [Arguments]  ${value}
   Wait Until Element Is Visible  css=input[tid='procuringEntity.name'
+  Wait For Ajax
   Input text  css=input[tid='procuringEntity.name']  ${value}
 
 
 Змінити tenderPeriod.startDate
   [Arguments]  ${value}
   Wait Until Element Is Visible  css=input[tid='auctionStartDate']
+  Wait For Ajax
   Set Date  css=input[tid='auctionStartDate']  ${value}
 
 
 Змінити eligibilityCriteria
   [Arguments]  ${value}
   Wait Until Element Is Visible  css=input[tid='eligibilityCriteria']
+  Wait For Ajax
   Input text  css=input[tid='eligibilityCriteria']  ${value}
 
 
 Змінити guarantee
   [Arguments]  ${value}
   Wait Until Element Is Visible  css=input[tid='data.dgfDecisionID']
+  Wait For Ajax
   Input text  css=input[tid='guarantyAmount']  ${value}
 
 
@@ -244,24 +257,28 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
   Wait Until Element Is Visible  css=input[tid='data.dgfDecisionID']
   ${correctDate}=  Convert Date  ${value}  result_format=%d/%m/%Y
   ${correctDate}=  Convert To String  ${correctDate}
+  Wait For Ajax
   Input Text  css=input[tid='dgfDecisionDate']  ${correctDate}
 
 
 Змінити dgfDecisionID
   [Arguments]  ${value}
   Wait Until Element Is Visible  css=input[tid='data.dgfDecisionID']
+  Wait For Ajax
   Input text  css=input[tid='data.dgfDecisionID']  ${value}
 
 
 Змінити tenderAttempts
   [Arguments]  ${value}
   Wait Until Element Is Visible  css=select[tid='data.tenderAttempts']
+  Wait For Ajax
   Select From List  css=select[tid='data.tenderAttempts']  number:${value}
 
 
 Змінити dgfID
   [Arguments]  ${value}
   Wait Until Element Is Visible  css=input[tid='data.dgfID']
+  Wait For Ajax
   Input text  css=input[tid='data.dgfID']  ${value}
 
 
@@ -311,7 +328,7 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
   Run Keyword And Return If  '${element}' == 'awards[0].status'  Отримати awards status  ${element}
   Run Keyword And Return If  '${element}' == 'awards[1].status'  Отримати awards status  ${element}
 
-  Run Keyword And Return If  'Period.' in '${element}'  Отримати дату та час  ${element}
+  Run Keyword And Return If  'Period.' in '${element}'  Отримати дату та час  ${element}
 
   Wait Until Element Is Visible  ${tender_data.${element}}  timeout=${COMMONWAIT}
   ${result}=  Отримати текст  ${element}
@@ -324,7 +341,7 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
   ${element_for_work}=  Set variable  xpath=//div[@ng-repeat='item in data.items' and contains(., '${item_id}')]//${tender_data.${element}}
   Wait For Element With Reload  ${element_for_work}
 
-  Run Keyword And Return If  '${element}' == 'items.deliveryDate.endDate'  Отримати дату та час  ${element_for_work}
+  Run Keyword And Return If  '${element}' == 'items.deliveryDate.endDate'  Отримати дату та час  ${element_for_work}
   Run Keyword And Return If  '${element}' == 'items.deliveryLocation.latitude'  Отримати число  ${element_for_work}
   Run Keyword And Return If  '${element}' == 'items.deliveryLocation.longitude'  Отримати число  ${element_for_work}
   Run Keyword And Return If  '${element}' == 'items.quantity'  Отримати число  ${element_for_work}
@@ -372,7 +389,7 @@ Wait for question
   ${size}=  Get Length  ${elements_list}
   ${size}=  Sum_Of_Numbers  ${size}  1
   ${title}=  Set Variable  ${EMPTY}
-  : FOR  ${index}  IN RANGE  1  ${size}
+  :FOR  ${index}  IN RANGE  1  ${size}
   \  ${text}=  Get Element Attribute  ${tender_data.${element_name}}[${index}]@title
   \  ${words}=  Split String  ${text}  \\
   \  ${result}=  Get From List  ${words}  -1
@@ -383,7 +400,7 @@ Wait for question
 Отримати заголовок документації до лоту
   [Arguments]  ${element}  ${doc_id}=${EMPTY}
   ${result}=  Отримати заголовок документа  ${element}  ${doc_id}
-  [Return] ${result}
+  [Return]  ${result}
 
 
 Отримати інформацію із документа по індексу
@@ -454,8 +471,9 @@ Wait for question
   [Return]  ${result}
 
 
-Отримати дату та час
+Отримати дату та час
   [Arguments]  ${element_name}
+  Switch Browser  ${ALIAS_NAME}
   ${result_full}=  Отримати текст елемента  ${element_name}
   ${result_full}=  Split String  ${result_full}
   ${day_length}=  Get Length  ${result_full[0]}
@@ -583,6 +601,7 @@ Check If Question Is Uploaded
 
 Подати цінову пропозицію
   [Arguments]  ${user_name}  ${tender_id}  ${bid}
+  Switch Browser  ${ALIAS_NAME}
   ${os}=  Evaluate  platform.system()  platform
   Run Keyword If  'без кваліфікації' in '${TEST NAME}'  Fail  Is not implemented yet
   #дождаться появления поля ввода ссуммы только в случае выполнения первого позитивного теста
@@ -594,7 +613,7 @@ Check If Question Is Uploaded
 
 
 Вказати ціну і підтвердити подання пропозиції
-  [Arguments]  ${bid}
+  [Arguments]  ${bid}  ${os}
   ${amount}=  Convert To String  ${bid.data.value.amount}
   ${amount2}=  Replace String  ${amount}  .  ,
   Run Keyword If  '${os}' == 'Linux'  Input Text  css=input[tid='bid.value.amount']  ${amount}
@@ -647,9 +666,28 @@ Check If Question Is Uploaded
   Execute Javascript  document.querySelector("div[tid='auction.docs'] input#input-doc-lot").className = ''
   Sleep  2s
   Choose File  css=div[tid='auction.docs'] input#input-doc-lot  ${filepath}
+  Wait Until Element Is Visible  css=div.modal-backdrop.fade
+  Wait Until Element Is Not Visible  css=div.modal-backdrop.fade
   Wait For Ajax
   Wait Until Element Is Not Visible  css=div.progress.progress-bar  ${COMMONWAIT}
   Select From List  xpath=(//div[@tid='auction.docs']//select[@tid='doc.type'])[last()]  ${file_type}
+  Wait For Ajax
+
+
+Додати предмет закупівлі
+  [Arguments]  ${user_name}  ${tender_id}  ${item}
+  Увійти в редагування тендера
+  Run Keyword And Ignore Error  Click Element  css=button[tid='btn.additem']
+  Click Element  ${tenderBtn.create_edit}
+  Wait Until Element Is Visible  css=div[tid='data.title']  ${COMMONWAIT}
+
+
+Видалити предмет закупівлі
+  [Arguments]  ${user_name}  ${tender_id}  ${item_id}
+  Увійти в редагування тендера
+  Run Keyword And Ignore Error  Click Element  css=a[tid='remove.item']
+  Click Element  ${tenderBtn.create_edit}
+  Wait Until Element Is Visible  css=div[tid='data.title']  ${COMMONWAIT}
 
 
 Завантажити документ
@@ -726,6 +764,7 @@ Check If Question Is Uploaded
 
 Додати посилання
   [Arguments]  ${link_type}  ${link}
+  Execute Javascript  window.document.evaluate("//div[@tid='btn.addUrl']", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.scrollIntoView(true);
   Wait Visibulity And Click Element  css=div[tid='btn.addUrl']
   Wait Until Element Is Visible  xpath=(//select[@tid='docurl.type'])[last()]  10s
   Select From List  xpath=(//select[@tid='docurl.type'])[last()]  ${link_type}
@@ -741,6 +780,7 @@ Check If Question Is Uploaded
 
 Додати офлайн документ
   [Arguments]  ${user_name}  ${tender_id}  ${accessDetails}
+  Execute Javascript  window.document.evaluate("//div[@tid='btn.addUrl']", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.scrollIntoView(true);
   Wait Visibulity And Click Element  css=div[tid='btn.addUrl']
   Wait Until Element Is Visible  xpath=(//select[@tid='docurl.type'])[last()]  10s
   Select From List  xpath=(//select[@tid='docurl.type'])[last()]  string:x_dgfAssetFamiliarization
@@ -764,7 +804,8 @@ Check If Question Is Uploaded
 
 
 Отримати посилання на аукціон для учасника
-  [Arguments]  ${user_name}  ${tender_id}
+  [Arguments]  ${user_name}  ${tender_id}  ${lot_id}=${Empty}
+  Switch Browser  ${ALIAS_NAME}
   Go To  ${USERS.users['${username}'].homepage}
   Run Keyword And Ignore Error  Login  ${user_name}
   privatmarket.Пошук тендера по ідентифікатору  ${username}  ${tender_id}
@@ -774,7 +815,8 @@ Check If Question Is Uploaded
 
 
 Отримати посилання на аукціон для глядача
-  [Arguments]  ${user_name}  ${tender_id}  ${lot_id}=1
+  [Arguments]  ${user_name}  ${tender_id}  ${lot_id}=${Empty}
+  Switch Browser  ${ALIAS_NAME}
   Wait For Element With Reload  css=a[tid='public.data.auctionUrl']  5
   ${url}=  Get Element Attribute  css=a[tid='public.data.auctionUrl']@href
   [Return]  ${url}
