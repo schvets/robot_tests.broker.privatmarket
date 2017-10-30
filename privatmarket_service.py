@@ -224,6 +224,15 @@ def get_claim_status (status):
     type_name = type_dictionary.get(status)
     return type_name
 
+def get_procurementMethod_Type (type):
+    type_dictionary = {
+        u'Конкурентний діалог з публікацією англ. мовою': 'competitiveDialogueEU',
+        u'Конкурентний діалог': 'competitiveDialogueUA'
+
+    }
+    type_name = type_dictionary.get(type)
+    return type_name
+
 
 def sum_of_numbers(number, value):
     number = int(number) + int(value)

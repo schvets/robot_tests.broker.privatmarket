@@ -104,7 +104,7 @@ ${tender_data_procuringEntity.identifier.scheme}  css=[data-id='identifier.schem
 ${tender_data_procuringEntity.identifier.id}  css=[data-id='identifier.id']
 
 ${tender_data_awards[0].documents[0].title}  css=.participant-info-block .doc-file-title
-${tender_data_awards[0].status}  xpath=//a[@data-id='status']
+${tender_data_awards[0].status}  xpath=//div[@data-id='status']
 ${tender_data_awards[0].suppliers[0].address.countryName}  css=.participant-info-block [data-id='address.countryName']
 ${tender_data_awards[0].suppliers[0].address.locality}  css=.participant-info-block [data-id='address.locality']
 ${tender_data_awards[0].suppliers[0].address.postalCode}  css=.participant-info-block [data-id='address.postalCode']
@@ -147,7 +147,7 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     #Для Viewer'а нужен хром, т.к. на хром настроена автоматическая закачка файлов
     Run Keyword If  '${username}' == 'PrivatMarket_Viewer'  Create WebDriver  Chrome  chrome_options=${chrome_options}  alias=${username}
     Run Keyword If  '${username}' == 'PrivatMarket_Owner'  Create WebDriver  Chrome  chrome_options=${chrome_options}  alias=${username}
-    Run Keyword If  '${username}' == 'PrivatMarket_Provider'  Create WebDriver  Firefox  chrome_options=${chrome_options}  alias=${username}
+    Run Keyword If  '${username}' == 'PrivatMarket_Provider'  Create WebDriver  Chrome  chrome_options=${chrome_options}  alias=${username}
     Go To  ${USERS.users['${username}'].homepage}
 
     #Open Browser  ${USERS.users['${username}'].homepage}  ${browser}  alias=${username}
@@ -804,7 +804,7 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     Switch To PMFrame
     Wait Visibility And Click Element  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]
     Wait Visibility And Click Element  xpath=//span[@ng-click="act.openAward(b)"]
-    Wait Visibility And Click Element  xpath=//div[@class='form-block__item']/form/select[1]/option[text()='Уведомления о решении']
+    Wait Visibility And Click Element  xpath=//div[@class='form-block__item']/form/select[1]/option[2]
     Sleep  1s
     Wait Visibility And Click Element  xpath=//div[@class='form-block__item']/form/select[2]/option[2]
     Sleep  1s
@@ -852,7 +852,11 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     Run Keyword And Return If  '${field_name}' == 'causeDescription'  Отримати інформацію з ${field_name}  ${field_name}
     Run Keyword And Return If  '${field_name}' == 'cause'  Отримати інформацію з ${field_name}  ${field_name}
     Run Keyword And Return If  '${field_name}' == 'awards[0].complaintPeriod.endDate'  Отримати інформацію з ${field_name}  1
-    Run Keyword And Return If  '${field_name}' == 'awards[-1].complaintPeriod.endDate'  Отримати інформацію з ${field_name}  1
+    Run Keyword And Return If  '${field_name}' == 'procurementMethodType'  Отримати інформацію з ${field_name}  1
+    Run Keyword And Return If  '${field_name}' == 'complaintPeriod.endDate'  Отримати дату та час  ${field_name}  0
+    Run Keyword And Return If  '${field_name}' == 'items[0].deliveryDate.startDate'  Отримати дату та час  ${field_name}  0
+    Run Keyword And Return If  '${field_name}' == 'items[0].deliveryDate.endDate'  Отримати дату та час  ${field_name}  0
+    Run Keyword And Return If  '${field_name}' == 'stage2TenderID'  Отримати інформацію з  ${field_name}  ${field_name}
 
     Wait Until Element Is Visible  ${tender_data_${field_name}}
     ${result_full}=  Get Text  ${tender_data_${field_name}}
@@ -1164,6 +1168,11 @@ Try To Search Complaint
     [Return]  ${currency_type}
 
 
+Отримати інформацію з stage2TenderID
+    [Arguments]  ${element_name}
+    Wait Visibility And Click Element  ${element_name}
+
+
 Отримати інформацію з awards[0].value.currency
     [Arguments]  ${element_name}
     ${currency}=  Отримати текст елемента  ${element_name}
@@ -1317,6 +1326,13 @@ Try To Search Complaint
     [Return]  ${result}
 
 
+Отримати інформацію з procurementMethodType
+    [Arguments]  ${element}
+    ${type}=  Отримати текст елемента  xpath=//div[@class='info-item']//div[2]//span[1]
+    ${type}=  get_procurementMethod_Type  ${type}
+    [Return]  ${type}
+
+
 Отримати інформацію зі зміною локалізації
     [Arguments]  ${element}  ${lang}
     Unselect Frame
@@ -1359,51 +1375,7 @@ Try To Search Complaint
     Switch To PMFrame
     ${class}=  Get Element Attribute  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]@class
     Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]
-    ${title}=  Get Element Attribute  ${tender_data_awards[0].status}@title
-    ${work_string}=  Get Regexp Matches  ${title}  до (.)*
-    ${work_string}=  Get From List  ${work_string}  0
-    ${work_string}=  Replace String  ${work_string}  ,${SPACE}  ${SPACE}
-    ${values_list}=  Split String  ${work_string}
-    ${day}=  Convert To Integer  ${values_list[0 + ${shift}]}
-    ${day}=  Set Variable If  ${day} < 10  0${day}  ${day}
-    ${month}=  privatmarket_service.get_month_number  ${values_list[1 + ${shift}]}
-    ${month}=  Set Variable If  ${month} < 10  0${month}  ${month}
-    ${year}=  Convert To String  ${values_list[2 + ${shift}]}
-    ${time}=  Convert To String  ${values_list[3 + ${shift}]}
-    ${date}=  Convert To String  ${year}-${month}-${day} ${time}
-    ${result}=  privatmarket_service.get_time_with_offset  ${date}
-    [Return]  ${result}
-
-
-Отримати інформацію з awards[-1].complaintPeriod.endDate
-    [Arguments]  ${shift}
-    Reload Page
-    Switch To PMFrame
-    ${class}=  Get Element Attribute  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]@class
-    Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]
-    ${title}=  Get Element Attribute  ${tender_data_awards[0].status}@title
-    ${work_string}=  Get Regexp Matches  ${title}  до (.)*
-    ${work_string}=  Get From List  ${work_string}  0
-    ${work_string}=  Replace String  ${work_string}  ,${SPACE}  ${SPACE}
-    ${values_list}=  Split String  ${work_string}
-    ${day}=  Convert To Integer  ${values_list[0 + ${shift}]}
-    ${day}=  Set Variable If  ${day} < 10  0${day}  ${day}
-    ${month}=  privatmarket_service.get_month_number  ${values_list[1 + ${shift}]}
-    ${month}=  Set Variable If  ${month} < 10  0${month}  ${month}
-    ${year}=  Convert To String  ${values_list[2 + ${shift}]}
-    ${time}=  Convert To String  ${values_list[3 + ${shift}]}
-    ${date}=  Convert To String  ${year}-${month}-${day} ${time}
-    ${result}=  privatmarket_service.get_time_with_offset  ${date}
-    [Return]  ${result}
-
-
-Отримати інформацію з awards[-1].complaintPeriod.endDate
-    [Arguments]  ${shift}
-    Reload Page
-    Switch To PMFrame
-    ${class}=  Get Element Attribute  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]@class
-    Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]
-    ${title}=  Get Element Attribute  xpath=//table[@class='bids']/tbody//td[4]/a@title
+    ${title}=  Get Element Attribute  xpath=//a[contains(., 'Переможець переговорів')]@title
     ${work_string}=  Get Regexp Matches  ${title}  до (.)*
     ${work_string}=  Get From List  ${work_string}  0
     ${work_string}=  Replace String  ${work_string}  ,${SPACE}  ${SPACE}
@@ -1444,7 +1416,7 @@ Try To Search Complaint
 
 Отримати дату та час
     [Arguments]  ${element_name}  ${shift}
-    Run Keyword If  'періоду блокування' in '${TEST_NAME}'  Wait For Element With Reload  ${tender_data_${element_name}}  1
+    Wait For Element With Reload  ${tender_data_${element_name}}  1
     ${result_full}=  Отримати текст елемента  ${element_name}
     ${work_string}=  Replace String  ${result_full}  ${SPACE},${SPACE}  ${SPACE}
     ${work_string}=  Replace String  ${result_full}  ,${SPACE}  ${SPACE}
