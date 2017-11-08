@@ -1051,19 +1051,19 @@ Login with P24
   [Arguments]  ${username}
   Wait Enable And Click Element  xpath=//a[contains(@href, 'https://bankid.privatbank.ua')]
 
-  Wait Until Element Is Visible  css=input[id='loginLikePhone']  5s
-  Input Text  css=input[id='loginLikePhone']  +${USERS.users['${username}'].login}
-  Input Text  css=input[id='passwordLikePassword']  ${USERS.users['${username}'].password}
-  Click Element  css=div[id='signInButton']
+  Wait Until Element Is Visible  id=inputLogin  5s
+  Input Text  id=inputLogin  +${USERS.users['${username}'].login}
+  Input Text  id=inputPassword  ${USERS.users['${username}'].password}
+  Click Element  css=.btn.btn-success.custom-btn
   Wait Until Element Is Visible  css=input[id='first-section']  5s
   Input Text  css=input[id='first-section']  12
   Input Text  css=input[id='second-section']  34
   Input Text  css=input[id='third-section']  56
-  Click Element  css=a[id='confirmButton']
+  Click Element  css=.btn.btn-success.custom-btn-confirm.sms
   Sleep  3s
   Wait For Ajax
-  Wait Until Element Is Not Visible  css=div.progress.progress-bar  ${COMMONWAIT}
-  Wait Until Element Is Not Visible  css=a[id='confirmButton']
+  Wait Until Element Is Not Visible  css=div#preloader  ${COMMONWAIT}
+  Wait Until Element Is Not Visible  css=.btn.btn-success.custom-btn-confirm.sms
 
 
 Login with email
