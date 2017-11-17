@@ -1,5 +1,5 @@
 # coding=utf-8
-
+import os
 from munch import munchify as privatmarket_munchify
 from selenium.common.exceptions import StaleElementReferenceException
 from datetime import datetime, timedelta
@@ -238,6 +238,9 @@ def sum_of_numbers(number, value):
     number = int(number) + int(value)
     return number
 
+def positivate_numbers(number):
+    number = int(number) * -1
+    return number
 
 def get_abs_item_index(lot_index, item_index, items_count):
     abs_index = ((int(lot_index)-1) * int(items_count)) + item_index
@@ -272,3 +275,6 @@ def get_items_from_lot(items, lot_id):
         if item['relatedLot'] == lot_id:
             lot_items.append(item)
     return lot_items
+
+def get_ECP_key():
+    return os.path.join(os.getcwd(), 'src/robot_tests.broker.privatmarket/Key-6.dat')

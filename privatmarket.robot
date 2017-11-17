@@ -5,6 +5,8 @@ Library  Selenium2Library
 Library  Collections
 Library  DebugLibrary
 Library  privatmarket_service.py
+Library  op_robot_tests.tests_files.service_keywords
+
 
 *** Variables ***
 ${COMMONWAIT}  40s
@@ -38,7 +40,7 @@ ${tender_data_auctionPeriod.startDate}  xpath=(//span[@ng-if='p.bd'])[3]
 ${tender_data_minimalStep.amount}  css=div#lotMinStepAmount
 ${tender_data_documentation.title}  xpath=//div[contains(@class, 'doc-file-title')]
 ${tender_data_documents[0].title}  xpath=//div[contains(@class, 'doc-file-title')]
-${tender_data_qualificationPeriod.endDate}  xpath=(//span[contains(@ng-if, 'p.ed')])[4]
+${tender_data_qualificationPeriod.endDate}  id=active.pre-qualification-ed
 ${tender_data_causeDescription}  css=#tenderType div.question-div>div:nth-of-type(1)
 ${tender_data_cause}  css=#tenderType>.action-element
 
@@ -63,6 +65,9 @@ ${tender_data_item.additionalClassifications[0].description}  //span[contains(@c
 ${tender_data_item.unit.name}  //div[@ng-if='adb.quantity']/div[2]/span[2])
 ${tender_data_item.unit.code}  //div[@ng-if='adb.quantity']/div[2]/span[2])
 ${tender_data_item.quantity}  //div[@ng-if='adb.quantity']/div[2]/span)
+${tender_data_items[0].deliveryDate.endDate}  xpath=//div[@data-id='deliveryDate.endDate']
+${tender_data_items[0].deliveryDate.startDate}  xpath=//div[@data-id='deliveryDate.startDate']
+${tender_data_items[0].description}  xpath=//div[@class='description']
 
 ${tender_data_lot.title}  //div[@id='lot-title'])
 ${tender_data_lot.description}  //section[contains(@class, 'description marged')])
@@ -80,6 +85,9 @@ ${tender_data_question.answer}  //div[@class='question-div question-expanded']/d
 ${tender_data_lot_question.title}  //span[contains(@class, 'question-title')]
 ${tender_data_lot_question.description}  //div[@class='question-div']/div[1]
 ${tender_data_lot_question.answer}  //div[@class='question-div question-expanded']/div[1]
+${tender_data_lot_question.questions[0].title}  //span[contains(@class, 'question-title')]
+${tender_data_lot_question.questions[0].description}  //div[@class='question-div']/div[1]
+#${tender_data_lot_question.questions[0].id}  //div[@class='question-div question-expanded']/div[1]
 
 ${tender_data_feature.featureOf}  /../../../*[1]
 
@@ -90,6 +98,7 @@ ${tender_data_complaint.satisfied}  //span[contains(@data-id, 'satisfied')]
 ${tender_data_complaint.cancellationReason}  //*[@description='q.cancellationReason']/div/div[1]
 ${tender_data_complaint.title}  //span[contains(@class, 'claimHead')]
 ${tender_data_complaint.description}  //div[@class='question-div']
+${tender_data_complaintPeriod.endDate}  id=cmplPeriodEnd
 
 ${tender_data_procuringEntity.address.countryName}  css=.delivery-info-container [data-id='address.countryName']
 ${tender_data_procuringEntity.address.locality}  css=.delivery-info-container [data-id='address.locality']
@@ -121,6 +130,12 @@ ${tender_data_awards[0].value.valueAddedTaxIncluded}  css=.participant-info-bloc
 ${tender_data_awards[0].value.currency}  css=.participant-info-block [data-id='value.currency']
 ${tender_data_awards[0].value.amount}  css=.participant-info-block [data-id='value.amount']
 ${tender_data_contracts[0].status}  css=#contractStatus
+${tender_data_features[0].title}  xpath=//div[@class='no-price']//span[@data-id='feature.title']
+
+${tender.data.awards[0].id}  id=prozorroHash
+
+${tender_data_lots[0].auctionPeriod.startDate}  id=active.auction-bd
+${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
 
 
 *** Keywords ***
@@ -168,7 +183,7 @@ ${tender_data_contracts[0].status}  css=#contractStatus
         ...  ELSE  Set Variable  True
 
     Wait For Tender  ${tenderId}  ${education_type}
-    Wait Visibility And Click Element  css=tr#${tenderId}
+    Wait Visibility And Click Element  xpath=//tr[@id='${tenderId}']
     Sleep  5s
     Switch To PMFrame
     Wait Until Element Is Visible  ${tender_data_title}  ${COMMONWAIT}
@@ -208,6 +223,8 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     ...  ${type} == 'aboveThresholdEU'  Wait Visibility And Click Element  css=a[data-id='choosedPrzAboveThresholdEU']
     ...  ELSE IF  ${type} == 'aboveThresholdUA'  Wait Visibility And Click Element  css=a[data-id='choosedPrzAboveThresholdUA']
     ...  ELSE IF  ${type} == 'negotiation'  Wait Visibility And Click Element  css=a[data-id='choosedPrzNegotiation']
+    ...  ELSE IF  ${type} == 'competitiveDialogueEU'  Wait Visibility And Click Element  css=a[data-id='choosedPrzCompetitiveDialogueEU']
+    ...  ELSE IF  ${type} == 'competitiveDialogueUA'  Wait Visibility And Click Element  css=a[data-id='choosedPrzCompetitiveDialogueUA']
     ...  ELSE  Wait Visibility And Click Element  css=a[data-id='choosedPrzBelowThreshold']
 
     Wait For Ajax
@@ -216,13 +233,14 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     ...  ELSE IF  ${type} == ''  Wait Visibility And Click Element  xpath=//select[@data-id='accelerator-select']/option[contains(., '240')]
     ...  ELSE  Wait Visibility And Click Element  xpath=//select[@data-id='accelerator-select']/option[contains(., '1440')]
 
+
 #step 0
     #we should add choosing of procurementMethodType
     Wait For Ajax
     Wait Element Visibility And Input Text  css=input[data-id='procurementName']  ${tender_data.data.title}
     Wait Element Visibility And Input Text  css=textarea[data-id='procurementDescription']  ${tender_data.data.description}
-    Run Keyword IF  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  css=.procurementName input[data-id='procurementNameEn']  ${tender_data.data.title_en}
-    Run Keyword IF  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  css=textarea[data-id='procurementDescriptionEn']  ${tender_data.data.description_en}
+    Run Keyword IF  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  css=.procurementName input[data-id='procurementNameEn']  ${tender_data.data.title_en}
+    Run Keyword IF  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  css=textarea[data-id='procurementDescriptionEn']  ${tender_data.data.description_en}
 
     #CPV
     Wait Visibility And Click Element  xpath=(//span[@data-id='actChoose'])[1]
@@ -234,7 +252,7 @@ ${tender_data_contracts[0].status}  css=#contractStatus
 
     #date
     Wait For Ajax
-    Run Keyword Unless  ${type} == 'aboveThresholdEU' or ${type} == 'aboveThresholdUA' or ${type} == 'negotiation'  Set Enquiry Period  ${tender_data.data.enquiryPeriod.startDate}  ${tender_data.data.enquiryPeriod.endDate}
+    Run Keyword Unless  ${type} == 'aboveThresholdEU' or ${type} == 'aboveThresholdUA' or ${type} == 'negotiation' or ${type} == 'competitiveDialogueEU' or ${type} == 'competitiveDialogueUA'  Set Enquiry Period  ${tender_data.data.enquiryPeriod.startDate}  ${tender_data.data.enquiryPeriod.endDate}
     Run Keyword If  ${type} == ''  Set Start Tender Period  ${tender_data.data.tenderPeriod.startDate}
     Run Keyword Unless  ${type} == 'negotiation'  Set End Tender Period  ${tender_data.data.tenderPeriod.endDate}
 
@@ -254,7 +272,7 @@ ${tender_data_contracts[0].status}  css=#contractStatus
 
     #contactPoint
     Wait Element Visibility And Input Text  css=input[data-id='name']  ${tender_data.data.procuringEntity.contactPoint.name}
-    Run Keyword IF  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  css=section[data-id='contactPoint'] input[data-id='nameEn']  ${tender_data.data.procuringEntity.contactPoint.name_en}
+    Run Keyword IF  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  css=section[data-id='contactPoint'] input[data-id='nameEn']  ${tender_data.data.procuringEntity.contactPoint.name_en}
 
     ${modified_phone}=  Remove String  ${tender_data.data.procuringEntity.contactPoint.telephone}  ${SPACE}
     ${modified_phone}=  Remove String  ${modified_phone}  -
@@ -265,16 +283,15 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     Wait Element Visibility And Input Text  css=section[data-id='contactPoint'] input[data-id='telephone']  ${modified_phone}
     Wait Element Visibility And Input Text  css=section[data-id='contactPoint'] input[data-id='email']  ${USERS.users['${username}'].email}
     Wait Element Visibility And Input Text  css=section[data-id='contactPoint'] input[data-id='url']  ${tender_data.data.procuringEntity.contactPoint.url}
-    Run Keyword IF  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  css=section[data-id='addContactPoint'] input[data-id='name']  ${tender_data.data.procuringEntity.contactPoint.name}
-    Run Keyword IF  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  css=section[data-id='addContactPoint'] input[data-id='nameEn']  ${tender_data.data.procuringEntity.contactPoint.name_en}
-    Run Keyword IF  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  css=section[data-id='addContactPoint'] input[data-id='telephone']  ${modified_phone}
-    Run Keyword IF  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  css=section[data-id='addContactPoint'] input[data-id='email']  ${USERS.users['${username}'].email}
-    Run Keyword IF  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  css=.procuringEntityName input[data-id='procurementNameEn']  ${tender_data.data.procuringEntity.name_en}
+    Run Keyword IF  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  css=section[data-id='addContactPoint'] input[data-id='name']  ${tender_data.data.procuringEntity.contactPoint.name}
+    Run Keyword IF  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  css=section[data-id='addContactPoint'] input[data-id='nameEn']  ${tender_data.data.procuringEntity.contactPoint.name_en}
+    Run Keyword IF  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  css=section[data-id='addContactPoint'] input[data-id='telephone']  ${modified_phone}
+    Run Keyword IF  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  css=section[data-id='addContactPoint'] input[data-id='email']  ${USERS.users['${username}'].email}
+    Run Keyword IF  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  css=.procuringEntityName input[data-id='procurementNameEn']  ${tender_data.data.procuringEntity.name_en}
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
 
 #step 1
     Додати lots  ${lots}  ${items}  ${type}
-
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
     Run Keyword If  ${type} == 'negotiation'  Wait Until Element Is Visible  css=label[for='documentation_tender_yes']  ${COMMONWAIT}
     ...  ELSE  Wait Until Element Is Visible  css=section[data-id='step3']  ${COMMONWAIT}
@@ -293,13 +310,17 @@ ${tender_data_contracts[0].status}  css=#contractStatus
 #step 5
     Wait Until Element Is Visible  css=section[data-id='step5']  ${COMMONWAIT}
     Sleep  3s
+
+    Run Keyword And Ignore Error  Wait Visibility And Click Element  xpath=//button[@data-id="modal-close"]
+
     Wait Visibility And Click Element  ${locator_tenderCreation.buttonSend}
+
     Close Confirmation In Editor  Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.
     Switch To PMFrame
 
     Run Keyword IF
-    ...  ${type} == 'aboveThresholdEU'  Wait For Element With Reload  css=[data-tender-status='active.tendering']  1
-    ...  ELSE IF  ${type} == 'aboveThresholdUA'  Wait For Element With Reload  css=[data-tender-status='active.tendering']  1
+    ...  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait For Element With Reload  css=[data-tender-status='active.tendering']  1
+    ...  ELSE IF  ${type} == 'aboveThresholdUA' or ${type} == 'competitiveDialogueUA'  Wait For Element With Reload  css=[data-tender-status='active.tendering']  1
     ...  ELSE IF  ${type} == 'negotiation'  Wait For Element With Reload  css=[data-tender-status='active']  1
     ...  ELSE  Wait For Element With Reload  css=[data-tender-status='active.enquiries']  1
     ${tender_id}=  Get Text  ${tender_data_tenderID}
@@ -322,8 +343,8 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     \  Run Keyword Unless  ${type} == 'negotiation'  Ввести мінімальний крок  ${lots}  ${index}  ${lot_index}
     \  Run Keyword Unless  ${type} == 'negotiation'  Wait Visibility And Click Element  xpath=(//label[contains(@for,'guarantee')])[${lot_index}]
     \  Run Keyword Unless  ${type} == 'negotiation'  Wait Element Visibility And Input Text  xpath=(//input[@data-id='guaranteeAmount'])[${lot_index}]  1
-    \  Run Keyword IF  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  xpath=(//input[@data-id='titleEn'])[${lot_index}]  ${lots[${index}].title_en}
-    \  Run Keyword IF  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  xpath=(//textarea[@data-id='descriptionEn'])[${lot_index}]  ${lots[${index}].description}
+    \  Run Keyword IF  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  xpath=(//input[@data-id='titleEn'])[${lot_index}]  ${lots[${index}].title_en}
+    \  Run Keyword IF  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  xpath=(//textarea[@data-id='descriptionEn'])[${lot_index}]  ${lots[${index}].description}
     \  ${count}=  Get Length  ${items}
     \  Run Keyword If  ${count} > 0  Додати items  ${items}  ${lot_index}  ${lots[${index}].id}  ${type}
 
@@ -344,7 +365,7 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     Wait Element Visibility And Input Text  xpath=//div[@data-id='lot'][${lot_index}]//div[@data-id='item'][${item_index}]//input[@data-id='description']  ${items[${index}].description}
     Wait Element Visibility And Input Text  xpath=//div[@data-id='lot'][${lot_index}]//div[@data-id='item'][${item_index}]//input[@data-id='quantity']  ${items[${index}].quantity}
     ${unitName}=  Run Keyword If
-    ...  ${type} == 'aboveThresholdEU'  privatmarket_service.get_unit_name_ru  ${items[${index}].unit.name}
+    ...  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  privatmarket_service.get_unit_name_ru  ${items[${index}].unit.name}
     ...  ELSE  privatmarket_service.get_unit_name  ${items[${index}].unit.name}
     Wait Visibility And Click Element  xpath=//div[@data-id='lot'][${lot_index}]//div[@data-id='item'][${item_index}]//select[@data-id='unit']/option[text()='${unitName}']
 
@@ -369,7 +390,7 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     ${abs_item_index}=  privatmarket_service.get_abs_item_index  ${lot_index}  ${index}  ${items_count}
     Set Date In Item  ${abs_item_index}  deliveryDate  sd  startDate  ${items[${index}].deliveryDate.startDate}
     Set Date In Item  ${abs_item_index}  deliveryDate  ed  endDate  ${items[${index}].deliveryDate.endDate}
-    Run Keyword IF  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  xpath=//div[@data-id='lot'][${lot_index}]//div[@data-id='item'][${item_index}]//input[@data-id='descriptionEn']  ${items[${index}].description_en}
+    Run Keyword IF  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  xpath=//div[@data-id='lot'][${lot_index}]//div[@data-id='item'][${item_index}]//input[@data-id='descriptionEn']  ${items[${index}].description_en}
 
 
 Додати нецінові показники
@@ -379,9 +400,9 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     #add tender feature
     Wait Visibility And Click Element  css=label[for='features_tender_yes']
     Wait Element Visibility And Input Text  css=[data-id='ptrFeatures'] [ng-model='feature.title']  ${features[1].title}
-    Run Keyword If  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  css=[data-id='ptrFeatures'] [ng-model='feature.title_en']  ${features[1].title_en}
+    Run Keyword If  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  css=[data-id='ptrFeatures'] [ng-model='feature.title_en']  ${features[1].title_en}
     Wait Element Visibility And Input Text  css=[data-id='ptrFeatures'] [ng-model='feature.description']  ${features[1].description}
-    Run Keyword If  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  css=[data-id='ptrFeatures'] [ng-model='feature.description_en']  ${features[1].description}
+    Run Keyword If  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  css=[data-id='ptrFeatures'] [ng-model='feature.description_en']  ${features[1].description}
 
     @{tender_enums}=  Get From Dictionary  ${features[1]}  enum
     ${tender_criterion_count}=  Get Length  ${tender_enums}
@@ -393,15 +414,15 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     \  ${elem_index}=  privatmarket_service.sum_of_numbers  ${index}  1
     \  Wait Element Visibility And Input Text  xpath=(//section[@data-id='ptrFeatures']//input[@data-id='value'])[${elem_index}]  ${tender_criterion_value}
     \  Wait Element Visibility And Input Text  xpath=(//section[@data-id='ptrFeatures']//input[@ng-model='criterion.title'])[${elem_index}]  ${tender_enums[${index}].title}
-    \  Run Keyword If  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  xpath=(//section[@data-id='ptrFeatures']//input[@ng-model='criterion.title_en'])[${elem_index}]  ${tender_enums[${index}].title}
+    \  Run Keyword If  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  xpath=(//section[@data-id='ptrFeatures']//input[@ng-model='criterion.title_en'])[${elem_index}]  ${tender_enums[${index}].title}
 
     #add lot feature
     Wait Visibility And Click Element  css=label[for='features_lots_yes']
     Wait Visibility And Click Element  css=[data-id='lot'] button[data-id='actAdd']
     Wait Element Visibility And Input Text  css=[data-id='lot'] [ng-model='feature.title']  ${features[0].title}
-    Run Keyword If  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  css=[data-id='lot'] [ng-model='feature.title_en']  ${features[0].title_en}
+    Run Keyword If  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  css=[data-id='lot'] [ng-model='feature.title_en']  ${features[0].title_en}
     Wait Element Visibility And Input Text  css=[data-id='lot'] [ng-model='feature.description']  ${features[0].description}
-    Run Keyword If  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  css=[data-id='lot'] [ng-model='feature.description_en']  ${features[0].description}
+    Run Keyword If  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  css=[data-id='lot'] [ng-model='feature.description_en']  ${features[0].description}
 
     @{lot_enums}=  Get From Dictionary  ${features[0]}  enum
     ${lot_criterion_count}=  Get Length  ${lot_enums}
@@ -413,15 +434,15 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     \  ${elem_index}=  privatmarket_service.sum_of_numbers  ${index}  1
     \  Wait Element Visibility And Input Text  xpath=(//div[@data-id='lot']//input[@data-id='value'])[${elem_index}]  ${lot_criterion_value}
     \  Wait Element Visibility And Input Text  xpath=(//div[@data-id='lot']//input[@ng-model='criterion.title'])[${elem_index}]  ${lot_enums[${index}].title}
-    \  Run Keyword If  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  xpath=(//div[@data-id='lot']//input[@ng-model='criterion.title_en'])[${elem_index}]  ${lot_enums[${index}].title}
+    \  Run Keyword If  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  xpath=(//div[@data-id='lot']//input[@ng-model='criterion.title_en'])[${elem_index}]  ${lot_enums[${index}].title}
 
     #add item feature
     Wait Visibility And Click Element  css=label[for='features_item_yes']
     Wait Visibility And Click Element  css=[data-id='item'] button[data-id='actAdd']
     Wait Element Visibility And Input Text  css=[data-id='item'] [ng-model='feature.title']  ${features[2].title}
-    Run Keyword If  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  css=[data-id='item'] [ng-model='feature.title_en']  ${features[2].title_en}
+    Run Keyword If  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  css=[data-id='item'] [ng-model='feature.title_en']  ${features[2].title_en}
     Wait Element Visibility And Input Text  css=[data-id='item'] [ng-model='feature.description']  ${features[2].description}
-    Run Keyword If  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  css=[data-id='item'] [ng-model='feature.description_en']  ${features[2].description}
+    Run Keyword If  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  css=[data-id='item'] [ng-model='feature.description_en']  ${features[2].description}
 
 
     @{item_enums}=  Get From Dictionary  ${features[2]}  enum
@@ -434,7 +455,7 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     \  ${elem_index}=  privatmarket_service.sum_of_numbers  ${index}  1
     \  Wait Element Visibility And Input Text  xpath=(//div[@data-id='item']//input[@data-id='value'])[${elem_index}]  ${item_criterion_value}
     \  Wait Element Visibility And Input Text  xpath=(//div[@data-id='item']//input[@ng-model='criterion.title'])[${elem_index}]  ${item_enums[${index}].title}
-    \  Run Keyword If  ${type} == 'aboveThresholdEU'  Wait Element Visibility And Input Text  xpath=(//div[@data-id='item']//input[@ng-model='criterion.title_en'])[${elem_index}]  ${item_enums[${index}].title}
+    \  Run Keyword If  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait Element Visibility And Input Text  xpath=(//div[@data-id='item']//input[@ng-model='criterion.title_en'])[${elem_index}]  ${item_enums[${index}].title}
 
 
 Обрати підставу вибору переговорної процедури
@@ -701,15 +722,45 @@ ${tender_data_contracts[0].status}  css=#contractStatus
 
 Підтвердити кваліфікацію
     [Arguments]  ${user_name}  ${tenderId}  ${bid_index}
-    Run Keyword If  '${bid_index}' == '0'  Wait Visibility And Click Element  xpath=//li[contains(@ng-class, 'lot-parts')]
+    debug
+    Wait Visibility And Click Element  xpath=//li[contains(@ng-class, 'lot-parts')]
+    Run Keyword If  ${bid_index} < 0  privatmarket_service.positivate_numbers  ${bid_index}
     ${index}=  privatmarket_service.sum_of_numbers  ${bid_index}  1
-    Run Keyword If  '${bid_index}' == '0'  Wait Visibility And Click Element  xpath=(//a[@ng-click='act.openQualification(q)'])[${index}]
+    Wait Visibility And Click Element  xpath=(//a[@ng-click='act.openQualification(q)'])[${index}]
     Wait For Ajax
     Wait Visibility And Click Element  css=#chkSelfQualified
     Wait Visibility And Click Element  css=#chkSelfEligible
+    Run Keyword And Ignore Error  Wait Visibility And Click Element  xpath=//select[@data-id='choseType']//option[2]
+    Run Keyword And Ignore Error  Wait Visibility And Click Element  xpath=//select[@data-id='choseLang']//option[2]
+    ${file_path}  ${file_title}  ${file_content}=  create_fake_doc
+    Run Keyword And Ignore Error  Choose File  xpath=//input[@class="ng-hide"]  ${filePath}
     Wait Until Element Is Enabled  xpath=//button[@ng-click="act.setQualificationStatus('active')"]
     Wait Visibility And Click Element  xpath=//button[@ng-click="act.setQualificationStatus('active')"]
     Wait Until Element Is Visible  css=.notify
+    Підписати ЕЦП  ${index}
+
+Підписати ЕЦП
+    [Arguments]  ${bid_index}
+    Reload Page
+    debug
+    Switch To PMFrame
+    Wait For Element With Reload  xpath=//span[@data-id="status" and contains(text(), 'Очікує ЕЦП')]  1
+
+    Wait Visibility And Click Element  xpath=(//a[@ng-click='act.openQualification(q)'])[${index}]
+    Wait For Ajax
+    Wait Visibility And Click Element  xpath=//button[@data-id='addQualFileEcp']
+    Select Window  name=signWin
+    Wait Until Element Is Visible  id=CAsServersSelect
+    Wait Visibility And Click Element  xpath=//select[@id='CAsServersSelect']//option[19]
+    Choose File  id=PKeyFileInput  get_ECP_key
+    Wait Element Visibility And Input Text  id=PKeyPassword  qwerty
+    Wait Visibility And Click Element  id=PKeyReadButton
+    Wait Until Element Is Visible  xpath=//span[@id='PKStatusInfo' and contains(text(), 'Ключ успішно завантажено')]
+    Wait Visibility And Click Element  id=SignDataButton
+    Wait Until Element Is Visible  xpath=//span[@id='PKStatusInfo' and contains(text(), 'ok')]
+    Close Window
+    Select Window
+
 
 
 Затвердити остаточне рішення кваліфікації
@@ -842,7 +893,7 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     Run Keyword And Return If  '${field_name}' == 'tenderPeriod.endDate'  Отримати дату та час  ${field_name}  1
     Run Keyword And Return If  '${field_name}' == 'minimalStep.amount'  Convert Amount To Number  ${field_name}
     Run Keyword And Return If  '${field_name}' == 'status'  Отримати інформацію з ${field_name}  ${field_name}
-    Run Keyword And Return If  '${field_name}' == 'qualificationPeriod.endDate'  Отримати дату та час  ${field_name}  1
+    Run Keyword And Return If  '${field_name}' == 'qualificationPeriod.endDate'  Отримати дату та час  ${field_name}  0
     Run Keyword And Return If  '${field_name}' == 'qualifications[0].status'  Отримати статус пропозиції кваліфікації  1
     Run Keyword And Return If  '${field_name}' == 'qualifications[1].status'  Отримати статус пропозиції кваліфікації  2
     Run Keyword And Return If  '${field_name}' == 'title_en'  Отримати інформацію зі зміною локалізації  ${field_name}  EN
@@ -853,10 +904,13 @@ ${tender_data_contracts[0].status}  css=#contractStatus
     Run Keyword And Return If  '${field_name}' == 'cause'  Отримати інформацію з ${field_name}  ${field_name}
     Run Keyword And Return If  '${field_name}' == 'awards[0].complaintPeriod.endDate'  Отримати інформацію з ${field_name}  1
     Run Keyword And Return If  '${field_name}' == 'procurementMethodType'  Отримати інформацію з ${field_name}  1
-    Run Keyword And Return If  '${field_name}' == 'complaintPeriod.endDate'  Отримати дату та час  ${field_name}  0
+    Run Keyword And Return If  '${field_name}' == 'complaintPeriod.endDate'  Отримати інформацію з ${field_name}  ${field_name}  0
     Run Keyword And Return If  '${field_name}' == 'items[0].deliveryDate.startDate'  Отримати дату та час  ${field_name}  0
     Run Keyword And Return If  '${field_name}' == 'items[0].deliveryDate.endDate'  Отримати дату та час  ${field_name}  0
-    Run Keyword And Return If  '${field_name}' == 'stage2TenderID'  Отримати інформацію з  ${field_name}  ${field_name}
+    Run Keyword And Return If  '${field_name}' == 'stage2TenderID'  Отримати інформацію з ${field_name}
+    Run Keyword And Return If  '${field_name}' == 'features[0].title'  Отримати інформацію з ${field_name}  ${field_name}
+    Run Keyword And Return If  '${field_name}' == 'lots[0].auctionPeriod.endDate'  Отримати дату та час  ${field_name}  0
+    Run Keyword And Return If  '${field_name}' == 'lots[0].auctionPeriod.startDate'  Отримати дату та час  ${field_name}  0
 
     Wait Until Element Is Visible  ${tender_data_${field_name}}
     ${result_full}=  Get Text  ${tender_data_${field_name}}
@@ -1119,7 +1173,7 @@ Try To Search Complaint
 
 
 Отримати посилання на аукціон для глядача
-    [Arguments]  ${user}  ${tenderId}
+    [Arguments]  ${user}  ${tenderId}  ${object_id}=${Empty}
     Wait For Element With Reload  css=button#takepartLink  1
     Wait Visibility And Click Element  css=button#takepartLink
     Wait Until Element Is Visible  xpath=//a[contains(@href, 'https://auction-sandbox.openprocurement.org/tenders/')]  timeout=30
@@ -1169,8 +1223,30 @@ Try To Search Complaint
 
 
 Отримати інформацію з stage2TenderID
+    ${type}=  Отримати текст елемента  xpath=//div[@class='info-item']//div[2]//span[1]
+##    Wait For Element With Reload  xpath=//*[@id="prozorroHash"]/div/a  1
+##    Click Element  xpath=//*[@id="prozorroHash"]/div/a
+##    Switch To PMFrame
+##    ${text}=  Get Text  xpath=//div//h3
+##    ${text_new}=  Strip String  ${text}
+##    @{values_list}=  Split String  ${text_new}
+##    ${result}=  @{values_list}[4]
+##    Reload Page
+##    Go Back
+    [Return]  ${type}
+
+
+Отримати інформацію з features[0].title
     [Arguments]  ${element_name}
-    Wait Visibility And Click Element  ${element_name}
+    Reload Page
+    Switch To PMFrame
+    Wait Until Element Is Visible  xpath=//li[contains(@ng-class, 'lot-parts')]
+    ${class}=  Get Element Attribute  xpath=//li[contains(@ng-class, 'lot-parts')]@class
+    Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=(//li[contains(@ng-class, 'lot.showTab')])[1]
+    Wait Until Element Is Visible  ${tender_data_${element_name}}
+    ${result_full}=  Get Text  ${tender_data_${element_name}}
+    ${result}=  Strip String  ${result_full}
+    [Return]  ${result}
 
 
 Отримати інформацію з awards[0].value.currency
@@ -1391,6 +1467,25 @@ Try To Search Complaint
     [Return]  ${result}
 
 
+Отримати інформацію з complaintPeriod.endDate
+    [Arguments]  ${element_name}  ${shift}
+    Reload Page
+    Switch To PMFrame
+    Reload And Switch To Tab  3
+    ${result_full}=  Отримати текст елемента  ${element_name}
+    ${work_string}=  Replace String  ${result_full}  ${SPACE},${SPACE}  ${SPACE}
+    ${work_string}=  Replace String  ${result_full}  ,${SPACE}  ${SPACE}
+    ${values_list}=  Split String  ${work_string}
+    ${day}=  Convert To String  ${values_list[0 + ${shift}]}
+    ${month}=  privatmarket_service.get_month_number  ${values_list[1 + ${shift}]}
+    ${month}=  Set Variable If  ${month} < 10  0${month}  ${month}
+    ${year}=  Convert To String  ${values_list[2 + ${shift}]}
+    ${time}=  Convert To String  ${values_list[3 + ${shift}]}
+    ${date}=  Convert To String  ${year}-${month}-${day} ${time}
+    ${result}=  privatmarket_service.get_time_with_offset  ${date}
+    [Return]  ${result}
+
+
 Отримати строку
     [Arguments]  ${element_name}  ${position_number}
     ${result_full}=  Отримати текст елемента  ${element_name}
@@ -1416,7 +1511,9 @@ Try To Search Complaint
 
 Отримати дату та час
     [Arguments]  ${element_name}  ${shift}
-    Wait For Element With Reload  ${tender_data_${element_name}}  1
+    ${element_present}=  Run Keyword And Return Status  Element Should Be Visible  ${element_name}
+    Run Keyword unless  ${element_present}  Wait For Element With Reload  ${tender_data_${element_name}}  1
+
     ${result_full}=  Отримати текст елемента  ${element_name}
     ${work_string}=  Replace String  ${result_full}  ${SPACE},${SPACE}  ${SPACE}
     ${work_string}=  Replace String  ${result_full}  ,${SPACE}  ${SPACE}
@@ -1598,6 +1695,7 @@ Try Search Element
     ...  ELSE IF  '${tab_number}' == '1' and 'статусу підписаної угоди з постачальником' in '${TEST_NAME}'  Відкрити детальну інформацію про контракт
     ...  ELSE IF  '${tab_number}' == '1' and '${TEST_NAME}' == 'Можливість укласти угоду для закупівлі'  Відкрити детальну інформацію про контракт
     ...  ELSE IF  '${tab_number}' == '1' and '${TEST_NAME}' == 'Можливість укласти угоду для переговорної процедури'  Відкрити детальну інформацію про контракт
+    ...  ELSE IF  '${tab_number}' == '1' and 'пропозицію кваліфікації' in '${TEST_NAME}'  Wait Visibility And Click Element  xpath=//li[contains(@ng-class, 'lot-parts')]
     ...  ELSE IF  '${tab_number}' == '1'  Відкрити детальну інформацію по позиціям
     ...  ELSE IF  '${tab_number}' == '2' and 'відповіді на запитання' in '${TEST_NAME}'  Wait Visibility And Click Element  css=.question-answer .question-expand-div>a:nth-of-type(1)
     ...  ELSE IF  '${tab_number}' == '3' and 'заголовку документації' in '${TEST_NAME}'  Відкрити інформацію про вкладені файли вимоги
@@ -1771,3 +1869,159 @@ Get Item Number
     [Arguments]  ${username}
     ${title_value}=  Get Value  css=input[data-id='procurementName']
     Should be equal as strings  ${title_value}  ${USERS.users['${user_name}'].initial_data.data.title}
+
+
+Створити вимогу про виправлення умов закупівлі
+    [Arguments]  ${username}  ${tender_uaid}  ${claim}  ${document}=${None}
+    Wait Visibility And Click Element  xpath=//a[@tooltip='Подати вимогу на даний лот']
+    Wait Element Visibility And Input Text  css=#titleComplaint  ${claim.data.title}
+    Wait Element Visibility And Input Text  css=#descriptionComplaint  ${claim.data.description}
+    Run Keyword And Ignore Error  Choose File  css=input[id='fileToUpload']  ${document}
+    Run Keyword And Ignore Error  Wait Visibility And Click Element  xpath=//select[@id='addressCountry']//option[@value='UA']
+    Wait Element Visibility And Input Text  css=#addressPostalCode  ${claim.data.author.address.postalCode}
+    Wait Element Visibility And Input Text  css=#addressRegion  ${claim.data.author.address.countryName}
+    Wait Element Visibility And Input Text  css=#addressLocality  ${claim.data.author.address.locality}
+    Wait Element Visibility And Input Text  css=#addressStreet  ${claim.data.author.address.streetAddress}
+    @{contactPoint} =  Split String  ${claim.data.author.contactPoint.name}
+    Wait Element Visibility And Input Text  css=#personSurname  @{contactPoint}[0]
+    Wait Element Visibility And Input Text  css=#personName  @{contactPoint}[1]
+    Wait Element Visibility And Input Text  css=#personPatronymic  @{contactPoint}[2]
+    Wait Element Visibility And Input Text  css=#personPhone  ${claim.data.author.contactPoint.telephone}
+    Wait Element Visibility And Input Text  css=#personFax  ${claim.data.author.contactPoint.faxNumber}
+    Wait Element Visibility And Input Text  css=#personEmail  ${claim.data.author.contactPoint.email}
+    Wait Visibility And Click Element  xpath=//button[@data-id="btn-send-complaint"]
+    Sleep  5s
+    Wait Visibility And Click Element  xpath=//button[@data-id="btn-close"]
+
+
+
+Задати запитання на лот
+	[Arguments]  ${username}  ${tender_uaid}  ${lot_id}  ${question}
+	Wait Until Element Is Visible  xpath=//li[contains(@ng-class, 'lot-parts')]
+    ${class}=  Get Element Attribute  xpath=//li[contains(@ng-class, 'lot-parts')]@class
+	Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=//li[contains(@ng-class, 'lot-faq')]
+	Wait Visibility And Click Element  xpath=//button[@class='btn btn-primary ng-scope ng-binding']
+	Wait Element Visibility And Input Text  css=#questionTitle  ${question.data.title}
+    Wait Element Visibility And Input Text  css=#questionDescription  ${question.data.description}
+    Run Keyword And Ignore Error  Wait Visibility And Click Element  xpath=//select[@id='addressCountry']//option[@value='UA']
+    Wait Element Visibility And Input Text  css=#addressPostalCode  ${question.data.author.address.postalCode}
+    Wait Element Visibility And Input Text  css=#addressRegion  ${question.data.author.address.countryName}
+    Wait Element Visibility And Input Text  css=#addressLocality  ${question.data.author.address.locality}
+    Wait Element Visibility And Input Text  css=#addressStreet  ${question.data.author.address.streetAddress}
+    @{contactPoint} =  Split String  ${question.data.author.contactPoint.name}
+    Wait Element Visibility And Input Text  css=#personSurname  @{contactPoint}[0]
+    Wait Element Visibility And Input Text  css=#personName  @{contactPoint}[1]
+    Wait Element Visibility And Input Text  css=#personPatronymic  @{contactPoint}[2]
+    Wait Element Visibility And Input Text  css=#personPhone  ${question.data.author.contactPoint.telephone}
+    Wait Element Visibility And Input Text  css=#personFax  ${question.data.author.contactPoint.faxNumber}
+    Wait Element Visibility And Input Text  css=#personEmail  ${question.data.author.contactPoint.email}
+    Wait Visibility And Click Element  xpath=//button[@data-id="btn-send-question"]
+    Sleep  5s
+    Wait Visibility And Click Element  xpath=//button[@data-id="btn-close"]
+    Sleep  60s
+
+
+Подати цінову пропозицію
+    [Arguments]  ${username}  ${tender_uaid}  ${bid}  ${lots_ids}=${None}  ${features_ids}=${None}
+    Switch To PMFrame
+    Wait Visibility And Click Element  xpath=//button[@data-id="createBidBtn"]
+    Switch To PMFrame
+    ${value_amount}=  privatmarket_service.convert_float_to_string  ${bid.data.lotValues[0].value.amount}
+    Wait Element Visibility And Input Text  xpath=//div[@ng-if="!model.nocost"]//div[2]//input  ${value_amount}
+    Wait Visibility And Click Element  xpath=//button[@class='btn afp-nav-btn ng-scope ng-binding']
+    Run Keyword And Ignore Error  Wait Visibility And Click Element  id=btnSaveComplaint
+    Wait Visibility And Click Element  xpath=//button[@class='btn afp-nav-btn ng-scope ng-binding']
+    Run Keyword And Ignore Error  Wait Visibility And Click Element  id=btnSaveComplaint
+    Wait Visibility And Click Element  xpath=//button[@class='btn afp-nav-btn ng-scope ng-binding']
+    Wait Visibility And Click Element  id=chkSelfQualified
+    Wait Visibility And Click Element  id=chkSelfEligible
+    Wait Visibility And Click Element  xpath=//button[@class='btn afp-nav-btn ng-scope ng-binding']
+    Run Keyword And Ignore Error  Wait Visibility And Click Element  id=btnClose
+    Sleep  60s
+
+
+Отримати інформацію із пропозиції
+    [Arguments]  ${username}  ${tender_uaid}  ${field}
+    Switch To PMFrame
+    Wait Until Element Is Visible  xpath=//li[contains(@ng-class, 'lot-parts')]
+    ${class}=  Get Element Attribute  xpath=//li[contains(@ng-class, 'lot-parts')]@class
+	Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=//li[contains(@ng-class, 'lot-parts')]
+
+    Run Keyword And Return If  '${field}' == 'lotValues[0].value.amount'  Отримати інформацію з пропозиції ${field}
+    Run Keyword And Return If  '${field}' == 'value.amount'  Отримати інформацію з пропозиції ${field}
+    Run Keyword And Return If  '${field}' == 'status'  Отримати інформацію з пропозиції ${field}
+    [Return]  ${result}
+
+
+Отримати інформацію з пропозиції lotValues[0].value.amount
+    ${value}=  Отримати текст елемента  xpath=//tr[contains(@ng-repeat, 'currBids[lot.id] ')]//td[2]
+    ${text_new}=  Strip String  ${value}
+    ${text_new}=  Replace String  ${text_new}  ${SPACE}  ${EMPTY}
+    ${result}=  convert to number  ${text_new}
+    [Return]  ${result}
+
+
+Отримати інформацію з пропозиції value.amount
+    ${value}=  Отримати текст елемента  xpath=//tr[contains(@ng-repeat, 'currBids[lot.id] ')]//td[3]
+    ${text_new}=  Strip String  ${value}
+    ${text_new}=  Replace String  ${text_new}  ${SPACE}  ${EMPTY}
+    ${result}=  convert to number  ${text_new}
+    [Return]  ${result}
+
+
+Отримати інформацію з пропозиції status
+    ${value}=  Отримати текст елемента  xpath=//tr[contains(@ng-repeat, 'currBids[lot.id] ')]//td[4]
+    [Return]  ${result}
+
+
+Завантажити документ в ставку
+    [Arguments]  ${username}  ${filePath}  ${tenderId}  ${doc_type}=documents
+    Switch To PMFrame
+    Wait Visibility And Click Element  xpath=//button[@data-id="editBidBtn"]
+    Switch To PMFrame
+    Wait Visibility And Click Element  xpath=//select[@data-id='choseType']//option[2]
+    Wait Visibility And Click Element  xpath=//select[@data-id='choseLang']//option[2]
+    Choose File  xpath=//input[@id='inputFile0']  ${filePath}
+    Sleep  5s
+    Wait Visibility And Click Element  xpath=//button[@class='btn afp-nav-btn ng-scope ng-binding']
+    Run Keyword And Ignore Error  Wait Visibility And Click Element  id=btnSaveComplaint
+    Wait Visibility And Click Element  xpath=//button[@class='btn afp-nav-btn ng-scope ng-binding']
+    Run Keyword And Ignore Error  Wait Visibility And Click Element  id=btnSaveComplaint
+    Wait Visibility And Click Element  xpath=//button[@class='btn afp-nav-btn ng-scope ng-binding']
+    Wait Visibility And Click Element  xpath=//button[@class='btn afp-nav-btn ng-scope ng-binding']
+    Run Keyword And Ignore Error  Wait Visibility And Click Element  id=btnClose
+    Sleep  15s
+
+Змінити цінову пропозицію
+    [Arguments]  ${username}  ${tender_uaid}  ${field}  ${value}
+    Switch To PMFrame
+    Wait Visibility And Click Element  xpath=//button[@data-id="editBidBtn"]
+    Switch To PMFrame
+    Wait Visibility And Click Element  xpath=//button[@class='btn afp-nav-btn ng-scope ng-binding']
+    Run Keyword And Ignore Error  Wait Visibility And Click Element  id=btnSaveComplaint
+    Switch To PMFrame
+    Wait Visibility And Click Element  xpath=//button[@class='btn afp-nav-btn ng-scope ng-binding']
+    Run Keyword And Ignore Error  Wait Visibility And Click Element  id=btnSaveComplaint
+    Switch To PMFrame
+    Wait Element Visibility And Input Text  xpath=//div[@ng-if="!model.nocost"]//div[2]  ${value}
+    Wait Visibility And Click Element  xpath=//button[@class='btn afp-nav-btn ng-scope ng-binding']
+    Wait Visibility And Click Element  xpath=//button[@class='btn afp-nav-btn ng-scope ng-binding']
+    Run Keyword And Ignore Error  Wait Visibility And Click Element  id=btnClose
+    Sleep  15s
+
+Задати запитання на тендер
+    [Arguments]  ${username}  ${tender_uaid}  ${question}
+    privatmarket.Задати запитання на лот  ${username}  ${tender_uaid}  ${lot_id}=${None}  ${question}
+
+Задати запитання на предмет
+	[Arguments]  ${username}  ${tender_uaid}  ${item_id}  ${question}
+    privatmarket.Задати запитання на лот  ${username}  ${tender_uaid}  ${lot_id}=${item_id}  ${question}
+
+
+Перевести тендер на статус очікування обробки мостом
+    [Arguments]  ${username}  ${tender_uaid}
+#    debug
+
+активувати другий етап
+    [Arguments]  ${username}  ${tender_uaid}
+#    debug
