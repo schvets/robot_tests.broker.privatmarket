@@ -29,6 +29,7 @@ ${tender_data.tenderPeriod.endDate}  css=span[tid='period.to']
 ${tender_data.auctionPeriod.startDate}  css=div[tid='data.auctionPeriod'] span[tid='period.from']
 ${tender_data.auctionPeriod.endDate}  css=div[tid='data.auctionPeriod'] span[tid='period.to']
 ${tender_data.eligibilityCriteria}  css=div[tid='data.eligibilityCriteria']
+${tender_data.guarantee.amount}  css=span[tid='data.guarantee.amount']
 
 ${tender_data.items.deliveryDate.endDate}  span[@tid='item.deliveryDate.endDate']
 ${tender_data.items.deliveryLocation.latitude}  span[@tid='item.deliveryLocation.latitude']
@@ -330,6 +331,7 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
   Run Keyword And Return If  '${element}' == 'procurementMethodType'  Отримати тип оголошеного лоту  ${element}
   Run Keyword And Return If  '${element}' == 'tenderAttempts'  Отримати значення поля Лоти виставляються  ${element}
   Run Keyword And Return If  '${element}' == 'cancellations[0].status'  Перевірити cancellations[0].status
+  Run Keyword And Return If  '${element}' == 'guarantee.amount'  Отримати число  ${element}
 
   Run Keyword And Return If  '${element}' == 'awards[0].status'  Отримати awards status  ${element}
   Run Keyword And Return If  '${element}' == 'awards[1].status'  Отримати awards status  ${element}
