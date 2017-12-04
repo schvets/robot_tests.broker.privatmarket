@@ -4,6 +4,7 @@ Library  Selenium2Library
 Library  privatmarket_service.py
 Library  Collections
 Library  BuiltIn
+Library  op_robot_tests.tests_files.service_keywords
 
 *** Variables ***
 ${COMMONWAIT}  60
@@ -45,6 +46,11 @@ ${tender_data.items.unit.code}  span[@tid='item.unit.code']
 ${tender_data.items.quantity}  span[@tid='item.quantity']
 ${tender_data.items.description}  div[@tid='item.description']
 ${tender_data.items[0].unit.code}  span[@tid='item.unit.code']
+${tender_data.items.additionalClassifications[0].scheme}  span[@tid='item.additionalClassifications.scheme']
+${tender_data.items.additionalClassifications[0].id}  span[@tid='item.additionalClassifications.id']
+${tender_data.items.additionalClassifications[0].description}  span[@tid='item.additionalClassifications.description']
+${tender_data.items.contractPeriod.startDate}  span[@tid='item.contractPeriod.startDate']
+${tender_data.items.contractPeriod.endDate}  span[@tid='item.contractPeriod.endDate']
 
 ${tender_data.questions.title}  span[@tid='data.question.title']
 ${tender_data.questions.description}  span[@tid='data.question.description']
@@ -336,8 +342,8 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 
 
 Отримати інформацію із предмету
-  [Arguments]  ${username}  ${tender_uaid}  ${item_id}  ${element}
-  ${element}=  Convert To String  items.${element}
+  [Arguments]  ${username}  ${tender_uaid}  ${item_id}  ${base_element}
+  ${element}=  Convert To String  items.${base_element}
   ${element_for_work}=  Set variable  xpath=//div[@ng-repeat='item in data.items' and contains(., '${item_id}')]//${tender_data.${element}}
   Wait For Element With Reload  ${element_for_work}
 
@@ -346,6 +352,9 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
   Run Keyword And Return If  '${element}' == 'items.deliveryLocation.longitude'  Отримати число  ${element_for_work}
   Run Keyword And Return If  '${element}' == 'items.quantity'  Отримати число  ${element_for_work}
   Run Keyword And Return If  '${element}' == 'items.unit.code'  Отримати unit.code  ${element_for_work}
+#  Run Keyword And Return If  'items.contractPeriod' in '${element}'  Отримати дату в ISO форматі  ${element_for_work}  %d-%m-%Y
+  Run Keyword And Return If  'items.contractPeriod' in '${element}'  Отримати дату контракту  ${base_element}  ${item_id}  ${element_for_work}
+
 
   Wait Until Element Is Visible  ${element_for_work}  timeout=${COMMONWAIT}
   ${result}=  Отримати текст елемента  ${element_for_work}
@@ -483,6 +492,24 @@ Wait for question
   ${year}=  get_current_year
   ${result_full}=  Set Variable  ${day}-${month}-${year} ${result_full[2]}
   ${result}=  get_time_with_offset  ${result_full}
+  [Return]  ${result}
+
+
+Отримати дату в ISO форматі
+  [Arguments]  ${element_name}  ${format}
+  ${date}=  Отримати текст елемента  ${element_name}
+  ${result}=  change_date_to_ISO_format  ${date}  ${format}
+  [Return]  ${result}
+
+
+Отримати дату контракту
+  [Arguments]  ${element}  ${item_id}  ${element_name}
+  ${date}=  Отримати текст елемента  ${element_name}
+  ${verifiable_date}=  change_date_format  ${date}  %d-%m-%Y  %Y-%m-%d
+  ${item_index}=  get_object_index_by_id  ${USERS.users['${tender_owner}'].initial_data.data['items']}  ${item_id}
+  ${full_date}=  Set Variable  ${USERS.users['${tender_owner}'].initial_data.data['items'][${item_index}].${element}}
+  ${etalon_date}=  Get Substring  ${full_date}  0  10
+  ${result}=  Set Variable If  '${etalon_date}' == '${verifiable_date}'  ${full_date}  ${verifiable_date}
   [Return]  ${result}
 
 

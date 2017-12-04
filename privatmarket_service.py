@@ -19,6 +19,16 @@ def get_time_with_offset(date):
     localized_date = time_zone.localize(date_obj)
     return localized_date.strftime('%Y-%m-%d %H:%M:%S.%f%z')
 
+def change_date_to_ISO_format(date, start_format):
+    date_obj = datetime.strptime(date, start_format)
+    time_zone = timezone('Europe/Kiev')
+    localized_date = time_zone.localize(date_obj)
+    return localized_date.strftime('%Y-%m-%d %H:%M:%S.%f%z')
+
+
+def change_date_format(date, start_format, end_format):
+    return datetime.strptime(date, start_format).strftime(end_format)
+
 
 def get_file_content(path_to_save_file):
     f = open(path_to_save_file, 'r')
