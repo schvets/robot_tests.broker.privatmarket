@@ -17,6 +17,7 @@ ${tender_data.value.valueAddedTaxIncluded}  css=span[tid='data.value.valueAddedT
 ${tender_data.minimalStep.amount}  css=span[tid='data.minimalStep.amount']
 ${tender_data.minimalStep.currency}  css=span[tid='data.minimalStep.currency']
 ${tender_data.minimalStep.valueAddedTaxIncluded}  css=span[tid='data.minimalStep.valueAddedTaxIncluded']
+${tender_data.minNumberOfQualifiedBids}  css=div[tid='data.minNumberOfQualifiedBids']
 
 ${tender_data.auctionID}  css=div[tid='data.auctionID']
 ${tender_data.dgfID}  css=div[tid='data.dgfID']
@@ -125,9 +126,6 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
   ${items_number}=  Get Length  ${items}
   Wait Enable And Click Element  css=#simple-dropdown
   Wait Enable And Click Element  css=a[href='#/add-lot']
-  ${substring timezone} =	Get Substring  ${tender_data.data.auctionPeriod.startDate}  0  -6
-  ${correctDate}=  Convert Date  ${substring timezone}  result_format=%d/%m/%Y
-  ${correctDate}=  Convert To String  ${correctDate}
 
   #main info
   Execute Javascript  angular.prozorroaccelerator=1440;
@@ -141,7 +139,10 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
   ...  '${items[0].additionalClassifications[0].id}' == 'PA02-0'  string:${tender_data.data.procurementMethodType}_rent  string:${tender_data.data.procurementMethodType}
 
   Select From List  css=select[tid='data.procurementMethodType']  ${method_type}
-  Run Keyword And Ignore Error  Input Text  css=input[tid='dgfDecisionDate']  ${correctDate}
+  ${index}=  Convert To String  ${tender_data.data.minNumberOfQualifiedBids}
+  Select From List By Value  css=select[tid='data.minNumberOfQualifiedBids']  ${index}
+  ${auctionPeriod_startDate}=  Отримати дату у форматі Д/М/Г  ${tender_data.data.auctionPeriod.startDate}
+  Run Keyword And Ignore Error  Input Text  css=input[tid='dgfDecisionDate']  ${auctionPeriod_startDate}
   Run Keyword And Ignore Error  Input text  css=input[tid='data.dgfDecisionID']  ${tender_data.data.dgfID}
   Select From List  css=select[tid='data.tenderAttempts']  number:${tender_data.data.tenderAttempts}
   Input text  css=textarea[tid='data.description']  ${tender_data.data.description}
@@ -182,6 +183,14 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
   Go To  ${USERS.users['${username}'].homepage}
   Wait For Ajax
   [Return]  ${tender_id}
+
+
+Отримати дату у форматі Д/М/Г
+  [Arguments]  ${element_name}
+  ${substring timezone} =	Get Substring  ${element_name}  0  -6
+  ${correctDate}=  Convert Date  ${substring timezone}  result_format=%d/%m/%Y
+  ${correctDate}=  Convert To String  ${correctDate}
+  [Return]  ${correctDate}
 
 
 Внести зміни в тендер
@@ -317,39 +326,17 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
   Input text  xpath=(//input[@tid='item.address.streetAddress'])[last()]  ${item.deliveryAddress.streetAddress}
   Input text  xpath=(//input[@tid='item.address.locality'])[last()]  ${item.deliveryAddress.locality}
 
-  Run Keyword If  '_rent' in '${method_type}'  Задати термін дії договору оренди
+  Run Keyword If  '_rent' in '${method_type}'  Задати термін дії договору оренди  ${item}
 
 
 Задати термін дії договору оренди
   [Arguments]  ${item}
   Select Checkbox  xpath=(//input[@tid='item.contractPeriod.checkbox'])[last()]
-  ${start_date}
-  Input text  xpath=(//input[@tid='contractStartDate'])[last()]  ${item.contractPeriod.startDate}
-  Input text  xpath=(//input[@tid='contractEndDate'])[last()]  ${item.contractPeriod.endDate}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  Sleep  2s
+  ${start_date}=  Отримати дату у форматі Д/М/Г  ${item.contractPeriod.startDate}
+  ${end_date}=  Отримати дату у форматі Д/М/Г  ${item.contractPeriod.endDate}
+  Input text  xpath=(//input[@tid='contractStartDate'])[last()]  ${start_date}
+  Input text  xpath=(//input[@tid='contractEndDate'])[last()]  ${end_date}
 
 
 Пошук тендера по ідентифікатору
@@ -371,6 +358,7 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
   Run Keyword And Return If  '${element}' == 'tenderAttempts'  Отримати значення поля Лоти виставляються  ${element}
   Run Keyword And Return If  '${element}' == 'cancellations[0].status'  Перевірити cancellations[0].status
   Run Keyword And Return If  '${element}' == 'guarantee.amount'  Отримати число  ${element}
+  Run Keyword And Return If  '${element}' == 'minNumberOfQualifiedBids'  Отримати число  ${element}
 
   Run Keyword And Return If  '${element}' == 'awards[0].status'  Отримати awards status  ${element}
   Run Keyword And Return If  '${element}' == 'awards[1].status'  Отримати awards status  ${element}
