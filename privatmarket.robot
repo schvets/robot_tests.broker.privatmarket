@@ -354,9 +354,7 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
   Run Keyword And Return If  '${element}' == 'items.deliveryLocation.longitude'  Отримати число  ${element_for_work}
   Run Keyword And Return If  '${element}' == 'items.quantity'  Отримати число  ${element_for_work}
   Run Keyword And Return If  '${element}' == 'items.unit.code'  Отримати unit.code  ${element_for_work}
-#  Run Keyword And Return If  'items.contractPeriod' in '${element}'  Отримати дату в ISO форматі  ${element_for_work}  %d-%m-%Y
-  Run Keyword And Return If  'items.contractPeriod' in '${element}'  Отримати дату контракту  ${base_element}  ${item_id}  ${element_for_work}
-
+  Run Keyword And Return If  'items.contractPeriod' in '${element}'  Отримати дату в ISO форматі  ${element_for_work}  %d-%m-%Y
 
   Wait Until Element Is Visible  ${element_for_work}  timeout=${COMMONWAIT}
   ${result}=  Отримати текст елемента  ${element_for_work}
@@ -501,17 +499,6 @@ Wait for question
   [Arguments]  ${element_name}  ${format}
   ${date}=  Отримати текст елемента  ${element_name}
   ${result}=  change_date_to_ISO_format  ${date}  ${format}
-  [Return]  ${result}
-
-
-Отримати дату контракту
-  [Arguments]  ${element}  ${item_id}  ${element_name}
-  ${date}=  Отримати текст елемента  ${element_name}
-  ${verifiable_date}=  change_date_format  ${date}  %d-%m-%Y  %Y-%m-%d
-  ${item_index}=  get_object_index_by_id  ${USERS.users['${tender_owner}'].initial_data.data['items']}  ${item_id}
-  ${full_date}=  Set Variable  ${USERS.users['${tender_owner}'].initial_data.data['items'][${item_index}].${element}}
-  ${etalon_date}=  Get Substring  ${full_date}  0  10
-  ${result}=  Set Variable If  '${etalon_date}' == '${verifiable_date}'  ${full_date}  ${verifiable_date}
   [Return]  ${result}
 
 
