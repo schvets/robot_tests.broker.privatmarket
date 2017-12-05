@@ -4,7 +4,6 @@ Library  Selenium2Library
 Library  privatmarket_service.py
 Library  Collections
 Library  BuiltIn
-Library  op_robot_tests.tests_files.service_keywords
 
 *** Variables ***
 ${COMMONWAIT}  60
