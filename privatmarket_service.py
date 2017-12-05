@@ -36,7 +36,7 @@ def get_file_content(path_to_save_file):
     return file_data
 
 def modify_test_data(initial_data):
-    initial_data['procuringEntity']['name'] = u"ВОЛОДИМИР БІЛЯВЦЕВ"
+    initial_data['procuringEntity']['name'] = u"Тестовый Тестовый"
     return initial_data
 
 def sum_of_numbers(number, value):
