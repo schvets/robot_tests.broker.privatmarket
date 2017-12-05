@@ -998,9 +998,28 @@ Check If Question Is Uploaded
   Click Element  css=button[tid='defaultOk']
 
 
+#Завантажити протокол аукціону в авард
+#  [Arguments]  ${username}  ${tender_id}  ${file_path}  ${bid_index}
+#  #privatmarket.Пошук тендера по ідентифікатору  ${username}  ${tender_id}
+#  debug
+#  Wait Until Element Is Visible  xpath=//*[@tid='btn.award.disqualify']  ${COMMONWAIT}
+#  Click Element  css=button[tid='btn.award.disqualify']
+#  Wait Until Element Is Visible  xpath=//*[@tid='btn.award.addDocForCancel']  ${COMMONWAIT}
+#  Click Element  css=button[tid='btn.award.addDocForCancel']
+#  Execute Javascript  document.querySelector("input[id='rejectQualificationInput0']").className = ''
+#  Sleep  2s
+#  Choose File  css=input[id='rejectQualificationInput0']  ${file_path}
+#  Wait For Ajax
+#  Wait Until Element Is Visible  css=button[tid='btn.award.unsuccessful']  ${COMMONWAIT}
+#  Click Element  css=button[tid='btn.award.unsuccessful']
+#  Wait For Ajax
+#  Wait Until Element Is Visible  xpath=//*[@tid='award.document.title']  ${COMMONWAIT}
+
+
 Підтвердити наявність протоколу аукціону
   [Arguments]  ${user_name}  ${tender_id}  ${award_index}
   Wait For Ajax
+#  debug
   Wait Until Element Contains  ${tender_data.awards[${award_index}].status}  Очікується підписання договору
 
 
