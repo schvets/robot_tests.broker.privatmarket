@@ -302,6 +302,14 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
   Input text  css=input[tid='data.dgfID']  ${value}
 
 
+Змінити guarantee.amount
+  [Arguments]  ${value}
+  debug
+  Wait Until Element Is Visible  css=input[tid='data.dgfID']
+  Wait For Ajax
+  Input text  css=input[tid='data.dgfID']  ${value}
+
+
 Додати новий предмет закупівлі
   [Arguments]  ${item}  ${method_type}  ${should_we_click_btn.additem}=${False}
   Run Keyword If  ${should_we_click_btn.additem}  Wait Visibulity And Click Element  css=button[tid='btn.additem']
