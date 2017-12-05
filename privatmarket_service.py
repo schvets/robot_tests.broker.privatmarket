@@ -25,6 +25,7 @@ def change_date_to_ISO_format(date, start_format):
     localized_date = time_zone.localize(date_obj)
     return localized_date.isoformat()
 
+
 def change_date_format(date, start_format, end_format):
     return datetime.strptime(date, start_format).strftime(end_format)
 

@@ -135,7 +135,12 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
   Wait Until Element Is Enabled  css=input[tid='data.title']
   Input text  css=input[tid='data.title']  ${tender_data.data.title}
   Input text  css=input[tid='data.dgfID']  ${tender_data.data.dgfID}
-  Select From List  css=select[tid='data.procurementMethodType']  string:${tender_data.data.procurementMethodType}
+
+  ${method_type}=  Set Variable If
+  ...  '${items[0].additionalClassifications[0].id}' == 'PA01-7'  string:${tender_data.data.procurementMethodType}_rent
+  ...  '${items[0].additionalClassifications[0].id}' == 'PA02-0'  string:${tender_data.data.procurementMethodType}_rent  string:${tender_data.data.procurementMethodType}
+
+  Select From List  css=select[tid='data.procurementMethodType']  ${method_type}
   Run Keyword And Ignore Error  Input Text  css=input[tid='dgfDecisionDate']  ${correctDate}
   Run Keyword And Ignore Error  Input text  css=input[tid='data.dgfDecisionID']  ${tender_data.data.dgfID}
   Select From List  css=select[tid='data.tenderAttempts']  number:${tender_data.data.tenderAttempts}
@@ -160,7 +165,7 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
   #items
   :FOR  ${index}  IN RANGE  ${items_number}
   \  ${should_we_click_btn.additem}=  Set Variable If  '0' != '${index}'  ${True}  ${False}
-  \  Додати новий предмет закупівлі  ${items[${index}]}  ${should_we_click_btn.additem}
+  \  Додати новий предмет закупівлі  ${items[${index}]}  ${method_type}  ${should_we_click_btn.additem}
 
   Click Button  ${tenderBtn.create_edit}
   Wait For Ajax
@@ -289,7 +294,7 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 
 
 Додати новий предмет закупівлі
-  [Arguments]  ${item}  ${should_we_click_btn.additem}=${False}
+  [Arguments]  ${item}  ${method_type}  ${should_we_click_btn.additem}=${False}
   Run Keyword If  ${should_we_click_btn.additem}  Wait Visibulity And Click Element  css=button[tid='btn.additem']
   Wait Until Element Is Enabled  xpath=(//textarea[@tid='item.description'])[last()]
   Input text  xpath=(//textarea[@tid='item.description'])[last()]  ${item.description}
@@ -311,6 +316,40 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
   Input text  xpath=(//input[@tid='item.address.region'])[last()]  ${item.deliveryAddress.region}
   Input text  xpath=(//input[@tid='item.address.streetAddress'])[last()]  ${item.deliveryAddress.streetAddress}
   Input text  xpath=(//input[@tid='item.address.locality'])[last()]  ${item.deliveryAddress.locality}
+
+  Run Keyword If  '_rent' in '${method_type}'  Задати термін дії договору оренди
+
+
+Задати термін дії договору оренди
+  [Arguments]  ${item}
+  Select Checkbox  xpath=(//input[@tid='item.contractPeriod.checkbox'])[last()]
+  ${start_date}
+  Input text  xpath=(//input[@tid='contractStartDate'])[last()]  ${item.contractPeriod.startDate}
+  Input text  xpath=(//input[@tid='contractEndDate'])[last()]  ${item.contractPeriod.endDate}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 Пошук тендера по ідентифікатору
