@@ -125,7 +125,8 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
   ${items_number}=  Get Length  ${items}
   Wait Enable And Click Element  css=#simple-dropdown
   Wait Enable And Click Element  css=a[href='#/add-lot']
-  ${correctDate}=  Convert Date  ${tender_data.data.dgfDecisionDate}  result_format=%d/%m/%Y
+  ${substring timezone} =	Get Substring  ${tender_data.data.auctionPeriod.startDate}  0  -6
+  ${correctDate}=  Convert Date  ${substring timezone}  result_format=%d/%m/%Y
   ${correctDate}=  Convert To String  ${correctDate}
 
   #main info
@@ -135,9 +136,8 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
   Input text  css=input[tid='data.title']  ${tender_data.data.title}
   Input text  css=input[tid='data.dgfID']  ${tender_data.data.dgfID}
   Select From List  css=select[tid='data.procurementMethodType']  string:${tender_data.data.procurementMethodType}
-  Input Text  css=input[tid='dgfDecisionDate']  ${correctDate}
-  Input text  css=input[tid='data.dgfDecisionID']  ${tender_data.data.dgfDecisionID}
-
+  Run Keyword And Ignore Error  Input Text  css=input[tid='dgfDecisionDate']  ${correctDate}
+  Run Keyword And Ignore Error  Input text  css=input[tid='data.dgfDecisionID']  ${tender_data.data.dgfID}
   Select From List  css=select[tid='data.tenderAttempts']  number:${tender_data.data.tenderAttempts}
   Input text  css=textarea[tid='data.description']  ${tender_data.data.description}
   ${amount_to_enter}=  Convert To String  ${tender_data.data.value.amount}
@@ -299,7 +299,8 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
   Wait Enable And Click Element  xpath=//span[@class='ui-select-choices-row-inner' and contains(., '${item.classification.id}')]
 
   #quantity
-  Input text  xpath=(//input[@tid='item.quantity'])[last()]  ${item.quantity}
+  ${correctQuantity}=  Convert To String  ${item.quantity}
+  Input text  xpath=(//input[@tid='item.quantity'])[last()]  ${correctQuantity}
   Select From List  xpath=(//select[@tid='item.unit.name'])[last()]  ${item.unit.name}
 
   #address
@@ -1051,8 +1052,8 @@ Login
   Sleep  7s
   Wait Enable And Click Element  css=a[ui-sref='modal.login']
 
-  Run Keyword If  'Owner' in '${username}'  Login with P24  ${username}
   Run Keyword If  'Provider' in '${username}'  Login with email  ${username}
+  Run Keyword If  'Owner' in '${username}'  Login with email  ${username}
 
   #Close message notification
   ${notification_visibility}=  Run Keyword And Return Status  Wait Until Element Is Visible  css=button[ng-click='later()']
@@ -1062,28 +1063,8 @@ Login
   Wait Until Element Is Visible  css=input[tid='global.search']  ${COMMONWAIT}
 
 
-Login with P24
-  [Arguments]  ${username}
-  Wait Enable And Click Element  xpath=//a[contains(@href, 'https://bankid.privatbank.ua')]
-
-  Wait Until Element Is Visible  id=inputLogin  5s
-  Input Text  id=inputLogin  +${USERS.users['${username}'].login}
-  Input Text  id=inputPassword  ${USERS.users['${username}'].password}
-  Click Element  css=.btn.btn-success.custom-btn
-  Wait Until Element Is Visible  css=input[id='first-section']  5s
-  Input Text  css=input[id='first-section']  12
-  Input Text  css=input[id='second-section']  34
-  Input Text  css=input[id='third-section']  56
-  Click Element  css=.btn.btn-success.custom-btn-confirm.sms
-  Sleep  3s
-  Wait For Ajax
-  Wait Until Element Is Not Visible  css=div#preloader  ${COMMONWAIT}
-  Wait Until Element Is Not Visible  css=.btn.btn-success.custom-btn-confirm.sms
-
-
 Login with email
   [Arguments]  ${username}
-
   Wait Until Element Is Visible  css=input[id='email']  5s
   Input Text  css=input[id='email']  ${USERS.users['${username}'].login}
   Input Text  css=input[id='password']  ${USERS.users['${username}'].password}
