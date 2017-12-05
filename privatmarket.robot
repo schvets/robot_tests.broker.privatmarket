@@ -133,9 +133,14 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
   Wait Until Element Is Enabled  css=input[tid='data.title']
   Input text  css=input[tid='data.title']  ${tender_data.data.title}
   Input text  css=input[tid='data.dgfID']  ${tender_data.data.dgfID}
+
+  ${method_type}=  Set Variable If
+  ...  '${items[0].additionalClassifications[0].id}' == 'PA01-7'  string:${tender_data.data.procurementMethodType}_rent
+  ...  '${items[0].additionalClassifications[0].id}' == 'PA02-0'  string:${tender_data.data.procurementMethodType}_rent  string:${tender_data.data.procurementMethodType}
+
+  Select From List  css=select[tid='data.procurementMethodType']  ${method_type}
   ${index}=  Convert To String  ${tender_data.data.minNumberOfQualifiedBids}
   Select From List By Value  css=select[tid='data.minNumberOfQualifiedBids']  ${index}
-  Select From List  css=select[tid='data.procurementMethodType']  string:${tender_data.data.procurementMethodType}
   ${auctionPeriod_startDate}=  Отримати дату у форматі Д/М/Г  ${tender_data.data.auctionPeriod.startDate}
   Run Keyword And Ignore Error  Input Text  css=input[tid='dgfDecisionDate']  ${auctionPeriod_startDate}
   Run Keyword And Ignore Error  Input text  css=input[tid='data.dgfDecisionID']  ${tender_data.data.dgfID}
@@ -161,7 +166,7 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
   #items
   :FOR  ${index}  IN RANGE  ${items_number}
   \  ${should_we_click_btn.additem}=  Set Variable If  '0' != '${index}'  ${True}  ${False}
-  \  Додати новий предмет закупівлі  ${items[${index}]}  ${should_we_click_btn.additem}
+  \  Додати новий предмет закупівлі  ${items[${index}]}  ${method_type}  ${should_we_click_btn.additem}
 
   Click Button  ${tenderBtn.create_edit}
   Wait For Ajax
@@ -298,7 +303,7 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 
 
 Додати новий предмет закупівлі
-  [Arguments]  ${item}  ${should_we_click_btn.additem}=${False}
+  [Arguments]  ${item}  ${method_type}  ${should_we_click_btn.additem}=${False}
   Run Keyword If  ${should_we_click_btn.additem}  Wait Visibulity And Click Element  css=button[tid='btn.additem']
   Wait Until Element Is Enabled  xpath=(//textarea[@tid='item.description'])[last()]
   Input text  xpath=(//textarea[@tid='item.description'])[last()]  ${item.description}
@@ -320,6 +325,18 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
   Input text  xpath=(//input[@tid='item.address.region'])[last()]  ${item.deliveryAddress.region}
   Input text  xpath=(//input[@tid='item.address.streetAddress'])[last()]  ${item.deliveryAddress.streetAddress}
   Input text  xpath=(//input[@tid='item.address.locality'])[last()]  ${item.deliveryAddress.locality}
+
+  Run Keyword If  '_rent' in '${method_type}'  Задати термін дії договору оренди  ${item}
+
+
+Задати термін дії договору оренди
+  [Arguments]  ${item}
+  Select Checkbox  xpath=(//input[@tid='item.contractPeriod.checkbox'])[last()]
+  Sleep  2s
+  ${start_date}=  Отримати дату у форматі Д/М/Г  ${item.contractPeriod.startDate}
+  ${end_date}=  Отримати дату у форматі Д/М/Г  ${item.contractPeriod.endDate}
+  Input text  xpath=(//input[@tid='contractStartDate'])[last()]  ${start_date}
+  Input text  xpath=(//input[@tid='contractEndDate'])[last()]  ${end_date}
 
 
 Пошук тендера по ідентифікатору
@@ -998,28 +1015,9 @@ Check If Question Is Uploaded
   Click Element  css=button[tid='defaultOk']
 
 
-#Завантажити протокол аукціону в авард
-#  [Arguments]  ${username}  ${tender_id}  ${file_path}  ${bid_index}
-#  #privatmarket.Пошук тендера по ідентифікатору  ${username}  ${tender_id}
-#  debug
-#  Wait Until Element Is Visible  xpath=//*[@tid='btn.award.disqualify']  ${COMMONWAIT}
-#  Click Element  css=button[tid='btn.award.disqualify']
-#  Wait Until Element Is Visible  xpath=//*[@tid='btn.award.addDocForCancel']  ${COMMONWAIT}
-#  Click Element  css=button[tid='btn.award.addDocForCancel']
-#  Execute Javascript  document.querySelector("input[id='rejectQualificationInput0']").className = ''
-#  Sleep  2s
-#  Choose File  css=input[id='rejectQualificationInput0']  ${file_path}
-#  Wait For Ajax
-#  Wait Until Element Is Visible  css=button[tid='btn.award.unsuccessful']  ${COMMONWAIT}
-#  Click Element  css=button[tid='btn.award.unsuccessful']
-#  Wait For Ajax
-#  Wait Until Element Is Visible  xpath=//*[@tid='award.document.title']  ${COMMONWAIT}
-
-
 Підтвердити наявність протоколу аукціону
   [Arguments]  ${user_name}  ${tender_id}  ${award_index}
   Wait For Ajax
-#  debug
   Wait Until Element Contains  ${tender_data.awards[${award_index}].status}  Очікується підписання договору
 
 
