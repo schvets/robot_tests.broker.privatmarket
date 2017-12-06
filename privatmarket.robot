@@ -403,6 +403,7 @@ ${tender_data_contracts[0].status}								xpath=//div[@class='modal-body info-di
 	Set Date And Time		css=input[ng-model='model.ptr.tenderPeriod.ed.d']	css=timepicker-pop[input-time='model.ptr.tenderPeriod.ed.t'] input[ng-model='inputTime']	${field_value}
 
 
+
 Завантажити документ
 	[Arguments]  ${user}  ${document}  ${tenderUaId}
 	Wait For Ajax
