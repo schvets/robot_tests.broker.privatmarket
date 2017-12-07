@@ -207,9 +207,9 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 
 Змінити value.amount
   [Arguments]  ${value}
-  Wait Until Element Is Visible  css=input[tid='data.minimalStep.amount']
+  Wait Until Element Is Visible  css=input[tid='data.value.amount']
   Wait For Ajax
-  Input text  css=input[tid='data.minimalStep.amount']  '${value}'
+  Input text  css=input[tid='data.value.amount']  '${value}'
 
 
 Змінити minimalStep.amount
@@ -304,7 +304,6 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 
 Змінити guarantee.amount
   [Arguments]  ${value}
-  debug
   Wait Until Element Is Visible  css=input[tid='data.dgfID']
   Wait For Ajax
   Input text  css=input[tid='data.dgfID']  ${value}
@@ -350,7 +349,7 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 Пошук тендера по ідентифікатору
   [Arguments]  ${user_name}  ${tender_id}
   Wait For Auction  ${tender_id}
-  Wait Enable And Click Element  css=a[tid='${tender_id}']
+  Wait Enable And Click Element  css=div[tid='${tender_id}']
   Wait Until element Is Visible  css=div[tid='data.title']  ${COMMONWAIT}
 
 
@@ -1185,8 +1184,8 @@ Try Search Auction
   Press Key  css=input[tid='global.search']  \\13
   Wait Until Element Is Not Visible  css=div.progress.progress-bar  ${COMMONWAIT}
   Wait Until Element Is Not Visible  css=div[role='dialog']  ${COMMONWAIT}
-  Wait Until Element Not Stale  css=a[tid='${tender_id}']  ${COMMONWAIT}
-  Wait Until Element Is Visible  css=a[tid='${tender_id}']  ${COMMONWAIT}
+  Wait Until Element Not Stale  css=div[tid='${tender_id}']  ${COMMONWAIT}
+  Wait Until Element Is Visible  css=div[tid='${tender_id}']  ${COMMONWAIT}
   [Return]  True
 
 
