@@ -503,7 +503,9 @@ Wait for question
 Отримати число
   [Arguments]  ${element_name}
   ${value}=  Отримати текст елемента  ${element_name}
-  ${result}=  Convert To Number  ${value}
+  ${result}=  Remove String  ${value}  ${SPACE}
+  ${result}=  Replace String  ${result}  ,  .
+  ${result}=  Convert To Number  ${result}
   [Return]  ${result}
 
 
