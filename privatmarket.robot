@@ -592,6 +592,8 @@ Wait for question
   Wait For Ajax
   Wait For Element With Reload  ${locator}
   ${result}=  Get Text  ${locator}
+  ${result}=  Remove String  ${result}  ${SPACE}
+  ${result}=  Replace String  ${result}  ,  .
   ${result}=  Convert To Number  ${result}
   [Return]  ${result}
 
@@ -1012,6 +1014,7 @@ Check If Question Is Uploaded
 Завантажити протокол аукціону в авард
   [Arguments]  ${username}  ${tender_id}  ${file_path}  ${bid_index}
   #privatmarket.Пошук тендера по ідентифікатору  ${username}  ${tender_id}
+  debug
   Wait Until Element Is Visible  xpath=//*[@tid='docProtocol']  ${COMMONWAIT}
   Execute Javascript  document.querySelector("input[id='docsProtocolI']").className = ''
   Sleep  2s
