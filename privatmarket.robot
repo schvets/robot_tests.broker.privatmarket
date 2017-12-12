@@ -1014,7 +1014,6 @@ Check If Question Is Uploaded
 Завантажити протокол аукціону в авард
   [Arguments]  ${username}  ${tender_id}  ${file_path}  ${bid_index}
   #privatmarket.Пошук тендера по ідентифікатору  ${username}  ${tender_id}
-  debug
   Wait Until Element Is Visible  xpath=//*[@tid='docProtocol']  ${COMMONWAIT}
   Execute Javascript  document.querySelector("input[id='docsProtocolI']").className = ''
   Sleep  2s
