@@ -304,9 +304,10 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
 
 Змінити guarantee.amount
   [Arguments]  ${value}
-  Wait Until Element Is Visible  css=input[tid='data.dgfID']
+  Wait Until Element Is Visible  css=input[tid='guarantyAmount']
   Wait For Ajax
-  Input text  css=input[tid='data.dgfID']  ${value}
+  ${amount_value}=  Convert To String  ${value}
+  Input text  css=input[tid='guarantyAmount']  ${amount_value}
 
 
 Додати новий предмет закупівлі
@@ -314,6 +315,7 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
   Run Keyword If  ${should_we_click_btn.additem}  Wait Visibulity And Click Element  css=button[tid='btn.additem']
   Wait Until Element Is Enabled  xpath=(//textarea[@tid='item.description'])[last()]
   Input text  xpath=(//textarea[@tid='item.description'])[last()]  ${item.description}
+
   #classification
   Input text  xpath=(//div[@tid='classification']//input)[last()]  ${item.classification.id}
   Wait Until Element Is Enabled  xpath=(//ul[contains(@class, 'ui-select-choices-content')])[last()]
@@ -322,7 +324,11 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
   #quantity
   ${correctQuantity}=  Convert To String  ${item.quantity}
   Input text  xpath=(//input[@tid='item.quantity'])[last()]  ${correctQuantity}
-  Select From List  xpath=(//select[@tid='item.unit.name'])[last()]  ${item.unit.name}
+  ${classification_id}=  Get Substring  ${item.classification.id}  0  2
+  ${rent_status}=  Set Variable If  '${classification_id}' == '04' or '${classification_id}' == '70'  ${True}  ${False}
+  ${default_status}=  Set Variable If  ${rent_status} == ${True} and 'rent' in '${method_type}'  ${True}  ${False}
+  Run Keyword If  ${default_status} == ${False}  Select From List  xpath=(//select[@tid='item.unit.name'])[last()]  ${item.unit.name}
+
 
   #address
   Select Checkbox  xpath=(//input[@tid='item.address.checkbox'])[last()]
@@ -332,7 +338,6 @@ ${tenderBtn.create_edit}  css=button[tid='btn.createlot']
   Input text  xpath=(//input[@tid='item.address.region'])[last()]  ${item.deliveryAddress.region}
   Input text  xpath=(//input[@tid='item.address.streetAddress'])[last()]  ${item.deliveryAddress.streetAddress}
   Input text  xpath=(//input[@tid='item.address.locality'])[last()]  ${item.deliveryAddress.locality}
-
   Run Keyword If  '_rent' in '${method_type}'  Задати термін дії договору оренди  ${item}
 
 
