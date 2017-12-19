@@ -32,10 +32,10 @@ ${tender_data_value.currency}  id=tenderBudgetCcy
 ${tender_data_value.valueAddedTaxIncluded}  id=tenderBudgetTax
 ${tender_data_tenderID}  css=#tenderId
 ${tender_data_procuringEntity.name}  css=a[ng-click='commonActions.openCard()']
-${tender_data_enquiryPeriod.startDate}  xpath=(//span[@ng-if='p.bd'])[1]
-${tender_data_enquiryPeriod.endDate}  xpath=(//span[contains(@ng-if, 'p.ed')])[1]
-${tender_data_tenderPeriod.startDate}  xpath=(//span[@ng-if='p.bd'])[2]
-${tender_data_tenderPeriod.endDate}  xpath=(//span[contains(@ng-if, 'p.ed')])[2]
+${tender_data_enquiryPeriod.startDate}  id=active.enquiries-bd
+${tender_data_enquiryPeriod.endDate}  id=active.enquiries-ed
+${tender_data_tenderPeriod.startDate}  id=active.tendering-bd
+${tender_data_tenderPeriod.endDate}  id=active.tendering-ed
 ${tender_data_auctionPeriod.startDate}  xpath=(//span[@ng-if='p.bd'])[3]
 ${tender_data_minimalStep.amount}  css=div#lotMinStepAmount
 ${tender_data_documentation.title}  xpath=//div[contains(@class, 'doc-file-title')]
@@ -875,13 +875,13 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
     Run Keyword And Return If  '${field_name}' == 'value.amount'  Convert Amount To Number  ${field_name}
     Run Keyword And Return If  '${field_name}' == 'value.currency'  Отримати інформацію з ${field_name}  ${field_name}
     Run Keyword And Return If  '${field_name}' == 'value.valueAddedTaxIncluded'  Отримати інформацію з ${field_name}  ${field_name}
-    Run Keyword And Return If  '${field_name}' == 'enquiryPeriod.startDate'  Отримати дату та час  ${field_name}  1
-    Run Keyword And Return If  '${field_name}' == 'enquiryPeriod.endDate'  Отримати дату та час  ${field_name}  1
-    Run Keyword And Return If  '${field_name}' == 'tenderPeriod.startDate'  Отримати дату та час  ${field_name}  1
-    Run Keyword And Return If  '${field_name}' == 'tenderPeriod.endDate'  Отримати дату та час  ${field_name}  1
+    Run Keyword And Return If  '${field_name}' == 'enquiryPeriod.startDate'  Отримати дату та час  ${field_name}
+    Run Keyword And Return If  '${field_name}' == 'enquiryPeriod.endDate'  Отримати дату та час  ${field_name}
+    Run Keyword And Return If  '${field_name}' == 'tenderPeriod.startDate'  Отримати дату та час  ${field_name}
+    Run Keyword And Return If  '${field_name}' == 'tenderPeriod.endDate'  Отримати дату та час  ${field_name}
     Run Keyword And Return If  '${field_name}' == 'minimalStep.amount'  Convert Amount To Number  ${field_name}
     Run Keyword And Return If  '${field_name}' == 'status'  Отримати інформацію з ${field_name}  ${field_name}
-    Run Keyword And Return If  '${field_name}' == 'qualificationPeriod.endDate'  Отримати дату та час  ${field_name}  0
+    Run Keyword And Return If  '${field_name}' == 'qualificationPeriod.endDate'  Отримати дату та час  ${field_name}
     Run Keyword And Return If  '${field_name}' == 'qualifications[0].status'  Отримати статус пропозиції кваліфікації  1
     Run Keyword And Return If  '${field_name}' == 'qualifications[1].status'  Отримати статус пропозиції кваліфікації  2
     Run Keyword And Return If  '${field_name}' == 'title_en'  Отримати інформацію зі зміною локалізації  ${field_name}  EN
@@ -893,12 +893,12 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
     Run Keyword And Return If  '${field_name}' == 'awards[0].complaintPeriod.endDate'  Отримати інформацію з ${field_name}  1
     Run Keyword And Return If  '${field_name}' == 'procurementMethodType'  Отримати інформацію з ${field_name}  1
     Run Keyword And Return If  '${field_name}' == 'complaintPeriod.endDate'  Отримати інформацію з ${field_name}  ${field_name}  0
-    Run Keyword And Return If  '${field_name}' == 'items[0].deliveryDate.startDate'  Отримати дату та час  ${field_name}  0
-    Run Keyword And Return If  '${field_name}' == 'items[0].deliveryDate.endDate'  Отримати дату та час  ${field_name}  0
+    Run Keyword And Return If  '${field_name}' == 'items[0].deliveryDate.startDate'  Отримати дату та час  ${field_name}
+    Run Keyword And Return If  '${field_name}' == 'items[0].deliveryDate.endDate'  Отримати дату та час  ${field_name}
     Run Keyword And Return If  '${field_name}' == 'stage2TenderID'  Отримати інформацію з ${field_name}
     Run Keyword And Return If  '${field_name}' == 'features[0].title'  Отримати інформацію з ${field_name}  ${field_name}
-    Run Keyword And Return If  '${field_name}' == 'lots[0].auctionPeriod.endDate'  Отримати дату та час  ${field_name}  0
-    Run Keyword And Return If  '${field_name}' == 'lots[0].auctionPeriod.startDate'  Отримати дату та час  ${field_name}  0
+    Run Keyword And Return If  '${field_name}' == 'lots[0].auctionPeriod.endDate'  Отримати дату та час  ${field_name}
+    Run Keyword And Return If  '${field_name}' == 'lots[0].auctionPeriod.startDate'  Отримати дату та час  ${field_name}
 
     Wait Until Element Is Visible  ${tender_data_${field_name}}
     ${result_full}=  Get Text  ${tender_data_${field_name}}
@@ -908,8 +908,8 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
 
 Отримати інформацію із лоту
     [Arguments]  ${username}  ${tender_uaid}  ${object_id}  ${field_name}
-    ${className}=  Get Element Attribute  xpath=//section[@id='lotSection']/section[contains(., '${object_id}')]//li[1]@class
-    Run Keyword If  '${className}' == 'simple-nav_item active'  Wait Visibility And Click Element  //section[@id='lotSection']/section[contains(., '${object_id}')]//li[1]/a
+    ${className}=  Get Element Attribute  xpath=//section[@id='lotSection']/section[contains(., '${object_id}')]//a[1]@class
+    Run Keyword If  '${className}' == 'nav-item'  Wait Visibility And Click Element  //section[@id='lotSection']/section[contains(., '${object_id}')]//a[1]
     ${element}=  Set Variable  xpath=(//section[@id='lotSection']/section[contains(., '${object_id}')]${tender_data_lot.${field_name}}
 
     Run Keyword And Return If  '${field_name}' == 'value.amount'  Convert Amount To Number  ${element}
@@ -932,8 +932,8 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
     Run Keyword Unless  'checked-item' in '${info_class}'  Click Element  ${info}
     ${element}=  Set Variable  xpath=(//div[@class='lot-info']/section[contains(., '${object_id}')]${tender_data_item.${field_name}}
 
-    Run Keyword And Return If  '${field_name}' == 'deliveryDate.startDate'  Отримати дату та час  ${element}  0
-    Run Keyword And Return If  '${field_name}' == 'deliveryDate.endDate'  Отримати дату та час  ${element}  0
+    Run Keyword And Return If  '${field_name}' == 'deliveryDate.startDate'  Отримати дату та час  ${element}
+    Run Keyword And Return If  '${field_name}' == 'deliveryDate.endDate'  Отримати дату та час  ${element}
     Run Keyword And Return If  '${field_name}' == 'deliveryLocation.latitude'  Отримати число  ${element}  0
     Run Keyword And Return If  '${field_name}' == 'deliveryLocation.longitude'  Отримати число  ${element}  0
     Run Keyword And Return If  '${field_name}' == 'additionalClassifications[0].scheme'  Отримати інформацію з ${field_name}  ${element}
@@ -1488,7 +1488,7 @@ Try To Search Complaint
 
 
 Отримати дату та час
-    [Arguments]  ${element_name}  ${shift}
+    [Arguments]  ${element_name}
     ${element_present}=  Run Keyword And Return Status  Element Should Be Visible  ${element_name}
     Run Keyword unless  ${element_present}  Wait For Element With Reload  ${tender_data_${element_name}}  1
 
@@ -1496,11 +1496,11 @@ Try To Search Complaint
     ${work_string}=  Replace String  ${result_full}  ${SPACE},${SPACE}  ${SPACE}
     ${work_string}=  Replace String  ${result_full}  ,${SPACE}  ${SPACE}
     ${values_list}=  Split String  ${work_string}
-    ${day}=  Convert To String  ${values_list[0 + ${shift}]}
-    ${month}=  privatmarket_service.get_month_number  ${values_list[1 + ${shift}]}
+    ${day}=  Convert To String  ${values_list[0]}
+    ${month}=  privatmarket_service.get_month_number  ${values_list[1]}
     ${month}=  Set Variable If  ${month} < 10  0${month}  ${month}
-    ${year}=  Convert To String  ${values_list[2 + ${shift}]}
-    ${time}=  Convert To String  ${values_list[3 + ${shift}]}
+    ${year}=  Convert To String  ${values_list[2]}
+    ${time}=  Convert To String  ${values_list[3]}
     ${date}=  Convert To String  ${year}-${month}-${day} ${time}
     ${result}=  privatmarket_service.get_time_with_offset  ${date}
     [Return]  ${result}
@@ -1681,8 +1681,8 @@ Reload And Switch To Tab
 
 Switch To Tab
     [Arguments]  ${tab_number}
-    ${class}=  Get Element Attribute  xpath=(//ul[@class='widget-header-block']//a)[${tab_number}]@class
-    Run Keyword Unless  'white-icon' in '${class}'  Wait Visibility And Click Element  xpath=(//ul[@class='widget-header-block']//a)[${tab_number}]
+    ${class}=  Get Element Attribute  xpath=(//div[@id='nav-tab']/a)[${tab_number}]@class
+    Run Keyword Unless  'checked' in '${class}'  Wait Visibility And Click Element  xpath=(//div[@id='nav-tab']/a)[${tab_number}]
 
 
 Search By Query
