@@ -23,7 +23,7 @@ ${locator_tenderAdd.btnSave}  css=button[data-id='actSave']
 ${locator_tenderCreation.buttonSend}  css=button[data-id='actSend']
 ${locator_tenderClaim.buttonCreate}  css=button[data-id='editProcBtn']
 
-${tender_data_title}  xpath=//div[contains(@class,'title-div')]
+${tender_data_title}  css=.title-div.grand-text>span>hl-span>span
 ${tender_data_description}  id=tenderDescription
 ${tender_data_procurementMethodType}  id=tenderType
 ${tender_data_status}  id=tenderStatus
@@ -168,14 +168,13 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
     #Open Browser  ${USERS.users['${username}'].homepage}  ${browser}  alias=${username}
     Set Window Size  @{USERS.users['${username}'].size}
     Set Selenium Implicit Wait  10s
-    Login  ${username}
-    Switch To PMFrame
+    Run Keyword Unless  '${username}' == 'PrivatMarket_Viewer'  Login  ${username}
 
 
 Пошук тендера по ідентифікатору
     [Arguments]  ${username}  ${tenderId}
     Go To  ${USERS.users['${username}'].homepage}
-    Close notification
+#    Close notification
     Wait Until Element Is Visible  ${locator_tenderSearch.searchInput}  timeout=${COMMONWAIT}
 
     ${suite_name}=  Convert To Lowercase  ${SUITE_NAME}
@@ -185,7 +184,6 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
     Wait For Tender  ${tenderId}  ${education_type}
     Wait Visibility And Click Element  xpath=//tr[@id='${tenderId}']
     Sleep  5s
-    Switch To PMFrame
     Wait Until Element Is Visible  ${tender_data_title}  ${COMMONWAIT}
 
 
@@ -197,7 +195,6 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
     @{items}=  Run Keyword If  ${presence}  Get From Dictionary  ${tender_data.data}  items
     ${presence}=  Run Keyword And Return Status  List Should Contain Value  ${tender_data.data}  features
     @{features}=  Run Keyword If  ${presence}  Get From Dictionary  ${tender_data.data}  features
-    Switch To PMFrame
     Close notification
     Wait Until Element Is Visible  ${locator_tenderSearch.searchInput}  ${COMMONWAIT}
     Check Current Mode New Realisation
@@ -207,7 +204,6 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
     Wait Visibility And Click Element  ${locator_tenderSearch.addTender}
     Unselect Frame
     Wait Until Page Contains Element  id=sender-analytics  ${COMMONWAIT}
-    Switch To PMFrame
     ${status}  ${type}=  Run Keyword And Ignore Error  Set Variable  '${tender_data.data.procurementMethodType}'
     ${type}=  Run Keyword If
     ...  '${status}' == 'PASS'  Set Variable  ${type}
@@ -316,7 +312,6 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
     Wait Visibility And Click Element  ${locator_tenderCreation.buttonSend}
 
     Close Confirmation In Editor  Закупівля поставлена в чергу на відправку в ProZorro. Статус закупівлі Ви можете відстежувати в особистому кабінеті.
-    Switch To PMFrame
 
     Run Keyword IF
     ...  ${type} == 'aboveThresholdEU' or ${type} == 'competitiveDialogueEU'  Wait For Element With Reload  css=[data-tender-status='active.tendering']  1
@@ -480,13 +475,11 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
     ...  ${ARGUMENTS[1]} == tenderId
     Reload Page
     Sleep  2s
-    Switch To PMFrame
 
 
 Внести зміни в тендер
     [Arguments]  ${user_name}  ${tenderId}  ${parameter}  ${value}
     Wait For Element With Reload  ${locator_tenderClaim.buttonCreate}  1
-    Switch To PMFrame
     Wait Visibility And Click Element  ${locator_tenderClaim.buttonCreate}
     Wait Until Element Is Visible  css=input[data-id='procurementName']  ${COMMONWAIT}
     Wait Until Keyword Succeeds  1min  10s  Звiрити value of title на сторінці редагуванння  ${user_name}
@@ -571,7 +564,6 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
     \  Wait Element Visibility And Input Text  xpath=(//div[@data-id='lot']//input[@ng-model='criterion.title'])[last()]  ${lot_enums[${index}].title}
     \  Wait Element Visibility And Input Text  xpath=(//div[@data-id='lot']//input[@ng-model='criterion.title_en'])[last()]  ${lot_enums[${index}].title}
 
-    Switch To PMFrame
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
     Wait For Ajax
     Wait Visibility And Click Element  css=#tab_4 a
@@ -584,7 +576,6 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
 Додати неціновий показник на предмет
   [Arguments]  ${username}  ${tender_uaid}  ${feature}  ${item_id}
     Wait For Element With Reload  ${locator_tenderClaim.buttonCreate}  1
-    Switch To PMFrame
     Wait Visibility And Click Element  ${locator_tenderClaim.buttonCreate}
     Wait Until Element Is Visible  css=input[data-id='procurementName']  ${COMMONWAIT}
     Wait Until Keyword Succeeds  1min  10s  Звiрити value of title на сторінці редагуванння  ${user_name}
@@ -606,7 +597,6 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
     \  Wait Element Visibility And Input Text  xpath=(//div[@data-id='item']//input[@ng-model='criterion.value'])[last()]  ${item_criterion_value}
     \  Wait Element Visibility And Input Text  xpath=(//div[@data-id='item']//input[@ng-model='criterion.title'])[last()]  ${item_enums[${index}].title}
 
-    Switch To PMFrame
     Wait Visibility And Click Element  ${locator_tenderAdd.btnSave}
     Wait For Ajax
     Wait Visibility And Click Element  css=#tab_4 a
@@ -743,7 +733,6 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
     [Arguments]  ${bid_index}
     Reload Page
     debug
-    Switch To PMFrame
     Wait For Element With Reload  xpath=//span[@data-id="status" and contains(text(), 'Очікує ЕЦП')]  1
 
     Wait Visibility And Click Element  xpath=(//a[@ng-click='act.openQualification(q)'])[${index}]
@@ -773,7 +762,6 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
 Отримати інформацію із тендера
     [Arguments]  ${user_name}  ${tender_uaid}  ${field_name}
     Reload Page
-    Switch To PMFrame
     Wait Until Element Is Visible  ${tender_data_title}  ${COMMONWAIT}
 
     Run Keyword Unless  'award_view' in @{TEST_TAGS} or 'add_contract' in @{TEST_TAGS}  Відкрити детальну інформацію по позиціям
@@ -814,12 +802,13 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
 
 
 Відкрити детальну інформацію по лотам
-    ${elements}=  Get Webelements  xpath=//li[contains(@ng-class, 'description')]
+    ${elements}=  Get Webelements  xpath=//a[contains(@ng-class, 'description')]
     ${count}=  Get_Length  ${elements}
     :FOR  ${item}  In Range  0  ${count}
     \  ${item}=  privatmarket_service.sum_of_numbers  ${item}  1
-    \  ${class}=  Get Element Attribute  xpath=(//li[contains(@ng-class, 'description')])[${item}]@class
-    \  Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=(//li[contains(@ng-class, 'description')])[${item}]
+    \  ${class}=  Get Element Attribute  xpath=(//a[contains(@ng-class, 'description')])[${item}]@class
+    \  Sleep  1s
+    \  Run Keyword Unless  'checked' in '${class}'  Click Element  xpath=(//a[contains(@ng-class, 'description')])[${item}]
 
 
 Створити постачальника, додати документацію і підтвердити його
@@ -852,7 +841,6 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
     Wait Visibility And Click Element  css=div.modal-header i.icon-remove
     Wait For Ajax
     Reload Page
-    Switch To PMFrame
     Wait Visibility And Click Element  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]
     Wait Visibility And Click Element  xpath=//span[@ng-click="act.openAward(b)"]
     Wait Visibility And Click Element  xpath=//div[@class='form-block__item']/form/select[1]/option[2]
@@ -1183,7 +1171,6 @@ Try To Search Complaint
 
 Відповісти на запитання
     [Arguments]  ${username}  ${tender_uaid}  ${answer_data}  ${question_id}
-    Switch To PMFrame
     Run Keyword And Return If  'на всі лоти' in '${TEST_NAME}'  Відповісти на запитання на лот  ${answer_data}  ${question_id}
 
     Switch To Tab  2
@@ -1201,7 +1188,6 @@ Try To Search Complaint
 
 Відповісти на запитання на лот
     [Arguments]  ${answer_data}  ${question_id}
-    Switch To PMFrame
     ${element}=  Set Variable  xpath=//div[contains(@class, 'lot-info') and contains(., '${question_id}')]//button
     Wait For Element With Reload  ${element}  1
     Wait Visibility And Click Element  ${element}
@@ -1226,7 +1212,6 @@ Try To Search Complaint
     ${type}=  Отримати текст елемента  xpath=//div[@class='info-item']//div[2]//span[1]
 ##    Wait For Element With Reload  xpath=//*[@id="prozorroHash"]/div/a  1
 ##    Click Element  xpath=//*[@id="prozorroHash"]/div/a
-##    Switch To PMFrame
 ##    ${text}=  Get Text  xpath=//div//h3
 ##    ${text_new}=  Strip String  ${text}
 ##    @{values_list}=  Split String  ${text_new}
@@ -1239,7 +1224,6 @@ Try To Search Complaint
 Отримати інформацію з features[0].title
     [Arguments]  ${element_name}
     Reload Page
-    Switch To PMFrame
     Wait Until Element Is Visible  xpath=//li[contains(@ng-class, 'lot-parts')]
     ${class}=  Get Element Attribute  xpath=//li[contains(@ng-class, 'lot-parts')]@class
     Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=(//li[contains(@ng-class, 'lot.showTab')])[1]
@@ -1415,7 +1399,6 @@ Try To Search Complaint
     Wait Visibility And Click Element  xpath=//li[contains(@class, 'change-language-item') and contains(., '${lang}')]
     Wait Until Element Is Visible  xpath=//li[contains(@class, 'change-language-item') and contains(., '${lang}')]/b
     Wait For Ajax
-    Switch To PMFrame
     ${element}=  Set Variable If
     ...  'title' in '${element}'  title
     ...  'description' in '${element}'  description
@@ -1423,7 +1406,6 @@ Try To Search Complaint
     ${result}=  Strip String  ${text}
     Unselect Frame
     Wait Visibility And Click Element  xpath=//li[contains(@class, 'change-language-item') and contains(., 'UK')]
-    Switch To PMFrame
     [Return]  ${result}
 
 
@@ -1434,21 +1416,18 @@ Try To Search Complaint
     Wait Visibility And Click Element  xpath=//li[contains(@class, 'change-language-item') and contains(., '${lang}')]
     Wait Until Element Is Visible  xpath=//li[contains(@class, 'change-language-item') and contains(., '${lang}')]/b
     Wait For Ajax
-    Switch To PMFrame
     Відкрити детальну інформацію по позиціям
     ${element}=  Set Variable  xpath=(//section[@id='subject-section']${tender_data_item.${field_name}}[${index}]
     ${text}=  Отримати текст елемента  ${element}
     ${result}=  Strip String  ${text}
     Unselect Frame
     Wait Visibility And Click Element  xpath=//li[contains(@class, 'change-language-item') and contains(., 'UK')]
-    Switch To PMFrame
     [Return]  ${result}
 
 
 Отримати інформацію з awards[0].complaintPeriod.endDate
     [Arguments]  ${shift}
     Reload Page
-    Switch To PMFrame
     ${class}=  Get Element Attribute  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]@class
     Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]
     ${title}=  Get Element Attribute  xpath=//a[contains(., 'Переможець переговорів')]@title
@@ -1470,7 +1449,6 @@ Try To Search Complaint
 Отримати інформацію з complaintPeriod.endDate
     [Arguments]  ${element_name}  ${shift}
     Reload Page
-    Switch To PMFrame
     Reload And Switch To Tab  3
     ${result_full}=  Отримати текст елемента  ${element_name}
     ${work_string}=  Replace String  ${result_full}  ${SPACE},${SPACE}  ${SPACE}
@@ -1587,16 +1565,8 @@ Try To Search Complaint
 
 
 Close notification
-    Switch To PMFrame
     ${notification_visibility}=  Run Keyword And Return Status  Wait Until Element Is Visible  css=section[data-id='popupHelloModal'] span[data-id='actClose']
     Run Keyword If  ${notification_visibility}  Click Element  css=section[data-id='popupHelloModal'] span[data-id='actClose']
-
-
-Switch To PMFrame
-    Sleep  5s
-    Unselect Frame
-    Wait Until Element Is Visible  id=tenders  ${COMMONWAIT}
-    Switch To Frame  id=tenders
 
 
 Switch To Frame
@@ -1607,7 +1577,7 @@ Switch To Frame
 
 Login
     [Arguments]  ${username}
-    Wait Visibility And Click Element  css=a[data-target='#login_modal']
+    Wait Visibility And Click Element  css=button[ng-click='act.loginPage()']
     Wait Until Element Is Visible  id=p24__login__field  ${COMMONWAIT}
     Execute Javascript  $('#p24__login__field').val('+${USERS.users['${username}'].login}')
     Input Text  xpath=//div[@id="login_modal" and @style='display: block;']//input[@type='password']  ${USERS.users['${username}'].password}
@@ -1634,7 +1604,6 @@ Wait For Tender
 
 Try Search Tender
     [Arguments]  ${tender_id}  ${education_type}
-    Switch To PMFrame
     Check Current Mode New Realisation
 
     #заполним поле поиска
@@ -1707,7 +1676,6 @@ Try Search Element
 Reload And Switch To Tab
     [Arguments]  ${tab_number}
     Reload Page
-    Switch To PMFrame
     Switch To Tab  ${tab_number}
 
 
@@ -1846,7 +1814,6 @@ Get Item Number
 
 Дочекатися можливості завантажити документ рішення кваліфікаційної комісії
     Reload Page
-    Switch To PMFrame
     Wait Visibility And Click Element  xpath=//li[contains(@ng-class, 'lot-parts')]
     Wait Visibility And Click Element  xpath=//div[@class='lot-info ng-scope' and contains(.,'Кваліфікація учасників') ]//table[@class='bids']//a[@class='ng-binding']
 
@@ -1923,9 +1890,7 @@ Get Item Number
 
 Подати цінову пропозицію
     [Arguments]  ${username}  ${tender_uaid}  ${bid}  ${lots_ids}=${None}  ${features_ids}=${None}
-    Switch To PMFrame
     Wait Visibility And Click Element  xpath=//button[@data-id="createBidBtn"]
-    Switch To PMFrame
     ${value_amount}=  privatmarket_service.convert_float_to_string  ${bid.data.lotValues[0].value.amount}
     Wait Element Visibility And Input Text  xpath=//div[@ng-if="!model.nocost"]//div[2]//input  ${value_amount}
     Wait Visibility And Click Element  xpath=//button[@class='btn afp-nav-btn ng-scope ng-binding']
@@ -1942,7 +1907,6 @@ Get Item Number
 
 Отримати інформацію із пропозиції
     [Arguments]  ${username}  ${tender_uaid}  ${field}
-    Switch To PMFrame
     Wait Until Element Is Visible  xpath=//li[contains(@ng-class, 'lot-parts')]
     ${class}=  Get Element Attribute  xpath=//li[contains(@ng-class, 'lot-parts')]@class
 	Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=//li[contains(@ng-class, 'lot-parts')]
@@ -1976,9 +1940,7 @@ Get Item Number
 
 Завантажити документ в ставку
     [Arguments]  ${username}  ${filePath}  ${tenderId}  ${doc_type}=documents
-    Switch To PMFrame
     Wait Visibility And Click Element  xpath=//button[@data-id="editBidBtn"]
-    Switch To PMFrame
     Wait Visibility And Click Element  xpath=//select[@data-id='choseType']//option[2]
     Wait Visibility And Click Element  xpath=//select[@data-id='choseLang']//option[2]
     Choose File  xpath=//input[@id='inputFile0']  ${filePath}
@@ -1994,15 +1956,11 @@ Get Item Number
 
 Змінити цінову пропозицію
     [Arguments]  ${username}  ${tender_uaid}  ${field}  ${value}
-    Switch To PMFrame
     Wait Visibility And Click Element  xpath=//button[@data-id="editBidBtn"]
-    Switch To PMFrame
     Wait Visibility And Click Element  xpath=//button[@class='btn afp-nav-btn ng-scope ng-binding']
     Run Keyword And Ignore Error  Wait Visibility And Click Element  id=btnSaveComplaint
-    Switch To PMFrame
     Wait Visibility And Click Element  xpath=//button[@class='btn afp-nav-btn ng-scope ng-binding']
     Run Keyword And Ignore Error  Wait Visibility And Click Element  id=btnSaveComplaint
-    Switch To PMFrame
     Wait Element Visibility And Input Text  xpath=//div[@ng-if="!model.nocost"]//div[2]  ${value}
     Wait Visibility And Click Element  xpath=//button[@class='btn afp-nav-btn ng-scope ng-binding']
     Wait Visibility And Click Element  xpath=//button[@class='btn afp-nav-btn ng-scope ng-binding']
