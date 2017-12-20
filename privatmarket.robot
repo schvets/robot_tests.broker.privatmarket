@@ -86,7 +86,9 @@ ${tender_data_lot_question.title}  //span[contains(@class, 'question-title')]
 ${tender_data_lot_question.description}  //div[@class='question-div']/div[1]
 ${tender_data_lot_question.answer}  //div[@class='question-div question-expanded']/div[1]
 ${tender_data_lot_question.questions[0].title}  //span[contains(@class, 'question-title')]
-${tender_data_lot_question.questions[0].description}  //div[@class='question-div']/div[1]
+${tender_data_lot_question.questions[0].description}  (//div[@class='question-div']/div[1])[1]
+${tender_data_lot_question.questions[0].answer}  (//div[@class='question-div']/div[1])[2]
+
 #${tender_data_lot_question.questions[0].id}  //div[@class='question-div question-expanded']/div[1]
 
 ${tender_data_feature.featureOf}  /../../../*[1]
@@ -784,12 +786,12 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
 
 
 Відкрити інформацію по запитанням на всі лоти
-    ${elements}=  Get Webelements  xpath=//li[contains(@ng-class, 'lot-faq')]
+    ${elements}=  Get Webelements  xpath=//a[contains(@ng-class, 'lot-faq')]
     ${count}=  Get_Length  ${elements}
     :FOR  ${item}  In Range  0  ${count}
     \  ${item}=  privatmarket_service.sum_of_numbers  ${item}  1
-    \  ${class}=  Get Element Attribute  xpath=(//li[contains(@ng-class, 'lot-faq')])[${item}]@class
-    \  Run Keyword Unless  'checked-item' in '${class}'  Click Element  xpath=(//li[contains(@ng-class, 'lot-faq')])[${item}]
+    \  ${class}=  Get Element Attribute  xpath=(//a[contains(@ng-class, 'lot-faq')])[${item}]@class
+    \  Run Keyword Unless  'checked-item' in '${class}'  Click Element  xpath=(//a[contains(@ng-class, 'lot-faq')])[${item}]
     \  Run Keyword If  'відповіді на запитання' in '${TEST_NAME}'  Wait Visibility And Click Element  xpath=(//div[contains(@class, 'question-answer')]//div[contains(@class, 'question-expand-div')]/a[1])[${item}]
 
 
@@ -899,10 +901,31 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
     Run Keyword And Return If  '${field_name}' == 'features[0].title'  Отримати інформацію з ${field_name}  ${field_name}
     Run Keyword And Return If  '${field_name}' == 'lots[0].auctionPeriod.endDate'  Отримати дату та час  ${field_name}
     Run Keyword And Return If  '${field_name}' == 'lots[0].auctionPeriod.startDate'  Отримати дату та час  ${field_name}
+    Run Keyword And Return If  '${field_name}' == 'questions[0].title'  Отримати інформацію з ${field_name}  ${field_name}
+    Run Keyword And Return If  '${field_name}' == 'questions[0].description'  Отримати інформацію з ${field_name}  ${field_name}
+    Run Keyword And Return If  '${field_name}' == 'questions[0].answer'  Отримати інформацію з ${field_name}  ${field_name}
 
     Wait Until Element Is Visible  ${tender_data_${field_name}}
     ${result_full}=  Get Text  ${tender_data_${field_name}}
     ${result}=  Strip String  ${result_full}
+    [Return]  ${result}
+
+Отримати інформацію з questions[0].title
+    [Arguments]  ${field_name}
+    Wait For Element With Reload  ${tender_data_lot_question.${field_name}}  1
+    ${result}=  Отримати текст елемента  ${tender_data_lot_question.${field_name}}
+    [Return]  ${result}
+
+Отримати інформацію з questions[0].description
+    [Arguments]  ${field_name}
+    Wait For Element With Reload  ${tender_data_lot_question.${field_name}}  1
+    ${result}=  Отримати текст елемента  ${tender_data_lot_question.${field_name}}
+    [Return]  ${result}
+
+Отримати інформацію з questions[0].answer
+    [Arguments]  ${field_name}
+    Wait For Element With Reload  ${tender_data_lot_question.${field_name}}  1
+    ${result}=  Отримати текст елемента  ${element_name}
     [Return]  ${result}
 
 
@@ -1866,7 +1889,7 @@ Get Item Number
 	[Arguments]  ${username}  ${tender_uaid}  ${lot_id}  ${question}
 	Wait Until Element Is Visible  xpath=//li[contains(@ng-class, 'lot-parts')]
     ${class}=  Get Element Attribute  xpath=//li[contains(@ng-class, 'lot-parts')]@class
-	Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=//li[contains(@ng-class, 'lot-faq')]
+	Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=//a[contains(@ng-class, 'lot-faq')]
 	Wait Visibility And Click Element  xpath=//button[@class='btn btn-primary ng-scope ng-binding']
 	Wait Element Visibility And Input Text  css=#questionTitle  ${question.data.title}
     Wait Element Visibility And Input Text  css=#questionDescription  ${question.data.description}
