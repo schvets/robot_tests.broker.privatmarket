@@ -132,7 +132,7 @@ ${tender_data_awards[0].value.amount}  css=.participant-info-block [data-id='val
 ${tender_data_contracts[0].status}  css=#contractStatus
 ${tender_data_features[0].title}  xpath=//div[@class='no-price']//span[@data-id='feature.title']
 
-${tender.data.awards[0].id}  id=prozorroHash
+#${tender.data.awards[0].id}  id=prozorroHash
 
 ${tender_data_lots[0].auctionPeriod.startDate}  id=active.auction-bd
 ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
