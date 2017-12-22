@@ -815,7 +815,7 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
 
 Створити постачальника, додати документацію і підтвердити його
     [Arguments]  ${username}  ${tender_uaid}  ${supplier_data}  ${document}
-    Click Element  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]
+    Click Element  xpath=(//a[contains(@ng-class, 'lot-parts')])[1]
     Wait For Ajax
     Run Keyword And Ignore Error  Click Button  css=button[data-id='addParticipant']
     Wait Visibility And Click Element  xpath=//span[@ng-click="act.openAwardDraftEditWnd(b.psId)"]
@@ -843,7 +843,7 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
     Wait Visibility And Click Element  css=div.modal-header i.icon-remove
     Wait For Ajax
     Reload Page
-    Wait Visibility And Click Element  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]
+    Wait Visibility And Click Element  xpath=(//a[contains(@ng-class, 'lot-parts')])[1]
     Wait Visibility And Click Element  xpath=//span[@ng-click="act.openAward(b)"]
     Wait Visibility And Click Element  xpath=//div[@class='form-block__item']/form/select[1]/option[2]
     Sleep  1s
@@ -1098,8 +1098,8 @@ Try To Search Complaint
 
 
 Відкрити детальну інформацію про постачальника
-    ${class}=  Get Element Attribute  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]@class
-    Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]
+    ${class}=  Get Element Attribute  xpath=(//a[contains(@ng-class, 'lot-parts')])[1]@class
+    Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=(//a[contains(@ng-class, 'lot-parts')])[1]
     Run keyword And Ignore Error  Wait Visibility And Click Element  xpath=//img[contains(@ng-src, 'icon-plus')]
 
 
@@ -1451,9 +1451,9 @@ Try To Search Complaint
 Отримати інформацію з awards[0].complaintPeriod.endDate
     [Arguments]  ${shift}
     Reload Page
-    ${class}=  Get Element Attribute  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]@class
-    Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=(//li[contains(@ng-class, 'lot-parts')])[1]
-    ${title}=  Get Element Attribute  xpath=//a[contains(., 'Переможець переговорів')]@title
+    ${class}=  Get Element Attribute  xpath=(//a[contains(@ng-class, 'lot-parts')])[1]@class
+    Run Keyword Unless  'checked' in '${class}'  Click Element  xpath=(//a[contains(@ng-class, 'lot-parts')])[1]
+    ${title}=  Get Element Attribute  xpath=//a[contains(., 'Переможець')]@title
     ${work_string}=  Get Regexp Matches  ${title}  до (.)*
     ${work_string}=  Get From List  ${work_string}  0
     ${work_string}=  Replace String  ${work_string}  ,${SPACE}  ${SPACE}
