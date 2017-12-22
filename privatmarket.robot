@@ -931,6 +931,7 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
 
 Отримати інформацію із лоту
     [Arguments]  ${username}  ${tender_uaid}  ${object_id}  ${field_name}
+    Execute JavaScript    window.scrollTo(${0},${0})
     ${className}=  Get Element Attribute  xpath=//section[@id='lotSection']/section[contains(., '${object_id}')]//a[1]@class
     Run Keyword If  '${className}' == 'nav-item'  Wait Visibility And Click Element  //section[@id='lotSection']/section[contains(., '${object_id}')]//a[1]
     ${element}=  Set Variable  xpath=(//section[@id='lotSection']/section[contains(., '${object_id}')]${tender_data_lot.${field_name}}
@@ -1093,8 +1094,8 @@ Try To Search Complaint
 
 
 Відкрити детальну інформацію про контракт
-    ${class}=  Get Element Attribute  xpath=(//li[contains(@ng-class, 'lot-cont')])[1]@class
-    Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=(//li[contains(@ng-class, 'lot-cont')])[1]
+    ${class}=  Get Element Attribute  xpath=(//a[contains(@ng-class, 'lot-cont')])[1]@class
+    Run Keyword Unless  'checked-nav' in '${class}'  Click Element  xpath=(//a[contains(@ng-class, 'lot-cont')])[1]
 
 
 Відкрити детальну інформацію про постачальника
@@ -1394,7 +1395,8 @@ Try To Search Complaint
 
 Отримати інформацію з causeDescription
     [Arguments]  ${element}
-    Wait Visibility And Click Element  css=#tenderType
+    Execute JavaScript    window.scrollTo(${0},${0})
+    Wait Visibility And Click Element  xpath=//div[contains(@ng-click, 'showReason')]
     ${result_full}=  Отримати текст елемента  ${element}
     ${result}=  Strip String  ${result_full}
     [Return]  ${result}
@@ -1402,7 +1404,8 @@ Try To Search Complaint
 
 Отримати інформацію з cause
     [Arguments]  ${element}
-    Wait Until Element Is Visible  css=#tenderType
+    Execute JavaScript    window.scrollTo(${0},${0})
+    Wait Visibility And Click Element  xpath=//div[contains(@ng-click, 'showReason')]
     ${result_full}=  Отримати текст елемента  ${element}
     ${result_full}=  Strip String  ${result_full}
     ${result}=  privatmarket_service.get_cause  ${result_full}
