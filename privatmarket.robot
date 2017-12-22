@@ -1708,6 +1708,7 @@ Reload And Switch To Tab
 Switch To Tab
     [Arguments]  ${tab_number}
     ${class}=  Get Element Attribute  xpath=(//div[@id='nav-tab']/a)[${tab_number}]@class
+    Execute JavaScript    window.scrollTo(${0},${0})
     Run Keyword Unless  'checked' in '${class}'  Wait Visibility And Click Element  xpath=(//div[@id='nav-tab']/a)[${tab_number}]
 
 
