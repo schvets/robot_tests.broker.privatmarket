@@ -179,6 +179,9 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
 #    Close notification
     Wait Until Element Is Visible  ${locator_tenderSearch.searchInput}  timeout=${COMMONWAIT}
 
+    ${class}=  Get Element Attribute  xpath=//span[@data-id='pinhead']@class
+    Run Keyword If  'color-green' in '${class}'  Click Element  css=[data-id='pinhead']
+
     ${suite_name}=  Convert To Lowercase  ${SUITE_NAME}
     ${education_type}=  Run Keyword If  'negotiation' in '${suite_name}'  Set Variable  False
         ...  ELSE  Set Variable  True
@@ -1708,7 +1711,7 @@ Reload And Switch To Tab
 Switch To Tab
     [Arguments]  ${tab_number}
     ${class}=  Get Element Attribute  xpath=(//div[@id='nav-tab']/a)[${tab_number}]@class
-    Execute JavaScript    window.scrollTo(${0},${0})
+    Execute JavaScript  window.scrollTo(${0},${0})
     Run Keyword Unless  'checked' in '${class}'  Wait Visibility And Click Element  xpath=(//div[@id='nav-tab']/a)[${tab_number}]
 
 
