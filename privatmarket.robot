@@ -23,7 +23,7 @@ ${locator_tenderAdd.btnSave}  css=button[data-id='actSave']
 ${locator_tenderCreation.buttonSend}  css=button[data-id='actSend']
 ${locator_tenderClaim.buttonCreate}  css=button[data-id='editProcBtn']
 
-${tender_data_title}  css=.title-div.grand-text>span>hl-span>span
+${tender_data_title}  css=.title-div [data-id='tender-full-title']
 ${tender_data_description}  id=tenderDescription
 ${tender_data_procurementMethodType}  id=tenderType
 ${tender_data_status}  id=tenderStatus
@@ -187,6 +187,29 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
         ...  ELSE  Set Variable  True
 
     Wait For Tender  ${tenderId}  ${education_type}
+    Wait Visibility And Click Element  xpath=//tr[@id='${tenderId}']
+    Sleep  5s
+    Wait Until Element Is Visible  ${tender_data_title}  ${COMMONWAIT}
+
+
+Оновити сторінку з планом
+  [Arguments]  ${username}  ${tenderId}
+    Go To  ${USERS.users['${username}'].homepage}
+#    Close notification
+    Wait Until Element Is Visible  ${locator_tenderSearch.searchInput}  timeout=${COMMONWAIT}
+
+    ${class}=  Get Element Attribute  xpath=//span[@data-id='pinhead']@class
+    Run Keyword If  'color-green' in '${class}'  Click Element  css=[data-id='pinhead']
+
+    Wait Visibility And Click Element  css=label[for='ttype-plans']
+
+    ${suite_name}=  Convert To Lowercase  ${SUITE_NAME}
+    ${education_type}=  Run Keyword If  'negotiation' in '${suite_name}'  Set Variable  False
+        ...  ELSE  Set Variable  True
+
+    ${type}=  Set Variable  plan
+    Wait For Tender  ${tenderId}  ${education_type}  ${type}
+
     Wait Visibility And Click Element  xpath=//tr[@id='${tenderId}']
     Sleep  5s
     Wait Until Element Is Visible  ${tender_data_title}  ${COMMONWAIT}
@@ -1627,13 +1650,16 @@ Wait Element Visibility And Input Text
 
 
 Wait For Tender
-    [Arguments]  ${tender_id}  ${education_type}
-    Wait Until Keyword Succeeds  7min  5s  Try Search Tender  ${tender_id}  ${education_type}
+    [Arguments]  ${tender_id}  ${education_type}  ${type}=tender
+    Wait Until Keyword Succeeds  7min  5s  Try Search Tender  ${tender_id}  ${education_type}  ${type}
 
 
 Try Search Tender
-    [Arguments]  ${tender_id}  ${education_type}
+    [Arguments]  ${tender_id}  ${education_type}  ${type}
     Check Current Mode New Realisation
+
+    #выберем поиск по планам закупок
+    Run Keyword If  '${type}' == 'plan'  Wait Visibility And Click Element  css=label[for='ttype-plans']
 
     #заполним поле поиска
     Clear Element Text  ${locator_tenderSearch.searchInput}
