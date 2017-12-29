@@ -134,6 +134,17 @@ ${tender_data_awards[0].value.amount}  css=.participant-info-block [data-id='val
 ${tender_data_contracts[0].status}  css=#contractStatus
 ${tender_data_features[0].title}  xpath=//div[@class='no-price']//span[@data-id='feature.title']
 
+${tender_data_funders[0].name}  xpath=//td[@ng-bind='model.ad.funders[0].contactPoint.name']
+${tender_data_funders[0].address.countryName}  xpath=(//span[@data-id='address.countryName'])[2]
+${tender_data_funders[0].address.locality}  xpath=(//span[@data-id='address.locality'])[2]
+${tender_data_funders[0].address.postalCode}  xpath=(//span[@data-id='address.postalCode'])[2]
+${tender_data_funders[0].address.region}  xpath=(//span[@data-id='address.region'])[2]
+${tender_data_funders[0].address.streetAddress}  xpath=(//span[@data-id='address.streetAddress'])[2]
+${tender_data_funders[0].contactPoint.url}  xpath=//td[@ng-bind='model.ad.funders[0].contactPoint.url']
+${tender_data_funders[0].identifier.id}  xpath=//td[@ng-bind='model.ad.funders[0].identifier.id']
+${tender_data_funders[0].identifier.legalName}  xpath=//td[@ng-bind='model.ad.funders[0].identifier.scheme']
+${tender_data_funders[0].identifier.scheme}  xpath=//td[@ng-bind='model.ad.funders[0].identifier.legalName']
+
 #${tender.data.awards[0].id}  id=prozorroHash
 
 ${tender_data_lots[0].auctionPeriod.startDate}  id=active.auction-bd
@@ -213,6 +224,26 @@ ${tender_data_lots[0].auctionPeriod.endDate}  id=active.auction-ed
     Wait Visibility And Click Element  xpath=//tr[@id='${tenderId}']
     Sleep  5s
     Wait Until Element Is Visible  ${tender_data_title}  ${COMMONWAIT}
+
+
+Пошук тендера за кошти донора
+     [Arguments]  ${username}  ${funder_id}
+    ${tenderId}=  Get text  ${tender_data_tenderID}
+    Go To  ${USERS.users['${username}'].homepage}
+
+    Wait Until Element Is Visible  ${locator_tenderSearch.searchInput}  timeout=${COMMONWAIT}
+    ${suite_name}=  Convert To Lowercase  ${SUITE_NAME}
+    ${education_type}=  Run Keyword If  'negotiation' in '${suite_name}'  Set Variable  False
+        ...  ELSE  Set Variable  True
+
+    Wait For Tender  ${tenderId}  ${education_type}
+    Run Keyword If  ${funder_id} == '44000'  Wait Visibility And Click Element  xpath=//select[@ng-model='template.funder']/option[contains(., 'Світовий Банк')]
+    Sleep  5s
+    Wait Visibility And Click Element  xpath=//tr[@id='${tenderId}']
+    Sleep  5s
+    Wait Until Element Is Visible  ${tender_data_title}  ${COMMONWAIT}
+
+
 
 
 Створити тендер
